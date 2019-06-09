@@ -1,0 +1,6 @@
+numpy
+pandas
+scikit-learn
+tensorflow
+h5py
+cython
