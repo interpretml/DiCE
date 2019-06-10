@@ -29,6 +29,6 @@ def decide(data_interface, model_interface):
         from dice_ml.dice_interfaces.dice_tensorflow import DiceTensorFlow
         return DiceTensorFlow
 
-    else: #elif(isinstance(model_interface.model, 'PyTorch')): # TODO: put PyTorch class
+    else: #elif(isinstance(model_interface.model, 'PyTorch')): # TODO: support for PyTorch 
         from dice_ml.dice_interfaces.dice_pytorch import DicePyTorch
         return DicePyTorch
