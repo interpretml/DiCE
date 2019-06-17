@@ -24,5 +24,5 @@ class KerasTensorFlowModel:
         return self.model(input_tensor)
 
     def get_gradient(self, input):
-        # TODO:
+        # Future Support
         return None

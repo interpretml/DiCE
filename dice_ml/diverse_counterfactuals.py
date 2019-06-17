@@ -14,10 +14,9 @@ class CounterfactualExamples:
         self.convert_to_dataframe() # transforming the test input from numpy to pandas dataframe
 
     def convert_to_dataframe(self):
-        # test_instance = pd.DataFrame(np.append(self.test_instance, self.test_pred, axis=1), columns = data_interface.encoded_feature_names)
-        test_instance1 = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns = self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+        test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns = self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
 
-        org_instance = self.data_interface.from_dummies(test_instance1)
+        org_instance = self.data_interface.from_dummies(test_instance_updated)
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
@@ -26,9 +25,8 @@ class CounterfactualExamples:
         result = self.data_interface.get_decoded_data(cfs)
         result = self.data_interface.de_normalize_data(result)
 
-        #result[self.data_interface.continuous_feature_names] = result[self.data_interface.continuous_feature_names].astype(float) # some prob with pandas
         v = self.data_interface.get_decimal_precisions()
-        k = self.data_interface.continuous_feature_names#result.columns.tolist()
+        k = self.data_interface.continuous_feature_names
         result = result.round(dict(zip(k,v)))
 
         # predictions for CFs
@@ -43,10 +41,10 @@ class CounterfactualExamples:
     def visualize_as_dataframe(self):
         # original instance
         print('Original test instance:')
-        display(self.org_instance)
+        display(self.org_instance) #  works only in Jupyter notebook
         # CFs
         print('\nDiverse Counterfactual set:')
-        display(self.final_cfs_df)
+        display(self.final_cfs_df)  #  works only in Jupyter notebook
 
     def visualize_as_list(self):
         # original instance

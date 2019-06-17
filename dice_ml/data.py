@@ -3,6 +3,7 @@
 DiCE requires only few parameters about the data such as the range of continuous features and the levels of categorical features. Hence, DiCE can be used for a private data whose meta data are only available (such as the feature names and range/levels of different features) by specifying appropriate parameters.
 """
 
+
 class Data:
     """Class containing all required information about the data for DiCE."""
 
@@ -22,6 +23,7 @@ class Data:
         self.__init__(params)
 
 # To add new implementations of Data, add the class in data_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.
+
 def decide(params):
     """Decides if the Data class is for public or private data."""
 
@@ -31,4 +33,3 @@ def decide(params):
     else: # use PrivateData if only meta data is provided #TODO: check PrivateData code
         from dice_ml.data_interfaces.private_data_interface import PrivateData
         return PrivateData
-        #return None

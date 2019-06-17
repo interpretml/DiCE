@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 
+
 class PrivateData:
     """A data interface for private data with meta information."""
 
@@ -16,17 +17,26 @@ class PrivateData:
             mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.
         """
 
-        if type(params['features']) is dict: features_dict = params['features']
-        else: raise ValueError("should provide dictionary with feature names as keys and range (for continuous features) or categories (for categorical features) as values")
+        if type(params['features']) is dict:
+            features_dict = params['features']
+        else:
+            raise ValueError(
+                "should provide dictionary with feature names as keys and range (for continuous features) or categories (for categorical features) as values")
 
-        if type(params['outcome_name']) is str: self.outcome_name = params['outcome_name']
-        else: raise ValueError("should provide the name of outcome feature")
+        if type(params['outcome_name']) is str:
+            self.outcome_name = params['outcome_name']
+        else:
+            raise ValueError("should provide the name of outcome feature")
 
-        if 'type_and_precision' in params: self.type_and_precision = params['type_and_precision']
-        else: self.type_and_precision = {}
+        if 'type_and_precision' in params:
+            self.type_and_precision = params['type_and_precision']
+        else:
+            self.type_and_precision = {}
 
-        if 'mad' in params: self.mad = params['mad']
-        else: self.mad = [1.0] * len(features_dict)
+        if 'mad' in params:
+            self.mad = params['mad']
+        else:
+            self.mad = [1.0] * len(features_dict)
 
         self.continuous_feature_names = []
         self.permitted_range = {}
@@ -34,25 +44,31 @@ class PrivateData:
         self.categorical_levels = {}
 
         for feature in features_dict:
-            if type(features_dict[feature][0]) is int: # continuous feature
+            if type(features_dict[feature][0]) is int:  # continuous feature
                 self.continuous_feature_names.append(feature)
                 self.permitted_range[feature] = features_dict[feature]
             else:
                 self.categorical_feature_names.append(feature)
                 self.categorical_levels[feature] = features_dict[feature]
 
-        self.feature_names = list(features_dict.keys())#self.continuous_feature_names + self.categorical_feature_names
+        # self.continuous_feature_names + self.categorical_feature_names
+        self.feature_names = list(features_dict.keys())
 
-        self.continuous_feature_indexes = [list(features_dict.keys()).index(name) for name in self.continuous_feature_names if name in features_dict]
+        self.continuous_feature_indexes = [list(features_dict.keys()).index(
+            name) for name in self.continuous_feature_names if name in features_dict]
 
-        self.categorical_feature_indexes = [list(features_dict.keys()).index(name) for name in self.categorical_feature_names if name in features_dict]
+        self.categorical_feature_indexes = [list(features_dict.keys()).index(
+            name) for name in self.categorical_feature_names if name in features_dict]
 
         if len(self.categorical_feature_names) > 0:
             # simulating sklearn's one-hot-encoding
-            self.encoded_feature_names = [feature for feature in self.continuous_feature_names] # continuous features on the left
+            # continuous features on the left
+            self.encoded_feature_names = [
+                feature for feature in self.continuous_feature_names]
             for feature_name in self.categorical_feature_names:
                 for category in sorted(self.categorical_levels[feature_name]):
-                    self.encoded_feature_names.append(feature_name+'_'+category)
+                    self.encoded_feature_names.append(
+                        feature_name+'_'+category)
 
         if len(self.type_and_precision) == 0:
             for feature_name in self.continuous_feature_names:
@@ -64,7 +80,8 @@ class PrivateData:
         for feature_name in self.continuous_feature_names:
             max_value = self.permitted_range[feature_name][1]
             min_value = self.permitted_range[feature_name][0]
-            result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+            result[feature_name] = (
+                df[feature_name] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -73,7 +90,8 @@ class PrivateData:
         for feature_name in self.continuous_feature_names:
             max_value = self.permitted_range[feature_name][1]
             min_value = self.permitted_range[feature_name][0]
-            result[feature_name] = (df[feature_name]*(max_value - min_value)) + min_value
+            result[feature_name] = (
+                df[feature_name]*(max_value - min_value)) + min_value
         return result
 
     def get_minx_maxx(self, normalized=True):
@@ -88,8 +106,7 @@ class PrivateData:
             maxx[0][idx] = self.permitted_range[feature_name][1]
             return minx, maxx
 
-     #TODO: remove 'from_training_data' from func name and remove normalized option
-    def get_mads_from_training_data(self, normalized=False):
+    def get_mads(self):
         """Computes Median Absolute Deviation of features."""
         return self.mad
 
@@ -98,19 +115,17 @@ class PrivateData:
 
         minx, maxx = self.get_minx_maxx(normalized=True)
 
-        # continuous feature move to the start of the dataframe after one-hot-encoding
-        self.encoded_continuous_feature_indexes = [i for i in range(len(self.continuous_feature_indexes))]
-
         # get the column indexes of categorical features after one-hot-encoding
         self.encoded_categorical_feature_indexes = self.get_encoded_categorical_feature_indexes()
 
-        return minx, maxx, self.encoded_continuous_feature_indexes, self.encoded_categorical_feature_indexes
+        return minx, maxx, self.encoded_categorical_feature_indexes
 
     def get_encoded_categorical_feature_indexes(self):
         """Gets the column indexes categorical features after one-hot-encoding."""
         cols = []
         for col_parent in self.categorical_feature_names:
-            temp = [self.encoded_feature_names.index(col) for col in self.encoded_feature_names if col.startswith(col_parent)]
+            temp = [self.encoded_feature_names.index(
+                col) for col in self.encoded_feature_names if col.startswith(col_parent)]
             cols.append(temp)
         return cols
 
@@ -125,8 +140,10 @@ class PrivateData:
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
         for l in self.categorical_feature_names:
-            cols, labs = [[c.replace(x,"") for c in data.columns if l+prefix_sep in c] for x in ["", l+prefix_sep]]
-            out[l] = pd.Categorical(np.array(labs)[np.argmax(data[cols].values, axis=1)])
+            cols, labs = [[c.replace(
+                x, "") for c in data.columns if l+prefix_sep in c] for x in ["", l+prefix_sep]]
+            out[l] = pd.Categorical(
+                np.array(labs)[np.argmax(data[cols].values, axis=1)])
             out.drop(cols, axis=1, inplace=True)
         return out
 
@@ -135,15 +152,18 @@ class PrivateData:
         precisions = [0]*len(self.feature_names)
         for ix, feature_name in enumerate(self.continuous_feature_names):
             type_prec = self.type_and_precision[feature_name]
-            if type_prec == 'int': precisions[ix] = 0
-            else: precisions[ix] = self.type_and_precision[feature_name][1]
+            if type_prec == 'int':
+                precisions[ix] = 0
+            else:
+                precisions[ix] = self.type_and_precision[feature_name][1]
         return precisions
 
     def get_decoded_data(self, data):
         """Gets the original data from dummy encoded data."""
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
-            data = pd.DataFrame(data = data, index = index, columns = self.encoded_feature_names)
+            data = pd.DataFrame(data=data, index=index,
+                                columns=self.encoded_feature_names)
         return self.from_dummies(data)
 
     def prepare_df_for_encoding(self):
@@ -153,27 +173,28 @@ class PrivateData:
         for cat_feature in colnames:
             levels.append(self.categorical_levels[cat_feature])
 
-        df = pd.DataFrame({colnames[0]:levels[0]})
-        for col in range(1,len(colnames)):
-            temp_df = pd.DataFrame({colnames[col]:levels[col]})
+        df = pd.DataFrame({colnames[0]: levels[0]})
+        for col in range(1, len(colnames)):
+            temp_df = pd.DataFrame({colnames[col]: levels[col]})
             df = pd.concat([df, temp_df], axis=1, sort=False)
 
         colnames = self.continuous_feature_names
-        for col in range(0,len(colnames)):
-            temp_df = pd.DataFrame({colnames[col]:[]})
+        for col in range(0, len(colnames)):
+            temp_df = pd.DataFrame({colnames[col]: []})
             df = pd.concat([df, temp_df], axis=1, sort=False)
 
         return df
 
     def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
-        return pd.get_dummies(data, drop_first = False, columns = self.categorical_feature_names)
+        return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
     def get_test_inputs(self, params, encode):
         """Prepares user defined test input for DiCE."""
-        params = {'row1':params}
+        params = {'row1': params}
 
-        test = pd.DataFrame.from_dict(params, orient='index', columns=self.feature_names)
+        test = pd.DataFrame.from_dict(
+            params, orient='index', columns=self.feature_names)
         test = test.reset_index(drop=True)
 
         if encode is False:
@@ -186,6 +207,7 @@ class PrivateData:
 
             return temp.tail(test.shape[0]).reset_index(drop=True)
 
-    def get_dev_data(self, model_interface, desired_class, filter_threshold = 0.5):
+    def get_dev_data(self, model_interface, desired_class, filter_threshold=0.5):
         """Constructs dev data by extracting part of the test data for which finding counterfactuals make sense."""
-        raise ValueError("Cannot compute dev data from only meta data information")
+        raise ValueError(
+            "Cannot compute dev data from only meta data information")

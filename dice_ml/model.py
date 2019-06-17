@@ -5,6 +5,7 @@ The implementations contain methods to access the output or gradients of ML mode
 
 import tensorflow as tf
 
+
 class Model:
     """An interface class to different ML Model implementations."""
     def __init__(self, model=None, model_path=''):
@@ -26,6 +27,7 @@ class Model:
         self.__init__(model, model_path)
 
 # To add new implementations of Model, add the class in model_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.
+
 def decide(model, model_path):
     """Decides the Model implementation type."""
 
@@ -33,6 +35,6 @@ def decide(model, model_path):
         from dice_ml.model_interfaces.keras_tensorflow_model import KerasTensorFlowModel
         return KerasTensorFlowModel
 
-    elif(isinstance(model, type)): # TODO: put PyTorch class
+    elif(isinstance(model, type)): # Future Support: PyTorch model class
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel
         return PyTorchModel

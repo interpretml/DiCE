@@ -2,6 +2,7 @@
 
 import tensorflow as tf
 
+
 class Dice:
     """An interface class to different DiCE implementations."""
 
@@ -22,6 +23,7 @@ class Dice:
         self.__init__(data_interface, model_interface)
 
 # To add new implementations of DiCE, add the class in dice_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.
+
 def decide(data_interface, model_interface):
     """Decides DiCE implementation type."""
 
@@ -29,6 +31,6 @@ def decide(data_interface, model_interface):
         from dice_ml.dice_interfaces.dice_tensorflow import DiceTensorFlow
         return DiceTensorFlow
 
-    else: #elif(isinstance(model_interface.model, 'PyTorch')): # TODO: support for PyTorch 
+    else: #elif(isinstance(model_interface.model, 'PyTorch')): # Future support: PyTorch
         from dice_ml.dice_interfaces.dice_pytorch import DicePyTorch
         return DicePyTorch
