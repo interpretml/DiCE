@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-class DiverseCounterfactuals:
+class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
     def __init__(self, data_interface, test_instance, test_pred, final_cfs, final_cfs_preds):
