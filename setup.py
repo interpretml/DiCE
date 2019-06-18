@@ -9,7 +9,7 @@ with open('requirements.txt', encoding='utf-8') as f:
 
 setuptools.setup(
     name="dice_ml",
-    version="2.0.1",
+    version="2.0.6",
     author="ramaravind",
     author_email="raam.arvind93@gmail.com",
     description="Generates Diverse Counterfactual Explanations",
@@ -23,5 +23,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
 
-    install_requires=install_requires
+    install_requires=install_requires,
+    include_package_data=True,
+    package_data={
+        # If any package contains *.h5 files, include them:
+        '': ['*.h5']
+    }
 )
