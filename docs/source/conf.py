@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = 'DiCE'
-copyright = '2019, ramaravind'
-author = 'ramaravind'
+copyright = '2019, raam,'
+author = 'raam,'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0.6'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------

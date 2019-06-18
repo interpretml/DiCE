@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dice_ml.dice_interfaces package &#8212; DiCE 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="dice-ml-dice-interfaces-package">
+<h1>dice_ml.dice_interfaces package<a class="headerlink" href="#dice-ml-dice-interfaces-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dice_ml.dice_interfaces.dice_pytorch">
+<span id="dice-ml-dice-interfaces-dice-pytorch-module"></span><h2>dice_ml.dice_interfaces.dice_pytorch module<a class="headerlink" href="#module-dice_ml.dice_interfaces.dice_pytorch" title="Permalink to this headline">¶</a></h2>
+<p>Module to generate diverse counterfactual explanations based on PyTorch framework</p>
+<dl class="class">
+<dt id="dice_ml.dice_interfaces.dice_pytorch.DicePyTorch">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice_interfaces.dice_pytorch.</code><code class="sig-name descname">DicePyTorch</code><span class="sig-paren">(</span><em class="sig-param">data_interface</em>, <em class="sig-param">model_interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_pytorch.html#DicePyTorch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.dice_interfaces.dice_tensorflow">
+<span id="dice-ml-dice-interfaces-dice-tensorflow-module"></span><h2>dice_ml.dice_interfaces.dice_tensorflow module<a class="headerlink" href="#module-dice_ml.dice_interfaces.dice_tensorflow" title="Permalink to this headline">¶</a></h2>
+<p>Module to generate diverse counterfactual explanationsbased on tensorflow</p>
+<dl class="class">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice_interfaces.dice_tensorflow.</code><code class="sig-name descname">DiceTensorFlow</code><span class="sig-paren">(</span><em class="sig-param">data_interface</em>, <em class="sig-param">model_interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_dist">
+<code class="sig-name descname">compute_dist</code><span class="sig-paren">(</span><em class="sig-param">x_hat</em>, <em class="sig-param">x1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.compute_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted distance between two vectors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_first_part_of_loss">
+<code class="sig-name descname">compute_first_part_of_loss</code><span class="sig-paren">(</span><em class="sig-param">method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.compute_first_part_of_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_first_part_of_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the first part (y-loss) of the loss function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_fourth_part_of_loss">
+<code class="sig-name descname">compute_fourth_part_of_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.compute_fourth_part_of_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_fourth_part_of_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_second_part_of_loss">
+<code class="sig-name descname">compute_second_part_of_loss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.compute_second_part_of_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_second_part_of_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the second part (distance from x1) of the loss function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_third_part_of_loss">
+<code class="sig-name descname">compute_third_part_of_loss</code><span class="sig-paren">(</span><em class="sig-param">method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.compute_third_part_of_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_third_part_of_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the third part (diversity) of the loss function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_cf_initializations">
+<code class="sig-name descname">do_cf_initializations</code><span class="sig-paren">(</span><em class="sig-param">total_CFs</em>, <em class="sig-param">algorithm</em>, <em class="sig-param">features_to_vary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.do_cf_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_cf_initializations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes TF variables required for CF generation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_loss_initializations">
+<code class="sig-name descname">do_loss_initializations</code><span class="sig-paren">(</span><em class="sig-param">yloss_type='l2_loss'</em>, <em class="sig-param">diversity_loss_type='dpp_style:inverse_dist'</em>, <em class="sig-param">feature_weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.do_loss_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_loss_initializations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the optimization loss</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_optimizer_initializations">
+<code class="sig-name descname">do_optimizer_initializations</code><span class="sig-paren">(</span><em class="sig-param">optimizer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.do_optimizer_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_optimizer_initializations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes gradient-based TF optimizers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.dpp_style">
+<code class="sig-name descname">dpp_style</code><span class="sig-paren">(</span><em class="sig-param">submethod</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.dpp_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.dpp_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the DPP of a matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.find_counterfactuals">
+<code class="sig-name descname">find_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param">test_instance</em>, <em class="sig-param">desired_class='opposite'</em>, <em class="sig-param">learning_rate=1</em>, <em class="sig-param">min_iter=500</em>, <em class="sig-param">max_iter=5000</em>, <em class="sig-param">project_iter=0</em>, <em class="sig-param">loss_diff_thres=1e-05</em>, <em class="sig-param">loss_converge_maxiter=1</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">init_near_test_instance=True</em>, <em class="sig-param">tie_random=False</em>, <em class="sig-param">stopping_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.find_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.find_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds counterfactuals by graident-descent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals">
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param">test_instance</em>, <em class="sig-param">total_CFs</em>, <em class="sig-param">desired_class='opposite'</em>, <em class="sig-param">proximity_weight=0.5</em>, <em class="sig-param">diversity_weight=1.0</em>, <em class="sig-param">categorical_penalty=1.0</em>, <em class="sig-param">algorithm='DiverseCF'</em>, <em class="sig-param">features_to_vary='all'</em>, <em class="sig-param">yloss_type='log_loss'</em>, <em class="sig-param">diversity_loss_type='dpp_style:inverse_dist'</em>, <em class="sig-param">feature_weights=None</em>, <em class="sig-param">optimizer='tensorflow:adam'</em>, <em class="sig-param">learning_rate=1</em>, <em class="sig-param">min_iter=500</em>, <em class="sig-param">max_iter=5000</em>, <em class="sig-param">project_iter=0</em>, <em class="sig-param">loss_diff_thres=1e-05</em>, <em class="sig-param">loss_converge_maxiter=1</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">init_near_test_instance=True</em>, <em class="sig-param">tie_random=False</em>, <em class="sig-param">stopping_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates diverse counterfactual explanations</p>
+<dl>
+<dt>Args:</dt><dd><p>test_instance: Numpy array. Test point of interest.
+total_CFs: Total number of counterfactuals required.</p>
+<p>desired_class: Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of test_instance for binary classification.
+proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.
+diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
+categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p>
+<p>algorithm: Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.
+features_to_vary: Either a string “all” or a list of feature names to vary.
+yloss_type: Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss”.
+diversity_loss_type: Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.
+feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.
+optimizer: Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p>
+<p>learning_rate: Learning rate for optimizer.
+min_iter: Min iterations to run gradient descent for.
+max_iter: Max iterations to run gradient descent for.
+project_iter: Project the gradients at an interval of these many iterations.
+loss_diff_thres: Minimum difference between successive loss values to check convergence.
+loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence
+verbose: Print intermediate loss value.
+init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.
+tie_random: Used in rounding off CFs and intermediate projection.
+stopping_threshold: Minimum threshold for counterfactuals target class probability.</p>
+</dd>
+<dt>Returns:</dt><dd><p>A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.get_evaluated_loss">
+<code class="sig-name descname">get_evaluated_loss</code><span class="sig-paren">(</span><em class="sig-param">test_instance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.get_evaluated_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.get_evaluated_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.initialize_CFs">
+<code class="sig-name descname">initialize_CFs</code><span class="sig-paren">(</span><em class="sig-param">test_instance</em>, <em class="sig-param">init_near_test_instance=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.initialize_CFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.initialize_CFs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize counterfactuals.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.predict_fn">
+<code class="sig-name descname">predict_fn</code><span class="sig-paren">(</span><em class="sig-param">input_instance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.predict_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.predict_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.round_off_cfs">
+<code class="sig-name descname">round_off_cfs</code><span class="sig-paren">(</span><em class="sig-param">assign=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.round_off_cfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.round_off_cfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>function for intermediate projection of CFs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.scipy_optimizers">
+<code class="sig-name descname">scipy_optimizers</code><span class="sig-paren">(</span><em class="sig-param">method='Nelder-Mead'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.scipy_optimizers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.scipy_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.stop_loop">
+<code class="sig-name descname">stop_loop</code><span class="sig-paren">(</span><em class="sig-param">itr</em>, <em class="sig-param">loss_diff</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.stop_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.stop_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the stopping condition for gradient descent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.tensorflow_optimizers">
+<code class="sig-name descname">tensorflow_optimizers</code><span class="sig-paren">(</span><em class="sig-param">method='adam'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.tensorflow_optimizers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.tensorflow_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes tensorflow optimizers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.update_hyperparameters">
+<code class="sig-name descname">update_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param">proximity_weight=0.5</em>, <em class="sig-param">diversity_weight=0.5</em>, <em class="sig-param">categorical_penalty=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.update_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.update_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates hyperparameters.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.dice_interfaces">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.dice_interfaces" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DiCE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, raam,.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/dice_ml.dice_interfaces.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
