@@ -18,18 +18,18 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = 'DiCE'
-copyright = '2019, raam,'
-author = 'raam,'
+copyright = '2019, Ramaravind, Amit, Chenhao'
+author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
-
+release = '2.0.6'
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+
 extensions = ['sphinx.ext.autodoc', 
     'sphinx.ext.viewcode',
     'sphinx.ext.todo'

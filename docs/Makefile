@@ -19,3 +19,5 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	move build/html/* .
+	move build/html/_sources .
+	move build/html/_static .
