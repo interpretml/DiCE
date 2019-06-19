@@ -1,144 +1,34 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>dice_ml.dice_interfaces.dice_tensorflow &mdash; DiCE 2.0.6 documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dice_ml.dice_interfaces.dice_tensorflow &#8212; DiCE 2.0.6 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="search" title="Search" href="../../../search.html" />
    
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="../../../index.html" class="icon icon-home"> DiCE
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">DiCE</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
-      <li>dice_ml.dice_interfaces.dice_tensorflow</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-      </li>
-    
-  </ul>
-
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
             
   <h1>Source code for dice_ml.dice_interfaces.dice_tensorflow</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module to generate diverse counterfactual explanationsbased on tensorflow&quot;&quot;&quot;</span>
@@ -158,9 +48,9 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            data_interface: an interface class to access data related params.</span>
-<span class="sd">            model_interface: an interface class to access trained ML model.</span>
+<span class="sd">        :param data_interface: an interface class to access data related params.</span>
+<span class="sd">        :param model_interface: an interface class to access trained ML model.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create TensorFLow session if one is not already created</span>
@@ -198,35 +88,34 @@
 <div class="viewcode-block" id="DiceTensorFlow.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;DiverseCF&quot;</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;log_loss&quot;</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span> <span class="n">feature_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;tensorflow:adam&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">init_near_test_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates diverse counterfactual explanations</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            test_instance: Numpy array. Test point of interest.</span>
-<span class="sd">            total_CFs: Total number of counterfactuals required.</span>
+<span class="sd">        :param test_instance: Numpy array. Test point of interest.</span>
+<span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
 
-<span class="sd">            desired_class: Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the outcome class of test_instance for binary classification.</span>
-<span class="sd">            proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.</span>
-<span class="sd">            diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.</span>
-<span class="sd">            categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</span>
+<span class="sd">        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the outcome class of test_instance for binary classification.</span>
+<span class="sd">        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.</span>
+<span class="sd">        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.</span>
+<span class="sd">        :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</span>
 
-<span class="sd">            algorithm: Counterfactual generation algorithm. Either &quot;DiverseCF&quot; or &quot;RandomInitCF&quot;.</span>
-<span class="sd">            features_to_vary: Either a string &quot;all&quot; or a list of feature names to vary.</span>
-<span class="sd">            yloss_type: Metric for y-loss of the optimization function. Takes &quot;l2_loss&quot; or &quot;log_loss&quot;.</span>
-<span class="sd">            diversity_loss_type: Metric for diversity loss of the optimization function. Takes &quot;avg_dist&quot; or &quot;dpp_style:inverse_dist&quot;.</span>
-<span class="sd">            feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.</span>
-<span class="sd">            optimizer: Tensorflow optimization algorithm. Currently tested only with &quot;tensorflow:adam&quot;.</span>
+<span class="sd">        :param algorithm: Counterfactual generation algorithm. Either &quot;DiverseCF&quot; or &quot;RandomInitCF&quot;.</span>
+<span class="sd">        :param features_to_vary: Either a string &quot;all&quot; or a list of feature names to vary.</span>
+<span class="sd">        :param yloss_type: Metric for y-loss of the optimization function. Takes &quot;l2_loss&quot; or &quot;log_loss&quot;.</span>
+<span class="sd">        :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes &quot;avg_dist&quot; or &quot;dpp_style:inverse_dist&quot;.</span>
+<span class="sd">        :param feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.</span>
+<span class="sd">        :param optimizer: Tensorflow optimization algorithm. Currently tested only with &quot;tensorflow:adam&quot;.</span>
 
-<span class="sd">            learning_rate: Learning rate for optimizer.</span>
-<span class="sd">            min_iter: Min iterations to run gradient descent for.</span>
-<span class="sd">            max_iter: Max iterations to run gradient descent for.</span>
-<span class="sd">            project_iter: Project the gradients at an interval of these many iterations.</span>
-<span class="sd">            loss_diff_thres: Minimum difference between successive loss values to check convergence.</span>
-<span class="sd">            loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence</span>
-<span class="sd">            verbose: Print intermediate loss value.</span>
-<span class="sd">            init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.</span>
-<span class="sd">            tie_random: Used in rounding off CFs and intermediate projection.</span>
-<span class="sd">            stopping_threshold: Minimum threshold for counterfactuals target class probability.</span>
+<span class="sd">        :param learning_rate: Learning rate for optimizer.</span>
+<span class="sd">        :param min_iter: Min iterations to run gradient descent for.</span>
+<span class="sd">        :param max_iter: Max iterations to run gradient descent for.</span>
+<span class="sd">        :param project_iter: Project the gradients at an interval of these many iterations.</span>
+<span class="sd">        :param loss_diff_thres: Minimum difference between successive loss values to check convergence.</span>
+<span class="sd">        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence</span>
+<span class="sd">        :param verbose: Print intermediate loss value.</span>
+<span class="sd">        :param init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.</span>
+<span class="sd">        :param tie_random: Used in rounding off CFs and intermediate projection.</span>
+<span class="sd">        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</span>
+<span class="sd">        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">([</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">])</span> <span class="o">==</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf_init_weights</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_weights</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_weights</span><span class="p">):</span>
@@ -739,43 +628,69 @@
         <span class="k">return</span> <span class="n">final_loss</span></div></div>
 </pre></div>
 
-           </div>
-           
           </div>
-          <footer>
-  
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">DiCE</a></h1>
 
-  <hr/>
 
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Ramaravind, Amit Sharma, Chenhao
 
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-</footer>
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Readme:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Readme File</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
 
         </div>
       </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Ramaravind, Amit, Chenhao.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
 
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
     
-   
 
-</body>
+    
+  </body>
 </html>

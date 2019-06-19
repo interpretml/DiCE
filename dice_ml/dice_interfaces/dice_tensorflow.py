@@ -15,9 +15,9 @@ class DiceTensorFlow:
     def __init__(self, data_interface, model_interface):
         """Init method
 
-        Args:
-            data_interface: an interface class to access data related params.
-            model_interface: an interface class to access trained ML model.
+        :param data_interface: an interface class to access data related params.
+        :param model_interface: an interface class to access trained ML model.
+
         """
 
         # create TensorFLow session if one is not already created
@@ -55,35 +55,34 @@ class DiceTensorFlow:
     def generate_counterfactuals(self, test_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=1.0, algorithm="DiverseCF", features_to_vary="all", yloss_type="log_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights=None, optimizer="tensorflow:adam", learning_rate=1, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_test_instance=True, tie_random=False, stopping_threshold=0.5):
         """Generates diverse counterfactual explanations
 
-        Args:
-            test_instance: Numpy array. Test point of interest.
-            total_CFs: Total number of counterfactuals required.
+        :param test_instance: Numpy array. Test point of interest.
+        :param total_CFs: Total number of counterfactuals required.
 
-            desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of test_instance for binary classification.
-            proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.
-            diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
-            categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
+        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of test_instance for binary classification.
+        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.
+        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
+        :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
 
-            algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
-            features_to_vary: Either a string "all" or a list of feature names to vary.
-            yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss".
-            diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
-            feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.
-            optimizer: Tensorflow optimization algorithm. Currently tested only with "tensorflow:adam".
+        :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
+        :param features_to_vary: Either a string "all" or a list of feature names to vary.
+        :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss".
+        :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
+        :param feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.
+        :param optimizer: Tensorflow optimization algorithm. Currently tested only with "tensorflow:adam".
 
-            learning_rate: Learning rate for optimizer.
-            min_iter: Min iterations to run gradient descent for.
-            max_iter: Max iterations to run gradient descent for.
-            project_iter: Project the gradients at an interval of these many iterations.
-            loss_diff_thres: Minimum difference between successive loss values to check convergence.
-            loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence
-            verbose: Print intermediate loss value.
-            init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.
-            tie_random: Used in rounding off CFs and intermediate projection.
-            stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param learning_rate: Learning rate for optimizer.
+        :param min_iter: Min iterations to run gradient descent for.
+        :param max_iter: Max iterations to run gradient descent for.
+        :param project_iter: Project the gradients at an interval of these many iterations.
+        :param loss_diff_thres: Minimum difference between successive loss values to check convergence.
+        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence
+        :param verbose: Print intermediate loss value.
+        :param init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.
+        :param tie_random: Used in rounding off CFs and intermediate projection.
+        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
 
-        Returns:
-            A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
+        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
+
         """
 
         if not collections.Counter([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer]) == collections.Counter(self.cf_init_weights + self.loss_weights + self.optimizer_weights):

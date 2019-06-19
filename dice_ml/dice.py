@@ -9,9 +9,9 @@ class Dice:
     def __init__(self, data_interface, model_interface):
         """Init method
 
-        Args:
-            data_interface: an interface to access data related params.
-            model_interface: an interface to access the output or gradients of a trained ML model.
+        :param data_interface: an interface to access data related params.
+        :param model_interface: an interface to access the output or gradients of a trained ML model.
+        
         """
 
         self.decide_implementation_type(data_interface, model_interface)

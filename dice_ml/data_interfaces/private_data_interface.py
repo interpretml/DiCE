@@ -10,11 +10,11 @@ class PrivateData:
     def __init__(self, params):
         """Init method
 
-        Args:
-            features: Dictionary with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values.
-            outcome_name: Outcome feature name.
-            type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just 'int' should be provided, if the feature is of type 'float', a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
-            mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.
+        :param features: Dictionary with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values.
+        :param outcome_name: Outcome feature name.
+        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just 'int' should be provided, if the feature is of type 'float', a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
+        :param mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.
+        
         """
 
         if type(params['features']) is dict:

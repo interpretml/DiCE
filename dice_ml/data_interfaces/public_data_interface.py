@@ -14,13 +14,13 @@ class PublicData:
     def __init__(self, params):
         """Init method
 
-        Args:
-            dataframe: Pandas DataFrame.
-            continuous_features: List of names of continuous features. The remaining features are categorical features.
-            outcome_name: Outcome feature name.
-            permitted_range (optional): Dictionary with feature names as keys and permitted range as values. Defaults to the range inferred from training data.
-            test_size (optional): Proportion of test set split. Defaults to 0.2.
-            test_split_random_state (optional): Random state for train test split. Defaults to 17.
+        :param dataframe: Pandas DataFrame.
+        :param continuous_features: List of names of continuous features. The remaining features are categorical features.
+        :param outcome_name: Outcome feature name.
+        :param permitted_range (optional): Dictionary with feature names as keys and permitted range as values. Defaults to the range inferred from training data.
+        :param test_size (optional): Proportion of test set split. Defaults to 0.2.
+        :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
+        
         """
 
         if isinstance(params['dataframe'], pd.DataFrame):

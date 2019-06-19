@@ -8,9 +8,9 @@ class KerasTensorFlowModel:
     def __init__(self, model=None, model_path=''):
         """Init method
 
-        Args:
-            model: trained Keras Sequential Model.
-            model_path: path to trained model
+        :param model: trained Keras Sequential Model.
+        :param model_path: path to trained model
+        
         """
 
         self.model = model

@@ -10,8 +10,7 @@ class Data:
     def __init__(self, **params):
         """Init method
 
-        Args:
-            params: a dictionary of required parameters.
+        :param **params: a dictionary of required parameters.
         """
 
         self.decide_implementation_type(params)

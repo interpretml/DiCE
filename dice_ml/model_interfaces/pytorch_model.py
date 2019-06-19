@@ -1,12 +1,12 @@
-"""Module containing an interface to trained PyTorch model."""
+"""Module containing an interface to trained PyTorch model (Future Support)."""
 
 class PyTorchModel:
 
     def __init__(self, model):
         """Init method
 
-        Args:
-            model: trained PyTorch Model.
+        :param model: trained PyTorch Model.
+
         """
 
         self.model = model

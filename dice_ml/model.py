@@ -11,9 +11,9 @@ class Model:
     def __init__(self, model=None, model_path=''):
         """Init method
 
-        Args:
-            model: trained ML model.
-            model_path: path to trained ML model.
+        :param model: trained ML model.
+        :param model_path: path to trained ML model.
+
         """
         if((model is None) & (model_path == '')):
             raise ValueError("should provide either a trained model or the path to a model")

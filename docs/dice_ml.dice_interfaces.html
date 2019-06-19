@@ -1,155 +1,34 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>dice_ml.dice_interfaces package &mdash; DiCE 2.0.6 documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dice_ml.dice_interfaces package &#8212; DiCE 2.0.6 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="search" title="Search" href="search.html" />
    
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html" class="icon icon-home"> DiCE
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">dice_ml.dice_interfaces package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-dice_ml.dice_interfaces.dice_pytorch">dice_ml.dice_interfaces.dice_pytorch module</a></li>
-<li><a class="reference internal" href="#module-dice_ml.dice_interfaces.dice_tensorflow">dice_ml.dice_interfaces.dice_tensorflow module</a></li>
-<li><a class="reference internal" href="#module-dice_ml.dice_interfaces">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">DiCE</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>dice_ml.dice_interfaces package</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/dice_ml.dice_interfaces.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
             
   <div class="section" id="dice-ml-dice-interfaces-package">
 <h1>dice_ml.dice_interfaces package<a class="headerlink" href="#dice-ml-dice-interfaces-package" title="Permalink to this headline">¶</a></h1>
@@ -158,7 +37,7 @@
 </div>
 <div class="section" id="module-dice_ml.dice_interfaces.dice_pytorch">
 <span id="dice-ml-dice-interfaces-dice-pytorch-module"></span><h2>dice_ml.dice_interfaces.dice_pytorch module<a class="headerlink" href="#module-dice_ml.dice_interfaces.dice_pytorch" title="Permalink to this headline">¶</a></h2>
-<p>Module to generate diverse counterfactual explanations based on PyTorch framework</p>
+<p>Module to generate diverse counterfactual explanations based on PyTorch framework (Future Support)</p>
 <dl class="class">
 <dt id="dice_ml.dice_interfaces.dice_pytorch.DicePyTorch">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice_interfaces.dice_pytorch.</code><code class="sig-name descname">DicePyTorch</code><span class="sig-paren">(</span><em class="sig-param">data_interface</em>, <em class="sig-param">model_interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_pytorch.html#DicePyTorch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch" title="Permalink to this definition">¶</a></dt>
@@ -237,31 +116,35 @@
 <dt id="dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals">
 <code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param">test_instance</em>, <em class="sig-param">total_CFs</em>, <em class="sig-param">desired_class='opposite'</em>, <em class="sig-param">proximity_weight=0.5</em>, <em class="sig-param">diversity_weight=1.0</em>, <em class="sig-param">categorical_penalty=1.0</em>, <em class="sig-param">algorithm='DiverseCF'</em>, <em class="sig-param">features_to_vary='all'</em>, <em class="sig-param">yloss_type='log_loss'</em>, <em class="sig-param">diversity_loss_type='dpp_style:inverse_dist'</em>, <em class="sig-param">feature_weights=None</em>, <em class="sig-param">optimizer='tensorflow:adam'</em>, <em class="sig-param">learning_rate=1</em>, <em class="sig-param">min_iter=500</em>, <em class="sig-param">max_iter=5000</em>, <em class="sig-param">project_iter=0</em>, <em class="sig-param">loss_diff_thres=1e-05</em>, <em class="sig-param">loss_converge_maxiter=1</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">init_near_test_instance=True</em>, <em class="sig-param">tie_random=False</em>, <em class="sig-param">stopping_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice_interfaces/dice_tensorflow.html#DiceTensorFlow.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates diverse counterfactual explanations</p>
-<dl>
-<dt>Args:</dt><dd><p>test_instance: Numpy array. Test point of interest.
-total_CFs: Total number of counterfactuals required.</p>
-<p>desired_class: Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of test_instance for binary classification.
-proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the test_instance.
-diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
-categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p>
-<p>algorithm: Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.
-features_to_vary: Either a string “all” or a list of feature names to vary.
-yloss_type: Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss”.
-diversity_loss_type: Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.
-feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.
-optimizer: Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p>
-<p>learning_rate: Learning rate for optimizer.
-min_iter: Min iterations to run gradient descent for.
-max_iter: Max iterations to run gradient descent for.
-project_iter: Project the gradients at an interval of these many iterations.
-loss_diff_thres: Minimum difference between successive loss values to check convergence.
-loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence
-verbose: Print intermediate loss value.
-init_near_test_instance: Boolean to indicate if counterfactuals are to be initialized near test_instance.
-tie_random: Used in rounding off CFs and intermediate projection.
-stopping_threshold: Minimum threshold for counterfactuals target class probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_instance</strong> – Numpy array. Test point of interest.</p></li>
+<li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
+<li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of test_instance for binary classification.</p></li>
+<li><p><strong>proximity_weight</strong> – A positive float. Larger this weight, more close the counterfactuals are to the test_instance.</p></li>
+<li><p><strong>diversity_weight</strong> – A positive float. Larger this weight, more diverse the counterfactuals are.</p></li>
+<li><p><strong>categorical_penalty</strong> – A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p></li>
+<li><p><strong>algorithm</strong> – Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.</p></li>
+<li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
+<li><p><strong>yloss_type</strong> – Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss”.</p></li>
+<li><p><strong>diversity_loss_type</strong> – Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.</p></li>
+<li><p><strong>feature_weights</strong> – Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.</p></li>
+<li><p><strong>optimizer</strong> – Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p></li>
+<li><p><strong>learning_rate</strong> – Learning rate for optimizer.</p></li>
+<li><p><strong>min_iter</strong> – Min iterations to run gradient descent for.</p></li>
+<li><p><strong>max_iter</strong> – Max iterations to run gradient descent for.</p></li>
+<li><p><strong>project_iter</strong> – Project the gradients at an interval of these many iterations.</p></li>
+<li><p><strong>loss_diff_thres</strong> – Minimum difference between successive loss values to check convergence.</p></li>
+<li><p><strong>loss_converge_maxiter</strong> – Maximum number of iterations for loss_diff_thres to hold to declare convergence</p></li>
+<li><p><strong>verbose</strong> – Print intermediate loss value.</p></li>
+<li><p><strong>init_near_test_instance</strong> – Boolean to indicate if counterfactuals are to be initialized near test_instance.</p></li>
+<li><p><strong>tie_random</strong> – Used in rounding off CFs and intermediate projection.</p></li>
+<li><p><strong>stopping_threshold</strong> – Minimum threshold for counterfactuals target class probability.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -321,43 +204,66 @@ stopping_threshold: Minimum threshold for counterfactuals target class probabili
 </div>
 
 
-           </div>
-           
           </div>
-          <footer>
-  
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DiCE</a></h1>
 
-  <hr/>
 
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Ramaravind, Amit Sharma, Chenhao
 
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-</footer>
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
 
         </div>
       </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Ramaravind, Amit, Chenhao.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/dice_ml.dice_interfaces.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
 
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
     
-   
 
-</body>
+    
+  </body>
 </html>
