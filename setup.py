@@ -9,7 +9,7 @@ with open('requirements.txt', encoding='utf-8') as f:
 
 setuptools.setup(
     name="dice_ml",
-    version="2.1.0",
+    version="2.1.1",
     author="ramaravind",
     author_email="raam.arvind93@gmail.com",
     description="Generates Diverse Counterfactual Explanations",
