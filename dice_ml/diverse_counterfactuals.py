@@ -40,17 +40,17 @@ class CounterfactualExamples:
 
     def visualize_as_dataframe(self):
         # original instance
-        print('Query instance:')
+        print('Query instance (original outcome : %i)' %round(self.test_pred))
         display(self.org_instance) #  works only in Jupyter notebook
         # CFs
-        print('\nDiverse Counterfactual set:')
+        print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
         display(self.final_cfs_df)  #  works only in Jupyter notebook
 
     def visualize_as_list(self):
         # original instance
-        print('Query instance:')
+        print('Query instance (original outcome : %i)' %round(self.test_pred))
         print(self.org_instance.values.tolist()[0])
         # CFs
-        print('\nDiverse Counterfactual set:')
+        print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
         for ix in range(len(self.final_cfs_list)):
             print(self.final_cfs_list[ix])
