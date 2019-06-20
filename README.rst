@@ -13,7 +13,12 @@ create an interpretable explanation. For example,
 consider a person who applied for a loan and was rejected by the loan distribution algorithm of a financial company. Typically, the company may provide an explanation on why the loan was rejected, for example, due to "poor credit history". However, such an explanation does not help the person decide *what they do should next* to improve their chances of being approved in the future. Critically, the most important feature may not be enough to flip the decision of the algorithm, and in practice, may not even be changeable such as gender and race.
 
 
-DiCE implements `counterfactual explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods. 
+DiCE implements `counterfactual explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers. 
+
+Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <link>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.
+
+Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples. 
+
 
 Installing DICE
 -----------------
@@ -82,6 +87,7 @@ For more details, check out the `Getting Started` <notebooks/DiCE_getting_starte
 Supported use-cases
 -------------------
 **Data**
+
 DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for discrete features). Thus, for sensitive data, the dataset can be provided as: 
 
 .. code:: python
@@ -97,9 +103,11 @@ DiCE does not need access to the full dataset. It only requires metadata propert
                        'hours_per_week': [1, 99]},
              outcome_name='income')
 **Model**
+
 We support pre-trained models as well as training a model using Tensorflow. Here's a simple example. 
 
 .. code:: python
+
     sess = tf.InteractiveSession()
     # Generating train and test data
     train, _ = d.split_data(d.normalize_data(d.one_hot_encoded_data))
@@ -111,35 +119,41 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     ann_model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
     ann_model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.01), metrics=['accuracy'])
     ann_model.fit(X_train, y_train, validation_split=0.20, epochs=50, verbose=0)
-    
+
 We plan to include support for PyTorch soon.
 
 **Explanations**
+
 We visualize explanations through a table highlighting the change in features. We plan to support an English language explanation too!
+
+Feasibility of counterfactual explanations
+-------------------------------------------
+We acknowledge that not all counterfactual explanations may be feasible for a
+user. In general, counterfactuals closer to an individual's profile will be
+more feasible. Diversity is also important to help an individual choose between
+multiple possible options. 
+
+DiCE provides tunable parameters for diversity and proximity to generate
+different kinds of explanations. It also supports simple constraints on
+features that reflect practical constraints (e.g., "working hours per week
+cannot be more than 50").
 
 The promise of counterfactual explanations
 -------------------------------------------
-Counterfactual explanations can be useful complement to current explanation methods. Being truthful to the model, counterfactual explanations can be useful to all stakeholders for a decision made by a machine learning model that makes decisions.
+Being truthful to the model, counterfactual explanations can be useful to all stakeholders for a decision made by a machine learning model that makes decisions.
 
-* **Decision subjects**: Counterfactual explanations can be used to explore actionable recourse based on a decision received by a ML model. CF explanations can show decision outcomes from the algorithm 
-with \emph{actionable} alternative profiles, to help people understand what they could have done to change their loan decision. 
-Similar to the loan example above, such explanations are useful for a range of scenarios involving decision-making on an individual's outcome, such as deciding admission to a university~\cite{waters2014grade}, screening job applicants \cite{rockoff2011can}, disbursing government aid \cite{andini2017targeting,athey2017beyond}, and identifying people at high risk of a future disease \cite{dai2015prediction}. In all these cases, knowing reasons for a bad outcome is not enough; it is important to know what to do to obtain a better outcome in the future. 
+* **Decision subjects**: Counterfactual explanations can be used to explore actionable recourse for a person based on a decision received by a ML model. DiCE shows decision outcomes with *actionable* alternative profiles, to help people understand what they could have done to change their model outcome. 
 
-* ML Model developers:  
-* Decision makers:
+* **ML model developers**: Counterfactual explanations are also useful for model developers to debug their model for potential problems. DiCE can be used to show CF explanations for a selection of inputs that can uncover if there are anyproblematic (in)dependences on some features (e.g., for 95% of inputs, changing features X and Y change the outcome, but not for the other 5%). We aim to support aggregate metrics to help developers debug ML models.
 
-* Decision evaluators: 
+* **Decision makers**: Counterfactual explanations may be useful to
+  decision-makers such as doctors or judges who may use ML models to make decisions. For a particular individual, DiCE allows probing the ML model to see the possible changes that lead to a different ML outcome, thus enabling decision-makers to assess their trust in the prediction.
+
+* **Decision evaluators**: Finally, counterfactual explanations can be useful
+  to decision evaluators who may be interested in fairness or other desirable
+  properties of an ML model. We plan to add support for this in the future. 
 
 
-Generating Counterfactual Explanations 
-----------------------------------------
-There is no free lunch, however. Barring simple linear models~\cite{russell2019efficient}, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on recent research [link] that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.
-
-Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples. 
-
-Here's the optimization problem that DiCE solves. 
-
-Add equation.
 
 
 
@@ -148,7 +162,7 @@ Roadmap
 Ideally, counterfactual explanations should balance between a wide range of suggested changes (\emph{diversity}), and the relative ease of adopting those changes (\emph{proximity} to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race. 
 
 We are working on adding the following features to DiCE:
-* Support for PyTorch models
+* Support for PyTorch and scikit-learn models
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations 
 * Incorporating causal constraints when generating counterfactual explanations
