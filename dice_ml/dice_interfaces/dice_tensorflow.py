@@ -84,7 +84,7 @@ class DiceTensorFlow:
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
 
         """
-        
+
         if([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer] != (self.cf_init_weights + self.loss_weights + self.optimizer_weights)):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
             self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights)
@@ -176,7 +176,7 @@ class DiceTensorFlow:
 
             loss_part1 = tf.add(loss_part1, temp_loss)
 
-        return tf.divide(loss_part1, tf.to_float(self.total_CFs))
+        return tf.divide(loss_part1, tf.cast(self.total_CFs, dtype=tf.float32))
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
@@ -191,7 +191,7 @@ class DiceTensorFlow:
         for i in range(self.total_CFs):
             loss_part2 = tf.add(loss_part2, self.compute_dist(
                 self.cfs_frozen[i], self.x1))
-        return tf.divide(loss_part2, tf.to_float(tf.multiply(len(self.minx[0]), self.total_CFs)))
+        return tf.divide(loss_part2, tf.cast(tf.multiply(len(self.minx[0]), self.total_CFs), dtype=tf.float32))
 
     def dpp_style(self, submethod):
         """Computes the DPP of a matrix."""
