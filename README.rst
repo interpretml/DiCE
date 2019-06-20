@@ -170,7 +170,7 @@ It also supports simple constraints on
 features that reflect practical constraints (e.g., "working hours per week
 cannot be more than 50").
 
-For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb`_ notebook.
+For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------
