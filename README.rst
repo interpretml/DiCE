@@ -1,4 +1,4 @@
-Diverse Counterfactual Explanations (DiCE) for Machine Learning 
+Diverse Counterfactual Explanations (DiCE) for ML 
 ======================================================================
  
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
@@ -22,11 +22,13 @@ DiCE supports Python 3+. To install DiCE and its dependencies, run this from the
 .. code:: bash
     python setup.py install
 
-If you face any problems, try installing dependencies manually:
+If you face any problems, try installing dependencies manually.
+
 .. code:: bash
     pip install -r requirements.txt
 
 DiCE requires the following packages:  
+
 * numpy 
 * scikit-learn 
 * pandas 
