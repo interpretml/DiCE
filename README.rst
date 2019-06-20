@@ -15,7 +15,7 @@ consider a person who applied for a loan and was rejected by the loan distributi
 
 DiCE implements `counterfactual explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers. 
 
-Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <link>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.
+Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <https://arxiv.org/abs/1905.07697>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.
 
 Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples. 
 
@@ -134,9 +134,43 @@ more feasible. Diversity is also important to help an individual choose between
 multiple possible options. 
 
 DiCE provides tunable parameters for diversity and proximity to generate
-different kinds of explanations. It also supports simple constraints on
+different kinds of explanations. 
+
+.. code:: python
+
+    dice_exp = exp.generate_counterfactuals(query_instance,
+                    total_CFs=4, desired_class="opposite",
+                    proximity_weight=1.5, diversity_weight=1.0)
+
+Additionally, it may be the case that some features are harder to change than
+others (e.g., education level is harder to change than working hours per week).DiCE allows input of relative difficulty in changing a feature through specifying *feature weights*. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature.
+
+.. code:: python
+
+    mads = d.get_mads_from_training_data(normalized=True)
+    # Create feature weights 
+    feature_weights = {}
+    for feature in mads:
+        feature_weights[feature] = round(1/mads[feature], 2)
+        print(feature_weights)
+    # Now generating explanations using the feature weights
+    dice_exp = exp.generate_counterfactuals(query_instance, 
+                    total_CFs=4, desired_class="opposite",                                         feature_weights=feature_weights)
+
+Finally, some features are impossible to change such as one's age or race. Therefore, DiCE also allows inputting a
+list of features to vary. 
+
+.. code:: python
+
+    dice_exp = exp.generate_counterfactuals(query_instance, 
+                    total_CFs=4, desired_class="opposite",                                         features_to_vary=['age','workclass','education','occupation','hours_per_week'])
+
+
+It also supports simple constraints on
 features that reflect practical constraints (e.g., "working hours per week
 cannot be more than 50").
+
+For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------
@@ -162,6 +196,7 @@ Roadmap
 Ideally, counterfactual explanations should balance between a wide range of suggested changes (\emph{diversity}), and the relative ease of adopting those changes (\emph{proximity} to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race. 
 
 We are working on adding the following features to DiCE:
+
 * Support for PyTorch and scikit-learn models
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations 
