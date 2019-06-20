@@ -15,9 +15,7 @@ consider a person who applied for a loan and was rejected by the loan distributi
 
 DiCE implements `counterfactual explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers. 
 
-Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <https://arxiv.org/abs/1905.07697>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.
-
-Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples. 
+Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <https://arxiv.org/abs/1905.07697>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change. Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples. 
 
 
 Installing DICE
@@ -82,7 +80,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-For more details, check out the `Getting Started` <notebooks/DiCE_getting_started.ipynb>_.
+For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_.
 
 Supported use-cases
 -------------------
@@ -119,6 +117,9 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     ann_model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
     ann_model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.01), metrics=['accuracy'])
     ann_model.fit(X_train, y_train, validation_split=0.20, epochs=50, verbose=0)
+    
+    # Generate the DiCE model for explanation
+    m = model.Model(model=ann_model)
 
 We plan to include support for PyTorch soon.
 
