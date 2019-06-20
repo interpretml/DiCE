@@ -3,7 +3,9 @@ This module containts helper functions to load data and get meta deta.
 """
 import numpy as np
 import pandas as pd
+import os
 
+import dice_ml
 
 def load_adult_income_dataset(save_intermediate=False):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
@@ -58,3 +60,9 @@ def load_adult_income_dataset(save_intermediate=False):
         pass#adult_data.to_csv('adult.csv', index=False)
 
     return adult_data
+
+
+def get_adult_income_modelpath():
+    pkg_path = dice_ml.__path__[0]
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult.h5')
+    return modelpath

@@ -40,7 +40,7 @@ class CounterfactualExamples:
 
     def visualize_as_dataframe(self):
         # original instance
-        print('Original test instance:')
+        print('Query instance:')
         display(self.org_instance) #  works only in Jupyter notebook
         # CFs
         print('\nDiverse Counterfactual set:')
@@ -48,7 +48,7 @@ class CounterfactualExamples:
 
     def visualize_as_list(self):
         # original instance
-        print('Original test instance:')
+        print('Query instance:')
         print(self.org_instance.values.tolist()[0])
         # CFs
         print('\nDiverse Counterfactual set:')

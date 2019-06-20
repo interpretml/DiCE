@@ -14,7 +14,7 @@ class PrivateData:
         :param outcome_name: Outcome feature name.
         :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just 'int' should be provided, if the feature is of type 'float', a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
         :param mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.
-        
+
         """
 
         if type(params['features']) is dict:
@@ -189,12 +189,18 @@ class PrivateData:
         """One-hot-encodes the data."""
         return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
-    def get_test_inputs(self, params, encode):
+    def prepare_query_instance(self, query_instance, encode):
         """Prepares user defined test input for DiCE."""
-        params = {'row1': params}
 
-        test = pd.DataFrame.from_dict(
-            params, orient='index', columns=self.feature_names)
+        if isinstance(query_instance, list):
+            query_instance = {'row1': query_instance}
+            test = pd.DataFrame.from_dict(
+                query_instance, orient='index', columns=self.feature_names)
+
+        elif isinstance(query_instance, dict):
+            query_instance = dict(zip(query_instance.keys(), [[q] for q in query_instance.values()]))
+            test = pd.DataFrame(query_instance, columns=self.feature_names)
+
         test = test.reset_index(drop=True)
 
         if encode is False:

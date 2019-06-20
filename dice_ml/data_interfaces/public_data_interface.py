@@ -20,7 +20,7 @@ class PublicData:
         :param permitted_range (optional): Dictionary with feature names as keys and permitted range as values. Defaults to the range inferred from training data.
         :param test_size (optional): Proportion of test set split. Defaults to 0.2.
         :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
-        
+
         """
 
         if isinstance(params['dataframe'], pd.DataFrame):
@@ -157,16 +157,16 @@ class PublicData:
     def get_mads_from_training_data(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
 
-        mads = np.array([[1.0]*len(self.encoded_feature_names)])
+        mads = {}
         if normalized is False:
-            for idx, feat in enumerate(self.continuous_feature_names):
-                mads[0][idx] = np.median(
-                    abs(self.train_df[feat].values - np.median(self.train_df[feat].values)))
+            for feature in self.continuous_feature_names:
+                mads[feature] = np.median(
+                    abs(self.train_df[feature].values - np.median(self.train_df[feature].values)))
         else:
             normalized_train_df = self.normalize_data(self.train_df)
-            for idx, feat in enumerate(self.continuous_feature_names):
-                mads[0][idx] = np.median(abs(
-                    normalized_train_df[feat].values - np.median(normalized_train_df[feat].values)))
+            for feature in self.continuous_feature_names:
+                mads[feature] = np.median(
+                    abs(normalized_train_df[feature].values - np.median(normalized_train_df[feature].values)))
         return mads
 
     def get_data_params(self):
@@ -193,7 +193,7 @@ class PublicData:
         if features_to_vary == "all":
             return [i for i in range(len(self.encoded_feature_names))]
         else:
-            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(feature_list))]
+            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(features_to_vary))]
 
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
@@ -230,7 +230,7 @@ class PublicData:
         return self.from_dummies(data)
 
     def prepare_df_for_encoding(self):
-        """Facilitates prepare_test_instance() function."""
+        """Facilitates prepare_query_instance() function."""
         levels = []
         colnames = self.categorical_feature_names
         for cat_feature in colnames:
@@ -248,12 +248,18 @@ class PublicData:
 
         return df
 
-    def prepare_test_instance(self, test_instance, encode):
+    def prepare_query_instance(self, query_instance, encode):
         """Prepares user defined test input for DiCE."""
-        test_instance = {'row1': test_instance}
 
-        test = pd.DataFrame.from_dict(
-            test_instance, orient='index', columns=self.feature_names)
+        if isinstance(query_instance, list):
+            query_instance = {'row1': query_instance}
+            test = pd.DataFrame.from_dict(
+                query_instance, orient='index', columns=self.feature_names)
+
+        elif isinstance(query_instance, dict):
+            query_instance = dict(zip(query_instance.keys(), [[q] for q in query_instance.values()]))
+            test = pd.DataFrame(query_instance, columns=self.feature_names)
+
         test = test.reset_index(drop=True)
 
         if encode is False:
