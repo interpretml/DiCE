@@ -17,14 +17,16 @@ DiCE implements `counterfactual explanations <https://arxiv.org/abs/1711.00399>`
 
 Installing DICE
 -----------------
-DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo.
+DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo:
 
 .. code:: bash
+
     python setup.py install
 
 If you face any problems, try installing dependencies manually.
 
 .. code:: bash
+
     pip install -r requirements.txt
 
 DiCE requires the following packages:  
@@ -39,12 +41,15 @@ DiCE requires the following packages:
 Getting started with DiCE
 -------------------------
 With DiCE, generating explanations is a simple three-step  process: train
-mode and then invoke DiCE to generate counterfactual examples for any input. 
+mode and then invoke DiCE to generate counterfactual examples for any input.
 
 .. code:: python
+
     import dice_ml
 
-    d = dice_ml.Data(dataframe=dice_ml.utils.helpers.load_adult_income_dataset(), continuous_features=['age', 'hours_per_week'], outcome_name='income')
+    d = dice_ml.Data(dataframe=dice_ml.utils.helpers.load_adult_income_dataset(), 
+                     continuous_features=['age', 'hours_per_week'], 
+                     outcome_name='income')
     m = dice_ml.Model(model_path=dice_ml.utils.helpers.get_adult_income_modelpath())
     exp = dice_ml.Dice(d,m)
 
@@ -52,6 +57,7 @@ For any given input, we can now generate counterfactual explanations. For
 example, the following input leads to class 0 (no loan).a
 
 .. code:: python
+
     query_instance = {'age':22,
         'workclass':'Private',
         'education':'HS-grad',
