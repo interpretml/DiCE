@@ -46,15 +46,17 @@ mode and then invoke DiCE to generate counterfactual examples for any input.
 .. code:: python
 
     import dice_ml
-
+    # Dataset for training an ML model
     d = dice_ml.Data(dataframe=dice_ml.utils.helpers.load_adult_income_dataset(), 
                      continuous_features=['age', 'hours_per_week'], 
                      outcome_name='income')
+    # Pre-trained ML model 
     m = dice_ml.Model(model_path=dice_ml.utils.helpers.get_adult_income_modelpath())
+    # DiCE explanation instance
     exp = dice_ml.Dice(d,m)
 
 For any given input, we can now generate counterfactual explanations. For
-example, the following input leads to class 0 (no loan).a
+example, the following input leads to class 0 (low income).
 
 .. code:: python
 
@@ -66,16 +68,54 @@ example, the following input leads to class 0 (no loan).a
         'race': 'White',
         'gender':'Female',
         'hours_per_week': 45}
+Using DiCE, we can now generate examples that would have been classified as class 1 (high income). 
+
+.. code:: python
+
     # Generate counterfactual examples
     dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
+For more details, check out the `Getting Started` <notebooks/DiCE_getting_started.ipynb>_.
 
 Supported use-cases
 -------------------
-We currently support Tensorflow models, but plan to include support for
-PyTorch soon.
+**Data**
+DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for discrete features). Thus, for sensitive data, the dataset can be provided as: 
+
+.. code:: python
+
+    d = data.Data(features={
+                       'age':[17, 90], 
+                       'workclass': ['Government', 'Other/Unknown', 'Private', 'Self-Employed'],
+                       'education': ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college'],
+                       'marital_status': ['Divorced', 'Married', 'Separated', 'Single', 'Widowed'],
+                       'occupation':['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar'],
+                       'race': ['Other', 'White'],
+                       'gender':['Female', 'Male'],
+                       'hours_per_week': [1, 99]},
+             outcome_name='income')
+**Model**
+We support pre-trained models as well as training a model using Tensorflow. Here's a simple example. 
+
+.. code:: python
+    sess = tf.InteractiveSession()
+    # Generating train and test data
+    train, _ = d.split_data(d.normalize_data(d.one_hot_encoded_data))
+    X_train = train.loc[:, train.columns != 'income']
+    y_train = train.loc[:, train.columns == 'income']
+    # Fitting a dense neural network model
+    ann_model = keras.Sequential()
+    ann_model.add(keras.layers.Dense(20, input_shape=(X_train.shape[1],), kernel_regularizer=keras.regularizers.l2(0.01), activation=tf.nn.relu))
+    ann_model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
+    ann_model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.01), metrics=['accuracy'])
+    ann_model.fit(X_train, y_train, validation_split=0.20, epochs=50, verbose=0)
+    
+We plan to include support for PyTorch soon.
+
+**Explanations**
+We visualize explanations through a table highlighting the change in features. We plan to support an English language explanation too!
 
 The promise of counterfactual explanations
 -------------------------------------------
