@@ -80,7 +80,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_.
+For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
 Supported use-cases
 -------------------
@@ -156,7 +156,8 @@ others (e.g., education level is harder to change than working hours per week).D
         print(feature_weights)
     # Now generating explanations using the feature weights
     dice_exp = exp.generate_counterfactuals(query_instance, 
-                    total_CFs=4, desired_class="opposite",                                         feature_weights=feature_weights)
+                    total_CFs=4, desired_class="opposite",
+                    feature_weights=feature_weights)
 
 Finally, some features are impossible to change such as one's age or race. Therefore, DiCE also allows inputting a
 list of features to vary. 
@@ -164,12 +165,12 @@ list of features to vary.
 .. code:: python
 
     dice_exp = exp.generate_counterfactuals(query_instance, 
-                    total_CFs=4, desired_class="opposite",                                         features_to_vary=['age','workclass','education','occupation','hours_per_week'])
-
+                    total_CFs=4, desired_class="opposite",
+                    features_to_vary=['age','workclass','education','occupation','hours_per_week'])
 
 It also supports simple constraints on
-features that reflect practical constraints (e.g., "working hours per week
-cannot be more than 50").
+features that reflect practical constraints (e.g., working hours per week
+cannot be more than 50).
 
 For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
@@ -179,7 +180,7 @@ Being truthful to the model, counterfactual explanations can be useful to all st
 
 * **Decision subjects**: Counterfactual explanations can be used to explore actionable recourse for a person based on a decision received by a ML model. DiCE shows decision outcomes with *actionable* alternative profiles, to help people understand what they could have done to change their model outcome. 
 
-* **ML model developers**: Counterfactual explanations are also useful for model developers to debug their model for potential problems. DiCE can be used to show CF explanations for a selection of inputs that can uncover if there are anyproblematic (in)dependences on some features (e.g., for 95% of inputs, changing features X and Y change the outcome, but not for the other 5%). We aim to support aggregate metrics to help developers debug ML models.
+* **ML model developers**: Counterfactual explanations are also useful for model developers to debug their model for potential problems. DiCE can be used to show CF explanations for a selection of inputs that can uncover if there are any problematic (in)dependences on some features (e.g., for 95% of inputs, changing features X and Y change the outcome, but not for the other 5%). We aim to support aggregate metrics to help developers debug ML models.
 
 * **Decision makers**: Counterfactual explanations may be useful to
   decision-makers such as doctors or judges who may use ML models to make decisions. For a particular individual, DiCE allows probing the ML model to see the possible changes that lead to a different ML outcome, thus enabling decision-makers to assess their trust in the prediction.
