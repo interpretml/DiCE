@@ -5,7 +5,10 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 `Ramaravind Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <www.amitsharma.in>`_, `Chenhao Tan <www.chenhaot.com>`_
 
-`Arxiv paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | `Live Jupyter notebook <http://www.todo-incomple.com>`_
+`Arxiv paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ |Live Jupyter notebook |Binder|_
+
+.. |Binder| image:: https://mybinder.org/badge_logo.svg
+.. _Binder:  https://mybinder.org/v2/gh/microsoft/DiCE/master?filepath=notebooks
 
 Explanations are critical for machine learning, especially as machine learning-based systems are being used to inform decisions in societally critical domains such as finance, healthcare, education, and criminal justice.
 However, most explanation methods depend on an approximation of the ML model to
