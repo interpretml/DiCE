@@ -39,7 +39,7 @@ DiCE requires the following packages:
 * pandas
 * cython
 * h5py
-* tensorflow
+* tensorflow (DiCE was tested on TensorFlow 1.13.0-rc1)
 
 Getting started with DiCE
 -------------------------
