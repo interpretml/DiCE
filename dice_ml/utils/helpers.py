@@ -10,8 +10,7 @@ import dice_ml
 def load_adult_income_dataset(save_intermediate=False):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
-    Args:
-        save_intermediate: save the transformed dataset. Do not save by default.
+    :param: save_intermediate: save the transformed dataset. Do not save by default.
     """
     raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', delimiter=', ', dtype=str)
 
@@ -66,3 +65,15 @@ def get_adult_income_modelpath():
     pkg_path = dice_ml.__path__[0]
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult.h5')
     return modelpath
+
+def get_adult_data_info():
+    feature_description = {'age':'age',
+                        'workclass': 'type of industry (Government, Other/Unknown, Private, Self-Employed)'
+                        'education': 'education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)',
+                        'marital_status': 'marital status (Divorced, Married, Separated, Single, Widowed)',
+                        'occupation': 'occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)',
+                        'race': 'white or other race?',
+                        'gender': 'male or female?',
+                        'hours_per_week': 'total work hours per week',
+                        'income': '0 (<=50K) vs 1 (>50K)'}
+    return feature_description
