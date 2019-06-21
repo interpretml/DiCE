@@ -1,6 +1,6 @@
 numpy
 pandas
 scikit-learn
-tensorflow
+tensorflow==1.13.0rc1
 h5py
 cython
