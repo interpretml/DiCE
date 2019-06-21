@@ -68,7 +68,7 @@ def get_adult_income_modelpath():
 
 def get_adult_data_info():
     feature_description = {'age':'age',
-                        'workclass': 'type of industry (Government, Other/Unknown, Private, Self-Employed)'
+                        'workclass': 'type of industry (Government, Other/Unknown, Private, Self-Employed)',
                         'education': 'education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)',
                         'marital_status': 'marital status (Divorced, Married, Separated, Single, Widowed)',
                         'occupation': 'occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)',
