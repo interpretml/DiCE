@@ -79,6 +79,10 @@ Using DiCE, we can now generate examples that would have been classified as clas
     dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
+    
+.. image:: docs/_static/cf-examples-getting-started.PNG
+  :width: 400
+  :alt: List of counterfactual examples
 
 For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
