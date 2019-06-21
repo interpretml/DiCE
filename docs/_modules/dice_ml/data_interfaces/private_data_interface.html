@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 2.0.6 documentation</title>
+  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -78,9 +78,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Readme:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Readme File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
 </ul>
 
             
@@ -160,7 +163,7 @@
 <span class="sd">        :param outcome_name: Outcome feature name.</span>
 <span class="sd">        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just &#39;int&#39; should be provided, if the feature is of type &#39;float&#39;, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.</span>
 <span class="sd">        :param mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
@@ -335,12 +338,18 @@
         <span class="sd">&quot;&quot;&quot;One-hot-encodes the data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_test_inputs"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_test_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_test_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">encode</span><span class="p">):</span>
+<div class="viewcode-block" id="PrivateData.prepare_query_instance"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_query_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">encode</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prepares user defined test input for DiCE.&quot;&quot;&quot;</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;row1&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
 
-        <span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
-            <span class="n">params</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">query_instance</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;row1&#39;</span><span class="p">:</span> <span class="n">query_instance</span><span class="p">}</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="n">query_instance</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">query_instance</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">query_instance</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="p">[[</span><span class="n">q</span><span class="p">]</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+
         <span class="n">test</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">encode</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>

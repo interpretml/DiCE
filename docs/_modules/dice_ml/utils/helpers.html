@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.utils.helpers &mdash; DiCE 2.0.6 documentation</title>
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -78,9 +78,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Readme:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Readme File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
 </ul>
 
             
@@ -149,13 +152,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">import</span> <span class="nn">dice_ml</span>
 
 <div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">save_intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        save_intermediate: save the transformed dataset. Do not save by default.</span>
+<span class="sd">    :param: save_intermediate: save the transformed dataset. Do not save by default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
@@ -204,6 +208,24 @@
         <span class="k">pass</span><span class="c1">#adult_data.to_csv(&#39;adult.csv&#39;, index=False)</span>
 
     <span class="k">return</span> <span class="n">adult_data</span></div>
+
+
+<div class="viewcode-block" id="get_adult_income_modelpath"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">[docs]</a><span class="k">def</span> <span class="nf">get_adult_income_modelpath</span><span class="p">():</span>
+    <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;adult.h5&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">modelpath</span></div>
+
+<div class="viewcode-block" id="get_adult_data_info"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">[docs]</a><span class="k">def</span> <span class="nf">get_adult_data_info</span><span class="p">():</span>
+    <span class="n">feature_description</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="s1">&#39;age&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="s1">&#39;type of industry (Government, Other/Unknown, Private, Self-Employed)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="s1">&#39;education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span> <span class="s1">&#39;marital status (Divorced, Married, Separated, Single, Widowed)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;occupation&#39;</span><span class="p">:</span> <span class="s1">&#39;occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="s1">&#39;white or other race?&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;gender&#39;</span><span class="p">:</span> <span class="s1">&#39;male or female?&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="s1">&#39;total work hours per week&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;income&#39;</span><span class="p">:</span> <span class="s1">&#39;0 (&lt;=50K) vs 1 (&gt;50K)&#39;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">feature_description</span></div>
 </pre></div>
 
            </div>

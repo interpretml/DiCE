@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.utils package &mdash; DiCE 2.0.6 documentation</title>
+  <title>dice_ml.utils package &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -34,7 +34,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dice_ml.model_interfaces package" href="dice_ml.model_interfaces.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -78,9 +79,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Readme:</span></p>
+              <p class="caption"><span class="caption-text">Diverse Counterfactual Explanations (DiCE) for ML:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">Readme File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dice_ml.html">dice_ml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dice_ml.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.data_interfaces.html">dice_ml.data_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.dice_interfaces.html">dice_ml.dice_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">dice_ml.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.model">dice_ml.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml">Module contents</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -126,6 +151,8 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
+          <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
+        
       <li>dice_ml.utils package</li>
     
     
@@ -154,11 +181,22 @@
 <span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this headline">¶</a></h2>
 <p>This module containts helper functions to load data and get meta deta.</p>
 <dl class="function">
+<dt id="dice_ml.utils.helpers.get_adult_data_info">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_data_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_data_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_data_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="dice_ml.utils.helpers.get_adult_income_modelpath">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_income_modelpath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_income_modelpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_income_modelpath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="dice_ml.utils.helpers.load_adult_income_dataset">
 <code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_adult_income_dataset</code><span class="sig-paren">(</span><em class="sig-param">save_intermediate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads adult income dataset from <a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Adult">https://archive.ics.uci.edu/ml/datasets/Adult</a> and prepares the data for data analysis based on <a class="reference external" href="https://rpubs.com/H_Zhu/235617">https://rpubs.com/H_Zhu/235617</a></p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>save_intermediate: save the transformed dataset. Do not save by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>save_intermediate: save the transformed dataset. Do not save by default.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -174,6 +212,13 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="dice_ml.model_interfaces.html" class="btn btn-neutral float-left" title="dice_ml.model_interfaces package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

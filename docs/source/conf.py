@@ -15,6 +15,7 @@ import sys
 sys.path.insert(0, os.path.abspath("../../"))
 
 
+
 # -- Project information -----------------------------------------------------
 
 project = 'DiCE'
@@ -22,7 +23,7 @@ copyright = '2019, Ramaravind, Amit, Chenhao'
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0.6'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -57,3 +58,5 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }

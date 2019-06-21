@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Readme File &mdash; DiCE 2.0.6 documentation</title>
+  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dice_ml package" href="dice_ml.html" />
     <link rel="prev" title="Welcome to DiCE’s documentation!" href="index.html" /> 
 </head>
 
@@ -79,9 +80,21 @@
               
             
             
-              <p class="caption"><span class="caption-text">Readme:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Readme File</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Diverse Counterfactual Explanations (DiCE) for ML</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-dice">Installing DICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started-with-dice">Getting started with DiCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-use-cases">Supported use-cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feasibility-of-counterfactual-explanations">Feasibility of counterfactual explanations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-promise-of-counterfactual-explanations">The promise of counterfactual explanations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#roadmap">Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dice_ml.html">dice_ml package</a></li>
 </ul>
 
             
@@ -127,7 +140,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Readme File</li>
+      <li>Diverse Counterfactual Explanations (DiCE) for ML</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -146,70 +159,187 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="readme-file">
-<h1>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h1>
-<p># Diverse Counterfactual Explanations (DiCE) for Machine Learning Models</p>
-<p><em>How to explain a complex machine learning model such that the explanation is truthful to the model and yet interpretable to people?</em></p>
-<p>Ramaravind Mothilal, [Amit Sharma](www.amitsharma.in), [Chenhao Tan](www.chenhaot.com)</p>
-<p>[Arxiv paper](<a class="reference external" href="https://arxiv.org/abs/1905.07697">https://arxiv.org/abs/1905.07697</a>) | [Docs](<a class="reference external" href="https://microsoft.github.io/dice">https://microsoft.github.io/dice</a>) | [Live Jupyter notebook]()</p>
+  <div class="section" id="diverse-counterfactual-explanations-dice-for-ml">
+<h1>Diverse Counterfactual Explanations (DiCE) for ML<a class="headerlink" href="#diverse-counterfactual-explanations-dice-for-ml" title="Permalink to this headline">¶</a></h1>
+<p><em>How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?</em></p>
+<p><a class="reference external" href="https://www.linkedin.com/in/ramaravindkm/">Ramaravind Mothilal</a>, <a class="reference external" href="www.amitsharma.in">Amit Sharma</a>, <a class="reference external" href="www.chenhaot.com">Chenhao Tan</a></p>
+<p><a class="reference external" href="https://arxiv.org/abs/1905.07697">Arxiv paper</a> | <a class="reference external" href="https://microsoft.github.io/DiCE">Docs</a> | Live Jupyter notebook <a class="reference external" href="https://mybinder.org/v2/gh/microsoft/DiCE/master?filepath=notebooks"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
 <p>Explanations are critical for machine learning, especially as machine learning-based systems are being used to inform decisions in societally critical domains such as finance, healthcare, education, and criminal justice.
 However, most explanation methods depend on an approximation of the ML model to
 create an interpretable explanation. For example,
-consider a person who applied for a loan and was rejected by the loan distribution algorithm of a financial company. Typically, the company may provide an explanation on why the loan was rejected, for example, due to <a href="#id1"><span class="problematic" id="id2">``</span></a>poor credit history’‘. However, such an explanation does not help the person decide <em>what they do should next</em> to improve their chances of being approved in the future. Critically, the most important feature may not be enough to flip the decision of the algorithm, and in practice, may not even be changeable such as gender and race.</p>
-<p><a href="#id3"><span class="problematic" id="id4">*</span></a>Counterfactual explanations*~cite{wachter2017counterfactual} provide this information, by showing feature-perturbed versions of the same person who would have received the loan, e.g., <a href="#id5"><span class="problematic" id="id6">``</span></a>you would have received the loan if your income was higher by $$10,000$’‘. In other words, they provide <a href="#id7"><span class="problematic" id="id8">``</span></a>what-if’’ explanations for model output.
-Thus, counterfactual explanations can be useful complement to current explanation methods.</p>
-<p># Installing DICE
-DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo:
-<code class="docutils literal notranslate"><span class="pre">`shell</span>
-<span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span>
-<span class="pre">`</span></code></p>
-<p>If you face any problems, try installing dependencies manually:
-<code class="docutils literal notranslate"><span class="pre">`shell</span>
-<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span>
-<span class="pre">`</span></code></p>
-<p>DiCE requires the following packages:
-* numpy
-* scikit-learn
-* pandas
-* cython
-* h5py
-* tensorflow</p>
-<p># Getting started with DiCE</p>
-<p># Supported use-cases</p>
-<p># The promise of counterfactual explanations
-Counterfactual explanations can be useful complement to current explanation methods. Being truthful to the model, counterfactual explanations can be useful to all stakeholders for a decision made by a machine learning model that makes decisions.</p>
+consider a person who applied for a loan and was rejected by the loan distribution algorithm of a financial company. Typically, the company may provide an explanation on why the loan was rejected, for example, due to “poor credit history”. However, such an explanation does not help the person decide <em>what they do should next</em> to improve their chances of being approved in the future. Critically, the most important feature may not be enough to flip the decision of the algorithm, and in practice, may not even be changeable such as gender and race.</p>
+<p>DiCE implements <a class="reference external" href="https://arxiv.org/abs/1711.00399">counterfactual (CF) explanations</a>  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., <code class="docutils literal notranslate"><span class="pre">you</span> <span class="pre">would</span> <span class="pre">have</span> <span class="pre">received</span> <span class="pre">the</span> <span class="pre">loan</span> <span class="pre">if</span> <span class="pre">your</span> <span class="pre">income</span> <span class="pre">was</span> <span class="pre">higher</span> <span class="pre">by</span> <span class="pre">$10,000</span></code>. In other words, it provides “what-if” explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers.</p>
+<p>Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on <a class="reference external" href="https://arxiv.org/abs/1905.07697">recent research</a> that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change. Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples.</p>
+<div class="section" id="installing-dice">
+<h2>Installing DICE<a class="headerlink" href="#installing-dice" title="Permalink to this headline">¶</a></h2>
+<p>DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py install
+</pre></div>
+</div>
+<p>If you face any problems, try installing dependencies manually.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements.txt
+</pre></div>
+</div>
+<p>DiCE requires the following packages:</p>
 <ul class="simple">
-<li><p><strong>Decision subjects</strong>: Counterfactual explanations can be used to explore actionable recourse based on a decision received by a ML model. CF explanations can show decision outcomes from the algorithm</p></li>
+<li><p>numpy</p></li>
+<li><p>scikit-learn</p></li>
+<li><p>pandas</p></li>
+<li><p>cython</p></li>
+<li><p>h5py</p></li>
+<li><p>tensorflow (DiCE was tested on <a class="reference external" href="https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1">TensorFlow 1.13.0-rc1</a>)</p></li>
 </ul>
-<p>with emph{actionable} alternative profiles, to help people understand what they could have done to change their loan decision.
-Similar to the loan example above, such explanations are useful for a range of scenarios involving decision-making on an individual’s outcome, such as deciding admission to a university~cite{waters2014grade}, screening job applicants cite{rockoff2011can}, disbursing government aid cite{andini2017targeting,athey2017beyond}, and identifying people at high risk of a future disease cite{dai2015prediction}. In all these cases, knowing reasons for a bad outcome is not enough; it is important to know what to do to obtain a better outcome in the future.</p>
+</div>
+<div class="section" id="getting-started-with-dice">
+<h2>Getting started with DiCE<a class="headerlink" href="#getting-started-with-dice" title="Permalink to this headline">¶</a></h2>
+<p>With DiCE, generating explanations is a simple three-step  process: train
+mode and then invoke DiCE to generate counterfactual examples for any input.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
+<span class="c1"># Dataset for training an ML model</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dice_ml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">(),</span>
+                 <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span>
+                 <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+<span class="c1"># Pre-trained ML model</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">dice_ml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">())</span>
+<span class="c1"># DiCE explanation instance</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For any given input, we can now generate counterfactual explanations. For
+example, the following input leads to class 0 (low income).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query_instance</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span>
+    <span class="s1">&#39;workclass&#39;</span><span class="p">:</span><span class="s1">&#39;Private&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;education&#39;</span><span class="p">:</span><span class="s1">&#39;HS-grad&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span><span class="s1">&#39;Single&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;occupation&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="s1">&#39;White&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gender&#39;</span><span class="p">:</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="mi">45</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Using DiCE, we can now generate examples that would have been classified as class 1 (high income).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate counterfactual examples</span>
+<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
+<span class="c1"># Visualize counterfactual explanation</span>
+<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="docs/_static/gettin_started_ouput.png"><img alt="List of counterfactual examples" src="docs/_static/gettin_started_ouput.png" style="width: 400px;" /></a>
+<p>For more details, check out the <a class="reference external" href="notebooks/DiCE_getting_started.ipynb">Getting Started</a> notebook.</p>
+</div>
+<div class="section" id="supported-use-cases">
+<h2>Supported use-cases<a class="headerlink" href="#supported-use-cases" title="Permalink to this headline">¶</a></h2>
+<p><strong>Data</strong></p>
+<p>DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for discrete features). Thus, for sensitive data, the dataset can be provided as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">features</span><span class="o">=</span><span class="p">{</span>
+                   <span class="s1">&#39;age&#39;</span><span class="p">:[</span><span class="mi">17</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+                   <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Government&#39;</span><span class="p">,</span> <span class="s1">&#39;Other/Unknown&#39;</span><span class="p">,</span> <span class="s1">&#39;Private&#39;</span><span class="p">,</span> <span class="s1">&#39;Self-Employed&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Assoc&#39;</span><span class="p">,</span> <span class="s1">&#39;Bachelors&#39;</span><span class="p">,</span> <span class="s1">&#39;Doctorate&#39;</span><span class="p">,</span> <span class="s1">&#39;HS-grad&#39;</span><span class="p">,</span> <span class="s1">&#39;Masters&#39;</span><span class="p">,</span> <span class="s1">&#39;Prof-school&#39;</span><span class="p">,</span> <span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;Some-college&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Divorced&#39;</span><span class="p">,</span> <span class="s1">&#39;Married&#39;</span><span class="p">,</span> <span class="s1">&#39;Separated&#39;</span><span class="p">,</span> <span class="s1">&#39;Single&#39;</span><span class="p">,</span> <span class="s1">&#39;Widowed&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;occupation&#39;</span><span class="p">:[</span><span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span> <span class="s1">&#39;Other/Unknown&#39;</span><span class="p">,</span> <span class="s1">&#39;Professional&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">,</span> <span class="s1">&#39;Service&#39;</span><span class="p">,</span> <span class="s1">&#39;White-Collar&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Other&#39;</span><span class="p">,</span> <span class="s1">&#39;White&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;gender&#39;</span><span class="p">:[</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span> <span class="s1">&#39;Male&#39;</span><span class="p">],</span>
+                   <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">]},</span>
+         <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Model</strong></p>
+<p>We support pre-trained models as well as training a model using Tensorflow. Here’s a simple example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
+<span class="c1"># Generating train and test data</span>
+<span class="n">train</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">split_data</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">one_hot_encoded_data</span><span class="p">))</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">train</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;income&#39;</span><span class="p">]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">train</span><span class="o">.</span><span class="n">columns</span> <span class="o">==</span> <span class="s1">&#39;income&#39;</span><span class="p">]</span>
+<span class="c1"># Fitting a dense neural network model</span>
+<span class="n">ann_model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
+<span class="n">ann_model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],),</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">regularizers</span><span class="o">.</span><span class="n">l2</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">))</span>
+<span class="n">ann_model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">))</span>
+<span class="n">ann_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s1">&#39;binary_crossentropy&#39;</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
+<span class="n">ann_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Generate the DiCE model for explanation</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">ann_model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We plan to include support for PyTorch soon.</p>
+<p><strong>Explanations</strong></p>
+<p>We visualize explanations through a table highlighting the change in features. We plan to support an English language explanation too!</p>
+</div>
+<div class="section" id="feasibility-of-counterfactual-explanations">
+<h2>Feasibility of counterfactual explanations<a class="headerlink" href="#feasibility-of-counterfactual-explanations" title="Permalink to this headline">¶</a></h2>
+<p>We acknowledge that not all counterfactual explanations may be feasible for a
+user. In general, counterfactuals closer to an individual’s profile will be
+more feasible. Diversity is also important to help an individual choose between
+multiple possible options.</p>
+<p>DiCE provides tunable parameters for diversity and proximity to generate
+different kinds of explanations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span>
+                <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally, it may be the case that some features are harder to change than
+others (e.g., education level is harder to change than working hours per week). DiCE allows input of relative difficulty in changing a feature through specifying <em>feature weights</em>. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mads</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get_mads_from_training_data</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># Create feature weights</span>
+<span class="n">feature_weights</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">mads</span><span class="p">:</span>
+    <span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">mads</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">)</span>
+<span class="c1"># Now generating explanations using the feature weights</span>
+<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span>
+                <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                <span class="n">feature_weights</span><span class="o">=</span><span class="n">feature_weights</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, some features are impossible to change such as one’s age or race. Therefore, DiCE also allows inputting a
+list of features to vary.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span>
+                <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;workclass&#39;</span><span class="p">,</span><span class="s1">&#39;education&#39;</span><span class="p">,</span><span class="s1">&#39;occupation&#39;</span><span class="p">,</span><span class="s1">&#39;hours_per_week&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>It also supports simple constraints on
+features that reflect practical constraints (e.g., working hours per week
+cannot be more than 50).</p>
+<p>For more details, check out <a class="reference external" href="notebooks/DiCE_with_advanced_options.ipynb">this</a> notebook.</p>
+</div>
+<div class="section" id="the-promise-of-counterfactual-explanations">
+<h2>The promise of counterfactual explanations<a class="headerlink" href="#the-promise-of-counterfactual-explanations" title="Permalink to this headline">¶</a></h2>
+<p>Being truthful to the model, counterfactual explanations can be useful to all stakeholders for a decision made by a machine learning model that makes decisions.</p>
 <ul class="simple">
-<li><p>ML Model developers:</p></li>
-<li><p>Decision makers:</p></li>
-<li><p>Decision evaluators:</p></li>
+<li><p><strong>Decision subjects</strong>: Counterfactual explanations can be used to explore actionable recourse for a person based on a decision received by a ML model. DiCE shows decision outcomes with <em>actionable</em> alternative profiles, to help people understand what they could have done to change their model outcome.</p></li>
+<li><p><strong>ML model developers</strong>: Counterfactual explanations are also useful for model developers to debug their model for potential problems. DiCE can be used to show CF explanations for a selection of inputs that can uncover if there are any problematic (in)dependences on some features (e.g., for 95% of inputs, changing features X and Y change the outcome, but not for the other 5%). We aim to support aggregate metrics to help developers debug ML models.</p></li>
+<li><p><strong>Decision makers</strong>: Counterfactual explanations may be useful to
+decision-makers such as doctors or judges who may use ML models to make decisions. For a particular individual, DiCE allows probing the ML model to see the possible changes that lead to a different ML outcome, thus enabling decision-makers to assess their trust in the prediction.</p></li>
+<li><p><strong>Decision evaluators</strong>: Finally, counterfactual explanations can be useful
+to decision evaluators who may be interested in fairness or other desirable
+properties of an ML model. We plan to add support for this in the future.</p></li>
 </ul>
-<p># Generating Counterfactual Explanations
-There is no free lunch, however. Barring simple linear models~cite{russell2019efficient}, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on recent research [link] that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change.</p>
-<p>Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples.</p>
-<p>Here’s the optimization problem that DiCE solves.</p>
-<p>Add equation.</p>
-<p># Roadmap
-Ideally, counterfactual explanations should balance between a wide range of suggested changes (emph{diversity}), and the relative ease of adopting those changes (emph{proximity} to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.</p>
-<p>We are working on adding the following features to DiCE:
-* Support for PyTorch models
-* Support for using DiCE for debugging machine learning models
-* Support for other algorithms for generating counterfactual explanations
-* Incorporating causal constraints when generating counterfactual explanations</p>
-<p># Contributing</p>
+</div>
+<div class="section" id="roadmap">
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
+<p>Ideally, counterfactual explanations should balance between a wide range of suggested changes (<em>diversity</em>), and the relative ease of adopting those changes (<em>proximity</em> to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.</p>
+<p>We are working on adding the following features to DiCE:</p>
+<ul class="simple">
+<li><p>Support for PyTorch and scikit-learn models</p></li>
+<li><p>Support for using DiCE for debugging machine learning models</p></li>
+<li><p>Support for other algorithms for generating counterfactual explanations</p></li>
+<li><p>Incorporating causal constraints when generating counterfactual explanations</p></li>
+</ul>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
 <p>This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit <a class="reference external" href="https://cla.microsoft.com">https://cla.microsoft.com</a>.</p>
 <p>When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
 a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
 provided by the bot. You will only need to do this once across all repos using our CLA.</p>
-<p>This project has adopted the [Microsoft Open Source Code of Conduct](<a class="reference external" href="https://opensource.microsoft.com/codeofconduct/">https://opensource.microsoft.com/codeofconduct/</a>).
-For more information see the [Code of Conduct FAQ](<a class="reference external" href="https://opensource.microsoft.com/codeofconduct/faq/">https://opensource.microsoft.com/codeofconduct/faq/</a>) or
-contact [<a class="reference external" href="mailto:opencode&#37;&#52;&#48;microsoft&#46;com">opencode<span>&#64;</span>microsoft<span>&#46;</span>com</a>](<a class="reference external" href="mailto:opencode&#37;&#52;&#48;microsoft&#46;com">mailto:opencode<span>&#64;</span>microsoft<span>&#46;</span>com</a>) with any additional questions or comments.</p>
+<p>This project has adopted the <a class="reference external" href="https://opensource.microsoft.com/codeofconduct/">Microsoft Open Source Code of Conduct</a>.
+For more information see the <a class="reference external" href="https://opensource.microsoft.com/codeofconduct/faq/">Code of Conduct FAQ</a> or
+contact <a class="reference external" href="mailto:opencode&#37;&#52;&#48;microsoft&#46;com">opencode<span>&#64;</span>microsoft<span>&#46;</span>com</a> with any additional questions or comments.</p>
+</div>
 </div>
 
 
@@ -219,6 +349,8 @@ contact [<a class="reference external" href="mailto:opencode&#37;&#52;&#48;micro
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dice_ml.html" class="btn btn-neutral float-right" title="dice_ml package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to DiCE’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

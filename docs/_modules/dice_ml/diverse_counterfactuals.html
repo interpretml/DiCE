@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 2.0.6 documentation</title>
+  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -78,9 +78,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Readme:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Readme File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dice_ml.html">dice_ml package</a></li>
 </ul>
 
             
@@ -186,18 +189,18 @@
 
 <div class="viewcode-block" id="CounterfactualExamples.visualize_as_dataframe"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># original instance</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Original test instance:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
         <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span><span class="p">)</span> <span class="c1">#  works only in Jupyter notebook</span>
         <span class="c1"># CFs</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
         <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span>  <span class="c1">#  works only in Jupyter notebook</span></div>
 
 <div class="viewcode-block" id="CounterfactualExamples.visualize_as_list"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># original instance</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Original test instance:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
         <span class="c1"># CFs</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">)):</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span></div></div>
 </pre></div>
