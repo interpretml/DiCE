@@ -33,7 +33,8 @@ release = '0.2'
 extensions = ['sphinx.ext.autodoc', 
     'sphinx.ext.viewcode',
     'sphinx.ext.todo',
-    'nbsphinx'
+    'nbsphinx',
+    'sphinx_rtd_theme'
 ]
 
 autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split', 'copy']
