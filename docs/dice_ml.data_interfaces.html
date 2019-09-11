@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data_interfaces package &mdash; DiCE 0.1 documentation</title>
+  <title>dice_ml.data_interfaces package &mdash; DiCE 0.2 documentation</title>
   
 
   
@@ -80,8 +80,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Diverse Counterfactual Explanations (DiCE) for ML:</span></p>
-<ul>
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
@@ -237,7 +236,7 @@
 
 <dl class="method">
 <dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">
-<code class="sig-name descname">get_mads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_mads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_mads</code><span class="sig-paren">(</span><em class="sig-param">normalized=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_mads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes Median Absolute Deviation of features.</p>
 </dd></dl>
 
@@ -342,8 +341,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_mads_from_training_data">
-<code class="sig-name descname">get_mads_from_training_data</code><span class="sig-paren">(</span><em class="sig-param">normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_mads_from_training_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads_from_training_data" title="Permalink to this definition">¶</a></dt>
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_mads">
+<code class="sig-name descname">get_mads</code><span class="sig-paren">(</span><em class="sig-param">normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_mads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes Median Absolute Deviation of features.</p>
 </dd></dl>
 
@@ -351,6 +350,12 @@
 <dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx">
 <code class="sig-name descname">get_minx_maxx</code><span class="sig-paren">(</span><em class="sig-param">normalized=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_minx_maxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the min/max value of features in normalized or de-normalized form.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data">
+<code class="sig-name descname">get_quantiles_from_training_data</code><span class="sig-paren">(</span><em class="sig-param">quantile=0.05</em>, <em class="sig-param">normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_quantiles_from_training_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes required quantile of Absolute Deviations of features.</p>
 </dd></dl>
 
 <dl class="method">

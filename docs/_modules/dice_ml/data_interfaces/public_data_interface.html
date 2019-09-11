@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data_interfaces.public_data_interface &mdash; DiCE 0.1 documentation</title>
+  <title>dice_ml.data_interfaces.public_data_interface &mdash; DiCE 0.2 documentation</title>
   
 
   
@@ -303,7 +303,7 @@
             <span class="n">data</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_split_random_state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span></div>
 
-<div class="viewcode-block" id="PublicData.get_mads_from_training_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads_from_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_mads_from_training_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PublicData.get_mads"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads">[docs]</a>    <span class="k">def</span> <span class="nf">get_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes Median Absolute Deviation of features.&quot;&quot;&quot;</span>
 
         <span class="n">mads</span> <span class="o">=</span> <span class="p">{}</span>
@@ -317,6 +317,21 @@
                 <span class="n">mads</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span>
                     <span class="nb">abs</span><span class="p">(</span><span class="n">normalized_train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">normalized_train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">mads</span></div>
+
+<div class="viewcode-block" id="PublicData.get_quantiles_from_training_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_quantiles_from_training_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantile</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes required quantile of Absolute Deviations of features.&quot;&quot;&quot;</span>
+
+        <span class="n">quantiles</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">normalized</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())))),</span> <span class="n">quantile</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">normalized_train_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_df</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">normalized_train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">normalized_train_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())))),</span> <span class="n">quantile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">quantiles</span></div>
 
 <div class="viewcode-block" id="PublicData.get_data_params"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets all data related params for DiCE.&quot;&quot;&quot;</span>
@@ -468,7 +483,7 @@
         <span class="c1"># convert from one-hot encoded vals to user interpretable fromat</span>
         <span class="n">dev_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_dummies</span><span class="p">(</span><span class="n">dev_data</span><span class="p">)</span>
         <span class="n">dev_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">de_normalize_data</span><span class="p">(</span><span class="n">dev_data</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dev_data</span><span class="p">,</span> <span class="n">dev_preds</span>  <span class="c1"># values.tolist()</span></div></div>
+        <span class="k">return</span> <span class="n">dev_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">],</span> <span class="n">dev_preds</span>  <span class="c1"># values.tolist()</span></div></div>
 </pre></div>
 
            </div>
