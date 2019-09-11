@@ -83,7 +83,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-.. image:: docs/getting_started_output.png
+.. image:: docs/_static/getting_started_output.png
   :width: 400
   :alt: List of counterfactual examples
 
