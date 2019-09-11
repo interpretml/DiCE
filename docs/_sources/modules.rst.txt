@@ -1,5 +1,5 @@
-DiCE
-====
+dice_ml
+=======
 
 .. toctree::
    :maxdepth: 4

@@ -1,4 +1,4 @@
-numpy
+numpy==1.16.0 # tensorflow 1.13.0rc1 requires numpy<1.17.0 
 pandas
 scikit-learn
 tensorflow==1.13.0rc1

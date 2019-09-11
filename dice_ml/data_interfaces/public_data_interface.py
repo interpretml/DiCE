@@ -154,7 +154,7 @@ class PublicData:
             data, test_size=self.test_size, random_state=self.test_split_random_state)
         return train_df, test_df
 
-    def get_mads_from_training_data(self, normalized=False):
+    def get_mads(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
 
         mads = {}
@@ -168,6 +168,21 @@ class PublicData:
                 mads[feature] = np.median(
                     abs(normalized_train_df[feature].values - np.median(normalized_train_df[feature].values)))
         return mads
+
+    def get_quantiles_from_training_data(self, quantile=0.05, normalized=False):
+        """Computes required quantile of Absolute Deviations of features."""
+
+        quantiles = {}
+        if normalized is False:
+            for feature in self.continuous_feature_names:
+                quantiles[feature] = np.quantile(
+                    abs(list(set(self.train_df[feature].tolist())) - np.median(list(set(self.train_df[feature].tolist())))), quantile)
+        else:
+            normalized_train_df = self.normalize_data(self.train_df)
+            for feature in self.continuous_feature_names:
+                quantiles[feature] = np.quantile(
+                    abs(list(set(normalized_train_df[feature].tolist())) - np.median(list(set(normalized_train_df[feature].tolist())))), quantile)
+        return quantiles
 
     def get_data_params(self):
         """Gets all data related params for DiCE."""
@@ -319,4 +334,4 @@ class PublicData:
         # convert from one-hot encoded vals to user interpretable fromat
         dev_data = self.from_dummies(dev_data)
         dev_data = self.de_normalize_data(dev_data)
-        return dev_data, dev_preds  # values.tolist()
+        return dev_data[self.feature_names], dev_preds  # values.tolist()

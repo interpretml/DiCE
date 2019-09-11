@@ -6,9 +6,9 @@ import numpy as np
 import random
 import collections
 import timeit
+import copy
 
 from dice_ml import diverse_counterfactuals as exp
-
 
 class DiceTensorFlow:
 
@@ -32,9 +32,19 @@ class DiceTensorFlow:
         # loading trained model
         self.model.load_model()
 
-        # get data-related parameters
+        # get data-related parameters - minx and max for normalized continuous features
         self.data_interface = data_interface
         self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()
+
+        # min and max for continuous features in original scale
+        flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]
+        self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]
+        org_minx, org_maxx = self.data_interface.get_minx_maxx(normalized=False)
+        self.cont_minx = list(org_minx[0][self.encoded_continuous_feature_indexes])
+        self.cont_maxx = list(org_maxx[0][self.encoded_continuous_feature_indexes])
+
+        # decimal precisions for continuous features
+        self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
         self.input_tensor = tf.Variable(self.minx, dtype=tf.float32)
         self.output_tensor = self.model.get_output(self.input_tensor)
@@ -52,10 +62,10 @@ class DiceTensorFlow:
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.optimizer_weights = []  # optimizer
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=1.0, algorithm="DiverseCF", features_to_vary="all", yloss_type="log_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights=None, optimizer="tensorflow:adam", learning_rate=1, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Generates diverse counterfactual explanations
 
-        :param query_instance: Numpy array. Test point of interest.
+        :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
 
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
@@ -65,9 +75,9 @@ class DiceTensorFlow:
 
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
-        :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss".
+        :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
         :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
-        :param feature_weights: Numpy array of weights for different features in the optimization function. Default option is equal weighting of all features.
+        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
         :param optimizer: Tensorflow optimization algorithm. Currently tested only with "tensorflow:adam".
 
         :param learning_rate: Learning rate for optimizer.
@@ -75,11 +85,12 @@ class DiceTensorFlow:
         :param max_iter: Max iterations to run gradient descent for.
         :param project_iter: Project the gradients at an interval of these many iterations.
         :param loss_diff_thres: Minimum difference between successive loss values to check convergence.
-        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence
+        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence. Defaults to 1, but we assigned a more conservative value of 2 in the paper.
         :param verbose: Print intermediate loss value.
         :param init_near_query_instance: Boolean to indicate if counterfactuals are to be initialized near query_instance.
         :param tie_random: Used in rounding off CFs and intermediate projection.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
 
@@ -91,17 +102,17 @@ class DiceTensorFlow:
             self.do_optimizer_initializations(optimizer)
 
         """
-        Future Support: We have three main components in our tensorflow graph: (1) initialization of tf.variables (2) defining ops for loss function initializations, and (3) defining ops for optimizer initializations. Define methods to delete some nodes from a tensorflow graphs or update variables/ops in a tensorflow graph dynamically, so that only those components corresponding to the variables that are updated change.
+        Future Support: We have three main components in our tensorflow graph: (1) initialization of tf.variables (2) defining ops for loss function initializations, and (3) defining ops for optimizer initializations. Need to define methods to delete some nodes from a tensorflow graphs or update variables/ops in a tensorflow graph dynamically, so that only those components corresponding to the variables that are updated change.
         """
 
         # check if hyperparameters are to be updated
         if not collections.Counter([proximity_weight, diversity_weight, categorical_penalty]) == collections.Counter(self.hyperparameters):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold)
+        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param)
 
         return exp.CounterfactualExamples(self.data_interface, query_instance,
-        test_pred, self.final_cfs, self.cfs_preds)
+        test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param)
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes TF variables required for CF generation."""
@@ -173,6 +184,11 @@ class DiceTensorFlow:
                     1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf)
+            elif method == "hinge_loss":
+                temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)), tf.subtract(
+                    1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
+                temp_loss = tf.losses.hinge_loss(
+                    logits=temp_logits, labels=self.target_cf)
 
             loss_part1 = tf.add(loss_part1, temp_loss)
 
@@ -180,10 +196,7 @@ class DiceTensorFlow:
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
-        if self.feature_weights is not None:
-            return tf.reduce_sum(tf.multiply(tf.abs(tf.subtract(x_hat, x1)), self.feature_weights))
-        else:
-            return tf.reduce_sum(tf.abs(tf.subtract(x_hat, x1)))
+        return tf.reduce_sum(tf.multiply(tf.abs(tf.subtract(x_hat, x1)), self.feature_weights))
 
     def compute_second_part_of_loss(self):
         """Compute the second part (distance from x1) of the loss function."""
@@ -244,7 +257,7 @@ class DiceTensorFlow:
                     tf.reduce_sum(self.cfs_frozen[i][0, v[0]:v[-1]+1]), 1.0)))
         return loss_part4
 
-    def do_loss_initializations(self, yloss_type="l2_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights=None):
+    def do_loss_initializations(self, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad"):
         """Defines the optimization loss"""
 
         # define the loss parts
@@ -257,20 +270,23 @@ class DiceTensorFlow:
         self.loss_part1 = self.compute_first_part_of_loss(self.yloss_type)
 
         # loss part 2: similarity between CFs and original instance
-        if feature_weights is not None:
-            feature_weights_list = []
-            for feature in self.data_interface.encoded_feature_names:
-                if feature in feature_weights:
-                    feature_weights_list.append(feature_weights[feature])
-                else:
-                    feature_weights_list.append(1.0)
-            feature_weights_list = [feature_weights_list]
+        if feature_weights == "inverse_mad":
+            normalized_mads = self.data_interface.get_mads(normalized=True)
+            feature_weights = {}
+            for feature in normalized_mads:
+                feature_weights[feature] = round(1/normalized_mads[feature], 2)
 
-            self.feature_weights = tf.Variable(self.minx, dtype=tf.float32)
-            self.dice_sess.run(
-                tf.assign(self.feature_weights, np.array(feature_weights_list, dtype=np.float32)))
-        else:
-            self.feature_weights = None
+        feature_weights_list = []
+        for feature in self.data_interface.encoded_feature_names:
+            if feature in feature_weights:
+                feature_weights_list.append(feature_weights[feature])
+            else:
+                feature_weights_list.append(1.0)
+        feature_weights_list = [feature_weights_list]
+
+        self.feature_weights = tf.Variable(self.minx, dtype=tf.float32)
+        self.dice_sess.run(
+            tf.assign(self.feature_weights, np.array(feature_weights_list, dtype=np.float32)))
 
         self.loss_part2 = self.compute_second_part_of_loss()
 
@@ -336,7 +352,7 @@ class DiceTensorFlow:
         self.reset_optimizer_op = tf.variables_initializer(self.opt_vars)
         self.dice_sess.run(self.reset_optimizer_op)
 
-    def update_hyperparameters(self, proximity_weight=0.5, diversity_weight=0.5, categorical_penalty=1.0):
+    def update_hyperparameters(self, proximity_weight=0.5, diversity_weight=0.5, categorical_penalty=0.1):
         """Updates hyperparameters."""
 
         self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
@@ -355,6 +371,12 @@ class DiceTensorFlow:
         temp_cfs = []
         for index, tcf in enumerate(self.cfs):
             cf = self.dice_sess.run(tcf)
+            for i, v in enumerate(self.encoded_continuous_feature_indexes):
+                org_cont = (cf[0, v]*(self.cont_maxx[i] - self.cont_minx[i])) + self.cont_minx[i] # continuous feature in orginal scale
+                org_cont = round(org_cont, self.cont_precisions[i]) # rounding off
+                normalized_cont = (org_cont - self.cont_minx[i])/(self.cont_maxx[i] - self.cont_minx[i])
+                cf[0, v] = normalized_cont # assign the projected continuous value
+
             for v in self.encoded_categorical_feature_indexes:
                 maxs = np.argwhere(
                     cf[0, v[0]:v[-1]+1] == np.amax(cf[0, v[0]:v[-1]+1])).flatten().tolist()
@@ -407,10 +429,10 @@ class DiceTensorFlow:
                               for preds in cfs_preds]
                 test_preds = [
                     item for sublist in test_preds for item in sublist]
-                if self.stopping_threshold < 0.5 and all(i <= self.stopping_threshold for i in test_preds):
+                if self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds):
                     self.converged = True
                     return True
-                elif self.stopping_threshold > 0.5 and all(i >= self.stopping_threshold for i in test_preds):
+                elif self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds):
                     self.converged = True
                     return True
                 else:
@@ -419,7 +441,7 @@ class DiceTensorFlow:
             self.loss_converge_iter = 0
             return False
 
-    def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=1, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5):
+    def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=False, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Finds counterfactuals by graident-descent."""
 
         # Prepares user defined query_instance for DiCE.
@@ -449,12 +471,17 @@ class DiceTensorFlow:
 
         self.dice_sess.run(self.reset_optimizer_op)
 
-        # to resolve tie - if multiple levels of an one-hot-encoded categorical variable takes value 1
+        # to resolve tie - if multiple levels of an one-hot-encoded categorical variable take value 1
         self.tie_random = tie_random
 
         # running optimization steps
         start_time = timeit.default_timer()
         self.final_cfs = []
+
+        # variables to backup best known CFs so far in the optimization process - if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
+        self.best_backup_cfs = []
+        self.best_backup_cfs_preds = []
+        self.min_dist_from_threshold = 100
 
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
@@ -490,12 +517,27 @@ class DiceTensorFlow:
                                        self.cf_init: clip_cf})
 
                 if verbose:
-                    if (iterations+1) % 50 == 0:
+                    if (iterations) % 50 == 0:
                         print('step %d,  loss=%g' % (iterations+1, loss_value))
 
                 loss_diff = abs(loss_value-prev_loss)
                 prev_loss = loss_value
                 iterations += 1
+
+                # backing up CFs if they are valid
+                temp_cfs_stored = self.round_off_cfs(assign=False)
+                temp_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
+                test_preds_stored = [np.round(preds.flatten().tolist(), 3)
+                              for preds in temp_preds_stored]
+                test_preds_stored = [
+                    item for sublist in test_preds_stored for item in sublist]
+
+                if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
+                    avg_preds_dist = np.mean([abs(pred-self.stopping_threshold) for pred in test_preds_stored])
+                    if avg_preds_dist < self.min_dist_from_threshold:
+                        self.min_dist_from_threshold = avg_preds_dist
+                        self.best_backup_cfs = temp_cfs_stored
+                        self.best_backup_cfs_preds = test_preds_stored
 
             # rounding off final cfs - not necessary when inter_project=True
             self.round_off_cfs(assign=True)
@@ -505,99 +547,80 @@ class DiceTensorFlow:
                 temp = self.dice_sess.run(self.cfs[j])
                 self.final_cfs.append(temp)
 
+            # max iterations at which GD stopped
+            self.max_iterations_run = iterations
+
         self.elapsed = timeit.default_timer() - start_time
 
         self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
-        # calculating separate loss parts
-        if self.total_random_inits > 0:
-            self.evaluated_loss_parts = self.get_evaluated_loss(query_instance)
+        # update final_cfs from backed up CFs if valid CFs are not found
+        self.valid_cfs_found = False
+        if((self.target_cf_class[0][0] == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class[0][0] == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
+            if self.min_dist_from_threshold != 100:
+                for ix in range(self.total_CFs):
+                    self.final_cfs[ix] = self.best_backup_cfs[ix]
+                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix]
+
+                self.valid_cfs_found = True # final_cfs have valid CFs through backup CFs
+            else:
+                self.valid_cfs_found = False # neither final_cfs nor backup cfs are valid
         else:
-            self.evaluated_loss_parts = []
-            self.evaluated_loss_parts.append(self.dice_sess.run(self.loss_part1,
-                                                                feed_dict={self.target_cf: self.target_cf_class}))
-            self.evaluated_loss_parts.append(self.dice_sess.run(self.loss_part2,
-                                                                feed_dict={self.x1: query_instance}))
-            self.evaluated_loss_parts.append(
-                self.dice_sess.run(self.loss_part3))
-            self.evaluated_loss_parts.append(
-                self.dice_sess.run(self.loss_part4))
+            self.valid_cfs_found = True # final_cfs have valid CFs
+
+        # post-hoc operation on continuous features to enhance sparsity - only for public data
+        if posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+            self.final_cfs_sparse = copy.deepcopy(self.final_cfs)
+            self.cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
+
+            normalized_quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param, normalized=True)
+            normalized_mads = self.data_interface.get_mads(normalized=True)
+            for feature in normalized_quantiles:
+                normalized_quantiles[feature] = min(normalized_quantiles[feature], normalized_mads[feature])
+
+            features_sorted = sorted(normalized_quantiles.items(), key=lambda kv: kv[1], reverse=True)
+            for ix in range(len(features_sorted)):
+                features_sorted[ix] = features_sorted[ix][0]
+            decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
+
+            for cf_ix in range(self.total_CFs):
+                current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
+
+                for feature in features_sorted:
+                    feat_ix = self.data_interface.encoded_feature_names.index(feature)
+                    change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix])
+                    diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
+
+                    if(abs(diff) <= normalized_quantiles[feature]):
+                        while((abs(diff)>10e-4) &
+                              ((self.target_cf_class[0][0] == 0 and current_pred[0][0] < self.stopping_threshold) |
+                               (self.target_cf_class[0][0] == 1 and current_pred[0][0] > self.stopping_threshold))):
+                            old_val = self.final_cfs_sparse[cf_ix][0][feat_ix]
+                            self.final_cfs_sparse[cf_ix][0][feat_ix] += np.sign(diff)*change
+                            current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
+
+                            if(((self.target_cf_class[0][0] == 0 and current_pred[0][0] > self.stopping_threshold) | (self.target_cf_class[0][0] == 1 and current_pred[0][0] < self.stopping_threshold))):
+                                self.final_cfs_sparse[cf_ix][0][feat_ix] = old_val
+                                break
+
+                            diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
+
+                self.cfs_preds_sparse[cf_ix] = self.predict_fn(self.final_cfs_sparse[cf_ix])
+        else:
+            self.final_cfs_sparse = None
+            self.cfs_preds_sparse = None
 
         m, s = divmod(self.elapsed, 60)
-        print('Diverse Counterfactuals found! total time taken: %02d' %
-              m, 'min %02d' % s, 'sec')
+        if self.valid_cfs_found:
+            self.total_CFs_found = self.total_CFs
+            print('Diverse Counterfactuals found! total time taken: %02d' %
+                  m, 'min %02d' % s, 'sec')
+        else:
+            self.total_CFs_found = 0
+            for pred in self.cfs_preds:
+                if((self.target_cf_class[0][0] == 0 and pred[0][0] < self.stopping_threshold) | (self.target_cf_class[0][0] == 1 and pred[0][0] > self.stopping_threshold)):
+                    self.total_CFs_found += 1
+
+            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return query_instance, test_pred
-
-    def get_evaluated_loss(self, query_instance):
-        # initiate sess and define TFs
-        final_loss = []
-
-        # First part of the loss: y-loss
-        if self.yloss_type == "l2_loss":
-            loss_part1 = np.sum(np.square(np.subtract(
-                self.cfs_preds, self.target_cf_class)))
-        elif self.yloss_type == "log_loss":
-            loss_part1 = 0.0
-            for i in range(len(self.final_cfs)):
-                temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.cfs_preds[i], 0.000001)),
-                                               tf.subtract(1.0, tf.abs(tf.subtract(self.cfs_preds[i], 0.000001)))))
-                temp_loss = self.dice_sess.run(tf.nn.sigmoid_cross_entropy_with_logits(
-                    logits=temp_logits, labels=tf.convert_to_tensor(self.target_cf_class, dtype=tf.float32)))
-                loss_part1 = np.add(loss_part1, temp_loss)
-
-        # First part of the loss
-        final_loss.append(np.divide(loss_part1, len(self.final_cfs)))
-
-        # second part of the loss: dist from x1
-        loss_part2 = np.sum(np.absolute(
-            np.subtract(self.final_cfs, query_instance)))
-        loss_part2 = np.divide(
-            loss_part2, (len(self.final_cfs[0][0])*len(self.final_cfs)))
-        final_loss.append(loss_part2)
-
-        # third part of the loss: diversity
-        if "dpp" in self.diversity_loss_type:
-            det_entries = []
-            if self.diversity_loss_type.split(':')[1] == "inverse_dist":
-                for i in range(len(self.final_cfs)):
-                    for j in range(len(self.final_cfs)):
-                        det_temp_entry = np.divide(
-                            1.0, (1.0 + np.sum(np.absolute(np.subtract(self.final_cfs[i], self.final_cfs[j])))))
-                        if i == j:
-                            det_temp_entry = det_temp_entry + 0.0001
-                        det_entries.append(det_temp_entry)
-
-            elif self.diversity_loss_type.split(':')[1] == "exponential_dist":
-                for i in range(len(self.final_cfs)):
-                    for j in range(len(self.final_cfs)):
-                        det_temp_entry = np.divide(1.0, np.exp(
-                            np.sum(np.absolute(np.subtract(self.final_cfs[i], self.final_cfs[j])))))
-                        if i == j:
-                            det_temp_entry = det_temp_entry + 0.0001
-                        det_entries.append(det_temp_entry)
-
-            det_entries = np.reshape(
-                det_entries, (len(self.final_cfs), len(self.final_cfs)))
-            final_loss.append(np.sum(np.linalg.det(det_entries)))
-
-        elif self.diversity_loss_type == "avg_dist":
-            loss_part3 = 0.0
-            count = 0.0
-            # computing pairwise distance and transforming it to normalized similarity
-            for i in range(len(self.final_cfs)):
-                for j in range(i+1, len(self.final_cfs)):
-                    count += 1.0
-                    loss_part3 = np.add(loss_part3,
-                                        np.divide(1.0, (1.0 + np.sum(np.absolute(np.subtract(self.final_cfs[i], self.final_cfs[j]))))))
-            final_loss.append(np.subtract(1.0, np.divide(loss_part3, count)))
-
-        # fourth part: correction loss
-        loss_part4 = 0.0
-        for i in range(len(self.final_cfs)):
-            for v in self.encoded_categorical_feature_indexes:
-                loss_part4 = np.add(loss_part4, np.square(np.subtract(
-                    np.sum(self.final_cfs[i][0, v[0]:v[-1]+1]), 1.0)))
-        final_loss.append(loss_part4)
-
-        return final_loss

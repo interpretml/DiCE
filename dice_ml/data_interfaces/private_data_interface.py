@@ -13,7 +13,7 @@ class PrivateData:
         :param features: Dictionary with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values.
         :param outcome_name: Outcome feature name.
         :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just 'int' should be provided, if the feature is of type 'float', a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
-        :param mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.
+        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.
 
         """
 
@@ -33,11 +33,6 @@ class PrivateData:
         else:
             self.type_and_precision = {}
 
-        if 'mad' in params:
-            self.mad = params['mad']
-        else:
-            self.mad = [1.0] * len(features_dict)
-
         self.continuous_feature_names = []
         self.permitted_range = {}
         self.categorical_feature_names = []
@@ -50,6 +45,13 @@ class PrivateData:
             else:
                 self.categorical_feature_names.append(feature)
                 self.categorical_levels[feature] = features_dict[feature]
+
+        if 'mad' in params:
+            self.mad = params['mad']
+        else:
+            self.mad = {}
+            for feature in self.continuous_feature_names:
+                self.mad[feature] = 1.0
 
         # self.continuous_feature_names + self.categorical_feature_names
         self.feature_names = list(features_dict.keys())
@@ -102,11 +104,12 @@ class PrivateData:
         if normalized:
             return minx, maxx
         else:
-            minx[0][idx] = self.permitted_range[feature_name][0]
-            maxx[0][idx] = self.permitted_range[feature_name][1]
+            for idx, feature_name in enumerate(self.continuous_feature_names):
+                minx[0][idx] = self.permitted_range[feature_name][0]
+                maxx[0][idx] = self.permitted_range[feature_name][1]
             return minx, maxx
 
-    def get_mads(self):
+    def get_mads(self, normalized=True):
         """Computes Median Absolute Deviation of features."""
         return self.mad
 
@@ -134,7 +137,7 @@ class PrivateData:
         if features_to_vary == "all":
             return [i for i in range(len(self.encoded_feature_names))]
         else:
-            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(feature_list))]
+            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(features_to_vary))]
 
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""

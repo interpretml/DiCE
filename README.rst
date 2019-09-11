@@ -3,7 +3,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
 
-`Ramaravind Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <www.amitsharma.in>`_, `Chenhao Tan <www.chenhaot.com>`_
+`Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <www.amitsharma.in>`_, `Chenhao Tan <www.chenhaot.com>`_
 
 `Arxiv paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
 
@@ -18,7 +18,7 @@ consider a person who applied for a loan and was rejected by the loan distributi
 
 DiCE implements `counterfactual (CF) explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers.
 
-Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <https://arxiv.org/abs/1905.07697>`_ that generates CF explanations for any ML model. The core idea to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change. Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples.
+Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on `recent research <https://arxiv.org/abs/1905.07697>`_ that generates CF explanations for any ML model. The core idea is to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change. Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples.
 
 
 Installing DICE
@@ -83,7 +83,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-.. image:: docs/_static/gettin_started_ouput.png
+.. image:: docs/getting_started_output.png
   :width: 400
   :alt: List of counterfactual examples
 
@@ -93,7 +93,7 @@ Supported use-cases
 -------------------
 **Data**
 
-DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for discrete features). Thus, for sensitive data, the dataset can be provided as:
+DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for categorical features). Thus, for sensitive data, the dataset can be provided as:
 
 .. code:: python
 
@@ -120,10 +120,10 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     y_train = train.loc[:, train.columns == 'income']
     # Fitting a dense neural network model
     ann_model = keras.Sequential()
-    ann_model.add(keras.layers.Dense(20, input_shape=(X_train.shape[1],), kernel_regularizer=keras.regularizers.l2(0.01), activation=tf.nn.relu))
+    ann_model.add(keras.layers.Dense(20, input_shape=(X_train.shape[1],), kernel_regularizer=keras.regularizers.l1(0.001), activation=tf.nn.relu))
     ann_model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))
     ann_model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.01), metrics=['accuracy'])
-    ann_model.fit(X_train, y_train, validation_split=0.20, epochs=50, verbose=0)
+    ann_model.fit(X_train, y_train, validation_split=0.20, epochs=100, verbose=0, class_weight={0:1,1:2})
 
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
@@ -151,17 +151,13 @@ different kinds of explanations.
                     proximity_weight=1.5, diversity_weight=1.0)
 
 Additionally, it may be the case that some features are harder to change than
-others (e.g., education level is harder to change than working hours per week). DiCE allows input of relative difficulty in changing a feature through specifying *feature weights*. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature.
+others (e.g., education level is harder to change than working hours per week). DiCE allows input of relative difficulty in changing a feature through specifying *feature weights*. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature. By default, DiCE computes this internally and divides the distance between continuous features by the MAD of the feature's values in the training set. We can also assign different values through the *feature_weights* parameter. 
 
 .. code:: python
 
-    mads = d.get_mads_from_training_data(normalized=True)
-    # Create feature weights
-    feature_weights = {}
-    for feature in mads:
-        feature_weights[feature] = round(1/mads[feature], 2)
-    print(feature_weights)
-    # Now generating explanations using the feature weights
+    # assigning new weights
+    feature_weights = {'age': 10, 'hours_per_week': 5}
+    # Now generating explanations using the new feature weights
     dice_exp = exp.generate_counterfactuals(query_instance,
                     total_CFs=4, desired_class="opposite",
                     feature_weights=feature_weights)
