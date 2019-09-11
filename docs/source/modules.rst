@@ -5,4 +5,3 @@ dice_ml
    :maxdepth: 4
 
    dice_ml
-   setup
