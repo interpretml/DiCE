@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath("../../"))
 
 
@@ -32,7 +33,8 @@ release = '0.2'
 # ones.
 extensions = ['sphinx.ext.autodoc', 
     'sphinx.ext.viewcode',
-    'sphinx.ext.todo'
+    'sphinx.ext.todo',
+    'sphinx_rtd_theme'
 ]
 
 autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split', 'copy']
@@ -51,7 +53,8 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'alabaster'
+html_theme_path = ["_themes", ]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
