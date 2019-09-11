@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -162,7 +162,7 @@
 <span class="sd">        :param features: Dictionary with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values.</span>
 <span class="sd">        :param outcome_name: Outcome feature name.</span>
 <span class="sd">        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just &#39;int&#39; should be provided, if the feature is of type &#39;float&#39;, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: int, cont_f2: [float, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.</span>
-<span class="sd">        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.</span>
+<span class="sd">        :param mad (optional): List containing Median Absolute Deviation of features. Default value is 1 for all features.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -182,6 +182,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_and_precision</span> <span class="o">=</span> <span class="p">{}</span>
 
+        <span class="k">if</span> <span class="s1">&#39;mad&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;mad&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">features_dict</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span> <span class="o">=</span> <span class="p">[]</span>
@@ -194,13 +199,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">categorical_levels</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">features_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="s1">&#39;mad&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;mad&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">mad</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
         <span class="c1"># self.continuous_feature_names + self.categorical_feature_names</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">features_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -253,12 +251,11 @@
         <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">minx</span><span class="p">,</span> <span class="n">maxx</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">):</span>
-                <span class="n">minx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">maxx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">minx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">maxx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">minx</span><span class="p">,</span> <span class="n">maxx</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_mads"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">[docs]</a>    <span class="k">def</span> <span class="nf">get_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="PrivateData.get_mads"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">[docs]</a>    <span class="k">def</span> <span class="nf">get_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes Median Absolute Deviation of features.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mad</span></div>
 
@@ -286,7 +283,7 @@
         <span class="k">if</span> <span class="n">features_to_vary</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="p">))]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">colidx</span> <span class="k">for</span> <span class="n">colidx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">))]</span></div>
+            <span class="k">return</span> <span class="p">[</span><span class="n">colidx</span> <span class="k">for</span> <span class="n">colidx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">feature_list</span><span class="p">))]</span></div>
 
 <div class="viewcode-block" id="PrivateData.from_dummies"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">[docs]</a>    <span class="k">def</span> <span class="nf">from_dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix_sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the original data from dummy encoded data with k levels.&quot;&quot;&quot;</span>

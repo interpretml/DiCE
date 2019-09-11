@@ -2,7 +2,7 @@
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# http://www.sphinx-doc.org/en/master/config
 
 # -- Path setup --------------------------------------------------------------
 
@@ -15,6 +15,7 @@ import sys
 sys.path.insert(0, os.path.abspath("../../"))
 
 
+
 # -- Project information -----------------------------------------------------
 
 project = 'DiCE'
@@ -22,7 +23,7 @@ copyright = '2019, Ramaravind, Amit, Chenhao'
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -35,7 +36,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.todo'
 ]
 
-autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split', 'copy']
+autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

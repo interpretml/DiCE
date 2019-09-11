@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.data &mdash; DiCE 0.1 documentation</title>
   
 
   
@@ -178,7 +178,7 @@
     <span class="k">if</span> <span class="s1">&#39;dataframe&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span> <span class="c1"># if params contain a Pandas dataframe, then use PublicData class</span>
         <span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.public_data_interface</span> <span class="k">import</span> <span class="n">PublicData</span>
         <span class="k">return</span> <span class="n">PublicData</span>
-    <span class="k">else</span><span class="p">:</span> <span class="c1"># use PrivateData if only meta data is provided</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># use PrivateData if only meta data is provided #TODO: check PrivateData code</span>
         <span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.private_data_interface</span> <span class="k">import</span> <span class="n">PrivateData</span>
         <span class="k">return</span> <span class="n">PrivateData</span></div>
 </pre></div>
