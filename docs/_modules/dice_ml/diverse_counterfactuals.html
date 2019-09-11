@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>dice_ml.diverse_counterfactuals</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dice_ml.diverse_counterfactuals</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<div class="viewcode-block" id="CounterfactualExamples"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples">[docs]</a><span class="k">class</span> <span class="nc">CounterfactualExamples</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class to store and visualize the resulting counterfactual explanations.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">test_instance</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">,</span> <span class="n">final_cfs</span><span class="p">,</span> <span class="n">final_cfs_preds</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">cfs_preds_sparse</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span> <span class="o">=</span> <span class="n">data_interface</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_instance</span> <span class="o">=</span> <span class="n">test_instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span> <span class="o">=</span> <span class="n">test_pred</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="o">=</span> <span class="n">final_cfs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_preds</span> <span class="o">=</span> <span class="n">final_cfs_preds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds_sparse</span> <span class="o">=</span> <span class="n">cfs_preds_sparse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posthoc_sparsity_param</span> <span class="o">=</span> <span class="n">posthoc_sparsity_param</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_dataframe</span><span class="p">()</span> <span class="c1"># transforming the test input from numpy to pandas dataframe</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_dataframe_sparse</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="CounterfactualExamples.convert_to_dataframe"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_instance_updated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)]),</span> <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="o">+</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
+
+        <span class="n">org_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">from_dummies</span><span class="p">(</span><span class="n">test_instance_updated</span><span class="p">)</span>
+        <span class="n">org_instance</span> <span class="o">=</span> <span class="n">org_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">de_normalize_data</span><span class="p">(</span><span class="n">org_instance</span><span class="p">)</span>
+
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">))])</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decoded_data</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">de_normalize_data</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)))</span>
+
+        <span class="c1"># predictions for CFs</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_preds</span><span class="p">]</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">test_preds</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">test_preds</span><span class="p">)</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_preds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CounterfactualExamples.convert_to_dataframe_sparse"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe_sparse">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_dataframe_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_instance_updated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)]),</span> <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="o">+</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
+
+        <span class="n">org_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">from_dummies</span><span class="p">(</span><span class="n">test_instance_updated</span><span class="p">)</span>
+        <span class="n">org_instance</span> <span class="o">=</span> <span class="n">org_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">de_normalize_data</span><span class="p">(</span><span class="n">org_instance</span><span class="p">)</span>
+
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span><span class="p">))])</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decoded_data</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">de_normalize_data</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)))</span>
+
+        <span class="c1"># predictions for CFs</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds_sparse</span><span class="p">]</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">test_preds</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+        <span class="n">test_preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">test_preds</span><span class="p">)</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_preds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CounterfactualExamples.visualize_as_dataframe"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="c1"># original instance</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
+        <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span><span class="p">)</span> <span class="c1">#  works only in Jupyter notebook</span>
+
+        <span class="k">if</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">display_sparse_df</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># CFs</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set after sparsity correction (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">)</span>  <span class="c1">#  works only in Jupyter notebook</span>
+
+        <span class="k">elif</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">display_sparse_df</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying without posthoc sparsity operation&#39;</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span>  <span class="c1">#  works only in Jupyter notebook</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># CFs</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span>  <span class="c1">#  works only in Jupyter notebook</span></div>
+
+
+<div class="viewcode-block" id="CounterfactualExamples.visualize_as_list"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># original instance</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">org_instance</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">display_sparse_df</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># CFs</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set after sparsity correction (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list_sparse</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list_sparse</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">and</span> <span class="n">display_sparse_df</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_sparse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying without posthoc sparsity operation&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># CFs</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set (new outcome : </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_list</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

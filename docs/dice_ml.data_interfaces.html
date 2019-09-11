@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.data_interfaces package &mdash; DiCE 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dice_ml.dice_interfaces package" href="dice_ml.dice_interfaces.html" />
+    <link rel="prev" title="dice_ml package" href="dice_ml.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dice_ml.html">dice_ml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dice_ml.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">dice_ml.data_interfaces package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces.private_data_interface">dice_ml.data_interfaces.private_data_interface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces.public_data_interface">dice_ml.data_interfaces.public_data_interface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.dice_interfaces.html">dice_ml.dice_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html">dice_ml.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.model">dice_ml.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
+        
+      <li>dice_ml.data_interfaces package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/dice_ml.data_interfaces.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dice-ml-data-interfaces-package">
+<h1>dice_ml.data_interfaces package<a class="headerlink" href="#dice-ml-data-interfaces-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dice_ml.data_interfaces.private_data_interface">
+<span id="dice-ml-data-interfaces-private-data-interface-module"></span><h2>dice_ml.data_interfaces.private_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.private_data_interface" title="Permalink to this headline">¶</a></h2>
+<p>Module containing meta data information about private data.</p>
+<dl class="class">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.data_interfaces.private_data_interface.</code><code class="sig-name descname">PrivateData</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A data interface for private data with meta information.</p>
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data">
+<code class="sig-name descname">de_normalize_data</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.de_normalize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>De-normalizes continuous features from [0,1] range to original range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">
+<code class="sig-name descname">from_dummies</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">prefix_sep='_'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.from_dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the original data from dummy encoded data with k levels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params">
+<code class="sig-name descname">get_data_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_data_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all data related params for DiCE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions">
+<code class="sig-name descname">get_decimal_precisions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decimal_precisions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Gets the precision of continuous features in the data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data">
+<code class="sig-name descname">get_decoded_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decoded_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the original data from dummy encoded data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_dev_data">
+<code class="sig-name descname">get_dev_data</code><span class="sig-paren">(</span><em class="sig-param">model_interface</em>, <em class="sig-param">desired_class</em>, <em class="sig-param">filter_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_dev_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_dev_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs dev data by extracting part of the test data for which finding counterfactuals make sense.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes">
+<code class="sig-name descname">get_encoded_categorical_feature_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_encoded_categorical_feature_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the column indexes categorical features after one-hot-encoding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary">
+<code class="sig-name descname">get_indexes_of_features_to_vary</code><span class="sig-paren">(</span><em class="sig-param">features_to_vary='all'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_indexes_of_features_to_vary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets indexes from feature names of one-hot-encoded data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">
+<code class="sig-name descname">get_mads</code><span class="sig-paren">(</span><em class="sig-param">normalized=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_mads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Median Absolute Deviation of features.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx">
+<code class="sig-name descname">get_minx_maxx</code><span class="sig-paren">(</span><em class="sig-param">normalized=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_minx_maxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the min/max value of features in normalized or de-normalized form.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data">
+<code class="sig-name descname">normalize_data</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.normalize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes continuous features to make them fall in the range [0,1].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data">
+<code class="sig-name descname">one_hot_encode_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.one_hot_encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-hot-encodes the data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_encoding">
+<code class="sig-name descname">prepare_df_for_encoding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_df_for_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Facilitates get_test_inputs() function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">
+<code class="sig-name descname">prepare_query_instance</code><span class="sig-paren">(</span><em class="sig-param">query_instance</em>, <em class="sig-param">encode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_query_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares user defined test input for DiCE.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.data_interfaces.public_data_interface">
+<span id="dice-ml-data-interfaces-public-data-interface-module"></span><h2>dice_ml.data_interfaces.public_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.public_data_interface" title="Permalink to this headline">¶</a></h2>
+<p>Module containing all required information about the raw or transformed public data.</p>
+<dl class="class">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.data_interfaces.public_data_interface.</code><code class="sig-name descname">PublicData</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A data interface for public data.</p>
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.de_normalize_data">
+<code class="sig-name descname">de_normalize_data</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.de_normalize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.de_normalize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>De-normalizes continuous features from [0,1] range to original range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies">
+<code class="sig-name descname">from_dummies</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">prefix_sep='_'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.from_dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the original data from dummy encoded data with k levels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params">
+<code class="sig-name descname">get_data_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all data related params for DiCE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_data_type">
+<code class="sig-name descname">get_data_type</code><span class="sig-paren">(</span><em class="sig-param">col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers data type of a feature from the training data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_decimal_precisions">
+<code class="sig-name descname">get_decimal_precisions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decimal_precisions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decimal_precisions" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Gets the precision of continuous features in the data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_decoded_data">
+<code class="sig-name descname">get_decoded_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decoded_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decoded_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the original data from dummy encoded data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_dev_data">
+<code class="sig-name descname">get_dev_data</code><span class="sig-paren">(</span><em class="sig-param">model_interface</em>, <em class="sig-param">desired_class</em>, <em class="sig-param">filter_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_dev_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_dev_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs dev data by extracting part of the test data for which finding counterfactuals make sense.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes">
+<code class="sig-name descname">get_encoded_categorical_feature_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_encoded_categorical_feature_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the column indexes categorical features after one-hot-encoding.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">
+<code class="sig-name descname">get_features_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_features_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_indexes_of_features_to_vary">
+<code class="sig-name descname">get_indexes_of_features_to_vary</code><span class="sig-paren">(</span><em class="sig-param">features_to_vary='all'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_indexes_of_features_to_vary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_indexes_of_features_to_vary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets indexes from feature names of one-hot-encoded data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_mads">
+<code class="sig-name descname">get_mads</code><span class="sig-paren">(</span><em class="sig-param">normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_mads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Median Absolute Deviation of features.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx">
+<code class="sig-name descname">get_minx_maxx</code><span class="sig-paren">(</span><em class="sig-param">normalized=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_minx_maxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the min/max value of features in normalized or de-normalized form.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data">
+<code class="sig-name descname">get_quantiles_from_training_data</code><span class="sig-paren">(</span><em class="sig-param">quantile=0.05</em>, <em class="sig-param">normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_quantiles_from_training_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes required quantile of Absolute Deviations of features.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.normalize_data">
+<code class="sig-name descname">normalize_data</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.normalize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.normalize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes continuous features to make them fall in the range [0,1].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.one_hot_encode_data">
+<code class="sig-name descname">one_hot_encode_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.one_hot_encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.one_hot_encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-hot-encodes the data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_encoding">
+<code class="sig-name descname">prepare_df_for_encoding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_df_for_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Facilitates prepare_query_instance() function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance">
+<code class="sig-name descname">prepare_query_instance</code><span class="sig-paren">(</span><em class="sig-param">query_instance</em>, <em class="sig-param">encode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_query_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares user defined test input for DiCE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.split_data">
+<code class="sig-name descname">split_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.split_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.split_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.data_interfaces">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.data_interfaces" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dice_ml.dice_interfaces.html" class="btn btn-neutral float-right" title="dice_ml.dice_interfaces package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dice_ml.html" class="btn btn-neutral float-left" title="dice_ml package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

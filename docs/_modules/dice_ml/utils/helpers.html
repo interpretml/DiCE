@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>dice_ml.utils.helpers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dice_ml.utils.helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module containts helper functions to load data and get meta deta.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">dice_ml</span>
+
+<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">save_intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
+
+<span class="sd">    :param: save_intermediate: save the transformed dataset. Do not save by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="c1">#  column names from &quot;https://archive.ics.uci.edu/ml/datasets/Adult&quot;</span>
+    <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;workclass&#39;</span><span class="p">,</span> <span class="s1">&#39;fnlwgt&#39;</span><span class="p">,</span> <span class="s1">&#39;education&#39;</span><span class="p">,</span> <span class="s1">&#39;educational-num&#39;</span><span class="p">,</span> <span class="s1">&#39;marital-status&#39;</span><span class="p">,</span> <span class="s1">&#39;occupation&#39;</span><span class="p">,</span> <span class="s1">&#39;relationship&#39;</span><span class="p">,</span> <span class="s1">&#39;race&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;capital-gain&#39;</span><span class="p">,</span> <span class="s1">&#39;capital-loss&#39;</span><span class="p">,</span> <span class="s1">&#39;hours-per-week&#39;</span><span class="p">,</span> <span class="s1">&#39;native-country&#39;</span><span class="p">,</span> <span class="s1">&#39;income&#39;</span><span class="p">]</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+
+
+    <span class="c1"># For more details on how the below transformations are made, please refer to https://rpubs.com/H_Zhu/235617</span>
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="s2">&quot;educational-num&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="s2">&quot;hours-per-week&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Without-pay&#39;</span><span class="p">:</span> <span class="s1">&#39;Other/Unknown&#39;</span><span class="p">,</span> <span class="s1">&#39;Never-worked&#39;</span><span class="p">:</span> <span class="s1">&#39;Other/Unknown&#39;</span><span class="p">}})</span>
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Federal-gov&#39;</span><span class="p">:</span> <span class="s1">&#39;Government&#39;</span><span class="p">,</span> <span class="s1">&#39;State-gov&#39;</span><span class="p">:</span> <span class="s1">&#39;Government&#39;</span><span class="p">,</span> <span class="s1">&#39;Local-gov&#39;</span><span class="p">:</span><span class="s1">&#39;Government&#39;</span><span class="p">}})</span>
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Self-emp-not-inc&#39;</span><span class="p">:</span> <span class="s1">&#39;Self-Employed&#39;</span><span class="p">,</span> <span class="s1">&#39;Self-emp-inc&#39;</span><span class="p">:</span> <span class="s1">&#39;Self-Employed&#39;</span><span class="p">}})</span>
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Never-worked&#39;</span><span class="p">:</span> <span class="s1">&#39;Self-Employed&#39;</span><span class="p">,</span> <span class="s1">&#39;Without-pay&#39;</span><span class="p">:</span> <span class="s1">&#39;Self-Employed&#39;</span><span class="p">}})</span>
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;?&#39;</span><span class="p">:</span> <span class="s1">&#39;Other/Unknown&#39;</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;occupation&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Adm-clerical&#39;</span><span class="p">:</span> <span class="s1">&#39;White-Collar&#39;</span><span class="p">,</span> <span class="s1">&#39;Craft-repair&#39;</span><span class="p">:</span> <span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;Exec-managerial&#39;</span><span class="p">:</span><span class="s1">&#39;White-Collar&#39;</span><span class="p">,</span><span class="s1">&#39;Farming-fishing&#39;</span><span class="p">:</span><span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;Handlers-cleaners&#39;</span><span class="p">:</span><span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;Machine-op-inspct&#39;</span><span class="p">:</span><span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span><span class="s1">&#39;Other-service&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;Priv-house-serv&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;Prof-specialty&#39;</span><span class="p">:</span><span class="s1">&#39;Professional&#39;</span><span class="p">,</span><span class="s1">&#39;Protective-serv&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;Tech-support&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;Transport-moving&#39;</span><span class="p">:</span><span class="s1">&#39;Blue-Collar&#39;</span><span class="p">,</span><span class="s1">&#39;Unknown&#39;</span><span class="p">:</span><span class="s1">&#39;Other/Unknown&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;Armed-Forces&#39;</span><span class="p">:</span><span class="s1">&#39;Other/Unknown&#39;</span><span class="p">,</span><span class="s1">&#39;?&#39;</span><span class="p">:</span><span class="s1">&#39;Other/Unknown&#39;</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;marital-status&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Married-civ-spouse&#39;</span><span class="p">:</span> <span class="s1">&#39;Married&#39;</span><span class="p">,</span> <span class="s1">&#39;Married-AF-spouse&#39;</span><span class="p">:</span> <span class="s1">&#39;Married&#39;</span><span class="p">,</span> <span class="s1">&#39;Married-spouse-absent&#39;</span><span class="p">:</span><span class="s1">&#39;Married&#39;</span><span class="p">,</span><span class="s1">&#39;Never-married&#39;</span><span class="p">:</span><span class="s1">&#39;Single&#39;</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Black&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span><span class="p">,</span> <span class="s1">&#39;Asian-Pac-Islander&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;Amer-Indian-Eskimo&#39;</span><span class="p">:</span><span class="s1">&#39;Other&#39;</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="p">[[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;workclass&#39;</span><span class="p">,</span><span class="s1">&#39;education&#39;</span><span class="p">,</span><span class="s1">&#39;marital-status&#39;</span><span class="p">,</span><span class="s1">&#39;occupation&#39;</span><span class="p">,</span><span class="s1">&#39;race&#39;</span><span class="p">,</span><span class="s1">&#39;gender&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;hours-per-week&#39;</span><span class="p">,</span><span class="s1">&#39;income&#39;</span><span class="p">]]</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;income&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;&lt;=50K&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&gt;50K&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Assoc-voc&#39;</span><span class="p">:</span> <span class="s1">&#39;Assoc&#39;</span><span class="p">,</span> <span class="s1">&#39;Assoc-acdm&#39;</span><span class="p">:</span> <span class="s1">&#39;Assoc&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;11th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;10th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;7th-8th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;9th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;12th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;5th-6th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;1st-4th&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;Preschool&#39;</span><span class="p">:</span><span class="s1">&#39;School&#39;</span><span class="p">}})</span>
+
+    <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;marital-status&#39;</span><span class="p">:</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">,</span> <span class="s1">&#39;hours-per-week&#39;</span><span class="p">:</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">save_intermediate</span><span class="p">:</span>
+        <span class="k">pass</span><span class="c1">#adult_data.to_csv(&#39;adult.csv&#39;, index=False)</span>
+
+    <span class="k">return</span> <span class="n">adult_data</span></div>
+
+
+<div class="viewcode-block" id="get_adult_income_modelpath"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">[docs]</a><span class="k">def</span> <span class="nf">get_adult_income_modelpath</span><span class="p">():</span>
+    <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;adult.h5&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">modelpath</span></div>
+
+<div class="viewcode-block" id="get_adult_data_info"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">[docs]</a><span class="k">def</span> <span class="nf">get_adult_data_info</span><span class="p">():</span>
+    <span class="n">feature_description</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="s1">&#39;age&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="s1">&#39;type of industry (Government, Other/Unknown, Private, Self-Employed)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="s1">&#39;education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span> <span class="s1">&#39;marital status (Divorced, Married, Separated, Single, Widowed)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;occupation&#39;</span><span class="p">:</span> <span class="s1">&#39;occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="s1">&#39;white or other race?&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;gender&#39;</span><span class="p">:</span> <span class="s1">&#39;male or female?&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="s1">&#39;total work hours per week&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;income&#39;</span><span class="p">:</span> <span class="s1">&#39;0 (&lt;=50K) vs 1 (&gt;50K)&#39;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">feature_description</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
