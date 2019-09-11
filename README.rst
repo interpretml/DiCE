@@ -3,7 +3,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
 
-`Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <www.amitsharma.in>`_, `Chenhao Tan <www.chenhaot.com>`_
+`Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
 
 `Arxiv paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
 
