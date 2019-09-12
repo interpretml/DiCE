@@ -62,7 +62,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.ipynb_checkpoints']
 # a list of builtin themes.
 #
 
-html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 #if not on_rtd:
