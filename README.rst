@@ -52,8 +52,9 @@ mode and then invoke DiCE to generate counterfactual examples for any input.
 .. code:: python
 
     import dice_ml
+    from dice_ml.utils import helpers # helper functions
     # Dataset for training an ML model
-    d = dice_ml.Data(dataframe=dice_ml.utils.helpers.load_adult_income_dataset(),
+    d = dice_ml.Data(dataframe=helpers.load_adult_income_dataset(),
                      continuous_features=['age', 'hours_per_week'],
                      outcome_name='income')
     # Pre-trained ML model
