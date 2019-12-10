@@ -251,7 +251,11 @@ class PublicData:
         for cat_feature in colnames:
             levels.append(self.data_df[cat_feature].cat.categories.tolist())
 
-        df = pd.DataFrame({colnames[0]: levels[0]})
+        if len(colnames) > 0:
+            df = pd.DataFrame({colnames[0]: levels[0]})
+        else:
+            df = pd.DataFrame()
+
         for col in range(1, len(colnames)):
             temp_df = pd.DataFrame({colnames[col]: levels[col]})
             df = pd.concat([df, temp_df], axis=1, sort=False)

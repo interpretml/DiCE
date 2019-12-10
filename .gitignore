@@ -105,3 +105,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.data
+
+# notebook to solve issues
+notebooks/DiCE_issues.ipynb
