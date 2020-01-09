@@ -61,8 +61,10 @@ class CounterfactualExamples:
         result = self.data_interface.de_normalize_data(result)
 
         v = self.data_interface.get_decimal_precisions()
-        k = self.data_interface.continuous_feature_names
-        result = result.round(dict(zip(k,v)))
+        # k = self.data_interface.continuous_feature_names
+        # result = result.round(dict(zip(k,v)))
+        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+            result[feature] = result[feature].astype(float).round(v[ix])
 
         # predictions for CFs
         test_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds_sparse]
