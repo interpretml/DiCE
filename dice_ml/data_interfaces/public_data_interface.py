@@ -66,11 +66,11 @@ class PublicData:
                 'category')
         if len(self.continuous_feature_names) > 0:
             for feature in self.continuous_feature_names:
-                if self.get_data_type(self.data_df[feature]) == ' float':
-                    self.data_df[self.continuous_feature_names] = self.data_df[self.continuous_feature_names].astype(
+                if self.get_data_type(self.data_df[feature]) == 'float':
+                    self.data_df[feature] = self.data_df[feature].astype(
                         float)
                 else:
-                    self.data_df[self.continuous_feature_names] = self.data_df[self.continuous_feature_names].astype(
+                    self.data_df[feature] = self.data_df[feature].astype(
                         int)
 
         if len(self.categorical_feature_names) > 0:
