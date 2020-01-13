@@ -191,21 +191,29 @@ class DiceBaseGenCF:
     
     def generate_countefactuals(self, query_instance, total_CFs, desired_class="opposite" ):
         
+        # Converting query_instance into numpy array
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = np.array([query_instance.iloc[0].values])
+        
         test_dataset= np.array_split( query_instance, query_instance.shape[0]//batch_size ,axis=0 )
-        gen_cf=[]        
+        final_gen_cf=[]
+        final_cf_pred=[]
         for i in range(len(query_instance)):
             train_x = test_dataset[i]
             train_x= torch.tensor( train_x ).float().to(cuda)
             train_y = torch.argmax( self.pred_model(train_x), dim=1 )                
             train_size += train_x.shape[0]        
-            gen_cf_i=[]
+            curr_gen_cf=[]
+            curr_cf_pred=[]            
+            
             for cf_count in range(total_CFs):                
                 recon_err, kl_err, x_true, x_pred, cf_label = model.compute_elbo( train_x, 1.0-train_y, pred_model )
-                gen_cf_i.append(x_pred)
+                curr_gen_cf.append(x_pred.cpu().numpy())
+                curr_cf_pred.append(cf_label.cpu.numpy())
 # Code for converting tensor countefactuals into pandas dataframe                
 #                 x_pred= d.de_normalize_data( d.get_decoded_data(x_pred.detach().cpu().numpy()) )
 #                 x_true= d.de_normalize_data( d.get_decoded_data(x_true.detach().cpu().numpy()) )                
-            gen_cf.append(gen_cf_i)
+            gen_cf.append(curr_gen_cf)
     
         return gen_cf
         
