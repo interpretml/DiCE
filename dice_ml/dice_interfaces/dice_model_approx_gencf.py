@@ -25,25 +25,26 @@ class DiceBaseGenCF:
         """    
         
         self.pred_model= model_interface
+        self.data_interface= data_interface
         
         self.encoded_size=10
-        self.data_size = len(data_interface.encoded_feature_names)
+        self.data_size = len(self.data_interface.encoded_feature_names)
 
         # Dataset for training Variational Encoder Decoder model for CF Generation
-        train_data_vae= data_interface.data_df.copy()
+        train_data_vae= self.data_interface.data_df.copy()
         # Can remove the condition of training on only low income dataset
         train_data_vae= train_data_vae[ train_data_vae['income']==0 ]
 
         #MAD
-        self.mad_feature_weights = data_interface.get_mads_from_training_data(normalized=False)
+        self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
 
         #One Hot Encoding for categorical features
-        encoded_data = data_interface.one_hot_encode_data(train_data_vae)
+        encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
         dataset = encoded_data.to_numpy()
 
         #Normlaise_Weights
         self.normalise_weights={}
-        encoded_categorical_feature_indexes = data_interface.get_data_params()[2]     
+        encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
         encoded_continuous_feature_indexes=[]
         for i in range(data_size):
             valid=1
@@ -71,7 +72,7 @@ class DiceBaseGenCF:
         self.vae_train_dataset= dataset[test_size:]
 
         #BaseGenCF Model
-        self.cf_vae = CF_VAE(self.data_size, self.encoded_size, data_interface)
+        self.cf_vae = CF_VAE(self.data_size, self.encoded_size, self.data_interface)
         
         #Hyperparam 
         # Currently set to the specific values for the Adult dataset; dataset dependent
@@ -120,11 +121,11 @@ class DiceBaseGenCF:
 
             #Validity         
             temp_logits = self.pred_model(x_pred)
-            validity_loss= torch.zeros(1).to(cuda)                                        
+            validity_loss= torch.zeros(1)                                       
             temp_1= temp_logits[target_label==1,:]
             temp_0= temp_logits[target_label==0,:]
-            validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]).to(cuda) - F.sigmoid(temp_1[:,0]).to(cuda), torch.tensor(-1).to(cuda), self.margin, reduction='mean')
-            validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]).to(cuda) - F.sigmoid(temp_0[:,1]).to(cuda), torch.tensor(-1).to(cuda), self.margin, reduction='mean')
+            validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
+            validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]) - F.sigmoid(temp_0[:,1]), torch.tensor(-1), self.margin, reduction='mean')
 
             for i in range(1,mc_samples):
                 x_pred = dm[i]       
@@ -147,8 +148,8 @@ class DiceBaseGenCF:
         #         validity_loss += -F.cross_entropy(temp_logits, target_label)      
                 temp_1= temp_logits[target_label==1,:]
                 temp_0= temp_logits[target_label==0,:]
-                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]).to(cuda) - F.sigmoid(temp_1[:,0]).to(cuda), torch.tensor(-1).to(cuda), self.margin, reduction='mean')
-                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]).to(cuda) - F.sigmoid(temp_0[:,1]).to(cuda), torch.tensor(-1).to(cuda), self.margin, reduction='mean')
+                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
+                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]) - F.sigmoid(temp_0[:,1]), torch.tensor(-1), self.margin, reduction='mean')
 
             recon_err = recon_err / mc_samples
             validity_loss = -1*self.validity_reg*validity_loss/mc_samples
@@ -158,7 +159,12 @@ class DiceBaseGenCF:
             return -torch.mean(recon_err - kl_divergence) - validity_loss
 
     
-    def train( self ):
+    def train( self, constraint_type, constraint_variables, constraint_direction, constraint_reg  ):
+        
+        # constraint_type: Binary Variable currently: (1) unary / (0) monotonic
+        # constraint_variables: List of List: [[Effect, Cause1, Cause2, .... ]]
+        # constraint_direction: -1: Negative, 1: Positive ( By default has to be one for monotonic constraints )
+        # constraint_reg: Tunable Hyperparamter
         
         for epoch in self.epochs:
             batch_num=0
@@ -176,6 +182,31 @@ class DiceBaseGenCF:
                 
                 out= self.cf_vae(train_x, train_y)
                 loss= self.compute_loss( out, train_x, train_y )
+                
+                #Unary Case
+                if constraint_type:
+                    for const in constraint_variables:
+                        # Get the index from the feature name
+                        # Handle the categorical variable case here too
+                        const_idx= const[0]
+                        dm = out['x_pred']
+                        mc_samples = out['mc_samples']
+                        x_pred = dm[0]
+                       
+                        constraint_loss = F.hinge_embedding_loss( constraint_direction*(x_pred[:,const_idx] - train_x[:,const_idx]), torch.tensor(-1), 0)
+
+                        for j in range(1, mc_samples):
+                            x_pred = dm[j]            
+                            constraint_loss+= F.hinge_embedding_loss( constraint_direction*(x_pred[:,const_idx] - train_x[:,const_idx]), torch.tensor(-1), 0)           
+                            
+                        constraint_loss= constraint_loss/mc_samples
+                        constraint_loss= constraint_reg*constraint_loss
+                        loss+= constraint_loss
+                        print('Constraint: ', constraint_loss, torch.mean(constraint_loss) )
+                else:
+                    #Train the regression model
+                    print('Yet to implement')
+                    
                 loss.backward()
                 train_loss += loss.item()
                 optimizer.step()
@@ -192,28 +223,43 @@ class DiceBaseGenCF:
     def generate_countefactuals(self, query_instance, total_CFs, desired_class="opposite" ):
         
         # Converting query_instance into numpy array
+        query_instance_org= query_instance
+        
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
         query_instance = np.array([query_instance.iloc[0].values])
         
-        test_dataset= np.array_split( query_instance, query_instance.shape[0]//batch_size ,axis=0 )
+        print(query_instance.shape[0])
+        if  query_instance.shape[0] > self.batch_size:
+            test_dataset= np.array_split( query_instance, query_instance.shape[0]//self.batch_size ,axis=0 )
+        else:
+            test_dataset= [ query_instance ] 
         final_gen_cf=[]
         final_cf_pred=[]
+        final_test_pred= []
         for i in range(len(query_instance)):
             train_x = test_dataset[i]
-            train_x= torch.tensor( train_x ).float().to(cuda)
+            train_x= torch.tensor( train_x ).float()
             train_y = torch.argmax( self.pred_model(train_x), dim=1 )                
             train_size += train_x.shape[0]        
             curr_gen_cf=[]
             curr_cf_pred=[]            
+            curr_test_pred=[]
             
             for cf_count in range(total_CFs):                
                 recon_err, kl_err, x_true, x_pred, cf_label = model.compute_elbo( train_x, 1.0-train_y, pred_model )
-                curr_gen_cf.append(x_pred.cpu().numpy())
-                curr_cf_pred.append(cf_label.cpu.numpy())
+                curr_gen_cf.append(x_pred.numpy())
+                curr_cf_pred.append(cf_label.numpy())
+                curr_test_pred.append(train_y.numpy())
 # Code for converting tensor countefactuals into pandas dataframe                
 #                 x_pred= d.de_normalize_data( d.get_decoded_data(x_pred.detach().cpu().numpy()) )
 #                 x_true= d.de_normalize_data( d.get_decoded_data(x_true.detach().cpu().numpy()) )                
-            gen_cf.append(curr_gen_cf)
-    
-        return gen_cf
+            final_gen_cf.append(curr_gen_cf)
+            final_cf_pred.append(curr_cf_pred)
+            final_test_pred.append(curr_test_pred)
         
+        #CF Gen out
+        result={}
+        result['CF']= final_gen_cf[0]
+        result['CF-Pred']= final_cf_pred[0]
+        result['test-pred']= torch.argmax(  )
+        return exp.CounterfactualExamples(self.data_interface, query_instance_org, test_pred, final_gen_cf[0], final_cf_pred[0])
