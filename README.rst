@@ -5,7 +5,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 `Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
 
-`Arxiv paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
+`FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
 .. _Binder:  https://mybinder.org/v2/gh/microsoft/DiCE/master?filepath=notebooks
