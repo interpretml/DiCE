@@ -27,7 +27,7 @@ DiCE supports Python 3+. To install DiCE and its dependencies, run this from the
 
 .. code:: bash
 
-    python setup.py install
+    pip install -e .
 
 If you face any problems, try installing dependencies manually.
 
