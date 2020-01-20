@@ -36,7 +36,7 @@ class DiceBaseGenCF:
         train_data_vae= train_data_vae[ train_data_vae['income']==0 ]
 
         #MAD
-        self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
+        #self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
 
         #One Hot Encoding for categorical features
         encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
@@ -46,7 +46,7 @@ class DiceBaseGenCF:
         self.normalise_weights={}
         encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
         encoded_continuous_feature_indexes=[]
-        for i in range(data_size):
+        for i in range(self.data_size):
             valid=1
             for v in encoded_categorical_feature_indexes:
                 if i in v:
@@ -60,7 +60,7 @@ class DiceBaseGenCF:
             self.normalise_weights[idx]=[_min, _max]
 
         #Normlization for conitnuous features
-        encoded_data= d.normalize_data(encoded_data)
+        encoded_data= self.data_interface.normalize_data(encoded_data)
         dataset = encoded_data.to_numpy()
 
         #Train, Val, Test Splits
@@ -81,14 +81,17 @@ class DiceBaseGenCF:
         self.batch_size= 2048
         self.validity_reg= 42.0 
         self.margin= 0.165
-        self.epoch= 25
+        self.epochs= 25
+        self.wm1=1e-2
+        self.wm2=1e-2
+        self.wm3=1e-2
        
         #Optimizer    
         self.cf_vae_optimizer = optim.Adam([
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
-            ], lr=learning_rate
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_mean.parameters()),'weight_decay': self.wm1},
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_var.parameters()),'weight_decay': self.wm2},
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.decoder_mean.parameters()),'weight_decay': self.wm3},
+            ], lr=self.learning_rate
         )
     
         def compute_loss( self, model_out, x, target_label ): 
@@ -104,7 +107,7 @@ class DiceBaseGenCF:
             #Reconstruction Term
             #Proximity: L1 Loss
             x_pred = dm[0]       
-            s= model.encoded_start_cat
+            s= self.cf_vae.encoded_start_cat
             recon_err = -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
             for key in self.normalise_weights.keys():
                 # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
@@ -161,13 +164,13 @@ class DiceBaseGenCF:
     
     def train( self ):
         
-        for epoch in self.epochs:
+        for epoch in range(self.epochs):
             batch_num=0
             train_loss= 0.0
             train_size=0
             
             train_dataset= torch.tensor(self.vae_train_dataset).float()
-            train_dataset= torch.utils.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+            train_dataset= torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
             for train_x in enumerate(train_dataset):
                 self.cf_vae_optimizer.zero_grad()
                 
