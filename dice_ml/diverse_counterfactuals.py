@@ -108,7 +108,7 @@ class CounterfactualExamples:
             org = self.org_instance.values.tolist()[0]
             for ix in range(df.shape[0]):
                 for jx in range(len(org)):
-                    if newdf[ix][jx] == org[jx]
+                    if newdf[ix][jx] == org[jx]:
                         newdf[ix][jx] = '-'
                     else:
                         newdf[ix][jx] = str(newdf[ix][jx])
