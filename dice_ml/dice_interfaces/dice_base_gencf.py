@@ -99,6 +99,11 @@ class DiceBaseGenCF:
             {'params': filter(lambda p: p.requires_grad, self.cf_vae.decoder_mean.parameters()),'weight_decay': self.wm3},
             ], lr=self.learning_rate
         )
+        
+        self.base_model_dir= '../dice_ml/utils/sample_trained_models/'
+        self.dataset_name= 'adult'
+        ##TODO: A general method to identify the dataset_name
+        self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
     
     def compute_loss( self, model_out, x, target_label ): 
 
@@ -168,7 +173,15 @@ class DiceBaseGenCF:
         return -torch.mean(recon_err - kl_divergence) - validity_loss
 
     
-    def train(self):
+    def train(self, pre_trained=False):
+        '''        
+        pre_trained: Bool Variable to check whether pre trained model exists to avoid training again        
+        '''
+        
+        if pre_trained:
+            self.cf_vae.load_state_dict(torch.load(self.save_path))
+            self.cf_vae.eval()
+            return 
         
         ##TODO: Handling such dataset specific constraints in a more general way
         # CF Generation for only low to high income data points
@@ -204,14 +217,11 @@ class DiceBaseGenCF:
             ret= loss/batch_num
             print('Train Avg Loss: ', ret, train_size )
             
-            base_model_dir= '../dice_ml/utils/sample_trained_models/'
-            ##TODO: A general way to get the dataset name or a better to save the pre trained models and load them for the next time
-            dataset_name= 'adult'
-            path=base_model_dir+ dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
-            torch.save(self.cf_vae.state_dict(), path)                   
+            #Save the model after training
+            torch.save(self.cf_vae.state_dict(), self.save_path)                   
             
     #The input arguments for this function same as the one defined for Diverse CF    
-    def generate_countefactuals(self, query_instance, total_CFs, desired_class="opposite",  ):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite",  ):
         
         # Converting query_instance into numpy array
         query_instance_org= query_instance
@@ -231,17 +241,15 @@ class DiceBaseGenCF:
             train_x = test_dataset[i]
             train_x= torch.tensor( train_x ).float()
             train_y = torch.argmax( self.pred_model(train_x), dim=1 )                
-            train_size += train_x.shape[0]        
             
             curr_gen_cf=[]
             curr_cf_pred=[]            
             curr_test_pred= train_y.numpy()
             
             for cf_count in range(total_CFs):                
-                recon_err, kl_err, x_true, x_pred, cf_label = model.compute_elbo( train_x, 1.0-train_y, pred_model )
-                curr_gen_cf.append(x_pred.numpy())
-                curr_cf_pred.append(cf_label.numpy())
-                curr_test_pred.append(train_y.numpy())
+                recon_err, kl_err, x_true, x_pred, cf_label = self.cf_vae.compute_elbo( train_x, 1.0-train_y, self.pred_model )
+                curr_gen_cf.append(x_pred.detach().numpy())
+                curr_cf_pred.append(cf_label.detach().numpy())
 # Code for converting tensor countefactuals into pandas dataframe                
 #                 x_pred= d.de_normalize_data( d.get_decoded_data(x_pred.detach().cpu().numpy()) )
 #                 x_true= d.de_normalize_data( d.get_decoded_data(x_true.detach().cpu().numpy()) )                
@@ -254,5 +262,9 @@ class DiceBaseGenCF:
         result['CF']= final_gen_cf[0]
         result['CF-Pred']= final_cf_pred[0]
         result['test-pred']= final_test_pred[0]
-        print(type(result['CF'], result['CF-Pred'], result['test-pred']))
-        return exp.CounterfactualExamples(self.data_interface, query_instance_org, test_pred, final_gen_cf[0], final_cf_pred[0])
+        
+        print(type(result['CF']), type(result['CF-Pred']), type(result['test-pred']))
+        print(final_test_pred[0])
+        
+        # Adding empty list for sparse cf gen and pred; adding 0 for the sparsity coffecient
+        return exp.CounterfactualExamples(self.data_interface, query_instance_org, final_test_pred[0], final_gen_cf[0], final_cf_pred[0], [], [], 0)
