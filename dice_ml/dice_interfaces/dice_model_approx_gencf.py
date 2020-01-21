@@ -16,7 +16,7 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
 
-class DiceBaseGenCF:
+class DiceMoedelApproxGenCF:
 
     def __init__(self, data_interface, model_interface):
         """
@@ -32,21 +32,14 @@ class DiceBaseGenCF:
 
         # Dataset for training Variational Encoder Decoder model for CF Generation
         train_data_vae= self.data_interface.data_df.copy()
-        # Can remove the condition of training on only low income dataset
-        train_data_vae= train_data_vae[ train_data_vae['income']==0 ]
-
+        
         #MAD
-        self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
+        #self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
 
-        #One Hot Encoding for categorical features
-        encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
-        dataset = encoded_data.to_numpy()
-
-        #Normlaise_Weights
-        self.normalise_weights={}
+        #Creating list of encoded categorical and continuous feature indices
         encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
         encoded_continuous_feature_indexes=[]
-        for i in range(data_size):
+        for i in range(self.data_size):
             valid=1
             for v in encoded_categorical_feature_indexes:
                 if i in v:
@@ -54,13 +47,26 @@ class DiceBaseGenCF:
             if valid:
                 encoded_continuous_feature_indexes.append(i)            
         encoded_start_cat = len(encoded_continuous_feature_indexes)
+        
+        #One Hot Encoding for categorical features
+        encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
+        
+        # The output/outcome variable position altered due to one_hot_encoding for categorical features: (Cont feat, Outcome, Cat feat) 
+        # Need to rearrange columns such that outcome variable comes at the last
+        cols = list(encoded_data.columns)
+        cols = cols[:encoded_start_cat] + cols[encoded_start_cat+1:] + [cols[encoded_start_cat]]
+        encoded_data = encoded_data[cols]        
+
+        #Normlaise_Weights
+        self.normalise_weights={}        
+        dataset = encoded_data.to_numpy()
         for idx in encoded_continuous_feature_indexes:
             _max= float(np.max( dataset[:,idx] ))
             _min= float(np.min( dataset[:,idx] ))
             self.normalise_weights[idx]=[_min, _max]
 
-        #Normlization for conitnuous features
-        encoded_data= d.normalize_data(encoded_data)
+        # Normlization for continuous features
+        encoded_data= self.data_interface.normalize_data(encoded_data)
         dataset = encoded_data.to_numpy()
 
         #Train, Val, Test Splits
@@ -81,98 +87,123 @@ class DiceBaseGenCF:
         self.batch_size= 2048
         self.validity_reg= 42.0 
         self.margin= 0.165
-        self.epoch= 25
+        self.epochs= 25
+        self.wm1=1e-2
+        self.wm2=1e-2
+        self.wm3=1e-2
        
         #Optimizer    
         self.cf_vae_optimizer = optim.Adam([
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
-            ], lr=learning_rate
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_mean.parameters()),'weight_decay': self.wm1},
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_var.parameters()),'weight_decay': self.wm2},
+            {'params': filter(lambda p: p.requires_grad, self.cf_vae.decoder_mean.parameters()),'weight_decay': self.wm3},
+            ], lr=self.learning_rate
         )
+        
+        self.base_model_dir= '../dice_ml/utils/sample_trained_models/'
+        self.dataset_name= 'adult'
+        ##TODO: A general method to identify the dataset_name
+        self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
     
-        def compute_loss( self, model_out, x, target_label ): 
+    def compute_loss( self, model_out, x, target_label ): 
 
-            em = model_out['em']
-            ev = model_out['ev']
-            z  = model_out['z']
-            dm = model_out['x_pred']
-            mc_samples = model_out['mc_samples']
-            #KL Divergence
-            kl_divergence = 0.5*torch.mean( em**2 +ev - torch.log(ev) - 1, axis=1 ) 
+        em = model_out['em']
+        ev = model_out['ev']
+        z  = model_out['z']
+        dm = model_out['x_pred']
+        mc_samples = model_out['mc_samples']
+        #KL Divergence
+        kl_divergence = 0.5*torch.mean( em**2 +ev - torch.log(ev) - 1, axis=1 ) 
 
-            #Reconstruction Term
-            #Proximity: L1 Loss
-            x_pred = dm[0]       
-            s= model.encoded_start_cat
-            recon_err = -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
+        #Reconstruction Term
+        #Proximity: L1 Loss
+        x_pred = dm[0]       
+        s= self.cf_vae.encoded_start_cat
+        recon_err = -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
+        for key in self.normalise_weights.keys():
+            # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
+            recon_err+= -(self.normalise_weights[key][1] - self.normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
+
+        # Sum to 1 over the categorical indexes of a feature
+        for v in self.cf_vae.encoded_categorical_feature_indexes:
+            temp = -torch.abs(  1.0-torch.sum( x_pred[:, v[0]:v[-1]+1], axis=1) )
+            recon_err += temp
+
+        count=0
+        count+= torch.sum(x_pred[:,:s]<0,axis=1).float()
+        count+= torch.sum(x_pred[:,:s]>1,axis=1).float()    
+
+        #Validity         
+        temp_logits = self.pred_model(x_pred)
+        validity_loss= torch.zeros(1)                                       
+        temp_1= temp_logits[target_label==1,:]
+        temp_0= temp_logits[target_label==0,:]
+        validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
+        validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]) - F.sigmoid(temp_0[:,1]), torch.tensor(-1), self.margin, reduction='mean')
+
+        for i in range(1,mc_samples):
+            x_pred = dm[i]       
+
+            recon_err += -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
             for key in self.normalise_weights.keys():
-                # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
+                # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs( (x[:,key] - x_pred[:,key]))
                 recon_err+= -(self.normalise_weights[key][1] - self.normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
 
             # Sum to 1 over the categorical indexes of a feature
-            for v in self.model.encoded_categorical_feature_indexes:
+            for v in self.cf_vae.encoded_categorical_feature_indexes:
                 temp = -torch.abs(  1.0-torch.sum( x_pred[:, v[0]:v[-1]+1], axis=1) )
                 recon_err += temp
 
-            count=0
             count+= torch.sum(x_pred[:,:s]<0,axis=1).float()
-            count+= torch.sum(x_pred[:,:s]>1,axis=1).float()    
+            count+= torch.sum(x_pred[:,:s]>1,axis=1).float()        
 
-            #Validity         
+            #Validity
             temp_logits = self.pred_model(x_pred)
-            validity_loss= torch.zeros(1)                                       
+    #         validity_loss += -F.cross_entropy(temp_logits, target_label)      
             temp_1= temp_logits[target_label==1,:]
             temp_0= temp_logits[target_label==0,:]
             validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
             validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]) - F.sigmoid(temp_0[:,1]), torch.tensor(-1), self.margin, reduction='mean')
 
-            for i in range(1,mc_samples):
-                x_pred = dm[i]       
+        recon_err = recon_err / mc_samples
+        validity_loss = -1*self.validity_reg*validity_loss/mc_samples
 
-                recon_err += -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
-                for key in self.normalise_weights.keys():
-                    # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs( (x[:,key] - x_pred[:,key]))
-                    recon_err+= -(self.normalise_weights[key][1] - self.normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
-
-                # Sum to 1 over the categorical indexes of a feature
-                for v in model.encoded_categorical_feature_indexes:
-                    temp = -torch.abs(  1.0-torch.sum( x_pred[:, v[0]:v[-1]+1], axis=1) )
-                    recon_err += temp
-
-                count+= torch.sum(x_pred[:,:s]<0,axis=1).float()
-                count+= torch.sum(x_pred[:,:s]>1,axis=1).float()        
-
-                #Validity
-                temp_logits = self.pred_model(x_pred)
-        #         validity_loss += -F.cross_entropy(temp_logits, target_label)      
-                temp_1= temp_logits[target_label==1,:]
-                temp_0= temp_logits[target_label==0,:]
-                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
-                validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_0[:,0]) - F.sigmoid(temp_0[:,1]), torch.tensor(-1), self.margin, reduction='mean')
-
-            recon_err = recon_err / mc_samples
-            validity_loss = -1*self.validity_reg*validity_loss/mc_samples
-
-            print('Avg wrong cont dim: ', torch.mean(count)/mc_samples)
-            print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss)
-            return -torch.mean(recon_err - kl_divergence) - validity_loss
-
+        print('Avg wrong cont dim: ', torch.mean(count)/mc_samples)
+        print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss)
+        return -torch.mean(recon_err - kl_divergence) - validity_loss    
     
-    def train( self, constraint_type, constraint_variables, constraint_direction, constraint_reg  ):
+    
+    def train( self, constraint_type, constraint_variables, constraint_direction, constraint_reg, pre_trained=False  ):
         
-        # constraint_type: Binary Variable currently: (1) unary / (0) monotonic
-        # constraint_variables: List of List: [[Effect, Cause1, Cause2, .... ]]
-        # constraint_direction: -1: Negative, 1: Positive ( By default has to be one for monotonic constraints )
-        # constraint_reg: Tunable Hyperparamter
+        '''        
+        pre_trained: Bool Variable to check whether pre trained model exists to avoid training again        
+        constraint_type: Binary Variable currently: (1) unary / (0) monotonic
+        constraint_variables: List of List: [[Effect, Cause1, Cause2, .... ]]
+        constraint_direction: -1: Negative, 1: Positive ( By default has to be one for monotonic constraints )
+        constraint_reg: Tunable Hyperparamter
+        '''
         
-        for epoch in self.epochs:
+        if pre_trained:
+            self.cf_vae.load_state_dict(torch.load(self.save_path))
+            self.cf_vae.eval()
+            return 
+        
+        ##TODO: Handling such dataset specific constraints in a more general way
+        # CF Generation for only low to high income data points
+        self.vae_train_dataset= self.vae_train_dataset[self.vae_train_dataset[:,-1]==0,:]
+        self.vae_val_dataset= self.vae_val_dataset[self.vae_val_dataset[:,-1]==0,:]
+
+        #Removing the outcome variable from the datasets
+        self.vae_train_feat= self.vae_train_dataset[:,:-1]
+        self.vae_val_feat= self.vae_val_dataset[:,:-1]        
+        
+        for epoch in range(self.epochs):
             batch_num=0
             train_loss= 0.0
             train_size=0
             
-            train_dataset= torch.tensor(self.vae_train_dataset).float()
-            train_dataset= torch.utils.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+            train_dataset= torch.tensor(self.vae_train_feat).float()
+            train_dataset= torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
             for train_x in enumerate(train_dataset):
                 self.cf_vae_optimizer.zero_grad()
                 
@@ -209,18 +240,18 @@ class DiceBaseGenCF:
                     
                 loss.backward()
                 train_loss += loss.item()
-                optimizer.step()
+                self.cf_vae_optimizer.step()
                 
                 batch_num+=1
                 
             ret= loss/batch_num
             print('Train Avg Loss: ', ret, train_size )
             
-    ## I plan to keep the input arguments for this function same as the one defined for Diverse CF
-    ## Questions: Would query_instance a numpy_matrix
-    ## In what format do I need to return the predicted countefactuals
-    
-    def generate_countefactuals(self, query_instance, total_CFs, desired_class="opposite" ):
+            #Save the model after training
+            torch.save(self.cf_vae.state_dict(), self.save_path)                        
+        
+    #The input arguments for this function same as the one defined for Diverse CF    
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite",  ):
         
         # Converting query_instance into numpy array
         query_instance_org= query_instance
@@ -240,16 +271,15 @@ class DiceBaseGenCF:
             train_x = test_dataset[i]
             train_x= torch.tensor( train_x ).float()
             train_y = torch.argmax( self.pred_model(train_x), dim=1 )                
-            train_size += train_x.shape[0]        
+            
             curr_gen_cf=[]
             curr_cf_pred=[]            
-            curr_test_pred=[]
+            curr_test_pred= train_y.numpy()
             
             for cf_count in range(total_CFs):                
-                recon_err, kl_err, x_true, x_pred, cf_label = model.compute_elbo( train_x, 1.0-train_y, pred_model )
-                curr_gen_cf.append(x_pred.numpy())
-                curr_cf_pred.append(cf_label.numpy())
-                curr_test_pred.append(train_y.numpy())
+                recon_err, kl_err, x_true, x_pred, cf_label = self.cf_vae.compute_elbo( train_x, 1.0-train_y, self.pred_model )
+                curr_gen_cf.append(x_pred.detach().numpy())
+                curr_cf_pred.append(cf_label.detach().numpy())
 # Code for converting tensor countefactuals into pandas dataframe                
 #                 x_pred= d.de_normalize_data( d.get_decoded_data(x_pred.detach().cpu().numpy()) )
 #                 x_true= d.de_normalize_data( d.get_decoded_data(x_true.detach().cpu().numpy()) )                
@@ -261,5 +291,10 @@ class DiceBaseGenCF:
         result={}
         result['CF']= final_gen_cf[0]
         result['CF-Pred']= final_cf_pred[0]
-        result['test-pred']= torch.argmax(  )
-        return exp.CounterfactualExamples(self.data_interface, query_instance_org, test_pred, final_gen_cf[0], final_cf_pred[0])
+        result['test-pred']= final_test_pred[0]
+        
+        print(type(result['CF']), type(result['CF-Pred']), type(result['test-pred']))
+        print(final_test_pred[0])
+        
+        # Adding empty list for sparse cf gen and pred; adding 0 for the sparsity coffecient
+        return exp.CounterfactualExamples(self.data_interface, query_instance_org, final_test_pred[0], final_gen_cf[0], final_cf_pred[0], [], [], 0)
