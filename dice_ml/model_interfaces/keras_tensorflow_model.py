@@ -9,8 +9,8 @@ class KerasTensorFlowModel:
         """Init method
 
         :param model: trained Keras Sequential Model.
-        :param model_path: path to trained model
-        
+        :param model_path: path to trained model.
+
         """
 
         self.model = model

@@ -133,12 +133,6 @@ class DiceTensorFlow:
         # target CF placeholder
         self.target_cf = tf.placeholder(tf.float32, (1, 1))
 
-        # a placeholder for original instance
-        self.x1 = tf.placeholder(tf.float32, shape=(1, self.minx.shape[1]))
-
-        # target CF placeholder
-        self.target_cf = tf.placeholder(tf.float32, (1, 1))
-
         # learning rate for GD
         self.learning_rate = tf.placeholder(tf.float32, ())
 
