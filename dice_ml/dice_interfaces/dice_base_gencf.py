@@ -217,11 +217,16 @@ class DiceBaseGenCF:
             ret= loss/batch_num
             print('Train Avg Loss: ', ret, train_size )
             
-            #Save the model after training
-            torch.save(self.cf_vae.state_dict(), self.save_path)                   
+            #Save the model after training every 10 epochs and at the last epoch
+            if (epoch!=0 and epoch%10==0) or epoch==self.epochs-1:
+                torch.save(self.cf_vae.state_dict(), self.save_path)                   
             
     #The input arguments for this function same as the one defined for Diverse CF    
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite",  ):
+
+        ## Loading the latest trained CFVAE model
+        self.cf_vae.load_state_dict(torch.load(self.save_path))
+        self.cf_vae.eval()
         
         # Converting query_instance into numpy array
         query_instance_org= query_instance
@@ -236,7 +241,7 @@ class DiceBaseGenCF:
             test_dataset= [ query_instance ] 
         final_gen_cf=[]
         final_cf_pred=[]
-        final_test_pred= []
+        final_test_pred=[]
         for i in range(len(query_instance)):
             train_x = test_dataset[i]
             train_x= torch.tensor( train_x ).float()
@@ -246,25 +251,44 @@ class DiceBaseGenCF:
             curr_cf_pred=[]            
             curr_test_pred= train_y.numpy()
             
-            for cf_count in range(total_CFs):                
+            for cf_count in range(total_CFs):                                
                 recon_err, kl_err, x_true, x_pred, cf_label = self.cf_vae.compute_elbo( train_x, 1.0-train_y, self.pred_model )
-                curr_gen_cf.append(x_pred.detach().numpy())
-                curr_cf_pred.append(cf_label.detach().numpy())
-# Code for converting tensor countefactuals into pandas dataframe                
-#                 x_pred= d.de_normalize_data( d.get_decoded_data(x_pred.detach().cpu().numpy()) )
-#                 x_true= d.de_normalize_data( d.get_decoded_data(x_true.detach().cpu().numpy()) )                
+                while( cf_label== train_y):
+                    print(cf_label, train_y)
+                    recon_err, kl_err, x_true, x_pred, cf_label = self.cf_vae.compute_elbo( train_x, 1.0-train_y, self.pred_model )
+                    
+                x_pred= x_pred.detach().numpy()
+                #Converting mixed scores into one hot feature representations
+                for v in self.cf_vae.encoded_categorical_feature_indexes:
+                    curr_max= x_pred[:, v[0]]
+                    curr_max_idx= v[0]
+                    for idx in v:
+                        if curr_max < x_pred[:, idx]:
+                            curr_max= x_pred[:, idx]
+                            curr_max_idx= idx
+                    for idx in v:
+                        if idx==curr_max_idx:
+                            x_pred[:, idx]=1
+                        else:
+                            x_pred[:, idx]=0
+                        
+                    
+                cf_label= cf_label.detach().numpy()
+                cf_label= np.reshape( cf_label, (cf_label.shape[0],1) )
+                
+                curr_gen_cf.append( x_pred )
+                curr_cf_pred.append( cf_label )
+                
             final_gen_cf.append(curr_gen_cf)
             final_cf_pred.append(curr_cf_pred)
             final_test_pred.append(curr_test_pred)
         
         #CF Gen out
         result={}
+        result['query-instance']= query_instance[0]
+        result['test-pred']= final_test_pred[0][0]
         result['CF']= final_gen_cf[0]
         result['CF-Pred']= final_cf_pred[0]
-        result['test-pred']= final_test_pred[0]
-        
-        print(type(result['CF']), type(result['CF-Pred']), type(result['test-pred']))
-        print(final_test_pred[0])
         
         # Adding empty list for sparse cf gen and pred; adding 0 for the sparsity coffecient
-        return exp.CounterfactualExamples(self.data_interface, query_instance_org, final_test_pred[0], final_gen_cf[0], final_cf_pred[0], [], [], 0)
+        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'], None, None, 0)
