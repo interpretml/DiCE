@@ -1,11 +1,12 @@
 
 import numpy as np
 import pandas as pd
+import copy
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
-    def __init__(self, data_interface, test_instance, test_pred, final_cfs, final_cfs_preds, final_cfs_sparse, cfs_preds_sparse, posthoc_sparsity_param):
+    def __init__(self, data_interface, test_instance, test_pred, final_cfs, final_cfs_preds, final_cfs_sparse=None, cfs_preds_sparse=None, posthoc_sparsity_param=0):
 
         self.data_interface = data_interface
         self.test_instance = test_instance
@@ -14,7 +15,7 @@ class CounterfactualExamples:
         self.final_cfs_preds = final_cfs_preds
         self.final_cfs_sparse = final_cfs_sparse
         self.cfs_preds_sparse = cfs_preds_sparse
-        self.posthoc_sparsity_param = posthoc_sparsity_param
+        self.posthoc_sparsity_param = posthoc_sparsity_param # might be useful for future additions
 
         self.convert_to_dataframe() # transforming the test input from numpy to pandas dataframe
         if self.final_cfs_sparse is not None:
@@ -75,7 +76,7 @@ class CounterfactualExamples:
         self.final_cfs_df_sparse = result[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.final_cfs_list_sparse = self.final_cfs_df_sparse.values.tolist()
 
-    def visualize_as_dataframe(self, display_sparse_df=True):
+    def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
 
         # original instance
         print('Query instance (original outcome : %i)' %round(self.test_pred))
@@ -83,35 +84,68 @@ class CounterfactualExamples:
 
         if 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is not None:
             # CFs
-            print('\nDiverse Counterfactual set after sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
-            display(self.final_cfs_df_sparse)  #  works only in Jupyter notebook
+            print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
+            self.display_df(self.final_cfs_df_sparse, show_only_changes)
 
         elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is None:
-            print('Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying without posthoc sparsity operation')
-            display(self.final_cfs_df)  #  works only in Jupyter notebook
+            print('Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
+            self.display_df(self.final_cfs_df, show_only_changes)
+
+        elif 'data_df' not in self.data_interface.__dict__: # for private data
+            print('Diverse Counterfactual set without sparsity correction since only metadata about each feature is available (new outcome : %i)' %(1-round(self.test_pred)))
+            self.display_df(self.final_cfs_df, show_only_changes)
+
         else:
             # CFs
-            print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
-            display(self.final_cfs_df)  #  works only in Jupyter notebook
+            print('\nDiverse Counterfactual set without sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
+            self.display_df(self.final_cfs_df, show_only_changes)
 
+    def display_df(self, df, show_only_changes):
+        if show_only_changes is False:
+            display(df)  #  works only in Jupyter notebook
+        else:
+            newdf = df.values
+            org = self.org_instance.values.tolist()[0]
+            for ix in range(df.shape[0]):
+                for jx in range(len(org)):
+                    if newdf[ix][jx] == org[jx]:
+                        newdf[ix][jx] = '-'
+                    else:
+                        newdf[ix][jx] = str(newdf[ix][jx])
+            display(pd.DataFrame(newdf, columns=df.columns)) #  works only in Jupyter notebook
 
-    def visualize_as_list(self, display_sparse_df=True):
+    def visualize_as_list(self, display_sparse_df=True, show_only_changes=False):
         # original instance
         print('Query instance (original outcome : %i)' %round(self.test_pred))
         print(self.org_instance.values.tolist()[0])
 
         if 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is not None:
             # CFs
-            print('\nDiverse Counterfactual set after sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
-            for ix in range(len(self.final_cfs_list_sparse)):
-                print(self.final_cfs_list_sparse[ix])
+            print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
+            self.print_list(self.final_cfs_list_sparse, show_only_changes)
 
         elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is None:
-            print('Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying without posthoc sparsity operation')
-            for ix in range(len(self.final_cfs_list)):
-                print(self.final_cfs_list[ix])
+            print('Please specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
+            self.print_list(self.final_cfs_list_sparse, show_only_changes)
+
+        elif 'data_df' not in self.data_interface.__dict__: # for private data
+            print('Diverse Counterfactual set without sparsity correction since only metadata about each feature is available (new outcome : %i)' %(1-round(self.test_pred)))
+            self.print_list(self.final_cfs_list, show_only_changes)
+
         else:
             # CFs
-            print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
-            for ix in range(len(self.final_cfs_list)):
-                print(self.final_cfs_list[ix])
+            print('\nDiverse Counterfactual set without sparsity correction (new outcome : %i)' %(1-round(self.test_pred)))
+            self.print_list(self.final_cfs_list, show_only_changes)
+
+    def print_list(self, li, show_only_changes):
+        if show_only_changes is False:
+            for ix in range(len(li)):
+                print(li[ix])
+        else:
+            newli = copy.deepcopy(li)
+            org = self.org_instance.values.tolist()[0]
+            for ix in range(len(newli)):
+                for jx in range(len(newli[ix])):
+                    if newli[ix][jx] == org[jx]:
+                        newli[ix][jx] = '-'
+                print(newli[ix])

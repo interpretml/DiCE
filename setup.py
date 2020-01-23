@@ -10,9 +10,9 @@ with open('requirements.txt', encoding='utf-8') as f:
 setuptools.setup(
     name="dice_ml",
     version="0.2",
-    author="Ramaravind, Amit, Chenhao",
+    author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
-    description="Generates Diverse Counterfactual Explanations",
+    description="Generates Diverse Counterfactual Explanations for machine learning models",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/microsoft/DiCE",
