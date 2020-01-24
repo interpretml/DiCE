@@ -40,9 +40,8 @@ DiCE requires the following packages:
 * numpy
 * scikit-learn
 * pandas
-* cython
 * h5py
-* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_)
+* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_. We are working to support Tensorflow 2.0 soon!)
 
 Getting started with DiCE
 -------------------------
@@ -194,19 +193,17 @@ Being truthful to the model, counterfactual explanations can be useful to all st
   properties of an ML model. We plan to add support for this in the future.
 
 
-
-
-
 Roadmap
 -------
 Ideally, counterfactual explanations should balance between a wide range of suggested changes (*diversity*), and the relative ease of adopting those changes (*proximity* to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.
 
 We are working on adding the following features to DiCE:
 
+* Incorporating causal constraints when generating counterfactual explanations (check out `feasible-CF branch <https://github.com/microsoft/DiCE/tree/feasible-cf>`_)
 * Support for PyTorch and scikit-learn models
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations
-* Incorporating causal constraints when generating counterfactual explanations
+
 
 
 Contributing
