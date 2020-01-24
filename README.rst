@@ -40,9 +40,8 @@ DiCE requires the following packages:
 * numpy
 * scikit-learn
 * pandas
-* cython
 * h5py
-* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_)
+* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_. We are working to support Tensorflow 2.0 soon!)
 
 Getting started with DiCE
 -------------------------
@@ -192,9 +191,6 @@ Being truthful to the model, counterfactual explanations can be useful to all st
 * **Decision evaluators**: Finally, counterfactual explanations can be useful
   to decision evaluators who may be interested in fairness or other desirable
   properties of an ML model. We plan to add support for this in the future.
-
-
-
 
 
 Roadmap
