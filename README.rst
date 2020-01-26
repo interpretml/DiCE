@@ -178,9 +178,9 @@ cannot be more than 50).
 
 For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
-** Preserving Feasibility Constraints **
+**Preserving Feasibility Constraints**
 
-We are working on incorporating our work on generating feasible counterfactuals https://arxiv.org/abs/1912.03277 with DiCE. Current implementations can be found in this branch; which will soon be integerated with the master. Please refer to the notebook: DiCE_getting_started_feasible.ipynb for an introduction regading the same. 
+We are working on incorporating our work on generating feasible counterfactuals https://arxiv.org/abs/1912.03277 with DiCE. Current implementations can be found in this branch; which will soon be integerated with the master. Please refer to the notebook: ***DiCE_getting_started_feasible.ipynb*** for an introduction regading the same. 
 
 
 The promise of counterfactual explanations
