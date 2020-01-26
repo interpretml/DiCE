@@ -85,8 +85,8 @@ class DiceModelApproxGenCF:
         # TODO: Make these hyperparam dataset dependent
         self.learning_rate= 1e-2
         self.batch_size= 2048
-        self.validity_reg= 42.0 
-        self.margin= 0.165
+        self.validity_reg= 73.0 
+        self.margin= 0.369
         self.epochs= 25
         self.wm1=1e-2
         self.wm2=1e-2
@@ -103,7 +103,7 @@ class DiceModelApproxGenCF:
         self.base_model_dir= '../dice_ml/utils/sample_trained_models/'
         self.dataset_name= 'adult'
         ##TODO: A general method to identify the dataset_name
-        self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
+        self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'ae-gen' + '.pth'
     
     def compute_loss( self, model_out, x, target_label ): 
 
