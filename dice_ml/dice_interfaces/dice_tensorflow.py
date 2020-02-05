@@ -578,23 +578,25 @@ class DiceTensorFlow:
             decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
 
             for cf_ix in range(self.total_CFs):
-                current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
-
                 for feature in features_sorted:
+                    current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
                     feat_ix = self.data_interface.encoded_feature_names.index(feature)
                     change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix])
                     diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
+                    old_diff = diff
 
                     if(abs(diff) <= normalized_quantiles[feature]):
-                        while((abs(diff)>10e-4) &
+                        while((abs(diff)>10e-4) & (np.sign(diff*old_diff) > 0) &
                               ((self.target_cf_class[0][0] == 0 and current_pred[0][0] < self.stopping_threshold) |
                                (self.target_cf_class[0][0] == 1 and current_pred[0][0] > self.stopping_threshold))):
                             old_val = self.final_cfs_sparse[cf_ix][0][feat_ix]
                             self.final_cfs_sparse[cf_ix][0][feat_ix] += np.sign(diff)*change
                             current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
+                            old_diff = diff
 
                             if(((self.target_cf_class[0][0] == 0 and current_pred[0][0] > self.stopping_threshold) | (self.target_cf_class[0][0] == 1 and current_pred[0][0] < self.stopping_threshold))):
                                 self.final_cfs_sparse[cf_ix][0][feat_ix] = old_val
+                                diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
                                 break
 
                             diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
