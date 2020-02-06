@@ -20,6 +20,7 @@ class PublicData:
         :param permitted_range (optional): Dictionary with feature names as keys and permitted range as values. Defaults to the range inferred from training data.
         :param test_size (optional): Proportion of test set split. Defaults to 0.2.
         :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
+        :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
 
         """
 
@@ -61,17 +62,22 @@ class PublicData:
         else:
             self.test_split_random_state = 17
 
+        if 'continuous_features_precision' in params:
+            self.continuous_features_precision = params['continuous_features_precision']
+        else:
+            self.continuous_features_precision = None
+
         if len(self.categorical_feature_names) > 0:
             self.data_df[self.categorical_feature_names] = self.data_df[self.categorical_feature_names].astype(
                 'category')
         if len(self.continuous_feature_names) > 0:
             for feature in self.continuous_feature_names:
-                if self.get_data_type(self.data_df[feature]) == 'float':
+                if self.get_data_type(feature) == 'float':
                     self.data_df[feature] = self.data_df[feature].astype(
-                        float)
+                        np.float32)
                 else:
                     self.data_df[feature] = self.data_df[feature].astype(
-                        int)
+                        np.int32)
 
         if len(self.categorical_feature_names) > 0:
             self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
@@ -98,13 +104,12 @@ class PublicData:
 
     def get_data_type(self, col):
         """Infers data type of a feature from the training data."""
-        for instance in col.tolist():
-            if isinstance(instance, int):
-                return 'int'
-            else:
-                if float(str(instance).split('.')[1]) > 0:
-                    return 'float'
-        return 'int'
+        if((self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32)):
+            return 'int'
+        elif((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
+            return 'float'
+        else:
+            raise ValueError("unknown data type of feature %s" %col)
 
     def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
@@ -223,17 +228,20 @@ class PublicData:
 
     def get_decimal_precisions(self):
         """"Gets the precision of continuous features in the data."""
+        # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
         precisions = [0]*len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
-            precisions[ix] = 0
-            for instance in self.data_df[col].tolist():
-                if isinstance(instance, int):
-                    precisions[ix] = 0
-                    break
-                else:
-                    if float(str(instance).split('.')[1]) > 0:
-                        precisions[ix] = len(str(instance).split('.')[1])
-                        break
+            if((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
+                precisions[ix] = self.continuous_features_precision[col]
+            elif((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
+                modes = self.data_df[col].mode()
+                maxp = len(str(modes[0]).split('.')[1]) # maxp stores the maximum precision of the modes
+                for mx in range(len(modes)):
+                    prec = len(str(modes[mx]).split('.')[1])
+                    if prec > maxp:
+                        maxp = prec
+                maxp = min(maxp, 4)
+                precisions[ix] = maxp
         return precisions
 
     def get_decoded_data(self, data):
