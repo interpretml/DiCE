@@ -11,7 +11,7 @@ class Dice:
 
         :param data_interface: an interface to access data related params.
         :param model_interface: an interface to access the output or gradients of a trained ML model.
-        
+
         """
 
         self.decide_implementation_type(data_interface, model_interface)
@@ -27,10 +27,14 @@ class Dice:
 def decide(data_interface, model_interface):
     """Decides DiCE implementation type."""
 
-    if( (isinstance(model_interface.model, tf.keras.models.Sequential)) | (model_interface.model_path.endswith('.h5')) ): # pretrained Keras Sequential model with Tensorflow backend
-        from dice_ml.dice_interfaces.dice_tensorflow import DiceTensorFlow
-        return DiceTensorFlow
+    if model_interface.backend == 'TF1': # pretrained Keras Sequential model with Tensorflow 1.x backend
+        from dice_ml.dice_interfaces.dice_tensorflow1 import DiceTensorFlow1
+        return DiceTensorFlow1
 
-    else: #elif(isinstance(model_interface.model, 'PyTorch')): # Future support: PyTorch
+    elif model_interface.backend == 'TF2': # pretrained Keras Sequential model with Tensorflow 2.x backend
+        from dice_ml.dice_interfaces.dice_tensorflow2 import DiceTensorFlow2
+        return DiceTensorFlow2
+
+    elif model_interface.backend == 'PYT': # PyTorch backend
         from dice_ml.dice_interfaces.dice_pytorch import DicePyTorch
         return DicePyTorch

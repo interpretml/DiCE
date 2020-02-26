@@ -61,9 +61,10 @@ def load_adult_income_dataset(save_intermediate=False):
     return adult_data
 
 
-def get_adult_income_modelpath():
+def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
-    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult.h5')
+    model_ext = '.h5' if 'TF' in backend else '.pth'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
     return modelpath
 
 def get_adult_data_info():

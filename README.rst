@@ -41,7 +41,7 @@ DiCE requires the following packages:
 * scikit-learn
 * pandas
 * h5py
-* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_. We are working to support Tensorflow 2.0 soon!)
+* tensorflow (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 as well.)
 
 Getting started with DiCE
 -------------------------
@@ -128,7 +128,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-We plan to include support for PyTorch soon.
+Check out the last section in `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
 
 **Explanations**
 

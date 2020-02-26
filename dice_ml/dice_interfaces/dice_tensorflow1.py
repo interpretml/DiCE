@@ -1,4 +1,4 @@
-"""Module to generate diverse counterfactual explanationsbased on tensorflow"""
+"""Module to generate diverse counterfactual explanations based on tensorflow"""
 
 import tensorflow as tf
 
@@ -10,7 +10,7 @@ import copy
 
 from dice_ml import diverse_counterfactuals as exp
 
-class DiceTensorFlow:
+class DiceTensorFlow1:
 
     def __init__(self, data_interface, model_interface):
         """Init method
@@ -520,11 +520,7 @@ class DiceTensorFlow:
 
                 # backing up CFs if they are valid
                 temp_cfs_stored = self.round_off_cfs(assign=False)
-                temp_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
-                test_preds_stored = [np.round(preds.flatten().tolist(), 3)
-                              for preds in temp_preds_stored]
-                test_preds_stored = [
-                    item for sublist in test_preds_stored for item in sublist]
+                test_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
 
                 if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred-self.stopping_threshold) for pred in test_preds_stored])

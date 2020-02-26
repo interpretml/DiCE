@@ -1,5 +1,5 @@
 numpy<=1.16 # tensorflow 1.x versions require numpy<1.17.0 
 pandas
 scikit-learn
-tensorflow<=1.15 
+tensorflow>=1.13 
 h5py

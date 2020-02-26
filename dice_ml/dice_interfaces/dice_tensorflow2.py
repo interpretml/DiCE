@@ -1,7 +1,7 @@
 """
-Module to generate diverse counterfactual explanations based on PyTorch framework
+Module to generate diverse counterfactual explanations based on tensorflow 2.0
 """
-import torch
+import tensorflow as tf
 
 import numpy as np
 import random
@@ -11,7 +11,7 @@ import copy
 
 from dice_ml import diverse_counterfactuals as exp
 
-class DicePyTorch:
+class DiceTensorFlow2:
 
     def __init__(self, data_interface, model_interface):
         """Init method
@@ -26,9 +26,6 @@ class DicePyTorch:
 
         # loading trained model
         self.model.load_model()
-
-        # set the model in evaluation mode
-        ev = self.model.set_eval_mode()
 
         # get data-related parameters - minx and max for normalized continuous features
         self.data_interface = data_interface
@@ -53,7 +50,7 @@ class DicePyTorch:
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -69,7 +66,7 @@ class DicePyTorch:
         :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
         :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
         :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
-        :param optimizer: PyTorch optimization algorithm. Currently tested only with "pytorch:adam".
+        :param optimizer: Tensorflow optimization algorithm. Currently tested only with "tensorflow:adam".
 
         :param learning_rate: Learning rate for optimizer.
         :param min_iter: Min iterations to run gradient descent for.
@@ -101,7 +98,7 @@ class DicePyTorch:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance).data
+        return self.model.get_output(input_instance).numpy()
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes CFs and other related variables."""
@@ -120,15 +117,16 @@ class DicePyTorch:
         if features_to_vary != self.features_to_vary:
             self.features_to_vary = features_to_vary
             self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)
+            self.freezer = tf.constant([1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))])
+
 
         # CF initialization
         if len(self.cfs) == 0:
             for ix in range(self.total_CFs):
-                one_init = []
+                one_init = [[]]
                 for jx in range(self.minx.shape[1]):
-                    one_init.append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
-                self.cfs.append(torch.tensor(one_init).float())
-                self.cfs[ix].requires_grad = True
+                    one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                self.cfs.append(tf.Variable(one_init, dtype=tf.float32))
 
     def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights):
         """Intializes variables related to main loss function"""
@@ -154,10 +152,7 @@ class DicePyTorch:
                     feature_weights_list.append(feature_weights[feature])
                 else:
                     feature_weights_list.append(1.0)
-            self.feature_weights_list = torch.tensor(feature_weights_list)
-
-        # define different parts of loss function
-        self.yloss_opt = torch.nn.BCEWithLogitsLoss()
+            self.feature_weights_list = tf.constant([feature_weights_list], dtype=tf.float32)
 
     def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
         """Update hyperparameters of the loss function"""
@@ -168,74 +163,77 @@ class DicePyTorch:
         self.categorical_penalty = categorical_penalty
 
     def do_optimizer_initializations(self, optimizer, learning_rate):
-        """Initializes gradient-based PyTorch optimizers."""
+        """Initializes gradient-based TensorFLow optimizers."""
         opt_library = optimizer.split(':')[0]
         opt_method = optimizer.split(':')[1]
 
         # optimizater initialization
         if opt_method == "adam":
-            self.optimizer = torch.optim.Adam(self.cfs, lr=learning_rate)
+            self.optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
         elif opt_method == "rmsprop":
-            self.optimizer = torch.optim.RMSprop(self.cfs, lr=learning_rate)
+            self.optimizer =  tf.compat.v1.train.RMSPropOptimizer(learning_rate=learning_rate)
 
     def compute_first_part_of_loss(self):
         """Computes the first part (y-loss) of the loss function."""
         loss_part1 = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
-                temp_loss = torch.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
+                temp_loss = tf.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
             elif self.yloss_type == "log_loss":
-                temp_logits = torch.log10((abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
-                criterion = torch.nn.BCEWithLogitsLoss()
-                temp_loss = criterion(temp_logits, self.target_cf_class)
+                temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
+                    logits=temp_logits, labels=self.target_cf_class)
             elif self.yloss_type == "hinge_loss":
-                temp_logits = torch.log10((abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
-                criterion = torch.nn.ReLU()
-                temp_loss = criterion(0.5 - (temp_logits*self.target_cf_class))
+                temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_loss = tf.compat.v1.losses.hinge_loss(
+                    logits=temp_logits, labels=self.target_cf_class)
 
-            loss_part1 += temp_loss[0]
+            loss_part1 += temp_loss
 
         return loss_part1/self.total_CFs
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
-        return torch.sum(torch.mul((torch.abs(x_hat - x1)), self.feature_weights_list), dim=0)
+        return tf.reduce_sum(tf.multiply((tf.abs(x_hat - x1)), self.feature_weights_list))
 
     def compute_second_part_of_loss(self):
         """Compute the second part (distance from x1) of the loss function."""
         loss_part2 = 0.0
         for i in range(self.total_CFs):
             loss_part2 += self.compute_dist(self.cfs[i], self.x1)
-        return loss_part2/(torch.mul(len(self.minx[0]), self.total_CFs))
+        return loss_part2/tf.cast((tf.multiply(len(self.minx[0]), self.total_CFs)), dtype=tf.float32)
 
     def dpp_style(self, submethod):
         """Computes the DPP of a matrix."""
-        det_entries = torch.ones((self.total_CFs, self.total_CFs))
+        det_entries = []
         if submethod == "inverse_dist":
             for i in range(self.total_CFs):
                 for j in range(self.total_CFs):
-                    det_entries[(i,j)] = 1.0/(1.0 + self.compute_dist(self.cfs[i], self.cfs[j]))
+                    det_temp_entry = tf.divide(1.0, tf.add(
+                        1.0, self.compute_dist(self.cfs[i], self.cfs[j])))
                     if i == j:
-                        det_entries[(i,j)] += 0.0001
+                        det_temp_entry = tf.add(det_temp_entry, 0.0001)
+                    det_entries.append(det_temp_entry)
 
         elif submethod == "exponential_dist":
             for i in range(self.total_CFs):
                 for j in range(self.total_CFs):
-                    det_entries[(i,j)] = 1.0/(torch.exp(self.compute_dist(self.cfs[i], self.cfs[j])))
-                    if i == j:
-                        det_entries[(i,j)] += 0.0001
+                    det_temp_entry = tf.divide(1.0, tf.exp(
+                        self.compute_dist(self.cfs[i], self.cfs[j])))
+                    det_entries.append(det_temp_entry)
 
-        loss_part3 = torch.det(det_entries)
+        det_entries = tf.reshape(det_entries, [self.total_CFs, self.total_CFs])
+        loss_part3 = tf.compat.v1.matrix_determinant(det_entries)
         return loss_part3
 
     def compute_third_part_of_loss(self):
         """Computes the third part (diversity) of the loss function."""
         if self.total_CFs == 1:
-            return torch.tensor(0.0)
+            return tf.constant(0.0)
 
         if "dpp" in self.diversity_loss_type:
             submethod = self.diversity_loss_type.split(':')[1]
-            return self.dpp_style(submethod)
+            return tf.reduce_sum(self.dpp_style(submethod))
         elif self.diversity_loss_type == "avg_dist":
             loss_part3 = 0.0
             count = 0.0
@@ -252,7 +250,7 @@ class DicePyTorch:
         loss_part4 = 0.0
         for i in range(self.total_CFs):
             for v in self.encoded_categorical_feature_indexes:
-                loss_part4 += torch.pow((torch.sum(self.cfs[i][v[0]:v[-1]+1]) - 1.0), 2)
+                loss_part4 += tf.pow((tf.reduce_sum(self.cfs[i][0, v[0]:v[-1]+1]) - 1.0), 2)
 
         return loss_part4
 
@@ -264,34 +262,38 @@ class DicePyTorch:
         self.loss_part4 = self.compute_fourth_part_of_loss()
 
         self.loss = self.loss_part1 + (self.proximity_weight * self.loss_part2) - (self.diversity_weight * self.loss_part3) + (self.categorical_penalty * self.loss_part4)
+        #print(self.loss_part1, self.loss_part2, self.loss_part3, self.loss_part4)
         return self.loss
 
     def initialize_CFs(self, query_instance, init_near_query_instance=False):
         """Initialize counterfactuals."""
         for n in range(self.total_CFs):
+            one_init = []
             for i in range(len(self.minx[0])):
                 if i in self.feat_to_vary_idxs:
                     if init_near_query_instance:
-                        self.cfs[n].data[i] = query_instance[i]+(n*0.01)
+                        one_init.append(query_instance[0][i]+(n*0.01))
                     else:
-                        self.cfs[n].data[i] = np.random.uniform(self.minx[0][i], self.maxx[0][i])
+                        one_init.append(np.random.uniform(self.minx[0][i], self.maxx[0][i]))
                 else:
-                    self.cfs[n].data[i] = query_instance[i]
+                    one_init.append(query_instance[0][i])
+            one_init = np.array([one_init], dtype=np.float32)
+            self.cfs[n].assign(one_init)
 
     def round_off_cfs(self, assign=False):
         """function for intermediate projection of CFs."""
         temp_cfs = []
         for index, tcf in enumerate(self.cfs):
-            cf = tcf.detach().clone().numpy()
+            cf = tcf.numpy()
             for i, v in enumerate(self.encoded_continuous_feature_indexes):
-                org_cont = (cf[v]*(self.cont_maxx[i] - self.cont_minx[i])) + self.cont_minx[i] # continuous feature in orginal scale
+                org_cont = (cf[0, v]*(self.cont_maxx[i] - self.cont_minx[i])) + self.cont_minx[i] # continuous feature in orginal scale
                 org_cont = round(org_cont, self.cont_precisions[i]) # rounding off
                 normalized_cont = (org_cont - self.cont_minx[i])/(self.cont_maxx[i] - self.cont_minx[i])
-                cf[v] = normalized_cont # assign the projected continuous value
+                cf[0, v] = normalized_cont # assign the projected continuous value
 
             for v in self.encoded_categorical_feature_indexes:
                 maxs = np.argwhere(
-                    cf[v[0]:v[-1]+1] == np.amax(cf[v[0]:v[-1]+1])).flatten().tolist()
+                    cf[0, v[0]:v[-1]+1] == np.amax(cf[0, v[0]:v[-1]+1])).flatten().tolist()
                 if(len(maxs) > 1):
                     if self.tie_random:
                         ix = random.choice(maxs)
@@ -301,14 +303,13 @@ class DicePyTorch:
                     ix = maxs[0]
                 for vi in range(len(v)):
                     if vi == ix:
-                        cf[v[vi]] = 1.0
+                        cf[0, v[vi]] = 1.0
                     else:
-                        cf[v[vi]] = 0.0
+                        cf[0, v[vi]] = 0.0
 
-            temp_cfs.append(torch.tensor(cf))
+            temp_cfs.append(cf)
             if assign:
-                for jx in range(len(cf)):
-                    self.cfs[index].data[jx] = temp_cfs[index][jx]
+                self.cfs[index].assign(temp_cfs[index])
 
         if assign:
             return None
@@ -338,7 +339,7 @@ class DicePyTorch:
                 return False
             else:
                 temp_cfs = self.round_off_cfs(assign=False)
-                test_preds = [self.predict_fn(cf)[0] for cf in temp_cfs]
+                test_preds = [self.predict_fn(tf.constant(cf, dtype=tf.float32))[0] for cf in temp_cfs]
 
                 if self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds):
                     self.converged = True
@@ -357,15 +358,14 @@ class DicePyTorch:
 
         # Prepares user defined query_instance for DiCE.
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
-        query_instance = query_instance.iloc[0].values
-        self.x1 = torch.tensor(query_instance)
+        query_instance = np.array([query_instance.iloc[0].values])
+        self.x1 = tf.constant(query_instance, dtype=tf.float32)
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(torch.tensor(query_instance).float())
-        test_pred = test_pred.numpy()[0]
+        test_pred = self.predict_fn(tf.constant(query_instance, dtype=tf.float32))[0][0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
-        self.target_cf_class = torch.tensor(desired_class).float()
+        self.target_cf_class = np.array([[desired_class]])
 
         self.min_iter = min_iter
         self.max_iter = max_iter
@@ -412,27 +412,28 @@ class DicePyTorch:
 
             while self.stop_loop(iterations, loss_diff) is False:
 
-                # zero all existing gradients
-                self.optimizer.zero_grad()
-                self.model.model.zero_grad()
+                # compute loss and tape the variables history
+                with tf.GradientTape() as tape:
+                    loss_value = self.compute_loss()
 
-                # get loss and backpropogate
-                loss_value = self.compute_loss()
-                self.loss.backward()
+                # get gradients
+                grads = tape.gradient(loss_value, self.cfs)
 
                 # freeze features other than feat_to_vary_idxs
                 for ix in range(self.total_CFs):
-                    for jx in range(len(self.minx[0])):
-                        if jx not in self.feat_to_vary_idxs:
-                            self.cfs[ix].grad[jx] = 0.0
+                    grads[ix] *= self.freezer
 
-                # update the variables
-                self.optimizer.step()
+                # apply gradients and update the variables
+                self.optimizer.apply_gradients(zip(grads, self.cfs))
 
                 # projection step
-                for ix in range(self.total_CFs):
-                    for jx in range(len(self.minx[0])):
-                        self.cfs[ix].data[jx] = torch.clamp(self.cfs[ix][jx], min=self.minx[0][jx], max=self.maxx[0][jx])
+                for j in range(0, self.total_CFs):
+                    temp_cf = self.cfs[j].numpy()
+                    clip_cf = np.clip(temp_cf, self.minx, self.maxx)  # clipping
+                    # to remove -ve sign before 0.0 in some cases
+                    clip_cf = np.add(clip_cf, np.array(
+                        [np.zeros([self.minx.shape[1]])]))
+                    self.cfs[j].assign(clip_cf)
 
                 if verbose:
                     if (iterations) % 50 == 0:
@@ -444,10 +445,10 @@ class DicePyTorch:
 
                 # backing up CFs if they are valid
                 temp_cfs_stored = self.round_off_cfs(assign=False)
-                test_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
+                test_preds_stored = [self.predict_fn(tf.constant(cf, dtype=tf.float32)) for cf in temp_cfs_stored]
 
                 if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
-                    avg_preds_dist = np.mean([abs(pred[0]-self.stopping_threshold) for pred in test_preds_stored])
+                    avg_preds_dist = np.mean([abs(pred[0][0]-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold:
                         self.min_dist_from_threshold = avg_preds_dist
                         self.best_backup_cfs = temp_cfs_stored
@@ -458,7 +459,7 @@ class DicePyTorch:
 
             # storing final CFs
             for j in range(0, self.total_CFs):
-                temp = self.cfs[j].detach().clone()
+                temp = self.cfs[j].numpy()
                 self.final_cfs.append(temp)
 
             # max iterations at which GD stopped
@@ -470,11 +471,11 @@ class DicePyTorch:
 
         # update final_cfs from backed up CFs if valid CFs are not found
         self.valid_cfs_found = False
-        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in test_preds_stored))):
+        if((self.target_cf_class == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
             if self.min_dist_from_threshold != 100:
                 for ix in range(self.total_CFs):
-                    self.final_cfs[ix] = self.best_backup_cfs[ix].clone()
-                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix].clone()
+                    self.final_cfs[ix] = self.best_backup_cfs[ix].copy()
+                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix].copy()
 
                 self.valid_cfs_found = True # final_cfs have valid CFs through backup CFs
             else:
@@ -484,11 +485,8 @@ class DicePyTorch:
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            self.final_cfs_sparse = []
-            self.cfs_preds_sparse = []
-            for ix in range(self.total_CFs):
-                self.final_cfs_sparse.append(self.final_cfs[ix].clone())
-                self.cfs_preds_sparse.append(self.cfs_preds[ix].clone())
+            self.final_cfs_sparse = copy.deepcopy(self.final_cfs)
+            self.cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
 
             normalized_quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param, normalized=True)
             normalized_mads = self.data_interface.get_mads(normalized=True)
@@ -505,51 +503,29 @@ class DicePyTorch:
                     current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
                     feat_ix = self.data_interface.encoded_feature_names.index(feature)
                     change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix])
-                    diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
+                    diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
                     old_diff = diff
 
                     if(abs(diff) <= normalized_quantiles[feature]):
                         while((abs(diff)>10e-4) & (np.sign(diff*old_diff) > 0) &
-                              ((self.target_cf_class == 0 and current_pred[0] < self.stopping_threshold) |
-                               (self.target_cf_class == 1 and current_pred[0] > self.stopping_threshold))):
-                            old_val = self.final_cfs_sparse[cf_ix][feat_ix]
-                            self.final_cfs_sparse[cf_ix][feat_ix] += np.sign(diff)*change
+                              ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) |
+                               (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                            old_val = self.final_cfs_sparse[cf_ix][0][feat_ix]
+                            self.final_cfs_sparse[cf_ix][0][feat_ix] += np.sign(diff)*change
                             current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
                             old_diff = diff
 
-                            if(((self.target_cf_class == 0 and current_pred[0] > self.stopping_threshold) | (self.target_cf_class == 1 and current_pred[0] < self.stopping_threshold))):
-                                self.final_cfs_sparse[cf_ix][feat_ix] = old_val
-                                diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
+                            if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) | (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
+                                self.final_cfs_sparse[cf_ix][0][feat_ix] = old_val
+                                diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
                                 break
 
-                            diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
+                            diff = query_instance[0][feat_ix] - self.final_cfs_sparse[cf_ix][0][feat_ix]
 
                 self.cfs_preds_sparse[cf_ix] = self.predict_fn(self.final_cfs_sparse[cf_ix])
         else:
             self.final_cfs_sparse = None
             self.cfs_preds_sparse = None
-
-        # convert to the format that is consistent with dice_tensorflow
-        for tix in range(self.total_CFs):
-            temp = self.final_cfs[tix].clone().numpy()
-            self.final_cfs[tix] = np.array([temp], dtype=np.float32)
-
-            temp = self.cfs_preds[tix].clone().numpy()
-            self.cfs_preds[tix] = np.array([temp], dtype=np.float32)
-
-            if self.final_cfs_sparse is not None:
-                temp = self.final_cfs_sparse[tix].clone().numpy()
-                self.final_cfs_sparse[tix] = np.array([temp], dtype=np.float32)
-
-                temp = self.cfs_preds_sparse[tix].clone().numpy()
-                self.cfs_preds_sparse[tix] = np.array([temp], dtype=np.float32)
-
-            if len(self.best_backup_cfs) > 0:
-                temp = self.best_backup_cfs[tix].clone().numpy()
-                self.best_backup_cfs[tix] = np.array([temp], dtype=np.float32)
-
-                temp = self.best_backup_cfs_preds[tix].clone().numpy()
-                self.best_backup_cfs_preds[tix] = np.array([temp], dtype=np.float32)
 
         m, s = divmod(self.elapsed, 60)
         if self.valid_cfs_found:
@@ -559,7 +535,7 @@ class DicePyTorch:
         else:
             self.total_CFs_found = 0
             for pred in self.cfs_preds:
-                if((self.target_cf_class == 0 and pred[0][0] < self.stopping_threshold) or (self.target_cf_class == 1 and pred[0][0] > self.stopping_threshold)):
+                if((self.target_cf_class == 0 and pred < self.stopping_threshold) or (self.target_cf_class == 1 and pred > self.stopping_threshold)):
                     self.total_CFs_found += 1
 
             print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
