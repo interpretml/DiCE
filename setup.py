@@ -14,7 +14,7 @@ setuptools.setup(
     author_email="raam.arvind93@gmail.com",
     description="Generates Diverse Counterfactual Explanations for machine learning models",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/microsoft/DiCE",
     packages=setuptools.find_packages(), #setuptools.find_packages(), ['dice_ml', 'dice_ml.data_interfaces', 'dice_ml.dice_interfaces', 'dice_ml.model_interfaces', 'dice_ml.utils']
     classifiers=[
