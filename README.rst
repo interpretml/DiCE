@@ -74,6 +74,7 @@ example, the following input leads to class 0 (low income).
         'race': 'White',
         'gender':'Female',
         'hours_per_week': 45}
+
 Using DiCE, we can now generate examples that would have been classified as class 1 (high income).
 
 .. code:: python
@@ -83,11 +84,11 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-.. image:: docs/_static/getting_started_output.png
+.. image:: https://github.com/microsoft/DiCE/blob/master/docs/_static/getting_started_output.png
   :width: 400
   :alt: List of counterfactual examples
 
-For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook.
+For more details, check out the `Getting Started <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
 Supported use-cases
 -------------------
@@ -107,6 +108,7 @@ DiCE does not need access to the full dataset. It only requires metadata propert
                        'gender':['Female', 'Male'],
                        'hours_per_week': [1, 99]},
              outcome_name='income')
+
 **Model**
 
 We support pre-trained models as well as training a model using Tensorflow. Here's a simple example.
@@ -128,7 +130,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-Check out the last section in `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
+Check out the last section in `Getting Started <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
 
 **Explanations**
 
@@ -175,7 +177,7 @@ It also supports simple constraints on
 features that reflect practical constraints (e.g., working hours per week
 cannot be more than 50).
 
-For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
+For more details, check out `this <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------

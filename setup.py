@@ -10,6 +10,7 @@ with open('requirements.txt', encoding='utf-8') as f:
 setuptools.setup(
     name="dice_ml",
     version="0.2",
+    license="MIT",
     author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
     description="Generate Diverse Counterfactual Explanations for any machine learning model.",
@@ -24,7 +25,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-
     keywords='machine-learning explanation interpretability counterfactual',
     install_requires=install_requires,
     include_package_data=True,
