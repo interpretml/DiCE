@@ -12,17 +12,19 @@ setuptools.setup(
     version="0.2",
     author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
-    description="Generates Diverse Counterfactual Explanations for machine learning models",
+    description="Generate Diverse Counterfactual Explanations for any machine learning model.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/microsoft/DiCE",
-    packages=setuptools.find_packages(), #setuptools.find_packages(), ['dice_ml', 'dice_ml.data_interfaces', 'dice_ml.dice_interfaces', 'dice_ml.model_interfaces', 'dice_ml.utils']
+    packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
 
+    keywords='machine-learning explanation interpretability counterfactual',
+    python_requires='>=3.4',
     install_requires=install_requires,
     include_package_data=True,
     package_data={
