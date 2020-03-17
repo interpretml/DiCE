@@ -1,4 +1,4 @@
-numpy<=1.16 # tensorflow 1.x versions require numpy<1.17.0 
+numpy # if you are using tensorflow 1.x, it requires numpy<=1.16 
 pandas
 scikit-learn
 tensorflow>=1.13 
