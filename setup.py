@@ -26,7 +26,6 @@ setuptools.setup(
     ],
 
     keywords='machine-learning explanation interpretability counterfactual',
-    python_requires='>=3.4',
     install_requires=install_requires,
     include_package_data=True,
     package_data={
