@@ -16,6 +16,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/microsoft/DiCE",
+    download_url="https://github.com/microsoft/DiCE/archive/v0.2.tar.gz",
+    python_requires='>=3.4',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
