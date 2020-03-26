@@ -3,7 +3,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
 
-`Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
+`Ramaravind K. Mothilal <https://raam93.github.io/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
 
 `FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
 
@@ -23,7 +23,7 @@ Barring simple linear models, however, it is difficult to generate CF examples t
 
 Installing DICE
 -----------------
-DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo:
+DiCE supports Python 3+. To install the latest version of DiCE and its dependencies, run this from the top-most folder of the repo:
 
 .. code:: bash
 
@@ -42,6 +42,12 @@ DiCE requires the following packages:
 * pandas
 * h5py
 * tensorflow (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 as well.)
+
+The stable version of DiCE is now available on `PyPI <https://pypi.org/project/dice-ml/>`_.
+
+.. code:: bash
+
+    pip install dice-ml
 
 Getting started with DiCE
 -------------------------
