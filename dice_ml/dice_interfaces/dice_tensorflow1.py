@@ -62,6 +62,10 @@ class DiceTensorFlow1:
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.optimizer_weights = []  # optimizer
 
+        # number of output nodes of ML model
+        temp_input = tf.convert_to_tensor([tf.random.uniform([len(self.data_interface.encoded_feature_names)])], dtype=tf.float32)
+        self.num_ouput_nodes = self.dice_sess.run(self.model.get_output(temp_input)).shape[1]
+
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Generates diverse counterfactual explanations
 
@@ -164,7 +168,8 @@ class DiceTensorFlow1:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
+        temp_preds = self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
+        return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds])
 
     def compute_first_part_of_loss(self, method):
         """Computes the first part (y-loss) of the loss function."""
@@ -173,14 +178,17 @@ class DiceTensorFlow1:
             if method == "l2_loss":
                 temp_loss = tf.square(tf.subtract(
                     self.model.get_output(self.cfs_frozen[i]), self.target_cf))
+                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):]
             elif method == "log_loss":
                 temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)), tf.subtract(
                     1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
+                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf)
             elif method == "hinge_loss":
                 temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)), tf.subtract(
                     1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
+                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf)
 
@@ -440,7 +448,7 @@ class DiceTensorFlow1:
 
         # Prepares user defined query_instance for DiCE.
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
-        query_instance = np.array([query_instance.iloc[0].values])
+        query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0][0]

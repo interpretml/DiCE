@@ -53,6 +53,10 @@ class DicePyTorch:
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
 
+        # number of output nodes of ML model
+        temp_input = torch.rand([len(self.data_interface.encoded_feature_names)]).float()
+        self.num_ouput_nodes = len(self.model.get_output(temp_input).data)
+
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Generates diverse counterfactual explanations
 
@@ -99,9 +103,13 @@ class DicePyTorch:
         return exp.CounterfactualExamples(self.data_interface, query_instance,
         test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param)
 
+    def get_model_output(self, input_instance):
+        """get output probability of ML model"""
+        return self.model.get_output(input_instance)[(self.num_ouput_nodes-1):]
+
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance).data
+        return self.get_model_output(input_instance).data
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes CFs and other related variables."""
@@ -183,13 +191,13 @@ class DicePyTorch:
         loss_part1 = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
-                temp_loss = torch.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
+                temp_loss = torch.pow((self.get_model_output(self.cfs[i]) - self.target_cf_class), 2)
             elif self.yloss_type == "log_loss":
-                temp_logits = torch.log10((abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = torch.log10((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
                 criterion = torch.nn.BCEWithLogitsLoss()
                 temp_loss = criterion(temp_logits, self.target_cf_class)
             elif self.yloss_type == "hinge_loss":
-                temp_logits = torch.log10((abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = torch.log10((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
                 criterion = torch.nn.ReLU()
                 temp_loss = criterion(0.5 - (temp_logits*self.target_cf_class))
 

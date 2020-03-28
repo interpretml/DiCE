@@ -50,6 +50,10 @@ class DiceTensorFlow2:
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
 
+        # number of output nodes of ML model
+        temp_input = tf.convert_to_tensor([tf.random.uniform([len(self.data_interface.encoded_feature_names)])], dtype=tf.float32)
+        self.num_ouput_nodes = self.model.get_output(temp_input).shape[1]
+
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1):
         """Generates diverse counterfactual explanations
 
@@ -98,7 +102,8 @@ class DiceTensorFlow2:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance).numpy()
+        temp_preds = self.model.get_output(input_instance).numpy()
+        return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds], dtype=np.float32)
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes CFs and other related variables."""
@@ -179,12 +184,15 @@ class DiceTensorFlow2:
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
                 temp_loss = tf.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
+                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):]
             elif self.yloss_type == "log_loss":
                 temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf_class)
             elif self.yloss_type == "hinge_loss":
                 temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.compat.v1.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf_class)
 
@@ -365,7 +373,7 @@ class DiceTensorFlow2:
         test_pred = self.predict_fn(tf.constant(query_instance, dtype=tf.float32))[0][0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
-        self.target_cf_class = np.array([[desired_class]])
+        self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
 
         self.min_iter = min_iter
         self.max_iter = max_iter
