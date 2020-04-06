@@ -15,8 +15,8 @@ class PyTorchModel:
         self.model = model
         self.model_path = model_path
         self.backend = backend
-        self.model.load_state_dict(model_path)
-        self.model.eval()
+        #self.model.load_state_dict(model_path)
+        #self.model.eval()
 
     def load_model(self):
         if self.model_path != '':
