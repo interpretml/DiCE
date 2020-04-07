@@ -24,7 +24,7 @@ class DiceBaseGenCF:
         :param model_interface: an interface class to access trained ML model
         """    
         
-        self.pred_model= model_interface
+        self.pred_model= model_interface.model
         self.data_interface= data_interface
         
         self.encoded_size=10

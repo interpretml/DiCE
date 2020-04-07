@@ -15,8 +15,6 @@ class PyTorchModel:
         self.model = model
         self.model_path = model_path
         self.backend = backend
-        #self.model.load_state_dict(model_path)
-        #self.model.eval()
 
     def load_model(self):
         if self.model_path != '':
@@ -31,6 +29,5 @@ class PyTorchModel:
     def get_gradient(self, input):
         # Future Support
         return None
+   
     
-    def forward(self, x):
-        return self.model(x)
