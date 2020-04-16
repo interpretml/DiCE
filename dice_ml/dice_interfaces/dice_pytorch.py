@@ -1,6 +1,7 @@
 """
 Module to generate diverse counterfactual explanations based on PyTorch framework
 """
+from dice_ml.dice_interfaces.dice_base import DiceBase
 import torch
 
 import numpy as np
@@ -11,7 +12,7 @@ import copy
 
 from dice_ml import diverse_counterfactuals as exp
 
-class DicePyTorch:
+class DicePyTorch(DiceBase):
 
     def __init__(self, data_interface, model_interface):
         """Init method
@@ -21,6 +22,8 @@ class DicePyTorch:
 
         """
 
+        super().__init__(data_interface) # initiating data related parameters
+
         # initializing model variables
         self.model = model_interface
 
@@ -29,20 +32,6 @@ class DicePyTorch:
 
         # set the model in evaluation mode
         ev = self.model.set_eval_mode()
-
-        # get data-related parameters - minx and max for normalized continuous features
-        self.data_interface = data_interface
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()
-
-        # min and max for continuous features in original scale
-        flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]
-        self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]
-        org_minx, org_maxx = self.data_interface.get_minx_maxx(normalized=False)
-        self.cont_minx = list(org_minx[0][self.encoded_continuous_feature_indexes])
-        self.cont_maxx = list(org_maxx[0][self.encoded_continuous_feature_indexes])
-
-        # decimal precisions for continuous features
-        self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
