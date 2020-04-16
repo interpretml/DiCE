@@ -1,20 +1,19 @@
 """Module containing an interface to trained PyTorch model."""
 
+from dice_ml.model_interfaces.base_model import BaseModel
 import torch
 
-class PyTorchModel:
+class PyTorchModel(BaseModel):
 
     def __init__(self, model=None, model_path='', backend='PYT'):
         """Init method
 
         :param model: trained PyTorch Model.
         :param model_path: path to trained model.
-        :param backend: tensorflow 1.0/2.0 or pytorch framework.
+        :param backend: "PYT" for PyTorch framework.
         """
 
-        self.model = model
-        self.model_path = model_path
-        self.backend = backend
+        super().__init__(model, model_path, backend)
 
     def load_model(self):
         if self.model_path != '':
@@ -28,6 +27,4 @@ class PyTorchModel:
 
     def get_gradient(self, input):
         # Future Support
-        return None
-   
-    
+        raise NotImplementedError("Future Support")
