@@ -41,7 +41,7 @@ DiCE requires the following packages:
 * scikit-learn
 * pandas
 * h5py
-* tensorflow (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 as well.)
+* tensorflow (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 and PyTorch as well.)
 
 The stable version of DiCE is now available on `PyPI <https://pypi.org/project/dice-ml/>`_.
 
