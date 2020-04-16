@@ -1,5 +1,7 @@
-"""Module to generate diverse counterfactual explanations based on tensorflow"""
-
+"""
+Module to generate diverse counterfactual explanations based on tensorflow 1.x
+"""
+from dice_ml.dice_interfaces.dice_base import DiceBase
 import tensorflow as tf
 
 import numpy as np
@@ -10,7 +12,7 @@ import copy
 
 from dice_ml import diverse_counterfactuals as exp
 
-class DiceTensorFlow1:
+class DiceTensorFlow1(DiceBase):
 
     def __init__(self, data_interface, model_interface):
         """Init method
@@ -19,6 +21,8 @@ class DiceTensorFlow1:
         :param model_interface: an interface class to access trained ML model.
 
         """
+
+        super().__init__(data_interface) # initiating data related parameters
 
         # create TensorFLow session if one is not already created
         if tf.get_default_session() is not None:
@@ -31,20 +35,6 @@ class DiceTensorFlow1:
 
         # loading trained model
         self.model.load_model()
-
-        # get data-related parameters - minx and max for normalized continuous features
-        self.data_interface = data_interface
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()
-
-        # min and max for continuous features in original scale
-        flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]
-        self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]
-        org_minx, org_maxx = self.data_interface.get_minx_maxx(normalized=False)
-        self.cont_minx = list(org_minx[0][self.encoded_continuous_feature_indexes])
-        self.cont_maxx = list(org_maxx[0][self.encoded_continuous_feature_indexes])
-
-        # decimal precisions for continuous features
-        self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
         self.input_tensor = tf.Variable(self.minx, dtype=tf.float32)
         self.output_tensor = self.model.get_output(self.input_tensor)

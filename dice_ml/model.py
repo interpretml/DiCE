@@ -10,7 +10,7 @@ class Model:
 
         :param model: trained ML model.
         :param model_path: path to trained ML model.
-        :param backend: tensorflow 1.0/2.0 or pytorch framework.
+        :param backend: "TF1" ("TF2") for TensorFLow 1.0 (2.0) and "PYT" for PyTorch implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with "model" and "explainer" as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class "SklearnModel" in module "sklearn_model.py" inside the subpackage dice_ml.model_interfaces, and dice interface class "DiceSklearn" in module "dice_sklearn" inside dice_ml.dice_interfaces, then backend parameter should be {"model": "sklearn_model.SklearnModel", "explainer": dice_sklearn.DiceSklearn}.
 
         """
         if((model is None) & (model_path == '')):
@@ -36,3 +36,9 @@ def decide(backend):
     elif backend == 'PYT': # PyTorch backend
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel
         return PyTorchModel
+
+    else: # all other implementations and frameworks
+        backend_model = backend['model']
+        module_name, class_name = backend_model.split('.')
+        module = __import__("dice_ml.model_interfaces." + module_name, fromlist=[class_name])
+        return getattr(module, class_name)

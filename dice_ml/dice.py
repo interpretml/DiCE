@@ -38,3 +38,9 @@ def decide(data_interface, model_interface):
     elif model_interface.backend == 'PYT': # PyTorch backend
         from dice_ml.dice_interfaces.dice_pytorch import DicePyTorch
         return DicePyTorch
+
+    else: # all other backends
+        backend_dice = model_interface.backend['explainer']
+        module_name, class_name = backend_dice.split('.')
+        module = __import__("dice_ml.dice_interfaces." + module_name, fromlist=[class_name])
+        return getattr(module, class_name)
