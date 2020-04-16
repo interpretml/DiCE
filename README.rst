@@ -3,7 +3,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
 
-`Ramaravind K. Mothilal <https://www.linkedin.com/in/ramaravindkm/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
+`Ramaravind K. Mothilal <https://raam93.github.io/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
 
 `FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://microsoft.github.io/DiCE>`_ | Live Jupyter notebook |Binder|_
 
@@ -23,7 +23,7 @@ Barring simple linear models, however, it is difficult to generate CF examples t
 
 Installing DICE
 -----------------
-DiCE supports Python 3+. To install DiCE and its dependencies, run this from the top-most folder of the repo:
+DiCE supports Python 3+. To install the latest version of DiCE and its dependencies, run this from the top-most folder of the repo:
 
 .. code:: bash
 
@@ -40,9 +40,14 @@ DiCE requires the following packages:
 * numpy
 * scikit-learn
 * pandas
-* cython
 * h5py
-* tensorflow (DiCE was tested on `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_)
+* tensorflow (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 and PyTorch as well.)
+
+The stable version of DiCE is now available on `PyPI <https://pypi.org/project/dice-ml/>`_.
+
+.. code:: bash
+
+    pip install dice-ml
 
 Getting started with DiCE
 -------------------------
@@ -75,6 +80,7 @@ example, the following input leads to class 0 (low income).
         'race': 'White',
         'gender':'Female',
         'hours_per_week': 45}
+
 Using DiCE, we can now generate examples that would have been classified as class 1 (high income).
 
 .. code:: python
@@ -84,11 +90,11 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-.. image:: docs/_static/getting_started_output.png
+.. image:: https://github.com/microsoft/DiCE/blob/master/docs/_static/getting_started_output.png
   :width: 400
   :alt: List of counterfactual examples
 
-For more details, check out the `Getting Started <notebooks/DiCE_getting_started.ipynb>`_ notebook.
+For more details, check out the `Getting Started <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
 Supported use-cases
 -------------------
@@ -108,6 +114,7 @@ DiCE does not need access to the full dataset. It only requires metadata propert
                        'gender':['Female', 'Male'],
                        'hours_per_week': [1, 99]},
              outcome_name='income')
+
 **Model**
 
 We support pre-trained models as well as training a model using Tensorflow. Here's a simple example.
@@ -129,7 +136,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-We plan to include support for PyTorch soon.
+Check out the last section in `Getting Started <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
 
 **Explanations**
 
@@ -176,13 +183,7 @@ It also supports simple constraints on
 features that reflect practical constraints (e.g., working hours per week
 cannot be more than 50).
 
-For more details, check out `this <notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
-
-Preserving Causal Constraints for Feasible Counterfactual Explanantions
------------------------------------------------------------------------
-
-We are working on incorporating our paper on `generating feasible counterfactuals <https://arxiv.org/abs/1912.03277>`_ with DiCE. Current implementations can be found in this branch; which will soon be integerated with the master. Please refer to the notebook: `DiCE_getting_started_feasible.ipynb <https://github.com/microsoft/DiCE/blob/feasible-cf/notebooks/DiCE_getting_started_feasible.ipynb>`_  for an introduction regading the same. 
-
+For more details, check out `this <https://github.com/microsoft/DiCE/blob/master/notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------
@@ -200,19 +201,17 @@ Being truthful to the model, counterfactual explanations can be useful to all st
   properties of an ML model. We plan to add support for this in the future.
 
 
-
-
-
 Roadmap
 -------
 Ideally, counterfactual explanations should balance between a wide range of suggested changes (*diversity*), and the relative ease of adopting those changes (*proximity* to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.
 
 We are working on adding the following features to DiCE:
 
+* Incorporating causal constraints when generating counterfactual explanations (check out `feasible-CF branch <https://github.com/microsoft/DiCE/tree/feasible-cf>`_)
 * Support for PyTorch and scikit-learn models
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations
-* Incorporating causal constraints when generating counterfactual explanations ( Checkout the **DiCE_getting_started_feasible.ipynb** in notebooks )
+
 
 
 Contributing
