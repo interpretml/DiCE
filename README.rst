@@ -208,7 +208,7 @@ Ideally, counterfactual explanations should balance between a wide range of sugg
 We are working on adding the following features to DiCE:
 
 * Incorporating causal constraints when generating counterfactual explanations (check out `feasible-CF branch <https://github.com/microsoft/DiCE/tree/feasible-cf>`_)
-* Support for PyTorch and scikit-learn models
+* Support for scikit-learn and other libraries where models are not necessarily differentiable
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations
 
