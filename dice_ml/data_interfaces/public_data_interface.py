@@ -18,7 +18,7 @@ class PublicData:
         :param dataframe: Pandas DataFrame.
         :param continuous_features: List of names of continuous features. The remaining features are categorical features.
         :param outcome_name: Outcome feature name.
-        :param permitted_range (optional): Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data.
+        :param permitted_range (optional): Dictionary with feature names as keys and permitted range as values. Defaults to the range inferred from training data.
         :param test_size (optional): Proportion of test set split. Defaults to 0.2.
         :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
         :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
@@ -55,9 +55,6 @@ class PublicData:
 
         if 'test_size' in params:
             self.test_size = params['test_size']
-            if self.test_size > 1 or self.test_size < 0:
-                raise ValueError(
-                    "should provide a decimal between 0 and 1")
         else:
             self.test_size = 0.2
 
@@ -96,23 +93,8 @@ class PublicData:
 
         if 'permitted_range' in params:
             self.permitted_range = params['permitted_range']
-            if not self.check_features_range():
-                raise ValueError(
-                    "permitted range of features should be within their original range")
         else:
             self.permitted_range = self.get_features_range()
-
-    def check_features_range(self):
-        for feature in self.continuous_feature_names:
-            if feature in self.permitted_range:
-                min_value = self.train_df[feature].min()
-                max_value = self.train_df[feature].max()
-
-                if self.permitted_range[feature][0] < min_value and self.permitted_range[feature][1] > max_value:
-                    return False
-            else:
-                self.permitted_range[feature] = [self.train_df[feature].min(), self.train_df[feature].max()]
-        return True
 
     def get_features_range(self):
         ranges = {}
@@ -200,7 +182,7 @@ class PublicData:
             if mads[feature] <= 0:
                 mads[feature] = 1.0
                 if display_warnings:
-                    logging.warning(" MAD for feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
+                    logging.warning(" MAD for Feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
         if return_mads:
             return mads
 
@@ -234,8 +216,7 @@ class PublicData:
         cols = []
         for col_parent in self.categorical_feature_names:
             temp = [self.encoded_feature_names.index(
-                col) for col in self.encoded_feature_names if col.startswith(col_parent) and
-                   col not in self.continuous_feature_names]
+                col) for col in self.encoded_feature_names if col.startswith(col_parent)]
             cols.append(temp)
         return cols
 
@@ -244,15 +225,7 @@ class PublicData:
         if features_to_vary == "all":
             return [i for i in range(len(self.encoded_feature_names))]
         else:
-            ixs = []
-            encoded_cats_ixs = self.get_encoded_categorical_feature_indexes()
-            encoded_cats_ixs = [item for sublist in encoded_cats_ixs for item in sublist]
-            for colidx, col in enumerate(self.encoded_feature_names):
-                if colidx in encoded_cats_ixs and col.startswith(tuple(features_to_vary)):
-                    ixs.append(colidx)
-                elif colidx not in encoded_cats_ixs and col in features_to_vary:
-                    ixs.append(colidx)
-            return ixs
+            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(features_to_vary))]
 
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
