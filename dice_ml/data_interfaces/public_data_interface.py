@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+import logging
 
 import tensorflow as tf
 from tensorflow import keras
@@ -109,7 +110,7 @@ class PublicData:
         elif((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
             return 'float'
         else:
-            raise ValueError("unknown data type of feature %s" %col)
+            raise ValueError("Unknown data type of feature %s: must be int or float" %col)
 
     def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
@@ -173,6 +174,17 @@ class PublicData:
                 mads[feature] = np.median(
                     abs(normalized_train_df[feature].values - np.median(normalized_train_df[feature].values)))
         return mads
+
+    def get_valid_mads(self, normalized=False, display_warnings=False, return_mads=True):
+        """Computes Median Absolute Deviation of features. If they are <=0, returns a practical value instead"""
+        mads = self.get_mads(normalized=normalized)
+        for feature in mads:
+            if mads[feature] <= 0:
+                mads[feature] = 1.0
+                if display_warnings:
+                    logging.warning(" MAD for Feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
+        if return_mads:
+            return mads
 
     def get_quantiles_from_training_data(self, quantile=0.05, normalized=False):
         """Computes required quantile of Absolute Deviations of features."""

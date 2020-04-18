@@ -80,6 +80,10 @@ class DicePyTorch(DiceBase):
 
         """
 
+        # check feature MAD validity and throw warnings
+        if feature_weights == "inverse_mad":
+            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
+
         if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
         if([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
@@ -140,7 +144,7 @@ class DicePyTorch(DiceBase):
         if feature_weights != self.feature_weights_input:
             self.feature_weights_input = feature_weights
             if feature_weights == "inverse_mad":
-                normalized_mads = self.data_interface.get_mads(normalized=True)
+                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
                 feature_weights = {}
                 for feature in normalized_mads:
                     feature_weights[feature] = round(1/normalized_mads[feature], 2)
@@ -488,7 +492,7 @@ class DicePyTorch(DiceBase):
                 self.cfs_preds_sparse.append(self.cfs_preds[ix].clone())
 
             normalized_quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param, normalized=True)
-            normalized_mads = self.data_interface.get_mads(normalized=True)
+            normalized_mads = self.data_interface.get_valid_mads(normalized=True)
             for feature in normalized_quantiles:
                 normalized_quantiles[feature] = min(normalized_quantiles[feature], normalized_mads[feature])
 
