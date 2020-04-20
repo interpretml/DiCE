@@ -182,7 +182,7 @@ class PublicData:
             if mads[feature] <= 0:
                 mads[feature] = 1.0
                 if display_warnings:
-                    logging.warning(" MAD for Feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
+                    logging.warning(" MAD for feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
         if return_mads:
             return mads
 
