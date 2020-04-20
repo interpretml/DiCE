@@ -71,8 +71,8 @@ class PrivateData:
                     self.encoded_feature_names.append(
                         feature_name+'_'+category)
 
-        if len(self.type_and_precision) == 0:
-            for feature_name in self.continuous_feature_names:
+        for feature_name in self.continuous_feature_names:
+            if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
 
     def normalize_data(self, df):
