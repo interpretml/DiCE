@@ -216,7 +216,8 @@ class PublicData:
         cols = []
         for col_parent in self.categorical_feature_names:
             temp = [self.encoded_feature_names.index(
-                col) for col in self.encoded_feature_names if col.startswith(col_parent)]
+                col) for col in self.encoded_feature_names if col.startswith(col_parent) and
+                   col not in self.continuous_feature_names]
             cols.append(temp)
         return cols
 
