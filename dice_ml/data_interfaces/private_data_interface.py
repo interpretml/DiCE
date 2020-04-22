@@ -111,7 +111,7 @@ class PrivateData:
     def get_mads(self, normalized=True):
         """Computes Median Absolute Deviation of features."""
         if normalized is False:
-            return self.mad
+            return self.mad.copy()
         else:
             mads = {}
             for feature in self.continuous_feature_names:
