@@ -250,7 +250,7 @@ class PublicData:
                 if colidx in encoded_cats_ixs and col.startswith(tuple(features_to_vary)):
                     ixs.append(colidx)
                 elif colidx not in encoded_cats_ixs and col in features_to_vary:
-                    ixs.appen(colidx)
+                    ixs.append(colidx)
             return ixs
 
     def from_dummies(self, data, prefix_sep='_'):
