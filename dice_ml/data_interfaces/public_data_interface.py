@@ -246,6 +246,7 @@ class PublicData:
         else:
             ixs = []
             encoded_cats_ixs = self.get_encoded_categorical_feature_indexes()
+            encoded_cats_ixs = [item for sublist in encoded_cats_ixs for item in sublist]
             for colidx, col in enumerate(self.encoded_feature_names):
                 if colidx in encoded_cats_ixs and col.startswith(tuple(features_to_vary)):
                     ixs.append(colidx)
