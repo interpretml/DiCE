@@ -244,7 +244,14 @@ class PublicData:
         if features_to_vary == "all":
             return [i for i in range(len(self.encoded_feature_names))]
         else:
-            return [colidx for colidx, col in enumerate(self.encoded_feature_names) if col.startswith(tuple(features_to_vary))]
+            ixs = []
+            encoded_cats_ixs = self.get_encoded_categorical_feature_indexes()
+            for colidx, col in enumerate(self.encoded_feature_names):
+                if colidx in encoded_cats_ixs and col.startswith(tuple(features_to_vary)):
+                    ixs.append(colidx)
+                elif colidx not in encoded_cats_ixs and col in features_to_vary:
+                    ixs.appen(colidx)
+            return ixs
 
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
