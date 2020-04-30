@@ -179,9 +179,9 @@ class DicePyTorch(DiceBase):
         elif opt_method == "rmsprop":
             self.optimizer = torch.optim.RMSprop(self.cfs, lr=learning_rate)
 
-    def compute_first_part_of_loss(self):
+    def compute_yloss(self):
         """Computes the first part (y-loss) of the loss function."""
-        loss_part1 = 0.0
+        yloss = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
                 temp_loss = torch.pow((self.get_model_output(self.cfs[i]) - self.target_cf_class), 2)[0]
@@ -194,20 +194,20 @@ class DicePyTorch(DiceBase):
                 criterion = torch.nn.ReLU()
                 temp_loss = criterion(0.5 - (temp_logits*self.target_cf_class))[0]
 
-            loss_part1 += temp_loss
+            yloss += temp_loss
 
-        return loss_part1/self.total_CFs
+        return yloss/self.total_CFs
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
         return torch.sum(torch.mul((torch.abs(x_hat - x1)), self.feature_weights_list), dim=0)
 
-    def compute_second_part_of_loss(self):
+    def compute_proximity_loss(self):
         """Compute the second part (distance from x1) of the loss function."""
-        loss_part2 = 0.0
+        proximity_loss = 0.0
         for i in range(self.total_CFs):
-            loss_part2 += self.compute_dist(self.cfs[i], self.x1)
-        return loss_part2/(torch.mul(len(self.minx[0]), self.total_CFs))
+            proximity_loss += self.compute_dist(self.cfs[i], self.x1)
+        return proximity_loss/(torch.mul(len(self.minx[0]), self.total_CFs))
 
     def dpp_style(self, submethod):
         """Computes the DPP of a matrix."""
@@ -226,10 +226,10 @@ class DicePyTorch(DiceBase):
                     if i == j:
                         det_entries[(i,j)] += 0.0001
 
-        loss_part3 = torch.det(det_entries)
-        return loss_part3
+        diversity_loss = torch.det(det_entries)
+        return diversity_loss
 
-    def compute_third_part_of_loss(self):
+    def compute_diversity_loss(self):
         """Computes the third part (diversity) of the loss function."""
         if self.total_CFs == 1:
             return torch.tensor(0.0)
@@ -238,33 +238,33 @@ class DicePyTorch(DiceBase):
             submethod = self.diversity_loss_type.split(':')[1]
             return self.dpp_style(submethod)
         elif self.diversity_loss_type == "avg_dist":
-            loss_part3 = 0.0
+            diversity_loss = 0.0
             count = 0.0
             # computing pairwise distance and transforming it to normalized similarity
             for i in range(self.total_CFs):
                 for j in range(i+1, self.total_CFs):
                     count += 1.0
-                    loss_part3 += 1.0/(1.0 + self.compute_dist(self.cfs[i], self.cfs[j]))
+                    diversity_loss += 1.0/(1.0 + self.compute_dist(self.cfs[i], self.cfs[j]))
 
-            return 1.0 - (loss_part3/count)
+            return 1.0 - (diversity_loss/count)
 
-    def compute_fourth_part_of_loss(self):
+    def compute_regularization_loss(self):
         """Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one"""
-        loss_part4 = 0.0
+        regularization_loss = 0.0
         for i in range(self.total_CFs):
             for v in self.encoded_categorical_feature_indexes:
-                loss_part4 += torch.pow((torch.sum(self.cfs[i][v[0]:v[-1]+1]) - 1.0), 2)
+                regularization_loss += torch.pow((torch.sum(self.cfs[i][v[0]:v[-1]+1]) - 1.0), 2)
 
-        return loss_part4
+        return regularization_loss
 
     def compute_loss(self):
         """Computes the overall loss"""
-        self.loss_part1 = self.compute_first_part_of_loss()
-        self.loss_part2 = self.compute_second_part_of_loss()
-        self.loss_part3 = self.compute_third_part_of_loss()
-        self.loss_part4 = self.compute_fourth_part_of_loss()
+        self.yloss = self.compute_yloss()
+        self.proximity_loss = self.compute_proximity_loss()
+        self.diversity_loss = self.compute_diversity_loss()
+        self.regularization_loss = self.compute_regularization_loss()
 
-        self.loss = self.loss_part1 + (self.proximity_weight * self.loss_part2) - (self.diversity_weight * self.loss_part3) + (self.categorical_penalty * self.loss_part4)
+        self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (self.diversity_weight * self.diversity_loss) + (self.categorical_penalty * self.regularization_loss)
         return self.loss
 
     def initialize_CFs(self, query_instance, init_near_query_instance=False):
