@@ -171,38 +171,38 @@ class DiceTensorFlow2(DiceBase):
         elif opt_method == "rmsprop":
             self.optimizer =  tf.compat.v1.train.RMSPropOptimizer(learning_rate=learning_rate)
 
-    def compute_first_part_of_loss(self):
+    def compute_yloss(self):
         """Computes the first part (y-loss) of the loss function."""
-        loss_part1 = 0.0
+        yloss = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
                 temp_loss = tf.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
-                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):]
+                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):][0][0]
             elif self.yloss_type == "log_loss":
                 temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
                 temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
-                    logits=temp_logits, labels=self.target_cf_class)
+                    logits=temp_logits, labels=self.target_cf_class)[0][0]
             elif self.yloss_type == "hinge_loss":
                 temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
                 temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
                 temp_loss = tf.compat.v1.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf_class)
 
-            loss_part1 += temp_loss
+            yloss += temp_loss
 
-        return loss_part1/self.total_CFs
+        return yloss/self.total_CFs
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
         return tf.reduce_sum(tf.multiply((tf.abs(x_hat - x1)), self.feature_weights_list))
 
-    def compute_second_part_of_loss(self):
+    def compute_proximity_loss(self):
         """Compute the second part (distance from x1) of the loss function."""
-        loss_part2 = 0.0
+        proximity_loss = 0.0
         for i in range(self.total_CFs):
-            loss_part2 += self.compute_dist(self.cfs[i], self.x1)
-        return loss_part2/tf.cast((tf.multiply(len(self.minx[0]), self.total_CFs)), dtype=tf.float32)
+            proximity_loss += self.compute_dist(self.cfs[i], self.x1)
+        return proximity_loss/tf.cast((tf.multiply(len(self.minx[0]), self.total_CFs)), dtype=tf.float32)
 
     def dpp_style(self, submethod):
         """Computes the DPP of a matrix."""
@@ -224,10 +224,10 @@ class DiceTensorFlow2(DiceBase):
                     det_entries.append(det_temp_entry)
 
         det_entries = tf.reshape(det_entries, [self.total_CFs, self.total_CFs])
-        loss_part3 = tf.compat.v1.matrix_determinant(det_entries)
-        return loss_part3
+        diversity_loss = tf.compat.v1.matrix_determinant(det_entries)
+        return diversity_loss
 
-    def compute_third_part_of_loss(self):
+    def compute_diversity_loss(self):
         """Computes the third part (diversity) of the loss function."""
         if self.total_CFs == 1:
             return tf.constant(0.0)
@@ -236,34 +236,34 @@ class DiceTensorFlow2(DiceBase):
             submethod = self.diversity_loss_type.split(':')[1]
             return tf.reduce_sum(self.dpp_style(submethod))
         elif self.diversity_loss_type == "avg_dist":
-            loss_part3 = 0.0
+            diversity_loss = 0.0
             count = 0.0
             # computing pairwise distance and transforming it to normalized similarity
             for i in range(self.total_CFs):
                 for j in range(i+1, self.total_CFs):
                     count += 1.0
-                    loss_part3 += 1.0/(1.0 + self.compute_dist(self.cfs[i], self.cfs[j]))
+                    diversity_loss += 1.0/(1.0 + self.compute_dist(self.cfs[i], self.cfs[j]))
 
-            return 1.0 - (loss_part3/count)
+            return 1.0 - (diversity_loss/count)
 
-    def compute_fourth_part_of_loss(self):
+    def compute_regularization_loss(self):
         """Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one"""
-        loss_part4 = 0.0
+        regularization_loss = 0.0
         for i in range(self.total_CFs):
             for v in self.encoded_categorical_feature_indexes:
-                loss_part4 += tf.pow((tf.reduce_sum(self.cfs[i][0, v[0]:v[-1]+1]) - 1.0), 2)
+                regularization_loss += tf.pow((tf.reduce_sum(self.cfs[i][0, v[0]:v[-1]+1]) - 1.0), 2)
 
-        return loss_part4
+        return regularization_loss
 
     def compute_loss(self):
         """Computes the overall loss"""
-        self.loss_part1 = self.compute_first_part_of_loss()
-        self.loss_part2 = self.compute_second_part_of_loss()
-        self.loss_part3 = self.compute_third_part_of_loss()
-        self.loss_part4 = self.compute_fourth_part_of_loss()
+        self.yloss = self.compute_yloss()
+        self.proximity_loss = self.compute_proximity_loss()
+        self.diversity_loss = self.compute_diversity_loss()
+        self.regularization_loss = self.compute_regularization_loss()
 
-        self.loss = self.loss_part1 + (self.proximity_weight * self.loss_part2) - (self.diversity_weight * self.loss_part3) + (self.categorical_penalty * self.loss_part4)
-        #print(self.loss_part1, self.loss_part2, self.loss_part3, self.loss_part4)
+        self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (self.diversity_weight * self.diversity_loss) + (self.categorical_penalty * self.regularization_loss)
+        #print(self.yloss, self.proximity_loss, self.diversity_loss, self.regularization_loss)
         return self.loss
 
     def initialize_CFs(self, query_instance, init_near_query_instance=False):
