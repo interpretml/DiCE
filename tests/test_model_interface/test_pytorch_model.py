@@ -1,8 +1,8 @@
+import numpy as np
 import pytest
 
 import dice_ml
 from dice_ml.utils import helpers
-import numpy as np
 
 pyt = pytest.importorskip("torch")
 
@@ -17,6 +17,9 @@ def test_model_initiation(pyt_model_object):
     assert isinstance(pyt_model_object, dice_ml.model_interfaces.pytorch_model.PyTorchModel)
 
 def test_model_initiation_fullpath():
+    """
+    Tests if model is initiated when full path to a model and explainer class is given to backend parameter.
+    """
     pyt = pytest.importorskip("torch")
     backend = {'model': 'pytorch_model.PyTorchModel',
             'explainer': 'dice_pytorch.DicePyTorch'}
@@ -33,8 +36,9 @@ class TestPyTorchModelMethods:
         self.m.load_model()
         assert self.m.model is not None
 
-    def test_model_output(self):
+    @pytest.mark.parametrize("input_instance, prediction",[(np.array([[0.5]*29], dtype=np.float32), 0.0957)])
+    def test_model_output(self, input_instance, prediction):
         self.m.load_model()
-        test_instance = pyt.tensor(np.array([[0.5]*29], dtype=np.float32))
-        prediction = self.m.get_output(test_instance).detach().numpy()[0][0]
-        assert (round(prediction,4)-0.0957)<1e-6
+        input_instance_pyt = pyt.tensor(input_instance)
+        prediction = self.m.get_output(input_instance_pyt).detach().numpy()[0][0]
+        pytest.approx(prediction, abs=1e-3) == prediction

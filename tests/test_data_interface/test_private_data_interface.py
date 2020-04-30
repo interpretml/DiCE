@@ -21,8 +21,8 @@ class TestPrivateDataMethods:
         self.d = data_object
 
     def test_mads(self):
-        mads = self.d.get_valid_mads(normalized=False)
-        assert list(mads.values()) == [10.0, 1.0]
+        mads = self.d.get_valid_mads(normalized=False) # normalized=True is already tested in test_data.py
+        assert list(mads.values()) == [10.0, 1.0] # 10 is given as the mad of feature 'age' while initiating private Data object; 1.0 is the default value. Check get_valid_mads() in private_data_interface for more info.
 
     def test_feature_precision(self):
-        assert self.d.get_decimal_precisions()[1] == 2
+        assert self.d.get_decimal_precisions()[1] == 2 # feature precision decides the least change that can be made to the feature in optimization, given as 2-decimal place for 'hours_per_week' feature while initiating private Data object.
