@@ -22,16 +22,17 @@ class TestCommonDataMethods:
             mads = self.d[0].get_valid_mads(normalized=normalized, display_warnings=False, return_mads=True)
             assert all(mads[feature] > 0 for feature in mads) # mads denotes variability in features and should be positive for DiCE.
 
-            if normalized == True:
+            if normalized:
                 min_value = 0
                 max_value = 1
-            else:
-                min_value = self.d[0].train_df[feature].min()
-                max_value = self.d[0].train_df[feature].max()
 
             errors = 0
             for feature in mads:
-                if mads[feature] < min_value or mads[feature] > max_value:
+                if not normalized:
+                    min_value = self.d[0].train_df[feature].min()
+                    max_value = self.d[0].train_df[feature].max()
+
+                if mads[feature] > max_value - min_value:
                     errors += 1
             assert errors==0 # mads can't be larger than the feature range
 
