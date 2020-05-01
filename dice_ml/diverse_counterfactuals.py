@@ -1,7 +1,7 @@
-
 import numpy as np
 import pandas as pd
 import copy
+from IPython.display import display
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
