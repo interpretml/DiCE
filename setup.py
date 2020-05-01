@@ -16,8 +16,8 @@ setuptools.setup(
     description="Generate Diverse Counterfactual Explanations for any machine learning model.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
-    url="https://github.com/microsoft/DiCE",
-    download_url="https://github.com/microsoft/DiCE/archive/v0.2.tar.gz",
+    url="https://github.com/interpretml/DiCE",
+    download_url="https://github.com/interpretml/DiCE/archive/v0.2.tar.gz",
     python_requires='>=3.4',
     packages=setuptools.find_packages(),
     classifiers=[
