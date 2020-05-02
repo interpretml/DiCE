@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    dice_ml.data_interfaces
    dice_ml.dice_interfaces

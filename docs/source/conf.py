@@ -65,15 +65,15 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.ipynb_checkpoints']
 html_theme = 'sphinx_rtd_theme'
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-#if not on_rtd:
-#    # only import and set the theme if we're building docs locally
-#    import sphinx_rtd_theme
-#    html_theme = 'sphinx_rtd_theme'
-#    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+if not on_rtd:
+    # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
