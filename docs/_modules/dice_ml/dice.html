@@ -21,10 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -78,8 +79,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
@@ -160,7 +168,7 @@
 
 <span class="sd">        :param data_interface: an interface to access data related params.</span>
 <span class="sd">        :param model_interface: an interface to access the output or gradients of a trained ML model.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">)</span>
@@ -176,13 +184,23 @@
 <div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.&quot;&quot;&quot;</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model_interface</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="n">model_interface</span><span class="o">.</span><span class="n">model_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">))</span> <span class="p">):</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow backend</span>
-        <span class="kn">from</span> <span class="nn">dice_ml.dice_interfaces.dice_tensorflow</span> <span class="k">import</span> <span class="n">DiceTensorFlow</span>
-        <span class="k">return</span> <span class="n">DiceTensorFlow</span>
+    <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF1&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 1.x backend</span>
+        <span class="kn">from</span> <span class="nn">dice_ml.dice_interfaces.dice_tensorflow1</span> <span class="k">import</span> <span class="n">DiceTensorFlow1</span>
+        <span class="k">return</span> <span class="n">DiceTensorFlow1</span>
 
-    <span class="k">else</span><span class="p">:</span> <span class="c1">#elif(isinstance(model_interface.model, &#39;PyTorch&#39;)): # Future support: PyTorch</span>
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF2&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 2.x backend</span>
+        <span class="kn">from</span> <span class="nn">dice_ml.dice_interfaces.dice_tensorflow2</span> <span class="k">import</span> <span class="n">DiceTensorFlow2</span>
+        <span class="k">return</span> <span class="n">DiceTensorFlow2</span>
+
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;PYT&#39;</span><span class="p">:</span> <span class="c1"># PyTorch backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.dice_interfaces.dice_pytorch</span> <span class="k">import</span> <span class="n">DicePyTorch</span>
-        <span class="k">return</span> <span class="n">DicePyTorch</span></div>
+        <span class="k">return</span> <span class="n">DicePyTorch</span>
+
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># all other backends</span>
+        <span class="n">backend_dice</span> <span class="o">=</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;explainer&#39;</span><span class="p">]</span>
+        <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">backend_dice</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;dice_ml.dice_interfaces.&quot;</span> <span class="o">+</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">class_name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

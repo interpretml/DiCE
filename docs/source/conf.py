@@ -37,7 +37,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx_rtd_theme'
 ]
 
-autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split', 'copy']
+autodoc_mock_imports = ['numpy', 'pandas', 'matplotlib', 'os', 'tensorflow', 'random', 'collections', 'timeit', 'tensorflow.keras', 'sklearn', 'sklearn.model_selection.train_test_split', 'copy', 'IPython', 'IPython.display.display', 'collections', 'collections.OrderedDict', 'logging', 'torch']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
