@@ -1,7 +1,10 @@
 """Module containing meta data information about private data."""
 
+import sys
 import pandas as pd
 import numpy as np
+import collections
+from collections import OrderedDict
 import logging
 logging.basicConfig(level=logging.NOTSET)
 
@@ -11,18 +14,20 @@ class PrivateData:
     def __init__(self, params):
         """Init method
 
-        :param features: Dictionary with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values.
+        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values. For python version <=3.6, should provide only an OrderedDict.
         :param outcome_name: Outcome feature name.
         :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just string 'int' should be provided, if the feature is of type float, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: 'int', cont_f2: ['float', 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
         :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.
 
         """
 
-        if type(params['features']) is dict:
+        if sys.version_info > (3,6,0) and type(params['features']) in [dict, collections.OrderedDict]:
+            features_dict = params['features']
+        elif sys.version_info <= (3,6,0) and type(params['features']) is collections.OrderedDict:
             features_dict = params['features']
         else:
             raise ValueError(
-                "should provide dictionary with feature names as keys and range (for continuous features) or categories (for categorical features) as values")
+                "should provide dictionary with feature names as keys and range (for continuous features) or categories (for categorical features) as values. For python version <3.6, should provide an OrderedDict")
 
         if type(params['outcome_name']) is str:
             self.outcome_name = params['outcome_name']
@@ -130,7 +135,8 @@ class PrivateData:
                         logging.warning(" MAD for feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
             else:
                 mads[feature] = 1.0
-                logging.info(" MAD is not given for feature %s, so using 1.0 as MAD instead.", feature)
+                if display_warnings:
+                    logging.info(" MAD is not given for feature %s, so using 1.0 as MAD instead.", feature)
 
         if return_mads:
             return mads
