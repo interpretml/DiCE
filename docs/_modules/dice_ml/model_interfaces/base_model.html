@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.model_interfaces.pytorch_model &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.model_interfaces.base_model &mdash; DiCE 0.2 documentation</title>
   
 
   
@@ -139,7 +139,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>dice_ml.model_interfaces.pytorch_model</li>
+      <li>dice_ml.model_interfaces.base_model</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -154,37 +154,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for dice_ml.model_interfaces.pytorch_model</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Module containing an interface to trained PyTorch model.&quot;&quot;&quot;</span>
+  <h1>Source code for dice_ml.model_interfaces.base_model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module containing a template class as an interface to ML model.</span>
+<span class="sd">   Subclasses implement model interfaces for different ML frameworks such as TensorFlow or PyTorch.</span>
+<span class="sd">   All model interface methods are in dice_ml.model_interfaces&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml.model_interfaces.base_model</span> <span class="k">import</span> <span class="n">BaseModel</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="viewcode-block" id="BaseModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel">[docs]</a><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">:</span>
 
-<div class="viewcode-block" id="PyTorchModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel">[docs]</a><span class="k">class</span> <span class="nc">PyTorchModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;PYT&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
-<span class="sd">        :param model: trained PyTorch Model.</span>
+<span class="sd">        :param model: trained ML Model.</span>
 <span class="sd">        :param model_path: path to trained model.</span>
-<span class="sd">        :param backend: &quot;PYT&quot; for PyTorch framework.</span>
+<span class="sd">        :param backend: ML framework. For frameworks other than TensorFlow or PyTorch, or for implementations other than standard DiCE (https://arxiv.org/pdf/1905.07697.pdf), provide both the module and class names as module_name.class_name. For instance, if there is a model interface class &quot;SklearnModel&quot; in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces, then backend parameter should be &quot;sklearn_model.SklearnModel&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
 
-<div class="viewcode-block" id="PyTorchModel.load_model"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span></div>
+<div class="viewcode-block" id="BaseModel.load_model"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="PyTorchModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span></div>
+<div class="viewcode-block" id="BaseModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="PyTorchModel.set_eval_mode"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.set_eval_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_eval_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="PyTorchModel.get_gradient"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_gradient">[docs]</a>    <span class="k">def</span> <span class="nf">get_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-        <span class="c1"># Future Support</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Future Support&quot;</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="BaseModel.get_gradient"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_gradient">[docs]</a>    <span class="k">def</span> <span class="nf">get_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 </pre></div>
 
            </div>

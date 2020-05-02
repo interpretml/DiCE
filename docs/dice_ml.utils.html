@@ -21,10 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -79,8 +80,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul class="current">
@@ -176,13 +184,13 @@
 /* CSS overrides for sphinx_rtd_theme */
 
 /* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
+.nbinput.nblast.container,
+.nboutput.nblast.container {
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
 /* ... except between code cells! */
-.nblast + .nbinput {
+.nblast.container + .nbinput.container {
     margin-top: -19px;
 }
 
@@ -203,19 +211,19 @@
 <div class="section" id="module-dice_ml.utils.helpers">
 <span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this headline">¶</a></h2>
 <p>This module containts helper functions to load data and get meta deta.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="dice_ml.utils.helpers.get_adult_data_info">
 <code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_data_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_data_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_data_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="dice_ml.utils.helpers.get_adult_income_modelpath">
-<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_income_modelpath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_income_modelpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_income_modelpath" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_income_modelpath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_income_modelpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_income_modelpath" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="dice_ml.utils.helpers.load_adult_income_dataset">
-<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_adult_income_dataset</code><span class="sig-paren">(</span><em class="sig-param">save_intermediate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_adult_income_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">save_intermediate</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads adult income dataset from <a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Adult">https://archive.ics.uci.edu/ml/datasets/Adult</a> and prepares the data for data analysis based on <a class="reference external" href="https://rpubs.com/H_Zhu/235617">https://rpubs.com/H_Zhu/235617</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Param</dt>

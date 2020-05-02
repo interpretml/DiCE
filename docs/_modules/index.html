@@ -21,10 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -78,8 +79,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
@@ -149,10 +157,13 @@
 <li><a href="dice_ml/data_interfaces/private_data_interface.html">dice_ml.data_interfaces.private_data_interface</a></li>
 <li><a href="dice_ml/data_interfaces/public_data_interface.html">dice_ml.data_interfaces.public_data_interface</a></li>
 <li><a href="dice_ml/dice.html">dice_ml.dice</a></li>
+<li><a href="dice_ml/dice_interfaces/dice_base.html">dice_ml.dice_interfaces.dice_base</a></li>
 <li><a href="dice_ml/dice_interfaces/dice_pytorch.html">dice_ml.dice_interfaces.dice_pytorch</a></li>
-<li><a href="dice_ml/dice_interfaces/dice_tensorflow.html">dice_ml.dice_interfaces.dice_tensorflow</a></li>
+<li><a href="dice_ml/dice_interfaces/dice_tensorflow1.html">dice_ml.dice_interfaces.dice_tensorflow1</a></li>
+<li><a href="dice_ml/dice_interfaces/dice_tensorflow2.html">dice_ml.dice_interfaces.dice_tensorflow2</a></li>
 <li><a href="dice_ml/diverse_counterfactuals.html">dice_ml.diverse_counterfactuals</a></li>
 <li><a href="dice_ml/model.html">dice_ml.model</a></li>
+<li><a href="dice_ml/model_interfaces/base_model.html">dice_ml.model_interfaces.base_model</a></li>
 <li><a href="dice_ml/model_interfaces/keras_tensorflow_model.html">dice_ml.model_interfaces.keras_tensorflow_model</a></li>
 <li><a href="dice_ml/model_interfaces/pytorch_model.html">dice_ml.model_interfaces.pytorch_model</a></li>
 <li><a href="dice_ml/utils/helpers.html">dice_ml.utils.helpers</a></li>

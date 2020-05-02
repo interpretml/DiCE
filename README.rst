@@ -101,7 +101,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
 
-.. image:: https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_output.png 
+.. image:: https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png 
   :width: 400
   :alt: List of counterfactual examples
 

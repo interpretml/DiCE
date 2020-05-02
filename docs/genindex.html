@@ -22,10 +22,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -79,8 +80,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
@@ -151,7 +159,8 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#C"><strong>C</strong></a>
+ <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
@@ -169,21 +178,67 @@
  | <a href="#V"><strong>V</strong></a>
  
 </div>
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel">BaseModel (class in dice_ml.model_interfaces.base_model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_dist">compute_dist() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.check_features_range">check_features_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_first_part_of_loss">compute_first_part_of_loss() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_dist">compute_dist() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_dist">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_fourth_part_of_loss">compute_fourth_part_of_loss() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_dist">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_second_part_of_loss">compute_second_part_of_loss() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_diversity_loss">compute_diversity_loss() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_diversity_loss">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_diversity_loss">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_loss">compute_loss() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_loss">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_proximity_loss">compute_proximity_loss() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_proximity_loss">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_proximity_loss">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.compute_third_part_of_loss">compute_third_part_of_loss() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_regularization_loss">compute_regularization_loss() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_regularization_loss">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_regularization_loss">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.compute_yloss">compute_yloss() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_yloss">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_yloss">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
       <li><a href="dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe">convert_to_dataframe() (dice_ml.diverse_counterfactuals.CounterfactualExamples method)</a>
 </li>
       <li><a href="dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe_sparse">convert_to_dataframe_sparse() (dice_ml.diverse_counterfactuals.CounterfactualExamples method)</a>
@@ -222,60 +277,197 @@
       </ul></li>
       <li><a href="dice_ml.html#dice_ml.dice.Dice">Dice (class in dice_ml.dice)</a>
 </li>
-      <li><a href="dice_ml.html#module-dice_ml">dice_ml (module)</a>
+      <li>
+    dice_ml
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml">module</a>
 </li>
-      <li><a href="dice_ml.html#module-dice_ml.data">dice_ml.data (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.data
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml.data">module</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces">dice_ml.data_interfaces (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.data_interfaces
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces">module</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.private_data_interface">dice_ml.data_interfaces.private_data_interface (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.data_interfaces.private_data_interface
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.private_data_interface">module</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.public_data_interface">dice_ml.data_interfaces.public_data_interface (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.data_interfaces.public_data_interface
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.public_data_interface">module</a>
 </li>
-      <li><a href="dice_ml.html#module-dice_ml.dice">dice_ml.dice (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.dice
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml.dice">module</a>
 </li>
+      </ul></li>
+      <li>
+    dice_ml.dice_interfaces
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.dice_interfaces.dice_base
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_base">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.dice_interfaces.dice_pytorch
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_pytorch">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.dice_interfaces.dice_tensorflow1
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow1">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.dice_interfaces.dice_tensorflow2
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow2">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces">dice_ml.dice_interfaces (module)</a>
+      <li>
+    dice_ml.diverse_counterfactuals
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml.diverse_counterfactuals">module</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_pytorch">dice_ml.dice_interfaces.dice_pytorch (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.model
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml.model">module</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow">dice_ml.dice_interfaces.dice_tensorflow (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.model_interfaces
+
+      <ul>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">module</a>
 </li>
-      <li><a href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.model_interfaces.base_model
+
+      <ul>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.base_model">module</a>
 </li>
-      <li><a href="dice_ml.html#module-dice_ml.model">dice_ml.model (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.model_interfaces.keras_tensorflow_model
+
+      <ul>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.keras_tensorflow_model">module</a>
 </li>
-      <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">dice_ml.model_interfaces (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.model_interfaces.pytorch_model
+
+      <ul>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.pytorch_model">module</a>
 </li>
-      <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.keras_tensorflow_model">dice_ml.model_interfaces.keras_tensorflow_model (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.utils
+
+      <ul>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils">module</a>
 </li>
-      <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.pytorch_model">dice_ml.model_interfaces.pytorch_model (module)</a>
+      </ul></li>
+      <li>
+    dice_ml.utils.helpers
+
+      <ul>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">module</a>
 </li>
-      <li><a href="dice_ml.utils.html#module-dice_ml.utils">dice_ml.utils (module)</a>
-</li>
-      <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers (module)</a>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_base.DiceBase">DiceBase (class in dice_ml.dice_interfaces.dice_base)</a>
 </li>
       <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch">DicePyTorch (class in dice_ml.dice_interfaces.dice_pytorch)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow">DiceTensorFlow (class in dice_ml.dice_interfaces.dice_tensorflow)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1">DiceTensorFlow1 (class in dice_ml.dice_interfaces.dice_tensorflow1)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_cf_initializations">do_cf_initializations() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2">DiceTensorFlow2 (class in dice_ml.dice_interfaces.dice_tensorflow2)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_loss_initializations">do_loss_initializations() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.display_df">display_df() (dice_ml.diverse_counterfactuals.CounterfactualExamples method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.do_optimizer_initializations">do_optimizer_initializations() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.do_cf_initializations">do_cf_initializations() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.do_cf_initializations">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.dpp_style">dpp_style() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.do_cf_initializations">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.do_loss_initializations">do_loss_initializations() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.do_loss_initializations">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.do_loss_initializations">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.do_optimizer_initializations">do_optimizer_initializations() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.do_optimizer_initializations">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.do_optimizer_initializations">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.dpp_style">dpp_style() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.dpp_style">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.dpp_style">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.find_counterfactuals">find_counterfactuals() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.find_counterfactuals">find_counterfactuals() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.find_counterfactuals">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">from_dummies() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
@@ -290,8 +482,16 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.generate_counterfactuals">generate_counterfactuals() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_base.DiceBase.generate_counterfactuals">generate_counterfactuals() (dice_ml.dice_interfaces.dice_base.DiceBase method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.generate_counterfactuals">(dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.generate_counterfactuals">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">get_adult_data_info() (in module dice_ml.utils.helpers)</a>
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">get_adult_income_modelpath() (in module dice_ml.utils.helpers)</a>
@@ -332,9 +532,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">get_features_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
-      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_gradient">get_gradient() (dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
+      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_gradient">get_gradient() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
 
       <ul>
+        <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_gradient">(dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
+</li>
         <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_gradient">(dice_ml.model_interfaces.pytorch_model.PyTorchModel method)</a>
 </li>
       </ul></li>
@@ -356,22 +558,38 @@
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
-      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">get_output() (dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.get_model_output">get_model_output() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+</li>
+      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_output">get_output() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
 
       <ul>
+        <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">(dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
+</li>
         <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output">(dice_ml.model_interfaces.pytorch_model.PyTorchModel method)</a>
 </li>
       </ul></li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data">get_quantiles_from_training_data() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads">get_valid_mads() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_mads">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.initialize_CFs">initialize_CFs() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.initialize_CFs">initialize_CFs() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.initialize_CFs">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.initialize_CFs">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -388,10 +606,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">load_adult_income_dataset() (in module dice_ml.utils.helpers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.load_model">load_model() (dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
+      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.load_model">load_model() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
+
+      <ul>
+        <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.load_model">(dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel method)</a>
 </li>
+        <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.load_model">(dice_ml.model_interfaces.pytorch_model.PyTorchModel method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -400,6 +622,49 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.html#dice_ml.model.Model">Model (class in dice_ml.model)</a>
 </li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="dice_ml.html#module-dice_ml">dice_ml</a>
+</li>
+        <li><a href="dice_ml.html#module-dice_ml.data">dice_ml.data</a>
+</li>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces">dice_ml.data_interfaces</a>
+</li>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.private_data_interface">dice_ml.data_interfaces.private_data_interface</a>
+</li>
+        <li><a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.public_data_interface">dice_ml.data_interfaces.public_data_interface</a>
+</li>
+        <li><a href="dice_ml.html#module-dice_ml.dice">dice_ml.dice</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces">dice_ml.dice_interfaces</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_base">dice_ml.dice_interfaces.dice_base</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_pytorch">dice_ml.dice_interfaces.dice_pytorch</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow1">dice_ml.dice_interfaces.dice_tensorflow1</a>
+</li>
+        <li><a href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow2">dice_ml.dice_interfaces.dice_tensorflow2</a>
+</li>
+        <li><a href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals</a>
+</li>
+        <li><a href="dice_ml.html#module-dice_ml.model">dice_ml.model</a>
+</li>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">dice_ml.model_interfaces</a>
+</li>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.base_model">dice_ml.model_interfaces.base_model</a>
+</li>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.keras_tensorflow_model">dice_ml.model_interfaces.keras_tensorflow_model</a>
+</li>
+        <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.pytorch_model">dice_ml.model_interfaces.pytorch_model</a>
+</li>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils">dice_ml.utils</a>
+</li>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -430,22 +695,30 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.predict_fn">predict_fn() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.predict_fn">predict_fn() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.predict_fn">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_encoding">prepare_df_for_encoding() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_encoding">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">prepare_query_instance() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list">print_list() (dice_ml.diverse_counterfactuals.CounterfactualExamples method)</a>
+</li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData">PrivateData (class in dice_ml.data_interfaces.private_data_interface)</a>
 </li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData">PublicData (class in dice_ml.data_interfaces.public_data_interface)</a>
@@ -458,29 +731,43 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.round_off_cfs">round_off_cfs() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.round_off_cfs">round_off_cfs() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.round_off_cfs">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.round_off_cfs">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.scipy_optimizers">scipy_optimizers() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.scipy_optimizers">scipy_optimizers() (dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
+</li>
+      <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.set_eval_mode">set_eval_mode() (dice_ml.model_interfaces.pytorch_model.PyTorchModel method)</a>
+</li>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.split_data">split_data() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.split_data">split_data() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.stop_loop">stop_loop() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.stop_loop">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.stop_loop">stop_loop() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.stop_loop">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.tensorflow_optimizers">tensorflow_optimizers() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.tensorflow_optimizers">tensorflow_optimizers() (dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -488,8 +775,14 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow.update_hyperparameters">update_hyperparameters() (dice_ml.dice_interfaces.dice_tensorflow.DiceTensorFlow method)</a>
+      <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_pytorch.DicePyTorch.update_hyperparameters">update_hyperparameters() (dice_ml.dice_interfaces.dice_pytorch.DicePyTorch method)</a>
+
+      <ul>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1.update_hyperparameters">(dice_ml.dice_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+        <li><a href="dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2.update_hyperparameters">(dice_ml.dice_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

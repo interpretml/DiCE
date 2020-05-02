@@ -4,7 +4,14 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Quick introduction to generating counterfactual explanations using DiCE"
+    "## Advanced options to customize Counterfactual Explanations\n",
+    "\n",
+    "Here we discuss a few ways to change DiCE's behavior. \n",
+    "\n",
+    "* Train a custom ML model \n",
+    "* Changing feature weights that decide relative importance of features in perturbation\n",
+    "* Trading off between proximity and diversity goals\n",
+    "* Selecting the features to change"
    ]
   },
   {
@@ -17,16 +24,12 @@
     "import dice_ml\n",
     "from dice_ml.utils import helpers # helper functions\n",
     "\n",
-    "# supress deprecation warnings from TF\n",
+    "# Tensorflow libraries\n",
     "import tensorflow as tf\n",
+    "from tensorflow import keras\n",
+    "\n",
+    "# supress deprecation warnings from TF\n",
     "tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "DiCE requires two inputs: a training dataset and a pre-trained ML model. It can also work without access to the full dataset (see this [notebook](DiCE_with_private_data.ipynb) for advanced examples)."
    ]
   },
   {
@@ -40,7 +43,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "We use the \"adult\" income dataset from UCI Machine Learning Repository (https://archive.ics.uci.edu/ml/datasets/adult). For demonstration purposes, we transform the data as described in **dice_ml.utils.helpers** module. "
+    "We use \"adult\" income dataset from UCI Machine Learning Repository (https://archive.ics.uci.edu/ml/datasets/adult). For demonstration purposes, we transform the data as detailed in **dice_ml.utils.helpers** module. "
    ]
   },
   {
@@ -50,13 +53,6 @@
    "outputs": [],
    "source": [
     "dataset = helpers.load_adult_income_dataset()"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "This dataset has 8 features. The outcome is income which is binarized to 0 (low-income, <=50K) or 1 (high-income, >50K). "
    ]
   },
   {
@@ -190,43 +186,6 @@
    "cell_type": "code",
    "execution_count": 4,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "{'age': 'age',\n",
-       " 'workclass': 'type of industry (Government, Other/Unknown, Private, Self-Employed)',\n",
-       " 'education': 'education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)',\n",
-       " 'marital_status': 'marital status (Divorced, Married, Separated, Single, Widowed)',\n",
-       " 'occupation': 'occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)',\n",
-       " 'race': 'white or other race?',\n",
-       " 'gender': 'male or female?',\n",
-       " 'hours_per_week': 'total work hours per week',\n",
-       " 'income': '0 (<=50K) vs 1 (>50K)'}"
-      ]
-     },
-     "execution_count": 4,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "# description of transformed features\n",
-    "adult_info = helpers.get_adult_data_info()\n",
-    "adult_info"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "Given this dataset, we construct a data object for DiCE. Since continuous and discrete features have different ways of perturbation, we need to specify the names of the continuous features. DiCE also requires the name of the output variable that the ML model will predict."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 5,
-   "metadata": {},
    "outputs": [],
    "source": [
     "d = dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')"
@@ -236,39 +195,71 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "### Loading the ML model"
+    "### 1. Training a custom ML model"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Below, we use a pre-trained ML model which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package."
+    "Below, we build an Artificial Neural Network based on Keras Tensorflow framework (version 1.13). The models differ slightly based on the version of TensorFlow you use. So the results you get in subsequent sections might be different from what is shown in this notebook."
    ]
   },
   {
-   "cell_type": "markdown",
+   "cell_type": "code",
+   "execution_count": 5,
    "metadata": {},
+   "outputs": [],
    "source": [
-    "The variable *backend* below indicates the implementation type of DiCE we want to use. We use TensorFlow 1.x in the notebooks with backend='TF1'. You can set backend to 'TF2' or 'PYT' to use DiCE with TensorFlow 2.x or with PyTorch respectively. We want to note that the time required to find counterfactuals with Tensorflow 2.x's eager style of execution is significantly greater than that with TensorFlow 1.x's graph execution."
+    "# seeding random numbers for reproducability\n",
+    "from numpy.random import seed\n",
+    "seed(1)\n",
+    "from tensorflow import set_random_seed\n",
+    "set_random_seed(2)"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 6,
    "metadata": {},
-   "outputs": [],
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<tensorflow.python.keras.callbacks.History at 0x1e3856b9400>"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
    "source": [
-    "backend = 'TF'+tf.__version__[0] # TF1\n",
-    "ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)\n",
-    "m = dice_ml.Model(model_path= ML_modelpath, backend=backend)"
+    "sess = tf.InteractiveSession()\n",
+    "\n",
+    "train, _ = d.split_data(d.normalize_data(d.one_hot_encoded_data))\n",
+    "X_train = train.loc[:, train.columns != 'income']\n",
+    "y_train = train.loc[:, train.columns == 'income']\n",
+    "\n",
+    "ann_model = keras.Sequential()\n",
+    "ann_model.add(keras.layers.Dense(20, input_shape=(X_train.shape[1],), kernel_regularizer=keras.regularizers.l1(0.001), activation=tf.nn.relu))\n",
+    "ann_model.add(keras.layers.Dense(1, activation=tf.nn.sigmoid))\n",
+    "\n",
+    "ann_model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.01), metrics=['accuracy'])\n",
+    "ann_model.fit(X_train, y_train, validation_split=0.20, epochs=100, verbose=0, class_weight={0:1,1:2})\n",
+    "# the training will take some time for 100 epochs.\n",
+    "# you can wait or set verbose=1 to see the progress of training."
    ]
   },
   {
-   "cell_type": "markdown",
+   "cell_type": "code",
+   "execution_count": 7,
    "metadata": {},
+   "outputs": [],
    "source": [
-    "For an example of how to train your own model, check out [this](DiCE_with_advanced_options.ipynb) notebook. "
+    "# provide the trained ML model to DiCE's model object\n",
+    "backend = 'TF'+tf.__version__[0] # TF1\n",
+    "m = dice_ml.Model(model=ann_model, backend=backend) "
    ]
   },
   {
@@ -279,15 +270,8 @@
    ]
   },
   {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "Based on the data object *d* and the model object *m*, we can now instantiate the DiCE class for generating explanations. "
-   ]
-  },
-  {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": 8,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -296,15 +280,8 @@
    ]
   },
   {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "DiCE provides local explanation for the model *m* and requires an query input whose outcome needs to be explained. Below we provide a sample input whose outcome is 0 (low-income) as per the ML model object *m*. "
-   ]
-  },
-  {
    "cell_type": "code",
-   "execution_count": 8,
+   "execution_count": 9,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -320,22 +297,15 @@
    ]
   },
   {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "Given the query input, we can now generate counterfactual explanations to show perturbed inputs from the original input where the ML model outputs class 1 (high-income). "
-   ]
-  },
-  {
    "cell_type": "code",
-   "execution_count": 9,
+   "execution_count": 10,
    "metadata": {},
    "outputs": [
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Diverse Counterfactuals found! total time taken: 00 min 02 sec\n"
+      "Diverse Counterfactuals found! total time taken: 00 min 03 sec\n"
      ]
     }
    ],
@@ -346,7 +316,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 10,
+   "execution_count": 11,
    "metadata": {},
    "outputs": [
     {
@@ -399,7 +369,7 @@
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
        "      <td>45.0</td>\n",
-       "      <td>0.01904</td>\n",
+       "      <td>0.018186</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -409,8 +379,8 @@
        "    age workclass education marital_status occupation   race  gender  \\\n",
        "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
        "\n",
-       "   hours_per_week   income  \n",
-       "0            45.0  0.01904  "
+       "   hours_per_week    income  \n",
+       "0            45.0  0.018186  "
       ]
      },
      "metadata": {},
@@ -459,15 +429,15 @@
        "  <tbody>\n",
        "    <tr>\n",
        "      <th>0</th>\n",
-       "      <td>70.0</td>\n",
+       "      <td>73.0</td>\n",
        "      <td>Private</td>\n",
-       "      <td>Masters</td>\n",
+       "      <td>Prof-school</td>\n",
        "      <td>Single</td>\n",
        "      <td>White-Collar</td>\n",
        "      <td>White</td>\n",
-       "      <td>Female</td>\n",
-       "      <td>51.0</td>\n",
-       "      <td>0.534</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.754</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>1</th>\n",
@@ -479,31 +449,31 @@
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
        "      <td>45.0</td>\n",
-       "      <td>0.861</td>\n",
+       "      <td>0.867</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>2</th>\n",
-       "      <td>47.0</td>\n",
+       "      <td>36.0</td>\n",
        "      <td>Private</td>\n",
        "      <td>HS-grad</td>\n",
        "      <td>Married</td>\n",
-       "      <td>Service</td>\n",
+       "      <td>Professional</td>\n",
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
-       "      <td>45.0</td>\n",
-       "      <td>0.589</td>\n",
+       "      <td>40.0</td>\n",
+       "      <td>0.620</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>3</th>\n",
-       "      <td>36.0</td>\n",
+       "      <td>43.0</td>\n",
        "      <td>Private</td>\n",
-       "      <td>Prof-school</td>\n",
+       "      <td>Masters</td>\n",
        "      <td>Married</td>\n",
        "      <td>Service</td>\n",
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
-       "      <td>62.0</td>\n",
-       "      <td>0.937</td>\n",
+       "      <td>55.0</td>\n",
+       "      <td>0.881</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -511,16 +481,16 @@
       ],
       "text/plain": [
        "    age      workclass    education marital_status    occupation   race  \\\n",
-       "0  70.0        Private      Masters         Single  White-Collar  White   \n",
+       "0  73.0        Private  Prof-school         Single  White-Collar  White   \n",
        "1  22.0  Self-Employed    Doctorate        Married       Service  White   \n",
-       "2  47.0        Private      HS-grad        Married       Service  White   \n",
-       "3  36.0        Private  Prof-school        Married       Service  White   \n",
+       "2  36.0        Private      HS-grad        Married  Professional  White   \n",
+       "3  43.0        Private      Masters        Married       Service  White   \n",
        "\n",
        "   gender  hours_per_week  income  \n",
-       "0  Female            51.0   0.534  \n",
-       "1  Female            45.0   0.861  \n",
-       "2  Female            45.0   0.589  \n",
-       "3  Female            62.0   0.937  "
+       "0    Male            45.0   0.754  \n",
+       "1  Female            45.0   0.867  \n",
+       "2  Female            40.0   0.620  \n",
+       "3  Female            55.0   0.881  "
       ]
      },
      "metadata": {},
@@ -528,7 +498,7 @@
     }
    ],
    "source": [
-    "# visualize the results\n",
+    "# visualize the resutls\n",
     "dice_exp.visualize_as_dataframe()"
    ]
   },
@@ -536,15 +506,89 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "In case, if you would like to visualize only the changes made to the query instance, you can set the parameter *show_only_changes=True*"
+    "### 2. Changing feature weights"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It may be the case that some features are harder to change than others (e.g., education level is harder to change than working hours per week). DiCE allows input of relative difficulty in changing a feature through specifying *feature weights*. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature.\n",
+    "\n",
+    "Median Absolute Deviation (MAD) of a continuous feature conveys the variability of the feature, and is more robust than standard deviation as is less affected by outliers and non-normality. The inverse of MAD would then imply the ease of varying the feature and is hence used as feature weights in our optimization to reflect the difficulty of changing a continuous feature. By default, DiCE computes this internally and divides the distance between continuous features by the MAD of the feature's values in the training set. Let's see what their values are by computing them below:"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 11,
-   "metadata": {
-    "scrolled": true
-   },
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'age': 7.3, 'hours_per_week': 24.5}\n"
+     ]
+    }
+   ],
+   "source": [
+    "# get MAD\n",
+    "mads = d.get_mads(normalized=True)\n",
+    "\n",
+    "# create feature weights\n",
+    "feature_weights = {}\n",
+    "for feature in mads:\n",
+    "    feature_weights[feature] = round(1/mads[feature], 2)\n",
+    "print(feature_weights)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The above feature weights encode that changing *age* is approximately seven times more difficult than changing categorical variables, and changing *hours_per_week* is approximately three times more difficult than changing *age*. Of course, this may sound odd, since a person cannot change their age. In this case, what it's reflecting is that there is a higher diversity in age values than hours-per-week values. Below we show how to over-ride these weights to assign custom user-defined weights."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, let's try to assign unit weights to the continuous features and see how it affects the counterfactual generation. DiCE allows this through *feature_weights* parameter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# assigning equal weights\n",
+    "feature_weights = {'age': 1, 'hours_per_week': 1}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Diverse Counterfactuals found! total time taken: 00 min 04 sec\n"
+     ]
+    }
+   ],
+   "source": [
+    "# generate counterfactuals\n",
+    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\", \n",
+    "                                        feature_weights=feature_weights)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
    "outputs": [
     {
      "name": "stdout",
@@ -596,7 +640,7 @@
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
        "      <td>45.0</td>\n",
-       "      <td>0.01904</td>\n",
+       "      <td>0.018186</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -606,8 +650,8 @@
        "    age workclass education marital_status occupation   race  gender  \\\n",
        "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
        "\n",
-       "   hours_per_week   income  \n",
-       "0            45.0  0.01904  "
+       "   hours_per_week    income  \n",
+       "0            45.0  0.018186  "
       ]
      },
      "metadata": {},
@@ -656,68 +700,68 @@
        "  <tbody>\n",
        "    <tr>\n",
        "      <th>0</th>\n",
-       "      <td>70.0</td>\n",
-       "      <td>-</td>\n",
-       "      <td>Masters</td>\n",
-       "      <td>-</td>\n",
-       "      <td>White-Collar</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>51.0</td>\n",
-       "      <td>0.534</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Prof-school</td>\n",
+       "      <td>Widowed</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>93.0</td>\n",
+       "      <td>0.797</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>1</th>\n",
-       "      <td>-</td>\n",
-       "      <td>Self-Employed</td>\n",
+       "      <td>90.0</td>\n",
+       "      <td>Private</td>\n",
        "      <td>Doctorate</td>\n",
        "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>0.861</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0.760</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>2</th>\n",
-       "      <td>47.0</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
+       "      <td>68.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
        "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>0.589</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>99.0</td>\n",
+       "      <td>0.898</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>3</th>\n",
-       "      <td>36.0</td>\n",
-       "      <td>-</td>\n",
-       "      <td>Prof-school</td>\n",
-       "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>62.0</td>\n",
-       "      <td>0.937</td>\n",
+       "      <td>55.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>Masters</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>Other</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>99.0</td>\n",
+       "      <td>0.790</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
        "</div>"
       ],
       "text/plain": [
-       "    age      workclass    education marital_status    occupation race gender  \\\n",
-       "0  70.0              -      Masters              -  White-Collar    -      -   \n",
-       "1     -  Self-Employed    Doctorate        Married             -    -      -   \n",
-       "2  47.0              -            -        Married             -    -      -   \n",
-       "3  36.0              -  Prof-school        Married             -    -      -   \n",
+       "    age      workclass    education marital_status    occupation   race  \\\n",
+       "0  34.0  Self-Employed  Prof-school        Widowed       Service  White   \n",
+       "1  90.0        Private    Doctorate        Married       Service  White   \n",
+       "2  68.0        Private      HS-grad        Married  White-Collar  White   \n",
+       "3  55.0        Private      Masters         Single       Service  Other   \n",
        "\n",
-       "  hours_per_week income  \n",
-       "0           51.0  0.534  \n",
-       "1              -  0.861  \n",
-       "2              -  0.589  \n",
-       "3           62.0  0.937  "
+       "   gender  hours_per_week  income  \n",
+       "0  Female            93.0   0.797  \n",
+       "1  Female             1.0   0.760  \n",
+       "2  Female            99.0   0.898  \n",
+       "3    Male            99.0   0.790  "
       ]
      },
      "metadata": {},
@@ -725,103 +769,34 @@
     }
    ],
    "source": [
-    "# highlight only the changes\n",
-    "dice_exp.visualize_as_dataframe(show_only_changes=True)"
+    "# visualize the resutls\n",
+    "dice_exp.visualize_as_dataframe()"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "That's it! You can try generating counterfactual explanations for other examples using the same code. You can also try out a use-case for sensitive data in [this](DiCE_with_private_data.ipynb) notebook. \n",
-    "\n",
-    "If you are curious about changing the number of explanations showns, feasibility of the explanations, or how to weigh different features for perturbing, check out how to change DiCE's behavior in this [advanced notebook](DiCE_with_advanced_options.ipynb).  \n",
-    "\n",
-    "The counterfactuals generated above are slightly different from those shown in [our paper](https://arxiv.org/pdf/1905.07697.pdf), where the loss convergence condition was made more conservative for rigorous experimentation. To replicate the results in the paper, add an argument *loss_converge_maxiter=2* (the default value is 1) in the *exp.generate_counterfactuals()* method above. For more info, see *generate_counterfactuals()* method in [dice_ml.dice_interfaces.dice_tensorflow.py](https://github.com/interpretml/DiCE/blob/master/dice_ml/dice_interfaces/dice_tensorflow1.py)."
+    "Note that we transform continuous features and one-hot-encode categorical features to fall between 0 and 1 in order to handle relative scale of features. However, this also means that the relative ease of changing continuous features is higher than categorical features when the total number of continuous features are very less compared to the total number of categories of all categorical variables combined. This is reflected in the above table where continuous features (*age* and *hours_per_week*) have been varied to reach their extreme values (*range of age: [17, 90]*; *range of hours_per_week: [1, 99]*) for most of the counterfactuals. This is the reason why the distances are divided by a scaling factor. Deviation from the median provides a robust measure of the variability of a feature’s values, and thus dividing by the MAD allows us to capture the relative prevalence of observing the feature at a particular value (see our [paper](https://arxiv.org/pdf/1905.07697.pdf) for more details)."
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "### Working with PyTorch"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "PyTorch installed.\n"
-     ]
-    }
-   ],
-   "source": [
-    "try:\n",
-    "    import torch\n",
-    "    print('PyTorch installed.')\n",
-    "except ImportError as e:\n",
-    "    print(\"Import Error!\", e.name, \"not found.. Please install from https://pytorch.org/\")"
+    "### 3. Trading off between proximity and diversity goals"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Just change the backend variable to 'PYT' to use DiCE with PyTorch. Below, we use a pre-trained ML model in PyTorch which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package."
+    "We acknowledge that not all counterfactual explanations may be feasible for a user. In general, counterfactuals closer to an individual's profile will be more feasible. Diversity is also important to help an individual choose between multiple possible options. DiCE allows tunable parameters *proximity_weight* (default: 0.5) and *diversity_weight* (default: 1.0) to handle proximity and diversity respectively. Below, we increase the proximity weight and see how the counterfactuals change."
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "backend = 'PYT'\n",
-    "ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)\n",
-    "m = dice_ml.Model(model_path= ML_modelpath, backend=backend)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "Instantiate the DiCE class with the new PyTorch model object *m*. "
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 8,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "exp = dice_ml.Dice(d, m)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 9,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# query instance in the form of a dictionary; keys: feature name, values: feature value\n",
-    "query_instance = {'age':22, \n",
-    "                  'workclass':'Private', \n",
-    "                  'education':'HS-grad', \n",
-    "                  'marital_status':'Single', \n",
-    "                  'occupation':'Service',\n",
-    "                  'race': 'White', \n",
-    "                  'gender':'Female', \n",
-    "                  'hours_per_week': 45}"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 10,
+   "execution_count": 16,
    "metadata": {},
    "outputs": [
     {
@@ -833,13 +808,14 @@
     }
    ],
    "source": [
-    "# generate counterfactuals\n",
-    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\")"
+    "# change proximity_weight from default value of 0.5 to 1.5\n",
+    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\", \n",
+    "                                        proximity_weight=1.5, diversity_weight=1.0) "
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 11,
+   "execution_count": 17,
    "metadata": {},
    "outputs": [
     {
@@ -892,7 +868,7 @@
        "      <td>White</td>\n",
        "      <td>Female</td>\n",
        "      <td>45.0</td>\n",
-       "      <td>0.000042</td>\n",
+       "      <td>0.018186</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -903,7 +879,7 @@
        "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
        "\n",
        "   hours_per_week    income  \n",
-       "0            45.0  0.000042  "
+       "0            45.0  0.018186  "
       ]
      },
      "metadata": {},
@@ -952,68 +928,68 @@
        "  <tbody>\n",
        "    <tr>\n",
        "      <th>0</th>\n",
-       "      <td>57.0</td>\n",
-       "      <td>-</td>\n",
-       "      <td>Doctorate</td>\n",
+       "      <td>47.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
        "      <td>Married</td>\n",
-       "      <td>White-Collar</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>0.993</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.554</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>1</th>\n",
-       "      <td>33.0</td>\n",
-       "      <td>-</td>\n",
-       "      <td>Prof-school</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
        "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>39.0</td>\n",
-       "      <td>0.964</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.867</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>2</th>\n",
-       "      <td>-</td>\n",
-       "      <td>Self-Employed</td>\n",
-       "      <td>Prof-school</td>\n",
-       "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>0.748</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.506</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>3</th>\n",
-       "      <td>49.0</td>\n",
-       "      <td>-</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>Private</td>\n",
        "      <td>Masters</td>\n",
        "      <td>Married</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>-</td>\n",
-       "      <td>62.0</td>\n",
-       "      <td>0.957</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>0.872</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
        "</div>"
       ],
       "text/plain": [
-       "    age      workclass    education marital_status    occupation race gender  \\\n",
-       "0  57.0              -    Doctorate        Married  White-Collar    -      -   \n",
-       "1  33.0              -  Prof-school        Married             -    -   Male   \n",
-       "2     -  Self-Employed  Prof-school        Married             -    -      -   \n",
-       "3  49.0              -      Masters        Married             -    -      -   \n",
+       "    age      workclass  education marital_status occupation   race  gender  \\\n",
+       "0  47.0        Private    HS-grad        Married    Service  White  Female   \n",
+       "1  22.0  Self-Employed  Doctorate        Married    Service  White  Female   \n",
+       "2  41.0        Private  Doctorate         Single    Service  White  Female   \n",
+       "3  30.0        Private    Masters        Married    Service  White  Female   \n",
        "\n",
-       "  hours_per_week income  \n",
-       "0              -  0.993  \n",
-       "1           39.0  0.964  \n",
-       "2              -  0.748  \n",
-       "3           62.0  0.957  "
+       "   hours_per_week  income  \n",
+       "0            45.0   0.554  \n",
+       "1            45.0   0.867  \n",
+       "2            45.0   0.506  \n",
+       "3            53.0   0.872  "
       ]
      },
      "metadata": {},
@@ -1021,16 +997,245 @@
     }
    ],
    "source": [
-    "# highlight only the changes\n",
-    "dice_exp.visualize_as_dataframe(show_only_changes=True)"
+    "# visualize the resutls\n",
+    "dice_exp.visualize_as_dataframe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As we see from above table, both continuous and categorical features are more closer to the original query instance and the counterfactuals are also less diverse than before."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 4. Selecting the features to vary"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "While counterfactuals provide *actionable* alternative profiles to achieve a different outcome, we note that some of the generated explanations suggest changes in features that cannot be varied easily (such as age), or sensitive attributes like race or gender. Hence, DiCE allows feeding in a list of features that are allowed to vary through a *features_to_vary* parameter. "
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 18,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Diverse Counterfactuals found! total time taken: 00 min 04 sec\n"
+     ]
+    }
+   ],
+   "source": [
+    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\", \n",
+    "                                        features_to_vary=['workclass','education','occupation','hours_per_week'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
    "metadata": {},
-   "outputs": [],
-   "source": []
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Query instance (original outcome : 0)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.018186</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age workclass education marital_status occupation   race  gender  \\\n",
+       "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
+       "\n",
+       "   hours_per_week    income  \n",
+       "0            45.0  0.018186  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Diverse Counterfactual set (new outcome : 1)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Professional</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>67.0</td>\n",
+       "      <td>0.609</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>81.0</td>\n",
+       "      <td>0.640</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>93.0</td>\n",
+       "      <td>0.761</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Masters</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>99.0</td>\n",
+       "      <td>0.652</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age      workclass  education marital_status    occupation   race  gender  \\\n",
+       "0  22.0  Self-Employed  Doctorate         Single  Professional  White  Female   \n",
+       "1  22.0  Self-Employed  Doctorate         Single       Service  White  Female   \n",
+       "2  22.0  Self-Employed  Doctorate         Single  White-Collar  White  Female   \n",
+       "3  22.0  Self-Employed    Masters         Single       Service  White  Female   \n",
+       "\n",
+       "   hours_per_week  income  \n",
+       "0            67.0   0.609  \n",
+       "1            81.0   0.640  \n",
+       "2            93.0   0.761  \n",
+       "3            99.0   0.652  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# visualize the resutls\n",
+    "dice_exp.visualize_as_dataframe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The above counterfactual examples show the importance of educational level in the model's predictions. All the generated counterfactuals suggest getting an advanced degree for a higher income (Masters or Ph.D.)."
+   ]
   }
  ],
  "metadata": {
@@ -1049,7 +1254,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.7.3"
+   "version": "3.7.5"
   },
   "toc": {
    "base_numbering": 1,

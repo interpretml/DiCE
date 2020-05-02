@@ -21,10 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -78,8 +79,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
@@ -149,32 +157,35 @@
   <h1>Source code for dice_ml.model_interfaces.keras_tensorflow_model</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module containing an interface to trained Keras Tensorflow model.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">dice_ml.model_interfaces.base_model</span> <span class="k">import</span> <span class="n">BaseModel</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 <span class="kn">from</span> <span class="nn">tensorflow</span> <span class="k">import</span> <span class="n">keras</span>
 
-<div class="viewcode-block" id="KerasTensorFlowModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel">[docs]</a><span class="k">class</span> <span class="nc">KerasTensorFlowModel</span><span class="p">:</span>
+<div class="viewcode-block" id="KerasTensorFlowModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel">[docs]</a><span class="k">class</span> <span class="nc">KerasTensorFlowModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF1&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param model: trained Keras Sequential Model.</span>
-<span class="sd">        :param model_path: path to trained model</span>
-<span class="sd">        </span>
+<span class="sd">        :param model_path: path to trained model.</span>
+<span class="sd">        :param backend: &quot;TF1&quot; for TensorFlow 1 and &quot;TF2&quot; for TensorFlow 2.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KerasTensorFlowModel.load_model"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KerasTensorFlowModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span></div>
+<div class="viewcode-block" id="KerasTensorFlowModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF2&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KerasTensorFlowModel.get_gradient"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_gradient">[docs]</a>    <span class="k">def</span> <span class="nf">get_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="c1"># Future Support</span>
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Future Support&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
