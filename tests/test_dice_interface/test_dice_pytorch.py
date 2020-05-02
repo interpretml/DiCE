@@ -18,12 +18,12 @@ def pyt_exp_object():
 
 class TestDiceTorchMethods:
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, pyt_exp_object, query_instance):
+    def _initiate_exp_object(self, pyt_exp_object, sample_adultincome_query):
         self.exp = pyt_exp_object # explainer object
         self.exp.do_cf_initializations(total_CFs=4, algorithm="DiverseCF", features_to_vary="all") # initialize required params for CF computations
 
         # prepare query isntance for CF optimization
-        query_instance = self.exp.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = self.exp.data_interface.prepare_query_instance(query_instance=sample_adultincome_query, encode=True)
         self.query_instance = query_instance.iloc[0].values
 
         self.exp.initialize_CFs(self.query_instance, init_near_query_instance=True) # initialize CFs
@@ -55,11 +55,11 @@ class TestDiceTorchMethods:
         loss4 = self.exp.compute_regularization_loss()
         assert pytest.approx(loss4.data.detach().numpy(), abs=1e-4) == 0.2086 # regularization loss computed for given query instance and feature weights.
 
-    def test_final_cfs_and_preds(self, query_instance):
+    def test_final_cfs_and_preds(self, sample_adultincome_query):
         """
         Tets correctness of final CFs and their predictions for sample query instance.
         """
-        dice_exp = self.exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
+        dice_exp = self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
         test_cfs = [[57.0, 'Private', 'Doctorate', 'Married', 'White-Collar', 'White', 'Female', 46.0, 0.993], [33.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 39.0, 0.964], [21.0, 'Self-Employed', 'Prof-school', 'Married', 'Service', 'White', 'Female', 47.0, 0.733], [49.0, 'Private', 'Masters', 'Married', 'Service', 'White', 'Female', 62.0, 0.957]]
         assert dice_exp.final_cfs_list == test_cfs
 

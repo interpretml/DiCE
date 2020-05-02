@@ -1,18 +1,19 @@
 import pytest
+from collections import OrderedDict
 
 import dice_ml
 
 @pytest.fixture
 def data_object():
-    return dice_ml.Data(features={'age':[17, 90],
-                        'workclass': ['Government', 'Other/Unknown', 'Private', 'Self-Employed'],
-                       'education': ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college'],
-                       'marital_status': ['Divorced', 'Married', 'Separated', 'Single', 'Widowed'],
-                       'occupation':['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar'],
-                       'race': ['Other', 'White'],
-                       'gender':['Female', 'Male'],
-                       'hours_per_week': [1, 99]},
-                    outcome_name='income',
+    features_dict = OrderedDict([('age', [17, 90]),
+                            ('workclass', ['Government', 'Other/Unknown', 'Private', 'Self-Employed']),
+                            ('education', ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college']),
+                            ('marital_status', ['Divorced', 'Married', 'Separated', 'Single', 'Widowed']),
+                            ('occupation', ['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar']),
+                            ('race', ['Other', 'White']),
+                            ('gender', ['Female', 'Male']),
+                            ('hours_per_week', [1, 99])]) # providing an OrderedDict to make it work for Python<3.6
+    return dice_ml.Data(features=features_dict, outcome_name='income',
                     type_and_precision={'hours_per_week':['float', 2]}, mad={'age': 10})
 
 class TestPrivateDataMethods:
