@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>DiCE &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml &mdash; DiCE 0.2 documentation</title>
   
 
   
@@ -21,10 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -78,8 +79,15 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package:</span></p>
 <ul>
@@ -129,7 +137,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>DiCE</li>
+      <li>dice_ml</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -153,13 +161,13 @@
 /* CSS overrides for sphinx_rtd_theme */
 
 /* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
+.nbinput.nblast.container,
+.nboutput.nblast.container {
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
 /* ... except between code cells! */
-.nblast + .nbinput {
+.nblast.container + .nbinput.container {
     margin-top: -19px;
 }
 
@@ -172,8 +180,8 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="dice">
-<h1>DiCE<a class="headerlink" href="#dice" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dice-ml">
+<h1>dice_ml<a class="headerlink" href="#dice-ml" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.html">dice_ml package</a><ul>
@@ -187,13 +195,16 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.dice_interfaces.html">dice_ml.dice_interfaces package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_base">dice_ml.dice_interfaces.dice_base module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_pytorch">dice_ml.dice_interfaces.dice_pytorch module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow">dice_ml.dice_interfaces.dice_tensorflow module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow1">dice_ml.dice_interfaces.dice_tensorflow1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow2">dice_ml.dice_interfaces.dice_tensorflow2 module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.model_interfaces.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.base_model">dice_ml.model_interfaces.base_model module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.keras_tensorflow_model">dice_ml.model_interfaces.keras_tensorflow_model module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.pytorch_model">dice_ml.model_interfaces.pytorch_model module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">Module contents</a></li>
