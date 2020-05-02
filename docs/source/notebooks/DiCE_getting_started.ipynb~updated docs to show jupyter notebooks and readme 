@@ -1,0 +1,1100 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Quick introduction to generating counterfactual explanations using DiCE"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# import DiCE\n",
+    "import dice_ml\n",
+    "from dice_ml.utils import helpers # helper functions\n",
+    "\n",
+    "# supress deprecation warnings from TF\n",
+    "import tensorflow as tf\n",
+    "tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "DiCE requires two inputs: a training dataset and a pre-trained ML model. It can also work without access to the full dataset (see this [notebook](DiCE_with_private_data.ipynb) for advanced examples)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Loading dataset"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We use the \"adult\" income dataset from UCI Machine Learning Repository (https://archive.ics.uci.edu/ml/datasets/adult). For demonstration purposes, we transform the data as described in **dice_ml.utils.helpers** module. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dataset = helpers.load_adult_income_dataset()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This dataset has 8 features. The outcome is income which is binarized to 0 (low-income, <=50K) or 1 (high-income, >50K). "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>39</td>\n",
+       "      <td>Government</td>\n",
+       "      <td>Bachelors</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>40</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>50</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Bachelors</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>13</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>38</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Divorced</td>\n",
+       "      <td>Blue-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>40</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>53</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>School</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>Blue-Collar</td>\n",
+       "      <td>Other</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>40</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>28</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>Bachelors</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>Professional</td>\n",
+       "      <td>Other</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>40</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   age      workclass  education marital_status    occupation   race  gender  \\\n",
+       "0   39     Government  Bachelors         Single  White-Collar  White    Male   \n",
+       "1   50  Self-Employed  Bachelors        Married  White-Collar  White    Male   \n",
+       "2   38        Private    HS-grad       Divorced   Blue-Collar  White    Male   \n",
+       "3   53        Private     School        Married   Blue-Collar  Other    Male   \n",
+       "4   28        Private  Bachelors        Married  Professional  Other  Female   \n",
+       "\n",
+       "   hours_per_week  income  \n",
+       "0              40       0  \n",
+       "1              13       0  \n",
+       "2              40       0  \n",
+       "3              40       0  \n",
+       "4              40       0  "
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dataset.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'age': 'age',\n",
+       " 'workclass': 'type of industry (Government, Other/Unknown, Private, Self-Employed)',\n",
+       " 'education': 'education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)',\n",
+       " 'marital_status': 'marital status (Divorced, Married, Separated, Single, Widowed)',\n",
+       " 'occupation': 'occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)',\n",
+       " 'race': 'white or other race?',\n",
+       " 'gender': 'male or female?',\n",
+       " 'hours_per_week': 'total work hours per week',\n",
+       " 'income': '0 (<=50K) vs 1 (>50K)'}"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# description of transformed features\n",
+    "adult_info = helpers.get_adult_data_info()\n",
+    "adult_info"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Given this dataset, we construct a data object for DiCE. Since continuous and discrete features have different ways of perturbation, we need to specify the names of the continuous features. DiCE also requires the name of the output variable that the ML model will predict."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "d = dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Loading the ML model"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Below, we use a pre-trained ML model which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The variable *backend* below indicates the implementation type of DiCE we want to use. We use TensorFlow 1.x in the notebooks with backend='TF1'. You can set backend to 'TF2' or 'PYT' to use DiCE with TensorFlow 2.x or with PyTorch respectively. We want to note that the time required to find counterfactuals with Tensorflow 2.x's eager style of execution is significantly greater than that with TensorFlow 1.x's graph execution."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "backend = 'TF'+tf.__version__[0] # TF1\n",
+    "ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)\n",
+    "m = dice_ml.Model(model_path= ML_modelpath, backend=backend)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For an example of how to train your own model, check out [this](DiCE_with_advanced_options.ipynb) notebook. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Generate diverse counterfactuals"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Based on the data object *d* and the model object *m*, we can now instantiate the DiCE class for generating explanations. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# initiate DiCE\n",
+    "exp = dice_ml.Dice(d, m)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "DiCE provides local explanation for the model *m* and requires an query input whose outcome needs to be explained. Below we provide a sample input whose outcome is 0 (low-income) as per the ML model object *m*. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# query instance in the form of a dictionary; keys: feature name, values: feature value\n",
+    "query_instance = {'age':22, \n",
+    "                  'workclass':'Private', \n",
+    "                  'education':'HS-grad', \n",
+    "                  'marital_status':'Single', \n",
+    "                  'occupation':'Service',\n",
+    "                  'race': 'White', \n",
+    "                  'gender':'Female', \n",
+    "                  'hours_per_week': 45}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Given the query input, we can now generate counterfactual explanations to show perturbed inputs from the original input where the ML model outputs class 1 (high-income). "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Diverse Counterfactuals found! total time taken: 00 min 02 sec\n"
+     ]
+    }
+   ],
+   "source": [
+    "# generate counterfactuals\n",
+    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Query instance (original outcome : 0)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.01904</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age workclass education marital_status occupation   race  gender  \\\n",
+       "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
+       "\n",
+       "   hours_per_week   income  \n",
+       "0            45.0  0.01904  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Diverse Counterfactual set (new outcome : 1)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>70.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>Masters</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>51.0</td>\n",
+       "      <td>0.534</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.861</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>47.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.589</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>36.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>Prof-school</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>62.0</td>\n",
+       "      <td>0.937</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age      workclass    education marital_status    occupation   race  \\\n",
+       "0  70.0        Private      Masters         Single  White-Collar  White   \n",
+       "1  22.0  Self-Employed    Doctorate        Married       Service  White   \n",
+       "2  47.0        Private      HS-grad        Married       Service  White   \n",
+       "3  36.0        Private  Prof-school        Married       Service  White   \n",
+       "\n",
+       "   gender  hours_per_week  income  \n",
+       "0  Female            51.0   0.534  \n",
+       "1  Female            45.0   0.861  \n",
+       "2  Female            45.0   0.589  \n",
+       "3  Female            62.0   0.937  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# visualize the results\n",
+    "dice_exp.visualize_as_dataframe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In case, if you would like to visualize only the changes made to the query instance, you can set the parameter *show_only_changes=True*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Query instance (original outcome : 0)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.01904</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age workclass education marital_status occupation   race  gender  \\\n",
+       "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
+       "\n",
+       "   hours_per_week   income  \n",
+       "0            45.0  0.01904  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Diverse Counterfactual set (new outcome : 1)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>70.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Masters</td>\n",
+       "      <td>-</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>51.0</td>\n",
+       "      <td>0.534</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>0.861</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>47.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>0.589</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>36.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Prof-school</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>62.0</td>\n",
+       "      <td>0.937</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age      workclass    education marital_status    occupation race gender  \\\n",
+       "0  70.0              -      Masters              -  White-Collar    -      -   \n",
+       "1     -  Self-Employed    Doctorate        Married             -    -      -   \n",
+       "2  47.0              -            -        Married             -    -      -   \n",
+       "3  36.0              -  Prof-school        Married             -    -      -   \n",
+       "\n",
+       "  hours_per_week income  \n",
+       "0           51.0  0.534  \n",
+       "1              -  0.861  \n",
+       "2              -  0.589  \n",
+       "3           62.0  0.937  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# highlight only the changes\n",
+    "dice_exp.visualize_as_dataframe(show_only_changes=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "That's it! You can try generating counterfactual explanations for other examples using the same code. You can also try out a use-case for sensitive data in [this](DiCE_with_private_data.ipynb) notebook. \n",
+    "\n",
+    "If you are curious about changing the number of explanations showns, feasibility of the explanations, or how to weigh different features for perturbing, check out how to change DiCE's behavior in this [advanced notebook](DiCE_with_advanced_options.ipynb).  \n",
+    "\n",
+    "The counterfactuals generated above are slightly different from those shown in [our paper](https://arxiv.org/pdf/1905.07697.pdf), where the loss convergence condition was made more conservative for rigorous experimentation. To replicate the results in the paper, add an argument *loss_converge_maxiter=2* (the default value is 1) in the *exp.generate_counterfactuals()* method above. For more info, see *generate_counterfactuals()* method in [dice_ml.dice_interfaces.dice_tensorflow.py](../dice_ml/dice_interfaces/dice_tensorflow.py)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Working with PyTorch"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "PyTorch installed.\n"
+     ]
+    }
+   ],
+   "source": [
+    "try:\n",
+    "    import torch\n",
+    "    print('PyTorch installed.')\n",
+    "except ImportError as e:\n",
+    "    print(\"Import Error!\", e.name, \"not found.. Please install from https://pytorch.org/\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Just change the backend variable to 'PYT' to use DiCE with PyTorch. Below, we use a pre-trained ML model in PyTorch which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "backend = 'PYT'\n",
+    "ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)\n",
+    "m = dice_ml.Model(model_path= ML_modelpath, backend=backend)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Instantiate the DiCE class with the new PyTorch model object *m*. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "exp = dice_ml.Dice(d, m)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# query instance in the form of a dictionary; keys: feature name, values: feature value\n",
+    "query_instance = {'age':22, \n",
+    "                  'workclass':'Private', \n",
+    "                  'education':'HS-grad', \n",
+    "                  'marital_status':'Single', \n",
+    "                  'occupation':'Service',\n",
+    "                  'race': 'White', \n",
+    "                  'gender':'Female', \n",
+    "                  'hours_per_week': 45}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Diverse Counterfactuals found! total time taken: 00 min 05 sec\n"
+     ]
+    }
+   ],
+   "source": [
+    "# generate counterfactuals\n",
+    "dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=\"opposite\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Query instance (original outcome : 0)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>22.0</td>\n",
+       "      <td>Private</td>\n",
+       "      <td>HS-grad</td>\n",
+       "      <td>Single</td>\n",
+       "      <td>Service</td>\n",
+       "      <td>White</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.000042</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age workclass education marital_status occupation   race  gender  \\\n",
+       "0  22.0   Private   HS-grad         Single    Service  White  Female   \n",
+       "\n",
+       "   hours_per_week    income  \n",
+       "0            45.0  0.000042  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Diverse Counterfactual set (new outcome : 1)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>workclass</th>\n",
+       "      <th>education</th>\n",
+       "      <th>marital_status</th>\n",
+       "      <th>occupation</th>\n",
+       "      <th>race</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>hours_per_week</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>57.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Doctorate</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>White-Collar</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>0.993</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>33.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Prof-school</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>39.0</td>\n",
+       "      <td>0.964</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>-</td>\n",
+       "      <td>Self-Employed</td>\n",
+       "      <td>Prof-school</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>0.748</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>49.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>Masters</td>\n",
+       "      <td>Married</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>62.0</td>\n",
+       "      <td>0.957</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age      workclass    education marital_status    occupation race gender  \\\n",
+       "0  57.0              -    Doctorate        Married  White-Collar    -      -   \n",
+       "1  33.0              -  Prof-school        Married             -    -   Male   \n",
+       "2     -  Self-Employed  Prof-school        Married             -    -      -   \n",
+       "3  49.0              -      Masters        Married             -    -      -   \n",
+       "\n",
+       "  hours_per_week income  \n",
+       "0              -  0.993  \n",
+       "1           39.0  0.964  \n",
+       "2              -  0.748  \n",
+       "3           62.0  0.957  "
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# highlight only the changes\n",
+    "dice_exp.visualize_as_dataframe(show_only_changes=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.5"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": false,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": false,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": true
+  },
+  "varInspector": {
+   "cols": {
+    "lenName": 16,
+    "lenType": 16,
+    "lenVar": 40
+   },
+   "kernels_config": {
+    "python": {
+     "delete_cmd_postfix": "",
+     "delete_cmd_prefix": "del ",
+     "library": "var_list.py",
+     "varRefreshCmd": "print(var_dic_list())"
+    },
+    "r": {
+     "delete_cmd_postfix": ") ",
+     "delete_cmd_prefix": "rm(",
+     "library": "var_list.r",
+     "varRefreshCmd": "cat(var_dic_list()) "
+    }
+   },
+   "types_to_exclude": [
+    "module",
+    "function",
+    "builtin_function_or_method",
+    "instance",
+    "_Feature"
+   ],
+   "window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
