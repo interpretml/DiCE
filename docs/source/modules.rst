@@ -1,4 +1,4 @@
-DiCE
+dice_ml
 =======
 
 .. toctree::
