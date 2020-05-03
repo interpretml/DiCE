@@ -67,7 +67,6 @@ instance/
 docs/_build/
 docs/build/
 docs/_sources/
-#.nojekyll
 
 # PyBuilder
 target/

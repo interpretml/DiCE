@@ -105,7 +105,7 @@ Using DiCE, we can now generate examples that would have been classified as clas
   :width: 400
   :alt: List of counterfactual examples
 
-For more details, check out the `Getting Started <https://github.com/microsoft/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook.
+For more details, check out the `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
 Supported use-cases
 -------------------
@@ -147,7 +147,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-Check out the last section in `Getting Started <https://github.com/microsoft/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
+Check out the last section in `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
 
 **Explanations**
 
@@ -194,7 +194,7 @@ It also supports simple constraints on
 features that reflect practical constraints (e.g., working hours per week
 cannot be more than 50).
 
-For more details, check out `this <https://github.com/microsoft/DiCE/blob/master/docs/source/notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
+For more details, check out `this <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------
@@ -218,7 +218,7 @@ Ideally, counterfactual explanations should balance between a wide range of sugg
 
 We are working on adding the following features to DiCE:
 
-* Incorporating causal constraints when generating counterfactual explanations (check out `feasible-CF branch <https://github.com/microsoft/DiCE/tree/feasible-cf>`_)
+* Incorporating causal constraints when generating counterfactual explanations (check out `feasible-CF branch <https://github.com/interpretml/DiCE/tree/feasible-cf>`_)
 * Support for scikit-learn and other libraries where models are not necessarily differentiable
 * Support for using DiCE for debugging machine learning models
 * Support for other algorithms for generating counterfactual explanations
