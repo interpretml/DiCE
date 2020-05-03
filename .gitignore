@@ -66,6 +66,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/build/
+docs/_sources/
 #.nojekyll
 
 # PyBuilder
