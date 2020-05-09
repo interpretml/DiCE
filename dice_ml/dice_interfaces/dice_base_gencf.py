@@ -1,9 +1,12 @@
+#General Imports
 import numpy as np
 import random
 import collections
 import timeit
 import copy
 
+#Dice Imports
+from dice_ml.dice_interfaces.dice_base import DiceBase
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 
@@ -16,16 +19,19 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
 
-class DiceBaseGenCF:
+class DiceBaseGenCF(DiceBase):
 
     def __init__(self, data_interface, model_interface):
         """
         :param data_interface: an interface class to data related params
         :param model_interface: an interface class to access trained ML model
-        """    
+        """ 
+        
+        # initiating data related parameters
+        super().__init__(data_interface) 
         
         self.pred_model= model_interface.model
-        self.data_interface= data_interface
+#         self.data_interface= data_interface
         
         self.encoded_size=10
         self.data_size = len(self.data_interface.encoded_feature_names)
@@ -36,38 +42,45 @@ class DiceBaseGenCF:
         #MAD
         #self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
 
-        #Creating list of encoded categorical and continuous feature indices
-        encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
-        encoded_continuous_feature_indexes=[]
-        for i in range(self.data_size):
-            valid=1
-            for v in encoded_categorical_feature_indexes:
-                if i in v:
-                    valid=0
-            if valid:
-                encoded_continuous_feature_indexes.append(i)            
-        encoded_start_cat = len(encoded_continuous_feature_indexes)
         
+        # Continuous and Categorical feature indices are by default inherited from DiceBaseClass
+        #Creating list of encoded categorical and continuous feature indices
+#         encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
+#         encoded_continuous_feature_indexes=[]
+#         for i in range(self.data_size):
+#             valid=1
+#             for v in encoded_categorical_feature_indexes:
+#                 if i in v:
+#                     valid=0
+#             if valid:
+#                 encoded_continuous_feature_indexes.append(i)            
+                
         #One Hot Encoding for categorical features
         encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
         
         # The output/outcome variable position altered due to one_hot_encoding for categorical features: (Cont feat, Outcome, Cat feat) 
         # Need to rearrange columns such that outcome variable comes at the last
+        encoded_start_cat = len(self.encoded_continuous_feature_indexes)
         cols = list(encoded_data.columns)
         cols = cols[:encoded_start_cat] + cols[encoded_start_cat+1:] + [cols[encoded_start_cat]]
         encoded_data = encoded_data[cols]        
-
-        #Normlaise_Weights
-        self.normalise_weights={}        
-        dataset = encoded_data.to_numpy()
-        for idx in encoded_continuous_feature_indexes:
-            _max= float(np.max( dataset[:,idx] ))
-            _min= float(np.min( dataset[:,idx] ))
-            self.normalise_weights[idx]=[_min, _max]
-
-        # Normlization for continuous features
+        
+        # Normalization for continuous features
         encoded_data= self.data_interface.normalize_data(encoded_data)
-        dataset = encoded_data.to_numpy()
+        dataset = encoded_data.to_numpy()        
+
+        #Normalise_Weights
+        self.normalise_weights={}      
+        for idx in range(len(self.cont_minx)):
+            _max= self.cont_maxx[idx]
+            _min= self.cont_minx[idx]
+            self.normalise_weights[idx]=[_min, _max]
+            
+#         print('Self Computed: ', encoded_continuous_feature_indexes, encoded_categorical_feature_indexes )
+#         print( 'DiceBase: ', self.encoded_continuous_feature_indexes, self.encoded_categorical_feature_indexes )
+#         print('Checks: ', ' Continuous: ', encoded_continuous_feature_indexes == self.encoded_continuous_feature_indexes, ' Categorical: ', encoded_categorical_feature_indexes == self.encoded_categorical_feature_indexes)
+        print('Checks: ', 'Self :', self.normalise_weights, 'DiceBase: ', self.cont_minx, self.cont_maxx)
+
 
         #Train, Val, Test Splits
         np.random.shuffle(dataset)
