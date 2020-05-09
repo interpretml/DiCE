@@ -79,7 +79,7 @@ class DiceBaseGenCF(DiceBase):
 #         print('Self Computed: ', encoded_continuous_feature_indexes, encoded_categorical_feature_indexes )
 #         print( 'DiceBase: ', self.encoded_continuous_feature_indexes, self.encoded_categorical_feature_indexes )
 #         print('Checks: ', ' Continuous: ', encoded_continuous_feature_indexes == self.encoded_continuous_feature_indexes, ' Categorical: ', encoded_categorical_feature_indexes == self.encoded_categorical_feature_indexes)
-        print('Checks: ', 'Self :', self.normalise_weights, 'DiceBase: ', self.cont_minx, self.cont_maxx)
+#         print('Checks: ', 'Self :', self.normalise_weights, 'DiceBase: ', self.cont_minx, self.cont_maxx)
 
 
         #Train, Val, Test Splits
