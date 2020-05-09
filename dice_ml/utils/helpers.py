@@ -12,8 +12,8 @@ def load_adult_income_dataset(save_intermediate=False):
 
     :param: save_intermediate: save the transformed dataset. Do not save by default.
     """
-    #raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', delimiter=', ', dtype=str)
-    raw_data = np.genfromtxt('/mnt/c/Users/t-dimaha/Desktop/DiCE/DiCE/dice_ml/utils/adult.data', delimiter=', ', dtype=str)   
+    raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', delimiter=', ', dtype=str)
+    #raw_data = np.genfromtxt('/mnt/c/Users/t-dimaha/Desktop/DiCE/DiCE/dice_ml/utils/adult.data', delimiter=', ', dtype=str)   
         
     #  column names from "https://archive.ics.uci.edu/ml/datasets/Adult"
     column_names = ['age', 'workclass', 'fnlwgt', 'education', 'educational-num', 'marital-status', 'occupation', 'relationship', 'race', 'gender', 'capital-gain', 'capital-loss', 'hours-per-week', 'native-country', 'income']
