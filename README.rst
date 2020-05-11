@@ -21,6 +21,8 @@ Diverse Counterfactual Explanations (DiCE) for ML
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
 .. _Binder:  https://mybinder.org/v2/gh/interpretML/DiCE/master?filepath=docs/source/notebooks
 
+ Blog Post: `Explanation for ML using diverse counterfactuals <https://www.microsoft.com/en-us/research/blog/open-source-library-provides-explanation-for-machine-learning-through-diverse-counterfactuals/>`_
+
 Explanations are critical for machine learning, especially as machine learning-based systems are being used to inform decisions in societally critical domains such as finance, healthcare, education, and criminal justice.
 However, most explanation methods depend on an approximation of the ML model to
 create an interpretable explanation. For example,
