@@ -16,10 +16,10 @@ class TestBaseExplainerLoader:
         tf = pytest.importorskip("tensorflow")
         backend = 'TF'+tf.__version__[0]
         exp = self._get_exp(backend)
-        assert issubclass(type(exp), dice_ml.dice_interfaces.dice_base.DiceBase)
+        assert issubclass(type(exp), dice_ml.explainer_interfaces.explainer_base.ExplainerBase)
 
     def test_pyt(self):
         pyt = pytest.importorskip("torch")
         backend = 'PYT'
         exp = self._get_exp(backend)
-        assert issubclass(type(exp), dice_ml.dice_interfaces.dice_base.DiceBase)
+        assert issubclass(type(exp), dice_ml.explainer_interfaces.explainer_base.ExplainerBase)
