@@ -18,6 +18,7 @@ class PrivateData:
         :param outcome_name: Outcome feature name.
         :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just string 'int' should be provided, if the feature is of type float, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: 'int', cont_f2: ['float', 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
         :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.
+        :param data_name: Dataset name
 
         """
 
@@ -79,6 +80,11 @@ class PrivateData:
         for feature_name in self.continuous_feature_names:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
+
+        if 'data_name' in params:
+            self.data_name = params['data_name']
+        else:
+            self.data_name = 'mydata'
 
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
