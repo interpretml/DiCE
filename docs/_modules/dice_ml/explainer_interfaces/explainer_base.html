@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.dice_interfaces.dice_base &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.2 documentation</title>
   
 
   
@@ -139,7 +139,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>dice_ml.dice_interfaces.dice_base</li>
+      <li>dice_ml.explainer_interfaces.explainer_base</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -154,12 +154,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for dice_ml.dice_interfaces.dice_base</h1><div class="highlight"><pre>
+  <h1>Source code for dice_ml.explainer_interfaces.explainer_base</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module containing a template class to generate counterfactual explanations.</span>
 <span class="sd">   Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.</span>
-<span class="sd">   All methods are in dice_ml.dice_interfaces&quot;&quot;&quot;</span>
+<span class="sd">   All methods are in dice_ml.explainer_interfaces&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="DiceBase"><a class="viewcode-back" href="../../../dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_base.DiceBase">[docs]</a><span class="k">class</span> <span class="nc">DiceBase</span><span class="p">:</span>
+<div class="viewcode-block" id="ExplainerBase"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase">[docs]</a><span class="k">class</span> <span class="nc">ExplainerBase</span><span class="p">:</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
@@ -180,7 +180,7 @@
         <span class="c1"># decimal precisions for continuous features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cont_precisions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()[</span><span class="n">ix</span><span class="p">]</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">]</span>
 
-<div class="viewcode-block" id="DiceBase.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.dice_interfaces.html#dice_ml.dice_interfaces.dice_base.DiceBase.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExplainerBase.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 </pre></div>
 
@@ -194,7 +194,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
