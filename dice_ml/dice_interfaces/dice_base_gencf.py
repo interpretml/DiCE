@@ -9,6 +9,7 @@ import copy
 from dice_ml.dice_interfaces.dice_base import DiceBase
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+from dice_ml.utils.helpers import get_base_gen_cf_initialization
 
 #Pytorch
 import torch
@@ -30,72 +31,13 @@ class DiceBaseGenCF(DiceBase):
         # initiating data related parameters
         super().__init__(data_interface) 
         
-        self.pred_model= model_interface.model
-#         self.data_interface= data_interface
-        
-        self.encoded_size=10
-        self.data_size = len(self.data_interface.encoded_feature_names)
-
-        # Dataset for training Variational Encoder Decoder model for CF Generation
-        train_data_vae= self.data_interface.data_df.copy()
-        
-        #MAD
-        #self.mad_feature_weights = self.data_interface.get_mads_from_training_data(normalized=False)
-
-        
-        # Continuous and Categorical feature indices are by default inherited from DiceBaseClass
-        #Creating list of encoded categorical and continuous feature indices
-#         encoded_categorical_feature_indexes = self.data_interface.get_data_params()[2]     
-#         encoded_continuous_feature_indexes=[]
-#         for i in range(self.data_size):
-#             valid=1
-#             for v in encoded_categorical_feature_indexes:
-#                 if i in v:
-#                     valid=0
-#             if valid:
-#                 encoded_continuous_feature_indexes.append(i)            
+        #Black Box ML Model to be explained
+        self.pred_model= model_interface.model        
                 
-        #One Hot Encoding for categorical features
-        encoded_data = self.data_interface.one_hot_encode_data(train_data_vae)
-        
-        # The output/outcome variable position altered due to one_hot_encoding for categorical features: (Cont feat, Outcome, Cat feat) 
-        # Need to rearrange columns such that outcome variable comes at the last
-        encoded_start_cat = len(self.encoded_continuous_feature_indexes)
-        cols = list(encoded_data.columns)
-        cols = cols[:encoded_start_cat] + cols[encoded_start_cat+1:] + [cols[encoded_start_cat]]
-        encoded_data = encoded_data[cols]        
-        
-        # Normalization for continuous features
-        encoded_data= self.data_interface.normalize_data(encoded_data)
-        dataset = encoded_data.to_numpy()        
-
-        #Normalise_Weights
-        self.normalise_weights={}      
-        for idx in range(len(self.cont_minx)):
-            _max= self.cont_maxx[idx]
-            _min= self.cont_minx[idx]
-            self.normalise_weights[idx]=[_min, _max]
-            
-#         print('Self Computed: ', encoded_continuous_feature_indexes, encoded_categorical_feature_indexes )
-#         print( 'DiceBase: ', self.encoded_continuous_feature_indexes, self.encoded_categorical_feature_indexes )
-#         print('Checks: ', ' Continuous: ', encoded_continuous_feature_indexes == self.encoded_continuous_feature_indexes, ' Categorical: ', encoded_categorical_feature_indexes == self.encoded_categorical_feature_indexes)
-#         print('Checks: ', 'Self :', self.normalise_weights, 'DiceBase: ', self.cont_minx, self.cont_maxx)
-
-
-        #Train, Val, Test Splits
-        np.random.shuffle(dataset)
-        test_size= int(0.1*dataset.shape[0])
-        self.vae_test_dataset= dataset[:test_size]
-        dataset= dataset[test_size:]
-        self.vae_val_dataset= dataset[:test_size]
-        self.vae_train_dataset= dataset[test_size:]
-
-        #BaseGenCF Model
-        self.cf_vae = CF_VAE(self.data_size, self.encoded_size, self.data_interface)
-        
         #Hyperparam 
         # Currently set to the specific values for the Adult dataset; dataset dependent
         # TODO: Make these hyperparam dataset dependent
+        self.encoded_size=10
         self.learning_rate= 1e-2
         self.batch_size= 2048
         self.validity_reg= 42.0 
@@ -104,19 +46,16 @@ class DiceBaseGenCF(DiceBase):
         self.wm1=1e-2
         self.wm2=1e-2
         self.wm3=1e-2
-       
-        #Optimizer    
-        self.cf_vae_optimizer = optim.Adam([
-            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_mean.parameters()),'weight_decay': self.wm1},
-            {'params': filter(lambda p: p.requires_grad, self.cf_vae.encoder_var.parameters()),'weight_decay': self.wm2},
-            {'params': filter(lambda p: p.requires_grad, self.cf_vae.decoder_mean.parameters()),'weight_decay': self.wm3},
-            ], lr=self.learning_rate
-        )
         
+        #Initializing parameters for the DiceBaseGenCF  
+        self.vae_train_dataset, self.vae_val_dataset, self.vae_test_dataset, self.normalise_weights, self.cf_vae, self.cf_vae_optimizer= get_base_gen_cf_initialization( self.data_interface, self.encoded_size, self.cont_minx, self.cont_maxx, self.margin, self.validity_reg, self.epochs, self.wm1, self.wm2, self.wm3, self.learning_rate ) 
+        
+        #Data paths
         self.base_model_dir= '../dice_ml/utils/sample_trained_models/'
         self.dataset_name= 'adult'
         ##TODO: A general method to identify the dataset_name
         self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
+
     
     def compute_loss( self, model_out, x, target_label ): 
 
@@ -134,17 +73,12 @@ class DiceBaseGenCF(DiceBase):
         s= self.cf_vae.encoded_start_cat
         recon_err = -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
         for key in self.normalise_weights.keys():
-            # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
             recon_err+= -(self.normalise_weights[key][1] - self.normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
 
         # Sum to 1 over the categorical indexes of a feature
         for v in self.cf_vae.encoded_categorical_feature_indexes:
             temp = -torch.abs(  1.0-torch.sum( x_pred[:, v[0]:v[-1]+1], axis=1) )
             recon_err += temp
-
-        count=0
-        count+= torch.sum(x_pred[:,:s]<0,axis=1).float()
-        count+= torch.sum(x_pred[:,:s]>1,axis=1).float()    
 
         #Validity         
         temp_logits = self.pred_model(x_pred)
@@ -159,7 +93,6 @@ class DiceBaseGenCF(DiceBase):
 
             recon_err += -torch.sum( torch.abs(x[:,s:-1] - x_pred[:,s:-1]), axis=1 )
             for key in self.normalise_weights.keys():
-                # recon_err+= -(1/mad_feature_weights[d.encoded_feature_names[int(key)]])*(normalise_weights[key][1] - normalise_weights[key][0])*torch.abs( (x[:,key] - x_pred[:,key]))
                 recon_err+= -(self.normalise_weights[key][1] - self.normalise_weights[key][0])*torch.abs(x[:,key] - x_pred[:,key]) 
 
             # Sum to 1 over the categorical indexes of a feature
@@ -167,12 +100,8 @@ class DiceBaseGenCF(DiceBase):
                 temp = -torch.abs(  1.0-torch.sum( x_pred[:, v[0]:v[-1]+1], axis=1) )
                 recon_err += temp
 
-            count+= torch.sum(x_pred[:,:s]<0,axis=1).float()
-            count+= torch.sum(x_pred[:,:s]>1,axis=1).float()        
-
             #Validity
             temp_logits = self.pred_model(x_pred)
-    #         validity_loss += -F.cross_entropy(temp_logits, target_label)      
             temp_1= temp_logits[target_label==1,:]
             temp_0= temp_logits[target_label==0,:]
             validity_loss += F.hinge_embedding_loss( F.sigmoid(temp_1[:,1]) - F.sigmoid(temp_1[:,0]), torch.tensor(-1), self.margin, reduction='mean')
@@ -181,7 +110,6 @@ class DiceBaseGenCF(DiceBase):
         recon_err = recon_err / mc_samples
         validity_loss = -1*self.validity_reg*validity_loss/mc_samples
 
-        print('Avg wrong cont dim: ', torch.mean(count)/mc_samples)
         print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss)
         return -torch.mean(recon_err - kl_divergence) - validity_loss
 
@@ -235,7 +163,7 @@ class DiceBaseGenCF(DiceBase):
                 torch.save(self.cf_vae.state_dict(), self.save_path)                   
             
     #The input arguments for this function same as the one defined for Diverse CF    
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite",  ):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite"  ):
 
         ## Loading the latest trained CFVAE model
         self.cf_vae.load_state_dict(torch.load(self.save_path))
@@ -303,5 +231,5 @@ class DiceBaseGenCF(DiceBase):
         result['CF']= final_gen_cf[0]
         result['CF-Pred']= final_cf_pred[0]
         
-        # Adding empty list for sparse cf gen and pred; adding 0 for the sparsity coffecient
-        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'], None, None, 0)
+        # Adding empty list for sparse cf gen and pred; adding 'NA' for the posthoc sparsity cofficient
+        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'], None, None, 'NA')

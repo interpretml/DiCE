@@ -7,13 +7,26 @@ import os
 
 import dice_ml
 
-def load_adult_income_dataset():
+#Dice Imports
+from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+
+#Pytorch
+import torch
+import torch.utils.data
+from torch import nn, optim
+from torch.nn import functional as F
+from torchvision import datasets, transforms
+from torchvision.utils import save_image
+from torch.autograd import Variable
+
+def load_adult_income_dataset(save_intermediate=False):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
-    :return adult_data: returns preprocessed adult income dataset.
+    :param: save_intermediate: save the transformed dataset. Do not save by default.
     """
     raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', delimiter=', ', dtype=str)
-
+    #raw_data = np.genfromtxt('/mnt/c/Users/t-dimaha/Desktop/DiCE/DiCE/dice_ml/utils/adult.data', delimiter=', ', dtype=str)   
+        
     #  column names from "https://archive.ics.uci.edu/ml/datasets/Adult"
     column_names = ['age', 'workclass', 'fnlwgt', 'education', 'educational-num', 'marital-status', 'occupation', 'relationship', 'race', 'gender', 'capital-gain', 'capital-loss', 'hours-per-week', 'native-country', 'income']
 
@@ -55,6 +68,9 @@ def load_adult_income_dataset():
 
     adult_data = adult_data.rename(columns={'marital-status': 'marital_status', 'hours-per-week': 'hours_per_week'})
 
+    if save_intermediate:
+        pass#adult_data.to_csv('adult.csv', index=False)
+
     return adult_data
 
 
@@ -75,3 +91,41 @@ def get_adult_data_info():
                         'hours_per_week': 'total work hours per week',
                         'income': '0 (<=50K) vs 1 (>50K)'}
     return feature_description
+
+def get_base_gen_cf_initialization( data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
+    
+        # Dataset for training Variational Encoder Decoder model for CF Generation        
+        df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
+        encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]] 
+        dataset = encoded_data.to_numpy()        
+        print('Dataset Shape:',  encoded_data.shape)
+        print('Datasets Columns:', encoded_data.columns)
+        
+        #Normalise_Weights
+        normalise_weights={}      
+        for idx in range(len(cont_minx)):
+            _max= cont_maxx[idx]
+            _min= cont_minx[idx]
+            normalise_weights[idx]=[_min, _max]
+    
+        #Train, Val, Test Splits
+        np.random.shuffle(dataset)
+        test_size= int(0.1*dataset.shape[0])
+        vae_test_dataset= dataset[:test_size]
+        dataset= dataset[test_size:]
+        vae_val_dataset= dataset[:test_size]
+        vae_train_dataset= dataset[test_size:]
+
+        #BaseGenCF Model
+        cf_vae = CF_VAE(data_interface, encoded_size)
+        
+        #Optimizer    
+        cf_vae_optimizer = optim.Adam([
+            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
+            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
+            {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
+            ], lr=learning_rate
+        )
+        
+        # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
+        return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer

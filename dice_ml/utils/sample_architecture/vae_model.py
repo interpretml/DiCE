@@ -8,12 +8,12 @@ from torch.autograd import Variable
 
 class CF_VAE(nn.Module):
     
-    def __init__(self, data_size, encoded_size, d):
+    def __init__(self, d, encoded_size):
 
         super(CF_VAE, self).__init__()
         
         self.encoded_size = encoded_size
-        self.data_size = data_size
+        self.data_size = len(d.encoded_feature_names)
         self.encoded_categorical_feature_indexes = d.get_data_params()[2]     
 
         self.encoded_continuous_feature_indexes=[]
@@ -141,12 +141,12 @@ class CF_VAE(nn.Module):
 
 class AutoEncoder(nn.Module):
     
-    def __init__(self, data_size, encoded_size, d):
+    def __init__(self, d, encoded_size):
 
         super(AutoEncoder, self).__init__()
         
         self.encoded_size = encoded_size
-        self.data_size = data_size
+        self.data_size = len(d.encoded_feature_names)
         self.encoded_categorical_feature_indexes = d.get_data_params()[2]     
 
         self.encoded_continuous_feature_indexes=[]
