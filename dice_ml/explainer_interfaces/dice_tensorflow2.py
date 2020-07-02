@@ -119,7 +119,8 @@ class DiceTensorFlow2(ExplainerBase):
 
 
         # CF initialization
-        if len(self.cfs) == 0:
+        if len(self.cfs) != self.total_CFs:
+            self.cfs = []
             for ix in range(self.total_CFs):
                 one_init = [[]]
                 for jx in range(self.minx.shape[1]):
@@ -258,8 +259,8 @@ class DiceTensorFlow2(ExplainerBase):
     def compute_loss(self):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss()
-        self.proximity_loss = self.compute_proximity_loss()
-        self.diversity_loss = self.compute_diversity_loss()
+        self.proximity_loss = self.compute_proximity_loss() if self.proximity_weight > 0 else 0.0
+        self.diversity_loss = self.compute_diversity_loss() if self.diversity_weight > 0 else 0.0
         self.regularization_loss = self.compute_regularization_loss()
 
         self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (self.diversity_weight * self.diversity_loss) + (self.categorical_penalty * self.regularization_loss)
@@ -452,8 +453,9 @@ class DiceTensorFlow2(ExplainerBase):
                     avg_preds_dist = np.mean([abs(pred[0][0]-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold:
                         self.min_dist_from_threshold = avg_preds_dist
-                        self.best_backup_cfs = temp_cfs_stored
-                        self.best_backup_cfs_preds = test_preds_stored
+                        for ix in range(self.total_CFs):
+                            self.best_backup_cfs = temp_cfs_stored.copy()
+                            self.best_backup_cfs_preds = test_preds_stored.copy()
 
             # rounding off final cfs - not necessary when inter_project=True
             self.round_off_cfs(assign=True)
@@ -468,9 +470,9 @@ class DiceTensorFlow2(ExplainerBase):
 
         self.elapsed = timeit.default_timer() - start_time
 
-        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.cfs]
+        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
-        # update final_cfs from backed up CFs if valid CFs are not found
+        # update final_cfs from backed up CFs if valid CFs are not found - currently works for DiverseCF only
         self.valid_cfs_found = False
         if((self.target_cf_class == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
             if self.min_dist_from_threshold != 100:
