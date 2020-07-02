@@ -1,8 +1,8 @@
 """Module containing a template class to generate counterfactual explanations.
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
-   All methods are in dice_ml.dice_interfaces"""
+   All methods are in dice_ml.explainer_interfaces"""
 
-class DiceBase:
+class ExplainerBase:
 
     def __init__(self, data_interface):
         """Init method

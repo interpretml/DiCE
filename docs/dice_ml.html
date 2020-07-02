@@ -96,7 +96,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">dice_ml package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.data_interfaces.html">dice_ml.data_interfaces package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dice_ml.dice_interfaces.html">dice_ml.dice_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.explainer_interfaces.html">dice_ml.explainer_interfaces package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html">dice_ml.utils package</a></li>
 </ul>
@@ -210,13 +210,13 @@
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dice_ml.dice_interfaces.html">dice_ml.dice_interfaces package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_base">dice_ml.dice_interfaces.dice_base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_pytorch">dice_ml.dice_interfaces.dice_pytorch module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow1">dice_ml.dice_interfaces.dice_tensorflow1 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces.dice_tensorflow2">dice_ml.dice_interfaces.dice_tensorflow2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.dice_interfaces.html#module-dice_ml.dice_interfaces">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dice_ml.explainer_interfaces.html">dice_ml.explainer_interfaces package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_pytorch">dice_ml.explainer_interfaces.dice_pytorch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_tensorflow1">dice_ml.explainer_interfaces.dice_tensorflow1 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_tensorflow2">dice_ml.explainer_interfaces.dice_tensorflow2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.explainer_base">dice_ml.explainer_interfaces.explainer_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a><ul>
@@ -268,12 +268,12 @@
 <p>Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch.</p>
 <dl class="py class">
 <dt id="dice_ml.dice.Dice">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An interface class to different DiCE implementations.</p>
 <dl class="py method">
 <dt id="dice_ml.dice.Dice.decide_implementation_type">
-<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides DiCE implementation type.</p>
 </dd></dl>
 
@@ -375,7 +375,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>

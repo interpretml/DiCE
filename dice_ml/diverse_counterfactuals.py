@@ -82,7 +82,11 @@ class CounterfactualExamples:
         print('Query instance (original outcome : %i)' %round(self.test_pred))
         display(self.org_instance) #  works only in Jupyter notebook
 
-        if 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is not None:
+        if self.posthoc_sparsity_param == None:
+            print('\Feasible Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
+            self.display_df(self.final_cfs_df, show_only_changes)
+
+        elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is not None:
             # CFs
             print('\nDiverse Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
             self.display_df(self.final_cfs_df_sparse, show_only_changes)

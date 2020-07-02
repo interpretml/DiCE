@@ -164,10 +164,10 @@
 
 <span class="kn">import</span> <span class="nn">dice_ml</span>
 
-<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">save_intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
 
-<span class="sd">    :param: save_intermediate: save the transformed dataset. Do not save by default.</span>
+<span class="sd">    :return adult_data: returns preprocessed adult income dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
@@ -212,9 +212,6 @@
 
     <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;marital-status&#39;</span><span class="p">:</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">,</span> <span class="s1">&#39;hours-per-week&#39;</span><span class="p">:</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">})</span>
 
-    <span class="k">if</span> <span class="n">save_intermediate</span><span class="p">:</span>
-        <span class="k">pass</span><span class="c1">#adult_data.to_csv(&#39;adult.csv&#39;, index=False)</span>
-
     <span class="k">return</span> <span class="n">adult_data</span></div>
 
 
@@ -247,7 +244,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>

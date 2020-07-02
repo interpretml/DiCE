@@ -7,10 +7,10 @@ import os
 
 import dice_ml
 
-def load_adult_income_dataset(save_intermediate=False):
+def load_adult_income_dataset():
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
-    :param: save_intermediate: save the transformed dataset. Do not save by default.
+    :return adult_data: returns preprocessed adult income dataset.
     """
     raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', delimiter=', ', dtype=str)
 
@@ -54,9 +54,6 @@ def load_adult_income_dataset(save_intermediate=False):
                                           '12th':'School', '5th-6th':'School', '1st-4th':'School', 'Preschool':'School'}})
 
     adult_data = adult_data.rename(columns={'marital-status': 'marital_status', 'hours-per-week': 'hours_per_week'})
-
-    if save_intermediate:
-        pass#adult_data.to_csv('adult.csv', index=False)
 
     return adult_data
 

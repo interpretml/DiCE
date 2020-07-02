@@ -22,6 +22,7 @@ class PublicData:
         :param test_size (optional): Proportion of test set split. Defaults to 0.2.
         :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
         :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
+        :param data_name: Dataset name
 
         """
 
@@ -101,6 +102,11 @@ class PublicData:
                     "permitted range of features should be within their original range")
         else:
             self.permitted_range = self.get_features_range()
+
+        if 'data_name' in params:
+            self.data_name = params['data_name']
+        else:
+            self.data_name = 'mydata'
 
     def check_features_range(self):
         for feature in self.continuous_feature_names:
