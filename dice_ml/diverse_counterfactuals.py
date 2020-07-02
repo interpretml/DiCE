@@ -82,7 +82,7 @@ class CounterfactualExamples:
         print('Query instance (original outcome : %i)' %round(self.test_pred))
         display(self.org_instance) #  works only in Jupyter notebook
 
-        if self.posthoc_sparsity_param == 'NA':
+        if self.posthoc_sparsity_param == None:
             print('\Feasible Counterfactual set (new outcome : %i)' %(1-round(self.test_pred)))
             self.display_df(self.final_cfs_df, show_only_changes)
 
