@@ -14,17 +14,10 @@ class CF_VAE(nn.Module):
         
         self.encoded_size = encoded_size
         self.data_size = len(d.encoded_feature_names)
-        self.encoded_categorical_feature_indexes = d.get_data_params()[2]     
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes = d.get_data_params()
 
-        self.encoded_continuous_feature_indexes=[]
-        for i in range(self.data_size):
-            valid=1
-            for v in self.encoded_categorical_feature_indexes:
-                if i in v:
-                    valid=0
-            if valid:
-                self.encoded_continuous_feature_indexes.append(i)            
-
+        flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]
+        self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]        
         self.encoded_start_cat = len(self.encoded_continuous_feature_indexes)
 
         # Plus 1 to the input encoding size and data size to incorporate the target class label        
