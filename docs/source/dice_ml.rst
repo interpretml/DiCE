@@ -8,7 +8,7 @@ Subpackages
    :maxdepth: 4
 
    dice_ml.data_interfaces
-   dice_ml.dice_interfaces
+   dice_ml.explainer_interfaces
    dice_ml.model_interfaces
    dice_ml.utils
 

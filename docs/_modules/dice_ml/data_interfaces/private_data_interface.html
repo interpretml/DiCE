@@ -175,6 +175,7 @@
 <span class="sd">        :param outcome_name: Outcome feature name.</span>
 <span class="sd">        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just string &#39;int&#39; should be provided, if the feature is of type float, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: &#39;int&#39;, cont_f2: [&#39;float&#39;, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.</span>
 <span class="sd">        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.</span>
+<span class="sd">        :param data_name: Dataset name</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -236,6 +237,11 @@
         <span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_and_precision</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">type_and_precision</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;int&#39;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;data_name&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_name&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_name</span> <span class="o">=</span> <span class="s1">&#39;mydata&#39;</span>
 
 <div class="viewcode-block" id="PrivateData.normalize_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Normalizes continuous features to make them fall in the range [0,1].&quot;&quot;&quot;</span>
@@ -426,7 +432,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>

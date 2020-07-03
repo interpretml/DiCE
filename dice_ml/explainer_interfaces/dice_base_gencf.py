@@ -228,4 +228,4 @@ class DiceBaseGenCF(ExplainerBase):
         result['CF-Pred']= final_cf_pred[0]
         
         # Adding empty list for sparse cf gen and pred; adding 'NA' for the posthoc sparsity cofficient
-        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'], 'NA')
+        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'],  posthoc_sparsity_param=None)

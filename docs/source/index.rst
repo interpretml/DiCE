@@ -1,8 +1,7 @@
 .. DiCE documentation master file, created by
-   sphinx-quickstart on Fri Jun 21 18:06:43 2019.
+   sphinx-quickstart on Tue May 19 13:15:18 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
-
 
 .. include:: ../../README.rst
 

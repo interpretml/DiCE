@@ -167,7 +167,7 @@
 
 <span class="sd">        :param model: trained ML model.</span>
 <span class="sd">        :param model_path: path to trained ML model.</span>
-<span class="sd">        :param backend: &quot;TF1&quot; (&quot;TF2&quot;) for TensorFLow 1.0 (2.0) and &quot;PYT&quot; for PyTorch implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with &quot;model&quot; and &quot;explainer&quot; as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class &quot;SklearnModel&quot; in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces, and dice interface class &quot;DiceSklearn&quot; in module &quot;dice_sklearn&quot; inside dice_ml.dice_interfaces, then backend parameter should be {&quot;model&quot;: &quot;sklearn_model.SklearnModel&quot;, &quot;explainer&quot;: dice_sklearn.DiceSklearn}.</span>
+<span class="sd">        :param backend: &quot;TF1&quot; (&quot;TF2&quot;) for TensorFLow 1.0 (2.0) and &quot;PYT&quot; for PyTorch implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with &quot;model&quot; and &quot;explainer&quot; as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class &quot;SklearnModel&quot; in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces, and dice interface class &quot;DiceSklearn&quot; in module &quot;dice_sklearn&quot; inside dice_ml.explainer_interfaces, then backend parameter should be {&quot;model&quot;: &quot;sklearn_model.SklearnModel&quot;, &quot;explainer&quot;: dice_sklearn.DiceSklearn}.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span><span class="p">((</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">model_path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)):</span>
@@ -211,7 +211,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>

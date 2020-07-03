@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = 'DiCE'
-copyright = '2019, Ramaravind, Amit, Chenhao'
+copyright = '2020, Ramaravind, Amit, Chenhao'
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
@@ -61,7 +61,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.ipynb_checkpoints']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-
 html_theme = 'sphinx_rtd_theme'
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
