@@ -6,8 +6,8 @@ import timeit
 import copy
 
 #Dice Imports
-from dice_ml.dice_interfaces.dice_base import DiceBase
-from dice_ml.dice_interfaces.dice_base_gencf import DiceBaseGenCF
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.explainer_interfaces.dice_base_gencf import DiceBaseGenCF
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 from dice_ml.utils.helpers import get_base_gen_cf_initialization
@@ -21,7 +21,7 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
 
-class DiceModelApproxGenCF(DiceBaseGenCF, DiceBase):
+class DiceModelApproxGenCF(DiceBaseGenCF, ExplainerBase):
 
     def __init__(self, data_interface, model_interface):
         """
