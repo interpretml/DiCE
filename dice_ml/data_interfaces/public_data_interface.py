@@ -22,7 +22,7 @@ class PublicData:
         :param test_size (optional): Proportion of test set split. Defaults to 0.2.
         :param test_split_random_state (optional): Random state for train test split. Defaults to 17.
         :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
-        :param data_name: Dataset name
+        :param data_name (optional): Dataset name
 
         """
 
