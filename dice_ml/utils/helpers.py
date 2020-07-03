@@ -110,7 +110,7 @@ def get_base_gen_cf_initialization( data_interface, encoded_size, cont_minx, con
     
         #Train, Val, Test Splits
         np.random.shuffle(dataset)
-        test_size= int(0.1*dataset.shape[0])
+        test_size= int(data_interface.test_size)
         vae_test_dataset= dataset[:test_size]
         dataset= dataset[test_size:]
         vae_val_dataset= dataset[:test_size]

@@ -22,7 +22,7 @@ from torch.autograd import Variable
 
 class DiceBaseGenCF(ExplainerBase):
 
-    def __init__(self, data_interface, model_interface):
+    def __init__(self, data_interface, model_interface, **kwargs):
         """
         :param data_interface: an interface class to data related params
         :param model_interface: an interface class to access trained ML model
@@ -35,26 +35,22 @@ class DiceBaseGenCF(ExplainerBase):
         self.pred_model= model_interface.model        
                 
         #Hyperparam 
-        # Currently set to the specific values for the Adult dataset; dataset dependent
-        # TODO: Make these hyperparam dataset dependent
-        self.encoded_size=10
-        self.learning_rate= 1e-2
-        self.batch_size= 2048
-        self.validity_reg= 42.0 
-        self.margin= 0.165
-        self.epochs= 25
-        self.wm1=1e-2
-        self.wm2=1e-2
-        self.wm3=1e-2
+        self.encoded_size=kwargs['encoded_size']
+        self.learning_rate= kwargs['lr']
+        self.batch_size= kwargs['batch_size']
+        self.validity_reg= kwargs['validity_reg']
+        self.margin= kwargs['margin']
+        self.epochs= kwargs['epochs']
+        self.wm1= kwargs['wm1']
+        self.wm2= kwargs['wm2']
+        self.wm3= kwargs['wm3']
         
         #Initializing parameters for the DiceBaseGenCF  
         self.vae_train_dataset, self.vae_val_dataset, self.vae_test_dataset, self.normalise_weights, self.cf_vae, self.cf_vae_optimizer= get_base_gen_cf_initialization( self.data_interface, self.encoded_size, self.cont_minx, self.cont_maxx, self.margin, self.validity_reg, self.epochs, self.wm1, self.wm2, self.wm3, self.learning_rate ) 
         
         #Data paths
         self.base_model_dir= '../dice_ml/utils/sample_trained_models/'
-        self.dataset_name= 'adult'
-        ##TODO: A general method to identify the dataset_name
-        self.save_path=self.base_model_dir+ self.dataset_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
+        self.save_path=self.base_model_dir+ self.data_interface.data_name +'-margin-' + str(self.margin) + '-validity_reg-'+ str(self.validity_reg) + '-epoch-' + str(self.epochs) + '-' + 'base-gen' + '.pth'
 
     
     def compute_loss( self, model_out, x, target_label ): 
