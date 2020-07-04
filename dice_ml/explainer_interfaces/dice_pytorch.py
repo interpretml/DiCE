@@ -102,7 +102,9 @@ class DicePyTorch(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.get_model_output(input_instance).data
+        if not torch.is_tensor(input_instance):
+            input_instance = torch.tensor(input_instance).float()
+        return self.get_model_output(input_instance).data.numpy()
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes CFs and other related variables."""
@@ -307,10 +309,10 @@ class DicePyTorch(ExplainerBase):
                     else:
                         cf[v[vi]] = 0.0
 
-            temp_cfs.append(torch.tensor(cf))
+            temp_cfs.append(cf)
             if assign:
                 for jx in range(len(cf)):
-                    self.cfs[index].data[jx] = temp_cfs[index][jx]
+                    self.cfs[index].data[jx] = torch.tensor(temp_cfs[index])[jx]
 
         if assign:
             return None
@@ -363,8 +365,7 @@ class DicePyTorch(ExplainerBase):
         self.x1 = torch.tensor(query_instance)
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(torch.tensor(query_instance).float())
-        test_pred = test_pred.numpy()[0]
+        test_pred = self.predict_fn(torch.tensor(query_instance).float())[0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
         self.target_cf_class = torch.tensor(desired_class).float()
@@ -392,8 +393,8 @@ class DicePyTorch(ExplainerBase):
         self.final_cfs = []
 
         # variables to backup best known CFs so far in the optimization process - if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
-        self.best_backup_cfs = []
-        self.best_backup_cfs_preds = []
+        self.best_backup_cfs = [0]*self.total_CFs
+        self.best_backup_cfs_preds = [0]*self.total_CFs
         self.min_dist_from_threshold = 100
 
         # looping the find CFs depending on whether its random initialization or not
@@ -453,15 +454,15 @@ class DicePyTorch(ExplainerBase):
                     if avg_preds_dist < self.min_dist_from_threshold:
                         self.min_dist_from_threshold = avg_preds_dist
                         for ix in range(self.total_CFs):
-                            self.best_backup_cfs = temp_cfs_stored.copy()
-                            self.best_backup_cfs_preds = test_preds_stored.copy()
+                            self.best_backup_cfs[ix] = temp_cfs_stored[ix].copy()
+                            self.best_backup_cfs_preds[ix] = test_preds_stored[ix].copy()
 
             # rounding off final cfs - not necessary when inter_project=True
             self.round_off_cfs(assign=True)
 
             # storing final CFs
             for j in range(0, self.total_CFs):
-                temp = self.cfs[j].detach().clone()
+                temp = self.cfs[j].detach().clone().numpy()
                 self.final_cfs.append(temp)
 
             # max iterations at which GD stopped
@@ -476,8 +477,8 @@ class DicePyTorch(ExplainerBase):
         if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in test_preds_stored))):
             if self.min_dist_from_threshold != 100:
                 for ix in range(self.total_CFs):
-                    self.final_cfs[ix] = self.best_backup_cfs[ix].clone()
-                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix].clone()
+                    self.final_cfs[ix] = self.best_backup_cfs[ix].copy()
+                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix].copy()
 
                 self.valid_cfs_found = True # final_cfs have valid CFs through backup CFs
             else:
@@ -486,73 +487,26 @@ class DicePyTorch(ExplainerBase):
             self.valid_cfs_found = True # final_cfs have valid CFs
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
-        if posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            self.final_cfs_sparse = []
-            self.cfs_preds_sparse = []
-            for ix in range(self.total_CFs):
-                self.final_cfs_sparse.append(self.final_cfs[ix].clone())
-                self.cfs_preds_sparse.append(self.cfs_preds[ix].clone())
-
-            normalized_quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param, normalized=True)
-            normalized_mads = self.data_interface.get_valid_mads(normalized=True)
-            for feature in normalized_quantiles:
-                normalized_quantiles[feature] = min(normalized_quantiles[feature], normalized_mads[feature])
-
-            features_sorted = sorted(normalized_quantiles.items(), key=lambda kv: kv[1], reverse=True)
-            for ix in range(len(features_sorted)):
-                features_sorted[ix] = features_sorted[ix][0]
-            decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
-
-            for cf_ix in range(self.total_CFs):
-                for feature in features_sorted:
-                    current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
-                    feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                    change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix])
-                    diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
-                    old_diff = diff
-
-                    if(abs(diff) <= normalized_quantiles[feature]):
-                        while((abs(diff)>10e-4) & (np.sign(diff*old_diff) > 0) &
-                              ((self.target_cf_class == 0 and current_pred[0] < self.stopping_threshold) |
-                               (self.target_cf_class == 1 and current_pred[0] > self.stopping_threshold))):
-                            old_val = self.final_cfs_sparse[cf_ix][feat_ix]
-                            self.final_cfs_sparse[cf_ix][feat_ix] += np.sign(diff)*change
-                            current_pred = self.predict_fn(self.final_cfs_sparse[cf_ix])
-                            old_diff = diff
-
-                            if(((self.target_cf_class == 0 and current_pred[0] > self.stopping_threshold) | (self.target_cf_class == 1 and current_pred[0] < self.stopping_threshold))):
-                                self.final_cfs_sparse[cf_ix][feat_ix] = old_val
-                                diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
-                                break
-
-                            diff = query_instance[feat_ix] - self.final_cfs_sparse[cf_ix][feat_ix]
-
-                self.cfs_preds_sparse[cf_ix] = self.predict_fn(self.final_cfs_sparse[cf_ix])
+        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+            final_cfs_sparse = copy.deepcopy(self.final_cfs)
+            cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
+            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param)
         else:
             self.final_cfs_sparse = None
             self.cfs_preds_sparse = None
 
         # convert to the format that is consistent with dice_tensorflow
         for tix in range(self.total_CFs):
-            temp = self.final_cfs[tix].clone().numpy()
-            self.final_cfs[tix] = np.array([temp], dtype=np.float32)
-
-            temp = self.cfs_preds[tix].clone().numpy()
-            self.cfs_preds[tix] = np.array([temp], dtype=np.float32)
+            self.final_cfs[tix] = np.array([self.final_cfs[tix]], dtype=np.float32)
+            self.cfs_preds[tix] = np.array([self.cfs_preds[tix]], dtype=np.float32)
 
             if self.final_cfs_sparse is not None:
-                temp = self.final_cfs_sparse[tix].clone().numpy()
-                self.final_cfs_sparse[tix] = np.array([temp], dtype=np.float32)
+                self.final_cfs_sparse[tix] = np.array([self.final_cfs_sparse[tix]], dtype=np.float32)
+                self.cfs_preds_sparse[tix] = np.array([self.cfs_preds_sparse[tix]], dtype=np.float32)
 
-                temp = self.cfs_preds_sparse[tix].clone().numpy()
-                self.cfs_preds_sparse[tix] = np.array([temp], dtype=np.float32)
-
-            if len(self.best_backup_cfs) > 0:
-                temp = self.best_backup_cfs[tix].clone().numpy()
-                self.best_backup_cfs[tix] = np.array([temp], dtype=np.float32)
-
-                temp = self.best_backup_cfs_preds[tix].clone().numpy()
-                self.best_backup_cfs_preds[tix] = np.array([temp], dtype=np.float32)
+            if isinstance(self.best_backup_cfs[0], np.ndarray): # checking if CFs are backed
+                self.best_backup_cfs[tix] = np.array([self.best_backup_cfs[tix]], dtype=np.float32)
+                self.best_backup_cfs_preds[tix] = np.array([self.best_backup_cfs_preds[tix]], dtype=np.float32)
 
         m, s = divmod(self.elapsed, 60)
         if self.valid_cfs_found:
