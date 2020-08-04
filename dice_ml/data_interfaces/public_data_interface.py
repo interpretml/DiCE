@@ -73,8 +73,11 @@ class PublicData:
             self.continuous_features_precision = None
 
         if len(self.categorical_feature_names) > 0:
+            for feature in self.categorical_feature_names:
+                self.data_df[feature] = self.data_df[feature].apply(str)
             self.data_df[self.categorical_feature_names] = self.data_df[self.categorical_feature_names].astype(
                 'category')
+
         if len(self.continuous_feature_names) > 0:
             for feature in self.continuous_feature_names:
                 if self.get_data_type(feature) == 'float':
@@ -263,10 +266,15 @@ class PublicData:
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
-        for l in self.categorical_feature_names:
+        for feat in self.categorical_feature_names:
+            cat_col_values = []
+            for val in list(self.data_df[feat].unique()):
+                cat_col_values.append(feat + prefix_sep + str(val))
+            match_cols = [c for c in data.columns if c in cat_col_values]
+
             cols, labs = [[c.replace(
-                x, "") for c in data.columns if l+prefix_sep in c] for x in ["", l+prefix_sep]]
-            out[l] = pd.Categorical(
+                x, "") for c in match_cols] for x in ["", feat + prefix_sep]]
+            out[feat] = pd.Categorical(
                 np.array(labs)[np.argmax(data[cols].values, axis=1)])
             out.drop(cols, axis=1, inplace=True)
         return out
@@ -285,7 +293,7 @@ class PublicData:
                     prec = len(str(modes[mx]).split('.')[1])
                     if prec > maxp:
                         maxp = prec
-                maxp = min(maxp, 4)
+                #maxp = min(maxp, 3)
                 precisions[ix] = maxp
         return precisions
 
