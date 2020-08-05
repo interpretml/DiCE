@@ -29,16 +29,17 @@ class CounterfactualExamples:
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
+        precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
+        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+            self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
+
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
 
         result = self.data_interface.get_decoded_data(cfs)
         result = self.data_interface.de_normalize_data(result)
 
-        v = self.data_interface.get_decimal_precisions()
-        # k = self.data_interface.continuous_feature_names
-        # result = result.round(dict(zip(k,v)))
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
-            result[feature] = result[feature].astype(float).round(v[ix])
+            result[feature] = result[feature].astype(float).round(precisions[ix])
 
         # predictions for CFs
         test_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.final_cfs_preds]
@@ -56,16 +57,17 @@ class CounterfactualExamples:
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
+        precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
+        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+            self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
+
         cfs = np.array([self.final_cfs_sparse[i][0] for i in range(len(self.final_cfs_sparse))])
 
         result = self.data_interface.get_decoded_data(cfs)
         result = self.data_interface.de_normalize_data(result)
 
-        v = self.data_interface.get_decimal_precisions()
-        # k = self.data_interface.continuous_feature_names
-        # result = result.round(dict(zip(k,v)))
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
-            result[feature] = result[feature].astype(float).round(v[ix])
+            result[feature] = result[feature].astype(float).round(precisions[ix])
 
         # predictions for CFs
         test_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds_sparse]
@@ -108,7 +110,7 @@ class CounterfactualExamples:
         if show_only_changes is False:
             display(df)  #  works only in Jupyter notebook
         else:
-            newdf = df.values
+            newdf = df.values.tolist()
             org = self.org_instance.values.tolist()[0]
             for ix in range(df.shape[0]):
                 for jx in range(len(org)):
