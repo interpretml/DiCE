@@ -31,11 +31,11 @@ class ExplainerBase:
     def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
 
-        :param final_cfs_sparse: list of final CFs in numpy format.
-        :param cfs_preds_sparse: list of predicted outcomes of final CFs in numpy format.
-        :param query_instance: query instance in numpy format.
-        :param posthoc_sparsity_param: parameter for the post-hoc operation on continuous features to enhance sparsity.
-        :param posthoc_sparsity_algorithm: perform either linear or binary search.
+        :param final_cfs_sparse: List of final CFs in numpy format.
+        :param cfs_preds_sparse: List of predicted outcomes of final CFs in numpy format.
+        :param query_instance: Query instance in numpy format.
+        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
         """
 
         normalized_quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param, normalized=True)
