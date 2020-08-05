@@ -267,11 +267,13 @@ class PublicData:
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
         for feat in self.categorical_feature_names:
+            # first, derive column names in the one-hot-encoded data from the original data
             cat_col_values = []
             for val in list(self.data_df[feat].unique()):
-                cat_col_values.append(feat + prefix_sep + str(val))
-            match_cols = [c for c in data.columns if c in cat_col_values]
+                cat_col_values.append(feat + prefix_sep + str(val)) # join original feature name and its unique values , ex: education_school
+            match_cols = [c for c in data.columns if c in cat_col_values] # check for the above matching columns in the encoded data
 
+            # then, recreate original data by removing the suffixes - based on the GitHub issue comment: https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271
             cols, labs = [[c.replace(
                 x, "") for c in match_cols] for x in ["", feat + prefix_sep]]
             out[feat] = pd.Categorical(
@@ -293,7 +295,6 @@ class PublicData:
                     prec = len(str(modes[mx]).split('.')[1])
                     if prec > maxp:
                         maxp = prec
-                #maxp = min(maxp, 3)
                 precisions[ix] = maxp
         return precisions
 

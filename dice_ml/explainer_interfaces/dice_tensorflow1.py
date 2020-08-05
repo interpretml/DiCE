@@ -85,7 +85,7 @@ class DiceTensorFlow1(ExplainerBase):
         :param tie_random: Used in rounding off CFs and intermediate projection.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
-        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary".
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
 

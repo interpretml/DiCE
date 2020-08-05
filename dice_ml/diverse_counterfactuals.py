@@ -29,7 +29,7 @@ class CounterfactualExamples:
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
-        precisions = self.data_interface.get_decimal_precisions()
+        precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
 
@@ -57,7 +57,7 @@ class CounterfactualExamples:
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
-        precisions = self.data_interface.get_decimal_precisions()
+        precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
 
