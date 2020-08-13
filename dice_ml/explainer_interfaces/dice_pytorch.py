@@ -450,7 +450,7 @@ class DicePyTorch(ExplainerBase):
                 temp_cfs_stored = self.round_off_cfs(assign=False)
                 test_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
 
-                if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
+                if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred[0]-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold:
                         self.min_dist_from_threshold = avg_preds_dist
@@ -475,7 +475,7 @@ class DicePyTorch(ExplainerBase):
 
         # update final_cfs from backed up CFs if valid CFs are not found - currently works for DiverseCF only
         self.valid_cfs_found = False
-        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in test_preds_stored))):
+        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in test_preds_stored))):
             if self.min_dist_from_threshold != 100:
                 for ix in range(self.total_CFs):
                     self.final_cfs[ix] = self.best_backup_cfs[ix].copy()

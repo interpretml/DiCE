@@ -525,7 +525,7 @@ class DiceTensorFlow1(ExplainerBase):
                 temp_cfs_stored = self.round_off_cfs(assign=False)
                 test_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
 
-                if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
+                if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold:
                         self.min_dist_from_threshold = avg_preds_dist
@@ -550,7 +550,7 @@ class DiceTensorFlow1(ExplainerBase):
 
         # update final_cfs from backed up CFs if valid CFs are not found
         self.valid_cfs_found = False
-        if((self.target_cf_class[0][0] == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) | (self.target_cf_class[0][0] == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
+        if((self.target_cf_class[0][0] == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class[0][0] == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
             if self.min_dist_from_threshold != 100:
                 for ix in range(self.total_CFs):
                     self.final_cfs[ix] = self.best_backup_cfs[ix].copy()
@@ -579,7 +579,7 @@ class DiceTensorFlow1(ExplainerBase):
         else:
             self.total_CFs_found = 0
             for pred in self.cfs_preds:
-                if((self.target_cf_class[0][0] == 0 and pred[0][0] < self.stopping_threshold) | (self.target_cf_class[0][0] == 1 and pred[0][0] > self.stopping_threshold)):
+                if((self.target_cf_class[0][0] == 0 and pred[0][0] < self.stopping_threshold) or (self.target_cf_class[0][0] == 1 and pred[0][0] > self.stopping_threshold)):
                     self.total_CFs_found += 1
 
             print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')

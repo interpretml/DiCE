@@ -71,14 +71,14 @@ def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
     old_diff = diff
     change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix]) # the minimal possible change for a feature
     while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
-          ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) |
+          ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
            (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
         old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
         final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff)*change
         current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
         old_diff = diff
 
-        if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) | (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
+        if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
             final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
             diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
             return final_cfs_sparse[cf_ix]
@@ -95,7 +95,7 @@ def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
     current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
 
     # first check if assigning query_instance values to a CF is required.
-    if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) | (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+    if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
         return final_cfs_sparse[cf_ix]
     else:
         final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
@@ -115,7 +115,7 @@ def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
             if current_val == right or current_val == left:
                 break
 
-            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) | (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
                 left = current_val + (10**-decimal_prec[feat_ix])
             else:
                 right = current_val - (10**-decimal_prec[feat_ix])
@@ -134,7 +134,7 @@ def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
             if current_val == right or current_val == left:
                 break
 
-            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) | (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
                 right = current_val - (10**-decimal_prec[feat_ix])
             else:
                 left = current_val + (10**-decimal_prec[feat_ix])
