@@ -34,7 +34,7 @@ class TestDiceTorchMethods:
         weights = np.random.rand(len(self.exp.data_interface.encoded_feature_names))
         self.exp.feature_weights_list = torch.tensor(weights)
 
-    @pytest.mark.parametrize("yloss, output",[("hinge_loss", 4.7753), ("l2_loss", 0.9999), ("log_loss", 4.2892)])
+    @pytest.mark.parametrize("yloss, output",[("hinge_loss", 10.8443), ("l2_loss", 0.9999), ("log_loss", 9.8443)])
     def test_yloss(self, yloss, output):
         self.exp.yloss_type = yloss
         loss1 = self.exp.compute_yloss()
@@ -60,8 +60,8 @@ class TestDiceTorchMethods:
         Tets correctness of final CFs and their predictions for sample query instance.
         """
         dice_exp = self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
-        test_cfs = [[57.0, 'Private', 'Doctorate', 'Married', 'White-Collar', 'White', 'Female', 46.0, 0.993], [33.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 39.0, 0.964], [21.0, 'Self-Employed', 'Prof-school', 'Married', 'Service', 'White', 'Female', 47.0, 0.733], [49.0, 'Private', 'Masters', 'Married', 'Service', 'White', 'Female', 62.0, 0.957]]
+        test_cfs = [[72.0, 'Private', 'HS-grad', 'Married', 'White-Collar', 'White', 'Female', 45.0, 0.691], [29.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 42.0, 0.943], [52.0, 'Private', 'Doctorate', 'Married', 'Service', 'White', 'Female', 44.0, 0.97], [47.0, 'Private', 'Masters', 'Married', 'Service', 'White', 'Female', 73.0, 0.971]]
         assert dice_exp.final_cfs_list == test_cfs
 
         preds = [np.round(preds.flatten().tolist(), 3)[0] for preds in dice_exp.final_cfs_preds]
-        assert pytest.approx(preds, abs=1e-3) == [0.993, 0.964, 0.733, 0.957]
+        assert pytest.approx(preds, abs=1e-3) == [0.691, 0.943, 0.97, 0.971]
