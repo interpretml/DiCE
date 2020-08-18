@@ -190,13 +190,16 @@ class DicePyTorch(ExplainerBase):
             if self.yloss_type == "l2_loss":
                 temp_loss = torch.pow((self.get_model_output(self.cfs[i]) - self.target_cf_class), 2)[0]
             elif self.yloss_type == "log_loss":
-                temp_logits = torch.log10((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
+                temp_logits = torch.log((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
                 criterion = torch.nn.BCEWithLogitsLoss()
                 temp_loss = criterion(temp_logits, torch.tensor([self.target_cf_class]))
             elif self.yloss_type == "hinge_loss":
-                temp_logits = torch.log10((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
+                temp_logits = torch.log((abs(self.get_model_output(self.cfs[i]) - 0.000001))/(1 - abs(self.get_model_output(self.cfs[i]) - 0.000001)))
                 criterion = torch.nn.ReLU()
-                temp_loss = criterion(0.5 - (temp_logits*self.target_cf_class))[0]
+                all_ones = torch.ones_like(self.target_cf_class)
+                labels = 2 * self.target_cf_class - all_ones
+                temp_loss = all_ones - torch.mul(labels, temp_logits)
+                temp_loss = torch.norm(criterion(temp_loss))
 
             yloss += temp_loss
 
