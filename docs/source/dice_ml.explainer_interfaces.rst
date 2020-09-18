@@ -36,6 +36,22 @@ dice\_ml.explainer\_interfaces.explainer\_base module
    :undoc-members:
    :show-inheritance:
 
+dice\_ml.explainer\_interfaces.feasible\_base\_vae module
+---------------------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.feasible_base_vae
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dice\_ml.explainer\_interfaces.feasible\_model\_approx module
+-------------------------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.feasible_model_approx
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

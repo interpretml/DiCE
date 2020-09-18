@@ -159,17 +159,17 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="k">import</span> <span class="n">keras</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
 
 
 <div class="viewcode-block" id="PublicData"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData">[docs]</a><span class="k">class</span> <span class="nc">PublicData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A data interface for public data.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param dataframe: Pandas DataFrame.</span>
@@ -179,7 +179,7 @@
 <span class="sd">        :param test_size (optional): Proportion of test set split. Defaults to 0.2.</span>
 <span class="sd">        :param test_split_random_state (optional): Random state for train test split. Defaults to 17.</span>
 <span class="sd">        :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.</span>
-<span class="sd">        :param data_name: Dataset name</span>
+<span class="sd">        :param data_name (optional): Dataset name</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -230,8 +230,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">continuous_features_precision</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
                 <span class="s1">&#39;category&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_type</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span><span class="p">:</span>
@@ -420,10 +423,17 @@
 <div class="viewcode-block" id="PublicData.from_dummies"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies">[docs]</a>    <span class="k">def</span> <span class="nf">from_dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix_sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the original data from dummy encoded data with k levels.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="c1"># first, derive column names in the one-hot-encoded data from the original data</span>
+            <span class="n">cat_col_values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+                <span class="n">cat_col_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feat</span> <span class="o">+</span> <span class="n">prefix_sep</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span> <span class="c1"># join original feature name and its unique values , ex: education_school</span>
+            <span class="n">match_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat_col_values</span><span class="p">]</span> <span class="c1"># check for the above matching columns in the encoded data</span>
+
+            <span class="c1"># then, recreate original data by removing the suffixes - based on the GitHub issue comment: https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271</span>
             <span class="n">cols</span><span class="p">,</span> <span class="n">labs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">c</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">l</span><span class="o">+</span><span class="n">prefix_sep</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">l</span><span class="o">+</span><span class="n">prefix_sep</span><span class="p">]]</span>
-            <span class="n">out</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">match_cols</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">feat</span> <span class="o">+</span> <span class="n">prefix_sep</span><span class="p">]]</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labs</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
             <span class="n">out</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -442,7 +452,6 @@
                     <span class="n">prec</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">modes</span><span class="p">[</span><span class="n">mx</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">prec</span> <span class="o">&gt;</span> <span class="n">maxp</span><span class="p">:</span>
                         <span class="n">maxp</span> <span class="o">=</span> <span class="n">prec</span>
-                <span class="n">maxp</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">maxp</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
                 <span class="n">precisions</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxp</span>
         <span class="k">return</span> <span class="n">precisions</span></div>
 

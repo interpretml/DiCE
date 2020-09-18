@@ -1,6 +1,14 @@
 dice\_ml.utils package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   dice_ml.utils.sample_architecture
+
 Submodules
 ----------
 

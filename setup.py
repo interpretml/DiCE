@@ -9,7 +9,7 @@ with open('requirements.txt', encoding='utf-8') as f:
 
 setuptools.setup(
     name="dice_ml",
-    version="0.2",
+    version="0.4",
     license="MIT",
     author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/interpretml/DiCE",
-    download_url="https://github.com/interpretml/DiCE/archive/v0.2.tar.gz",
+    download_url="https://github.com/interpretml/DiCE/archive/v0.4.tar.gz",
     python_requires='>=3.4',
     packages=setuptools.find_packages(),
     classifiers=[

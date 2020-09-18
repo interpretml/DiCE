@@ -161,21 +161,21 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PrivateData"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData">[docs]</a><span class="k">class</span> <span class="nc">PrivateData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A data interface for private data with meta information.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values. For python version &lt;=3.6, should provide only an OrderedDict.</span>
 <span class="sd">        :param outcome_name: Outcome feature name.</span>
 <span class="sd">        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just string &#39;int&#39; should be provided, if the feature is of type float, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: &#39;int&#39;, cont_f2: [&#39;float&#39;, 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.</span>
 <span class="sd">        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.</span>
-<span class="sd">        :param data_name: Dataset name</span>
+<span class="sd">        :param data_name (optional): Dataset name</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
