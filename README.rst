@@ -109,19 +109,14 @@ Using DiCE, we can now generate examples that would have been classified as clas
 
 For more details, check out the `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook.
 
-Counterfactual generation methods
----------------------------------
+Supported methods for generating counterfactuals
+------------------------------------------------
 DiCE can generate counterfactual examples using the following methods.
 
-* An explicit loss-based method described in
-`Mothilal et al. (2020) <https://arxiv.org/abs/1905.07697>`_ (Default).
-* A Variational AutoEncoder (VAE)-based method described in `Mahajan et al.
-  (2019) <https://arxiv.org/abs/1912.03277>`_ (see the BaseVAE `notebook <https://github.com/interpretml/DiCE/blob/master/docs/notebooks/DiCE_getting_started_feasible.ipynb>`_).
+* An explicit loss-based method described in `Mothilal et al. (2020) <https://arxiv.org/abs/1905.07697>`_ (Default).
+* A Variational AutoEncoder (VAE)-based method described in `Mahajan et al. (2019) <https://arxiv.org/abs/1912.03277>`_ (see the BaseVAE `notebook <https://github.com/interpretml/DiCE/blob/master/docs/notebooks/DiCE_getting_started_feasible.ipynb>`_).
 
-Both these methods require a differentiable model, such as a neural network. 
-We plan to add support for tree-based ML models in the future. If you are
-interested in a specific method, do raise an issue `here
-<https://github.com/interpretml/DiCE/issues>`_.
+Both these methods require a differentiable model, such as a neural network. We plan to add support for tree-based ML models in the future. If you are interested in a specific method, do raise an issue `here <https://github.com/interpretml/DiCE/issues>`_.
 
 Supported use-cases
 -------------------
@@ -243,7 +238,7 @@ Citing
 -------
 If you find DiCE useful for your research work, please cite it as follows.
 
-Ramaravind K. Mothilal, Amit Sharma, and Chenhao Tan (2020). Explaining machine learning classifiers through diverse counterfactual explanations. Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency. 
+Ramaravind K. Mothilal, Amit Sharma, and Chenhao Tan (2020). **Explaining machine learning classifiers through diverse counterfactual explanations**. *Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency*. 
 
 Bibtex::
 
