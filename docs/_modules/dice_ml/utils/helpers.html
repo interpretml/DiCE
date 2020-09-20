@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.utils.helpers &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.4 documentation</title>
   
 
   
@@ -164,10 +164,22 @@
 
 <span class="kn">import</span> <span class="nn">dice_ml</span>
 
-<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">save_intermediate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="c1">#Dice Imports</span>
+<span class="kn">from</span> <span class="nn">dice_ml.utils.sample_architecture.vae_model</span> <span class="kn">import</span> <span class="n">CF_VAE</span>
+
+<span class="c1">#Pytorch</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">save_image</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+
+<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
 
-<span class="sd">    :param: save_intermediate: save the transformed dataset. Do not save by default.</span>
+<span class="sd">    :return adult_data: returns preprocessed adult income dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
@@ -212,9 +224,6 @@
 
     <span class="n">adult_data</span> <span class="o">=</span> <span class="n">adult_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;marital-status&#39;</span><span class="p">:</span> <span class="s1">&#39;marital_status&#39;</span><span class="p">,</span> <span class="s1">&#39;hours-per-week&#39;</span><span class="p">:</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">})</span>
 
-    <span class="k">if</span> <span class="n">save_intermediate</span><span class="p">:</span>
-        <span class="k">pass</span><span class="c1">#adult_data.to_csv(&#39;adult.csv&#39;, index=False)</span>
-
     <span class="k">return</span> <span class="n">adult_data</span></div>
 
 
@@ -235,6 +244,44 @@
                         <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="s1">&#39;total work hours per week&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;income&#39;</span><span class="p">:</span> <span class="s1">&#39;0 (&lt;=50K) vs 1 (&gt;50K)&#39;</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">feature_description</span></div>
+
+<div class="viewcode-block" id="get_base_gen_cf_initialization"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_base_gen_cf_initialization">[docs]</a><span class="k">def</span> <span class="nf">get_base_gen_cf_initialization</span><span class="p">(</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">encoded_size</span><span class="p">,</span> <span class="n">cont_minx</span><span class="p">,</span> <span class="n">cont_maxx</span><span class="p">,</span> <span class="n">margin</span><span class="p">,</span> <span class="n">validity_reg</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">wm1</span><span class="p">,</span> <span class="n">wm2</span><span class="p">,</span> <span class="n">wm3</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="p">):</span>
+    
+        <span class="c1"># Dataset for training Variational Encoder Decoder model for CF Generation        </span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data_interface</span><span class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span class="n">data_interface</span><span class="o">.</span><span class="n">one_hot_encoded_data</span><span class="p">)</span>
+        <span class="n">encoded_data</span><span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span> 
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>        
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Dataset Shape:&#39;</span><span class="p">,</span>  <span class="n">encoded_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Datasets Columns:&#39;</span><span class="p">,</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        
+        <span class="c1">#Normalise_Weights</span>
+        <span class="n">normalise_weights</span><span class="o">=</span><span class="p">{}</span>      
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cont_minx</span><span class="p">)):</span>
+            <span class="n">_max</span><span class="o">=</span> <span class="n">cont_maxx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">_min</span><span class="o">=</span> <span class="n">cont_minx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">normalise_weights</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="n">_min</span><span class="p">,</span> <span class="n">_max</span><span class="p">]</span>
+    
+        <span class="c1">#Train, Val, Test Splits</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">test_size</span><span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_interface</span><span class="o">.</span><span class="n">test_size</span><span class="p">)</span>
+        <span class="n">vae_test_dataset</span><span class="o">=</span> <span class="n">dataset</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]</span>
+        <span class="n">dataset</span><span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]</span>
+        <span class="n">vae_val_dataset</span><span class="o">=</span> <span class="n">dataset</span><span class="p">[:</span><span class="n">test_size</span><span class="p">]</span>
+        <span class="n">vae_train_dataset</span><span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">test_size</span><span class="p">:]</span>
+
+        <span class="c1">#BaseGenCF Model</span>
+        <span class="n">cf_vae</span> <span class="o">=</span> <span class="n">CF_VAE</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">encoded_size</span><span class="p">)</span>
+        
+        <span class="c1">#Optimizer    </span>
+        <span class="n">cf_vae_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">([</span>
+            <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">,</span> <span class="n">cf_vae</span><span class="o">.</span><span class="n">encoder_mean</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span><span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="n">wm1</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">,</span> <span class="n">cf_vae</span><span class="o">.</span><span class="n">encoder_var</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span><span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="n">wm2</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">,</span> <span class="n">cf_vae</span><span class="o">.</span><span class="n">decoder_mean</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span><span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="n">wm3</span><span class="p">},</span>
+            <span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all</span>
+        <span class="k">return</span> <span class="n">vae_train_dataset</span><span class="p">,</span> <span class="n">vae_val_dataset</span><span class="p">,</span> <span class="n">vae_test_dataset</span><span class="p">,</span> <span class="n">normalise_weights</span><span class="p">,</span> <span class="n">cf_vae</span><span class="p">,</span> <span class="n">cf_vae_optimizer</span></div>
 </pre></div>
 
            </div>
@@ -247,7 +294,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Ramaravind, Amit, Chenhao
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>

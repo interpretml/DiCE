@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -9,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; DiCE 0.2 documentation</title>
+  <title>Index &mdash; DiCE 0.4 documentation</title>
   
 
   
@@ -213,6 +212,8 @@
       <ul>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.compute_loss">(dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
+        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.compute_loss">(dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE method)</a>
+</li>
       </ul></li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.compute_proximity_loss">compute_proximity_loss() (dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch method)</a>
 
@@ -362,6 +363,20 @@
         <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.explainer_base">module</a>
 </li>
       </ul></li>
+      <li>
+    dice_ml.explainer_interfaces.feasible_base_vae
+
+      <ul>
+        <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.feasible_base_vae">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.explainer_interfaces.feasible_model_approx
+
+      <ul>
+        <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.feasible_model_approx">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -407,10 +422,24 @@
 </li>
       </ul></li>
       <li>
+    dice_ml.utils.helpers
+
+      <ul>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">module</a>
+</li>
+      </ul></li>
+      <li>
     dice_ml.utils.sample_architecture
 
       <ul>
         <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture">module</a>
+</li>
+      </ul></li>
+      <li>
+    dice_ml.utils.sample_architecture.vae_model
+
+      <ul>
+        <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture.vae_model">module</a>
 </li>
       </ul></li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch">DicePyTorch (class in dice_ml.explainer_interfaces.dice_pytorch)</a>
@@ -473,6 +502,10 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE">FeasibleBaseVAE (class in dice_ml.explainer_interfaces.feasible_base_vae)</a>
+</li>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox">FeasibleModelApprox (class in dice_ml.explainer_interfaces.feasible_model_approx)</a>
+</li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.find_counterfactuals">find_counterfactuals() (dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch method)</a>
 
       <ul>
@@ -504,7 +537,15 @@
 </li>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">(dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
 </li>
+        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals">(dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE method)</a>
+</li>
       </ul></li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">get_adult_data_info() (in module dice_ml.utils.helpers)</a>
+</li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">get_adult_income_modelpath() (in module dice_ml.utils.helpers)</a>
+</li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_base_gen_cf_initialization">get_base_gen_cf_initialization() (in module dice_ml.utils.helpers)</a>
+</li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params">get_data_params() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
@@ -537,10 +578,10 @@
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">get_features_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">get_features_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+</li>
       <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_gradient">get_gradient() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
 
       <ul>
@@ -613,6 +654,8 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">load_adult_income_dataset() (in module dice_ml.utils.helpers)</a>
+</li>
       <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.load_model">load_model() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
 
       <ul>
@@ -657,6 +700,10 @@
 </li>
         <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.explainer_base">dice_ml.explainer_interfaces.explainer_base</a>
 </li>
+        <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.feasible_base_vae">dice_ml.explainer_interfaces.feasible_base_vae</a>
+</li>
+        <li><a href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.feasible_model_approx">dice_ml.explainer_interfaces.feasible_model_approx</a>
+</li>
         <li><a href="dice_ml.html#module-dice_ml.model">dice_ml.model</a>
 </li>
         <li><a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">dice_ml.model_interfaces</a>
@@ -669,7 +716,11 @@
 </li>
         <li><a href="dice_ml.utils.html#module-dice_ml.utils">dice_ml.utils</a>
 </li>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers</a>
+</li>
         <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture">dice_ml.utils.sample_architecture</a>
+</li>
+        <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture.vae_model">dice_ml.utils.sample_architecture.vae_model</a>
 </li>
       </ul></li>
   </ul></td>
@@ -776,6 +827,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.tensorflow_optimizers">tensorflow_optimizers() (dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train">train() (dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE method)</a>
+
+      <ul>
+        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox.train">(dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

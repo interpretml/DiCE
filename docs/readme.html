@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.2 documentation</title>
+  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.4 documentation</title>
   
 
   
@@ -86,10 +86,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Diverse Counterfactual Explanations (DiCE) for ML</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-dice">Installing DICE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started-with-dice">Getting started with DiCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-methods-for-generating-counterfactuals">Supported methods for generating counterfactuals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#supported-use-cases">Supported use-cases</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#feasibility-of-counterfactual-explanations">Feasibility of counterfactual explanations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-promise-of-counterfactual-explanations">The promise of counterfactual explanations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#roadmap">Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citing">Citing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
 </ul>
 </li>
@@ -222,7 +224,7 @@ consider a person who applied for a loan and was rejected by the loan distributi
 <li><p>scikit-learn</p></li>
 <li><p>pandas</p></li>
 <li><p>h5py</p></li>
-<li><p>tensorflow (We use DiCE with <a class="reference external" href="https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1">TensorFlow 1.13.0-rc1</a> in the notebooks, however, it works with Tensorflow&gt;=1.13 and PyTorch as well.)</p></li>
+<li><p>tensorflow/pytorch (We use DiCE with <a class="reference external" href="https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1">TensorFlow 1.13.0-rc1</a> in the notebooks, however, it works with Tensorflow&gt;=1.13 and PyTorch as well.)</p></li>
 </ul>
 <p>The stable version of DiCE is now available on <a class="reference external" href="https://pypi.org/project/dice-ml/">PyPI</a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install dice-ml
@@ -266,6 +268,15 @@ example, the following input leads to class 0 (low income).</p>
 </div>
 <a class="reference internal image-reference" href="https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png"><img alt="List of counterfactual examples" src="https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png" style="width: 400px;" /></a>
 <p>For more details, check out the <a class="reference external" href="https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb">Getting Started</a> notebook.</p>
+</div>
+<div class="section" id="supported-methods-for-generating-counterfactuals">
+<h2>Supported methods for generating counterfactuals<a class="headerlink" href="#supported-methods-for-generating-counterfactuals" title="Permalink to this headline">¶</a></h2>
+<p>DiCE can generate counterfactual examples using the following methods.</p>
+<ul class="simple">
+<li><p>An explicit loss-based method described in <a class="reference external" href="https://arxiv.org/abs/1905.07697">Mothilal et al. (2020)</a> (Default).</p></li>
+<li><p>A Variational AutoEncoder (VAE)-based method described in <a class="reference external" href="https://arxiv.org/abs/1912.03277">Mahajan et al. (2019)</a> (see the BaseVAE <a class="reference external" href="https://github.com/interpretml/DiCE/blob/master/docs/notebooks/DiCE_getting_started_feasible.ipynb">notebook</a>).</p></li>
+</ul>
+<p>Both these methods require a differentiable model, such as a neural network. We plan to add support for tree-based ML models in the future. If you are interested in a specific method, do raise an issue <a class="reference external" href="https://github.com/interpretml/DiCE/issues">here</a>.</p>
 </div>
 <div class="section" id="supported-use-cases">
 <h2>Supported use-cases<a class="headerlink" href="#supported-use-cases" title="Permalink to this headline">¶</a></h2>
@@ -358,11 +369,26 @@ properties of an ML model. We plan to add support for this in the future.</p></l
 <p>Ideally, counterfactual explanations should balance between a wide range of suggested changes (<em>diversity</em>), and the relative ease of adopting those changes (<em>proximity</em> to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.</p>
 <p>We are working on adding the following features to DiCE:</p>
 <ul class="simple">
-<li><p>Incorporating causal constraints when generating counterfactual explanations (check out <a class="reference external" href="https://github.com/interpretml/DiCE/tree/feasible-cf">feasible-CF branch</a>)</p></li>
+<li><p>Explaining model’s decision for multi-class (alpha version on master) and regression problems.</p></li>
 <li><p>Support for scikit-learn and other libraries where models are not necessarily differentiable</p></li>
 <li><p>Support for using DiCE for debugging machine learning models</p></li>
 <li><p>Support for other algorithms for generating counterfactual explanations</p></li>
 </ul>
+</div>
+<div class="section" id="citing">
+<h2>Citing<a class="headerlink" href="#citing" title="Permalink to this headline">¶</a></h2>
+<p>If you find DiCE useful for your research work, please cite it as follows.</p>
+<p>Ramaravind K. Mothilal, Amit Sharma, and Chenhao Tan (2020). <strong>Explaining machine learning classifiers through diverse counterfactual explanations</strong>. <em>Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency</em>.</p>
+<p>Bibtex:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@inproceedings</span><span class="p">{</span><span class="n">mothilal2020dice</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Explaining</span> <span class="n">machine</span> <span class="n">learning</span> <span class="n">classifiers</span> <span class="n">through</span> <span class="n">diverse</span> <span class="n">counterfactual</span> <span class="n">explanations</span><span class="p">},</span>
+        <span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Mothilal</span><span class="p">,</span> <span class="n">Ramaravind</span> <span class="n">K</span> <span class="ow">and</span> <span class="n">Sharma</span><span class="p">,</span> <span class="n">Amit</span> <span class="ow">and</span> <span class="n">Tan</span><span class="p">,</span> <span class="n">Chenhao</span><span class="p">},</span>
+        <span class="n">booktitle</span><span class="o">=</span><span class="p">{</span><span class="n">Proceedings</span> <span class="n">of</span> <span class="n">the</span> <span class="mi">2020</span> <span class="n">Conference</span> <span class="n">on</span> <span class="n">Fairness</span><span class="p">,</span> <span class="n">Accountability</span><span class="p">,</span> <span class="ow">and</span> <span class="n">Transparency</span><span class="p">},</span>
+        <span class="n">pages</span><span class="o">=</span><span class="p">{</span><span class="mi">607</span><span class="o">--</span><span class="mi">617</span><span class="p">},</span>
+        <span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2020</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>

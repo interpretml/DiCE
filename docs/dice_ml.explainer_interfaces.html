@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.2 documentation</title>
+  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.4 documentation</title>
   
 
   
@@ -102,8 +102,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_tensorflow1">dice_ml.explainer_interfaces.dice_tensorflow1 module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_tensorflow2">dice_ml.explainer_interfaces.dice_tensorflow2 module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.explainer_base">dice_ml.explainer_interfaces.explainer_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dice-ml-explainer-interfaces-feasible-base-vae-module">dice_ml.explainer_interfaces.feasible_base_vae module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dice-ml-explainer-interfaces-feasible-model-approx-module">dice_ml.explainer_interfaces.feasible_model_approx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.feasible_base_vae">dice_ml.explainer_interfaces.feasible_base_vae module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.feasible_model_approx">dice_ml.explainer_interfaces.feasible_model_approx module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces">Module contents</a></li>
 </ul>
 </li>
@@ -706,11 +706,56 @@ All methods are in dice_ml.explainer_interfaces</p>
 </dd></dl>
 
 </div>
-<div class="section" id="dice-ml-explainer-interfaces-feasible-base-vae-module">
-<h2>dice_ml.explainer_interfaces.feasible_base_vae module<a class="headerlink" href="#dice-ml-explainer-interfaces-feasible-base-vae-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dice_ml.explainer_interfaces.feasible_base_vae">
+<span id="dice-ml-explainer-interfaces-feasible-base-vae-module"></span><h2>dice_ml.explainer_interfaces.feasible_base_vae module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.feasible_base_vae" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.feasible_base_vae.</code><code class="sig-name descname">FeasibleBaseVAE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_base_vae.html#FeasibleBaseVAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.compute_loss">
+<code class="sig-name descname">compute_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_out</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">target_label</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_base_vae.html#FeasibleBaseVAE.compute_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.compute_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals">
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_base_vae.html#FeasibleBaseVAE.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train">
+<code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pre_trained</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_base_vae.html#FeasibleBaseVAE.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>pre_trained: Bool Variable to check whether pre trained model exists to avoid training again</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="dice-ml-explainer-interfaces-feasible-model-approx-module">
-<h2>dice_ml.explainer_interfaces.feasible_model_approx module<a class="headerlink" href="#dice-ml-explainer-interfaces-feasible-model-approx-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dice_ml.explainer_interfaces.feasible_model_approx">
+<span id="dice-ml-explainer-interfaces-feasible-model-approx-module"></span><h2>dice_ml.explainer_interfaces.feasible_model_approx module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.feasible_model_approx" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.feasible_model_approx.</code><code class="sig-name descname">FeasibleModelApprox</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_model_approx.html#FeasibleModelApprox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE" title="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE</span></code></a>, <a class="reference internal" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox.train">
+<code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint_type</span></em>, <em class="sig-param"><span class="n">constraint_variables</span></em>, <em class="sig-param"><span class="n">constraint_direction</span></em>, <em class="sig-param"><span class="n">constraint_reg</span></em>, <em class="sig-param"><span class="n">pre_trained</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_model_approx.html#FeasibleModelApprox.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox.train" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pre_trained</strong> – Bool Variable to check whether pre trained model exists to avoid training again</p></li>
+<li><p><strong>constraint_type</strong> – Binary Variable currently: (1) unary / (0) monotonic</p></li>
+<li><p><strong>constraint_variables</strong> – List of List: [[Effect, Cause1, Cause2, …. ]]</p></li>
+<li><p><strong>constraint_direction</strong> – -1: Negative, 1: Positive ( By default has to be one for monotonic constraints )</p></li>
+<li><p><strong>constraint_reg</strong> – Tunable Hyperparamter</p></li>
+</ul>
+</dd>
+</dl>
+<p>:return None</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-dice_ml.explainer_interfaces">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.explainer_interfaces" title="Permalink to this headline">¶</a></h2>
