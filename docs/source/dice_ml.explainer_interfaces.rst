@@ -52,7 +52,6 @@ dice\_ml.explainer\_interfaces.feasible\_model\_approx module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

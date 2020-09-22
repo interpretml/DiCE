@@ -20,7 +20,6 @@ dice\_ml.utils.helpers module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

@@ -20,7 +20,6 @@ dice\_ml.data\_interfaces.public\_data\_interface module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

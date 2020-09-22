@@ -12,7 +12,6 @@ dice\_ml.utils.sample\_architecture.vae\_model module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

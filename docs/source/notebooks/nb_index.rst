@@ -9,4 +9,5 @@ Example notebooks
    DiCE_getting_started
    DiCE_with_private_data
    DiCE_with_advanced_options
+   DiCE_getting_started_feasible
 

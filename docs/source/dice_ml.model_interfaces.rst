@@ -28,7 +28,6 @@ dice\_ml.model\_interfaces.pytorch\_model module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
