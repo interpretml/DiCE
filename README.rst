@@ -25,7 +25,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
  
  **Case Studies**: `Towards Data Science <https://towardsdatascience.com/dice-diverse-counterfactual-explanations-for-hotel-cancellations-762c311b2c64>`_ (Hotel Bookings) | `Analytics Vidhya <https://medium.com/analytics-vidhya/dice-ml-models-with-counterfactual-explanations-for-the-sunk-titanic-30aa035056e0>`_ (Titanic Dataset)
  
- .. image:: https://www.microsoft.com/en-us/research/uploads/prod/2020/01/MSR-Amit_1400x788-v3-1blog.gif
+.. image:: https://www.microsoft.com/en-us/research/uploads/prod/2020/01/MSR-Amit_1400x788-v3-1blog.gif
   :align: center
   :alt: Visualizing a counterfactual explanation
   
