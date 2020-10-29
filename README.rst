@@ -15,14 +15,20 @@ Diverse Counterfactual Explanations (DiCE) for ML
 *How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?*
 
 `Ramaravind K. Mothilal <https://raam93.github.io/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
-
+  
 `FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://interpretml.github.io/DiCE/>`_ | Live Jupyter notebook |Binder|_
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
 .. _Binder:  https://mybinder.org/v2/gh/interpretML/DiCE/master?filepath=docs/source/notebooks
 
- Blog Post: `Explanation for ML using diverse counterfactuals <https://www.microsoft.com/en-us/research/blog/open-source-library-provides-explanation-for-machine-learning-through-diverse-counterfactuals/>`_
-
+ **Blog Post**: `Explanation for ML using diverse counterfactuals <https://www.microsoft.com/en-us/research/blog/open-source-library-provides-explanation-for-machine-learning-through-diverse-counterfactuals/>`_
+ 
+ **Case Studies**: `Towards Data Science <https://towardsdatascience.com/dice-diverse-counterfactual-explanations-for-hotel-cancellations-762c311b2c64>`_ (Hotel Bookings) | `Analytics Vidhya <https://medium.com/analytics-vidhya/dice-ml-models-with-counterfactual-explanations-for-the-sunk-titanic-30aa035056e0>`_ (Titanic Dataset)
+ 
+ .. image:: https://www.microsoft.com/en-us/research/uploads/prod/2020/01/MSR-Amit_1400x788-v3-1blog.gif
+  :align: center
+  :alt: Visualizing a counterfactual explanation
+  
 Explanations are critical for machine learning, especially as machine learning-based systems are being used to inform decisions in societally critical domains such as finance, healthcare, education, and criminal justice.
 However, most explanation methods depend on an approximation of the ML model to
 create an interpretable explanation. For example,
