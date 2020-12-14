@@ -22,7 +22,7 @@ class DicePyTorch(ExplainerBase):
 
         """
 
-        super().__init__(data_interface, model_interface) # initiating data related parameters
+        super().__init__(data_interface) # initiating data related parameters
 
         # initializing model variables
         self.model = model_interface

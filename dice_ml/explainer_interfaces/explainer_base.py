@@ -12,7 +12,7 @@ from dice_ml import diverse_counterfactuals as exp
 
 class ExplainerBase:
 
-    def __init__(self, data_interface, model_interface):
+    def __init__(self, data_interface, model_interface=None):
         """Init method
 
         :param data_interface: an interface class to access data related params.
