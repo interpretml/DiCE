@@ -29,7 +29,11 @@ class Model:
 def decide(backend):
     """Decides the Model implementation type."""
 
-    if 'TF' in backend: # Tensorflow 1 or 2 backend
+    if backend is None: # random sampling of CFs
+        from dice_ml.model_interfaces.base_model import BaseModel
+        return BaseModel
+
+    elif 'TF' in backend: # Tensorflow 1 or 2 backend
         from dice_ml.model_interfaces.keras_tensorflow_model import KerasTensorFlowModel
         return KerasTensorFlowModel
 

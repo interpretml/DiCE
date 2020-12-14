@@ -330,16 +330,18 @@ class PublicData:
         return df
 
     def prepare_query_instance(self, query_instance, encode):
-        """Prepares user defined test input for DiCE."""
-
+        """Prepares user defined test input(s) for DiCE."""
         if isinstance(query_instance, list):
-            query_instance = {'row1': query_instance}
-            test = pd.DataFrame.from_dict(
-                query_instance, orient='index', columns=self.feature_names)
+            if isinstance(query_instance[0], dict): # prepare a list of query instances
+                test = pd.DataFrame(query_instance, columns=self.feature_names)
+
+            else: # prepare a single query instance in list
+                query_instance = {'row1': query_instance}
+                test = pd.DataFrame.from_dict(
+                    query_instance, orient='index', columns=self.feature_names)
 
         elif isinstance(query_instance, dict):
-            query_instance = dict(zip(query_instance.keys(), [[q] for q in query_instance.values()]))
-            test = pd.DataFrame(query_instance, columns=self.feature_names)
+            test = pd.DataFrame({k: [v] for k, v in query_instance.items()}, columns=self.feature_names)
 
         test = test.reset_index(drop=True)
 

@@ -27,7 +27,11 @@ class Dice:
 def decide(data_interface, model_interface):
     """Decides DiCE implementation type."""
 
-    if model_interface.backend == 'TF1': # pretrained Keras Sequential model with Tensorflow 1.x backend
+    if model_interface.backend is None: # random sampling of CFs
+        from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+        return ExplainerBase
+    
+    elif model_interface.backend == 'TF1': # pretrained Keras Sequential model with Tensorflow 1.x backend
         from dice_ml.explainer_interfaces.dice_tensorflow1 import DiceTensorFlow1
         return DiceTensorFlow1
 
