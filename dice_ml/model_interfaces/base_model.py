@@ -2,6 +2,8 @@
    Subclasses implement model interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All model interface methods are in dice_ml.model_interfaces"""
 
+import pickle
+
 class BaseModel:
 
     def __init__(self, model=None, model_path='', backend=''):
