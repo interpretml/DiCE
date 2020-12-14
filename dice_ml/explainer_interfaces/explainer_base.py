@@ -33,13 +33,14 @@ class ExplainerBase:
         # decimal precisions for continuous features
         self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
 
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
@@ -48,6 +49,21 @@ class ExplainerBase:
         :param random_seed: Random seed for reproducibility
         """
 
+        # permitted range for continuous features
+        if permitted_range is not None:
+            if not self.data_interface.check_features_range():
+                raise ValueError(
+                    "permitted range of features should be within their original range")
+            else:
+                self.data_interface.permitted_range = permitted_range
+                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+                self.cont_minx = []
+                self.cont_maxx = []
+                for feature in self.data_interface.continuous_feature_names:
+                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+
+        # fixing features that are to be fixed
         self.total_CFs = total_CFs
         if features_to_vary == "all":
             self.fixed_features_values = {}

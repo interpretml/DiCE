@@ -22,7 +22,7 @@ class DiceTensorFlow1(ExplainerBase):
 
         """
 
-        super().__init__(data_interface) # initiating data related parameters
+        super().__init__(data_interface, model_interface) # initiating data related parameters
 
         # create TensorFLow session if one is not already created
         if tf.get_default_session() is not None:
