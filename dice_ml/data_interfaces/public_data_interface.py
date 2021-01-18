@@ -356,6 +356,18 @@ class PublicData:
 
             return temp.tail(test.shape[0]).reset_index(drop=True)
 
+    def prepare_dataset_instance(self, encode=True):
+        """Prepares the entire dataset as a sequence of test inputs for DiCE."""
+        dataset_dict = self.data_df[self.feature_names].to_dict('records')
+        return self.prepare_query_instance(query_instance=dataset_dict, encode=encode)
+
+    def append_predictions(self, test_pred):
+        """Appends the value predicted for each row of the dataset to a copy of the dataset"""
+        df_copy = self.data_df.copy()
+        for i in range(len(test_pred)):
+            df_copy.at[i, self.outcome_name + "_pred"] = test_pred[i]
+        return df_copy
+
     def get_dev_data(self, model_interface, desired_class, filter_threshold=0.5):
         """Constructs dev data by extracting part of the test data for which finding counterfactuals make sense."""
 
