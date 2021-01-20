@@ -29,3 +29,6 @@ class BaseModel:
 
     def get_gradient(self):
         raise NotImplementedError
+
+    def get_num_output_nodes(self):
+        return 0

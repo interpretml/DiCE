@@ -2,6 +2,7 @@
 
 from dice_ml.model_interfaces.base_model import BaseModel
 import torch
+import numpy as np
 
 class PyTorchModel(BaseModel):
 
@@ -28,3 +29,7 @@ class PyTorchModel(BaseModel):
     def get_gradient(self, input):
         # Future Support
         raise NotImplementedError("Future Support")
+
+    def get_num_output_nodes(self, inp_size):
+        temp_input = torch.tensor([np.random.uniform([inp_size])])
+        return self.get_output(temp_input).shape[1]
