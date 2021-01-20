@@ -89,7 +89,8 @@ class DiceKD(ExplainerBase):
             desired_class = 1.0 - np.round(test_pred)
         else:
             desired_class = np.round(test_pred)
-        query_instance_copy = query_instance.copy()
+            
+        query_instance_copy = query_instance_orig.copy()
 
         # preparing query instance for conversion to pandas dataframe
         for q in query_instance_copy:
