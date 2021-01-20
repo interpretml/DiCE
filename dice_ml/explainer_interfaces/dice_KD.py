@@ -71,11 +71,12 @@ class DiceKD(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
+
         temp_preds = self.model.get_output(input_instance).numpy()
         return np.array([preds[(self.num_output_nodes - 1):] for preds in temp_preds], dtype=np.float32)
 
     def find_counterfactuals(self, query_instance, desired_class, total_cfs):
-        """Finds counterfactuals by gradient-descent."""
+        """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
@@ -89,7 +90,7 @@ class DiceKD(ExplainerBase):
             desired_class = 1.0 - np.round(test_pred)
         else:
             desired_class = np.round(test_pred)
-            
+
         query_instance_copy = query_instance_orig.copy()
 
         # preparing query instance for conversion to pandas dataframe
