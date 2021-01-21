@@ -454,7 +454,7 @@ class DiceTensorFlow1(ExplainerBase):
             return False
 
     def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=False, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
-        """Finds counterfactuals by graident-descent."""
+        """Finds counterfactuals by gradient-descent."""
 
         # Prepares user defined query_instance for DiCE.
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)

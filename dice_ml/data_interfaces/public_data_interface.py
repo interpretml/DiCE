@@ -6,8 +6,6 @@ from sklearn.model_selection import train_test_split
 import logging
 
 import tensorflow as tf
-from tensorflow import keras
-
 
 class PublicData:
     """A data interface for public data."""
@@ -43,7 +41,7 @@ class PublicData:
             raise ValueError("should provide the name of outcome feature")
 
         self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
-        ) if name not in self.continuous_feature_names+[self.outcome_name]]
+        ) if name not in self.continuous_feature_names + [self.outcome_name]]
 
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
@@ -132,12 +130,12 @@ class PublicData:
 
     def get_data_type(self, col):
         """Infers data type of a feature from the training data."""
-        if((self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32)):
+        if ((self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32)):
             return 'int'
-        elif((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
+        elif ((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
             return 'float'
         else:
-            raise ValueError("Unknown data type of feature %s: must be int or float" %col)
+            raise ValueError("Unknown data type of feature %s: must be int or float" % col)
 
     def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
@@ -165,8 +163,8 @@ class PublicData:
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
-        minx = np.array([[0.0]*len(self.encoded_feature_names)])
-        maxx = np.array([[1.0]*len(self.encoded_feature_names)])
+        minx = np.array([[0.0] * len(self.encoded_feature_names)])
+        maxx = np.array([[1.0] * len(self.encoded_feature_names)])
 
         for idx, feature_name in enumerate(self.continuous_feature_names):
             max_value = self.train_df[feature_name].max()
@@ -220,12 +218,14 @@ class PublicData:
         if normalized is False:
             for feature in self.continuous_feature_names:
                 quantiles[feature] = np.quantile(
-                    abs(list(set(self.train_df[feature].tolist())) - np.median(list(set(self.train_df[feature].tolist())))), quantile)
+                    abs(list(set(self.train_df[feature].tolist())) - np.median(
+                        list(set(self.train_df[feature].tolist())))), quantile)
         else:
             normalized_train_df = self.normalize_data(self.train_df)
             for feature in self.continuous_feature_names:
                 quantiles[feature] = np.quantile(
-                    abs(list(set(normalized_train_df[feature].tolist())) - np.median(list(set(normalized_train_df[feature].tolist())))), quantile)
+                    abs(list(set(normalized_train_df[feature].tolist())) - np.median(
+                        list(set(normalized_train_df[feature].tolist())))), quantile)
         return quantiles
 
     def get_data_params(self):
@@ -244,7 +244,7 @@ class PublicData:
         for col_parent in self.categorical_feature_names:
             temp = [self.encoded_feature_names.index(
                 col) for col in self.encoded_feature_names if col.startswith(col_parent) and
-                   col not in self.continuous_feature_names]
+                                                              col not in self.continuous_feature_names]
             cols.append(temp)
         return cols
 
@@ -284,13 +284,13 @@ class PublicData:
     def get_decimal_precisions(self):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
-        precisions = [0]*len(self.feature_names)
+        precisions = [0] * len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
-            if((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
+            if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]
-            elif((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
+            elif ((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
                 modes = self.data_df[col].mode()
-                maxp = len(str(modes[0]).split('.')[1]) # maxp stores the maximum precision of the modes
+                maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
                 for mx in range(len(modes)):
                     prec = len(str(modes[mx]).split('.')[1])
                     if prec > maxp:
@@ -332,10 +332,10 @@ class PublicData:
     def prepare_query_instance(self, query_instance, encode):
         """Prepares user defined test input(s) for DiCE."""
         if isinstance(query_instance, list):
-            if isinstance(query_instance[0], dict): # prepare a list of query instances
+            if isinstance(query_instance[0], dict):  # prepare a list of query instances
                 test = pd.DataFrame(query_instance, columns=self.feature_names)
 
-            else: # prepare a single query instance in list
+            else:  # prepare a single query instance in list
                 query_instance = {'row1': query_instance}
                 test = pd.DataFrame.from_dict(
                     query_instance, orient='index', columns=self.feature_names)
@@ -343,13 +343,15 @@ class PublicData:
         elif isinstance(query_instance, dict):
             test = pd.DataFrame({k: [v] for k, v in query_instance.items()}, columns=self.feature_names)
 
+        elif isinstance(query_instance, pd.DataFrame):
+            test = query_instance.copy()
+
         test = test.reset_index(drop=True)
 
         if encode is False:
             return self.normalize_data(test)
         else:
             temp = self.prepare_df_for_encoding()
-
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)
             temp = self.normalize_data(temp)
@@ -385,7 +387,7 @@ class PublicData:
             input_tensor)  # model(input_tensor)
         temp_data = test[self.encoded_feature_names].values.astype(np.float32)
         dev_preds = [self.data_sess.run(output_tensor, feed_dict={
-                                        input_tensor: np.array([dt])}) for dt in temp_data]
+            input_tensor: np.array([dt])}) for dt in temp_data]
         dev_preds = [dev_preds[i][0][0] for i in range(len(dev_preds))]
 
         # filtering examples which have predicted value >/< threshold

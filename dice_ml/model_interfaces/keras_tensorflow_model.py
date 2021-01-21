@@ -29,3 +29,7 @@ class KerasTensorFlowModel(BaseModel):
     def get_gradient(self, input):
         # Future Support
         raise NotImplementedError("Future Support")
+
+    def get_num_output_nodes(self, inp_size):
+        temp_input = tf.convert_to_tensor([tf.random.uniform([inp_size])], dtype=tf.float32)
+        return self.get_output(temp_input).shape[1]
