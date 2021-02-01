@@ -96,15 +96,18 @@ class PrivateData:
                 df[feature_name] - min_value) / (max_value - min_value)
         return result
 
-    def de_normalize_data(self, df):
+    def de_normalize_data(self, df, normalized=True):
         """De-normalizes continuous features from [0,1] range to original range."""
-        result = df.copy()
-        for feature_name in self.continuous_feature_names:
-            max_value = self.permitted_range[feature_name][1]
-            min_value = self.permitted_range[feature_name][0]
-            result[feature_name] = (
-                df[feature_name]*(max_value - min_value)) + min_value
-        return result
+        if normalized:
+            result = df.copy()
+            for feature_name in self.continuous_feature_names:
+                max_value = self.permitted_range[feature_name][1]
+                min_value = self.permitted_range[feature_name][0]
+                result[feature_name] = (
+                    df[feature_name]*(max_value - min_value)) + min_value
+            return result
+        else:
+            return df.copy()
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
@@ -204,13 +207,19 @@ class PrivateData:
                 precisions[ix] = self.type_and_precision[feature_name][1]
         return precisions
 
-    def get_decoded_data(self, data):
-        """Gets the original data from dummy encoded data."""
+    def get_decoded_data(self, data, encoding='one-hot'):
+        """Gets the original data from encoded data."""
+
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
-            data = pd.DataFrame(data=data, index=index,
-                                columns=self.encoded_feature_names)
-        return self.from_dummies(data)
+            if encoding=='one-hot':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.encoded_feature_names)
+                return self.from_dummies(data)
+            elif encoding=='label':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.feature_names)
+                return data
 
     def prepare_df_for_encoding(self):
         """Facilitates get_test_inputs() function."""
@@ -235,9 +244,8 @@ class PrivateData:
         """One-hot-encodes the data."""
         return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
-    def prepare_query_instance(self, query_instance, encode):
-        """Prepares user defined test input for DiCE."""
-
+    def prepare_query_instance(self, query_instance, encoding='one-hot'):
+        """Prepares user defined test input(s) for DiCE."""
         if isinstance(query_instance, list):
             if isinstance(query_instance[0], dict):  # prepare a list of query instances
                 test = pd.DataFrame(query_instance, columns=self.feature_names)
@@ -255,9 +263,11 @@ class PrivateData:
 
         test = test.reset_index(drop=True)
 
-        if encode is False:
+        if encoding == 'one-hot':
+            for column in self.categorical_feature_names:
+                test[column] = self.labelencoder[column].transform(test[column])
             return self.normalize_data(test)
-        else:
+        elif encoding == 'label':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)

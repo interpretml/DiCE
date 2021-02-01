@@ -181,6 +181,34 @@ class ExplainerBase:
 
         return final_cfs_sparse, cfs_preds_sparse
 
+    def check_permitted_range(self, permitted_range):
+        # check permitted range for continuous features
+        if permitted_range is not None:
+            if not self.data_interface.check_features_range():
+                raise ValueError(
+                    "permitted range of features should be within their original range")
+            else:
+                self.data_interface.permitted_range = permitted_range
+                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+                self.cont_minx = []
+                self.cont_maxx = []
+                for feature in self.data_interface.continuous_feature_names:
+                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+
+    def check_mad_validity(self, feature_weights):
+        # check feature MAD validity and throw warnings
+        if feature_weights == "inverse_mad":
+            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
+
+    def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
+        if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
+            self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
+        if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
+            self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoded=False)
+        if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
+            self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+
 def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
 
     # first get required parameters
@@ -299,3 +327,6 @@ def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
                 left = current_val + (10**-decimal_prec[feat_ix])
 
     return final_cfs_sparse[cf_ix]
+
+def sigmoid(self, z):
+    return 1 / (1 + np.exp(-z))

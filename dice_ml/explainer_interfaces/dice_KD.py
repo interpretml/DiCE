@@ -36,7 +36,7 @@ class DiceKD(ExplainerBase):
     def build_KD_tree(self):
         # Stores the predictions on the training data
         dataset_instance = self.data_interface.prepare_query_instance(
-            query_instance=self.data_interface.data_df[self.data_interface.feature_names], encode=True)
+            query_instance=self.data_interface.data_df[self.data_interface.feature_names], encoding='one-hot')
         dataset_dict_output = np.array([dataset_instance.values], dtype=np.float32)
         predictions = self.predict_fn(dataset_dict_output)
         predictions_vals = np.reshape(predictions[0], (predictions.shape[1],))
