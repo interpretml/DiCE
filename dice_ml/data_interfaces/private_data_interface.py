@@ -3,10 +3,12 @@
 import sys
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 import collections
 from collections import OrderedDict
 import logging
 logging.basicConfig(level=logging.NOTSET)
+from sklearn.preprocessing import LabelEncoder
 
 class PrivateData:
     """A data interface for private data with meta information."""
@@ -80,6 +82,14 @@ class PrivateData:
         for feature_name in self.continuous_feature_names:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
+
+        self.labelencoder = {}
+
+        self.label_encoded_data = self.data_df.copy()
+
+        for column in self.categorical_feature_names:
+            self.labelencoder[column] = LabelEncoder()
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
         if 'data_name' in params:
             self.data_name = params['data_name']
@@ -182,6 +192,12 @@ class PrivateData:
                     ixs.append(colidx)
             return ixs
 
+    def from_label(self, data):
+        out = data.copy()
+        for column in self.categorical_feature_names:
+            out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+        return out
+
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
@@ -260,17 +276,18 @@ class PrivateData:
 
         test = test.reset_index(drop=True)
 
-        if encoding == 'one-hot':
+        if encoding == 'label':
+            for column in self.categorical_feature_names:
+                test[column] = self.labelencoder[column].transform(test[column])
+            return self.normalize_data(test)
+
+        elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)
             temp = self.normalize_data(temp)
-            return temp.tail(test.shape[0]).reset_index(drop=True)
 
-        elif encoding == 'label':
-            for column in self.categorical_feature_names:
-                test[column] = self.labelencoder[column].transform(test[column])
-            return self.normalize_data(test)
+            return temp.tail(test.shape[0]).reset_index(drop=True)
 
     def get_dev_data(self, model_interface, desired_class, filter_threshold=0.5):
         """Constructs dev data by extracting part of the test data for which finding counterfactuals make sense."""

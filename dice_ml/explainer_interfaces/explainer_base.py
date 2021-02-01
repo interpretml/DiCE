@@ -201,6 +201,70 @@ class ExplainerBase:
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
+    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
+        """Intializes CFs and other related variables."""
+
+        self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
+
+        if algorithm == "RandomInitCF":
+            # no. of times to run the experiment with random inits for diversity
+            self.total_random_inits = total_CFs
+            self.total_CFs = 1  # size of counterfactual set
+        else:
+            self.total_random_inits = 0
+            self.total_CFs = total_CFs  # size of counterfactual set
+
+        # freeze those columns that need to be fixed
+        if features_to_vary != self.features_to_vary:
+            self.features_to_vary = features_to_vary
+            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(
+                features_to_vary=features_to_vary)
+            self.freezer = [1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))]
+
+        # CF initialization
+        if len(self.cfs) != self.total_CFs:
+            self.cfs = []
+            for kx in range(self.population_size):
+                self.temp_cfs = []
+                for ix in range(self.total_CFs):
+                    one_init = [[]]
+                    for jx in range(len(self.data_interface.feature_names)):
+                        one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                    self.temp_cfs.append(np.array(one_init))
+                self.cfs.append(self.temp_cfs)
+
+    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoded=True):
+        """Intializes variables related to main loss function"""
+
+        self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
+        # define the loss parts
+        self.yloss_type = yloss_type
+        self.diversity_loss_type = diversity_loss_type
+
+        # define feature weights
+        if feature_weights != self.feature_weights_input:
+            self.feature_weights_input = feature_weights
+            if feature_weights == "inverse_mad":
+                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
+                feature_weights = {}
+                for feature in normalized_mads:
+                    feature_weights[feature] = round(1 / normalized_mads[feature], 2)
+
+            feature_weights_list = []
+            if(encoded):
+                for feature in self.data_interface.encoded_feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(1.0)
+            else:
+                for feature in self.data_interface.feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
+            self.feature_weights_list = [feature_weights_list]
+
     def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
         if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
@@ -208,6 +272,14 @@ class ExplainerBase:
             self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoded=False)
         if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+
+    def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
+        """Update hyperparameters of the loss function"""
+
+        self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
+        self.proximity_weight = proximity_weight
+        self.diversity_weight = diversity_weight
+        self.categorical_penalty = categorical_penalty
 
 def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
 
