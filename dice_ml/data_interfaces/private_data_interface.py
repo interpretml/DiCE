@@ -261,16 +261,16 @@ class PrivateData:
         test = test.reset_index(drop=True)
 
         if encoding == 'one-hot':
-            for column in self.categorical_feature_names:
-                test[column] = self.labelencoder[column].transform(test[column])
-            return self.normalize_data(test)
-        elif encoding == 'label':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)
             temp = self.normalize_data(temp)
-
             return temp.tail(test.shape[0]).reset_index(drop=True)
+
+        elif encoding == 'label':
+            for column in self.categorical_feature_names:
+                test[column] = self.labelencoder[column].transform(test[column])
+            return self.normalize_data(test)
 
     def get_dev_data(self, model_interface, desired_class, filter_threshold=0.5):
         """Constructs dev data by extracting part of the test data for which finding counterfactuals make sense."""
