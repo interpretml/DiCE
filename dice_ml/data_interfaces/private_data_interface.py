@@ -209,11 +209,11 @@ class PrivateData:
 
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
-            if encoding=='one-hot':
+            if encoding == 'one-hot':
                 data = pd.DataFrame(data=data, index=index,
                                     columns=self.encoded_feature_names)
                 return self.from_dummies(data)
-            elif encoding=='label':
+            elif encoding == 'label':
                 data = pd.DataFrame(data=data, index=index,
                                     columns=self.feature_names)
                 return data
