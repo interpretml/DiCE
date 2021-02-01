@@ -1,5 +1,5 @@
 """
-Module to generate diverse counterfactual explanations based on tensorflow 2.x
+Module to generate diverse counterfactual explanations based on genetic algorithm
 """
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import math
@@ -175,9 +175,7 @@ class DiceGenetic(ExplainerBase):
         return self.loss.numpy()
 
     def mate(self, k1, k2):
-        '''
-        Perform mating and produce new offspring
-        '''
+        """Performs mating and produces new offsprings"""
 
         # chromosome for offspring
         child_chromosome = []
@@ -203,7 +201,7 @@ class DiceGenetic(ExplainerBase):
         return child_chromosome
 
     def find_counterfactuals(self, query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm):
-        """Finds counterfactuals by gradient-descent."""
+        """Finds counterfactuals by generating cfs through the genetic algorithm"""
 
         # Prepares user defined query_instance for DiCE.
 
