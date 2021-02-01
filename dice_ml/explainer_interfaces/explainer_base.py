@@ -400,5 +400,5 @@ def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, f
 
     return final_cfs_sparse[cf_ix]
 
-def sigmoid(self, z):
+def sigmoid(z):
     return 1 / (1 + np.exp(-z))
