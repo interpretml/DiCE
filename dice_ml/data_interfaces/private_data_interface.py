@@ -96,18 +96,15 @@ class PrivateData:
                 df[feature_name] - min_value) / (max_value - min_value)
         return result
 
-    def de_normalize_data(self, df, normalized=True):
+    def de_normalize_data(self, df):
         """De-normalizes continuous features from [0,1] range to original range."""
-        if normalized:
-            result = df.copy()
-            for feature_name in self.continuous_feature_names:
-                max_value = self.permitted_range[feature_name][1]
-                min_value = self.permitted_range[feature_name][0]
-                result[feature_name] = (
-                    df[feature_name]*(max_value - min_value)) + min_value
-            return result
-        else:
-            return df.copy()
+        result = df.copy()
+        for feature_name in self.continuous_feature_names:
+            max_value = self.permitted_range[feature_name][1]
+            min_value = self.permitted_range[feature_name][0]
+            result[feature_name] = (
+                df[feature_name]*(max_value - min_value)) + min_value
+        return result
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
