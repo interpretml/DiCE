@@ -29,7 +29,7 @@ class DiceKD(ExplainerBase):
         self.model.load_model()
 
         # number of output nodes of ML model
-        # self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.encoded_feature_names))
+        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.encoded_feature_names))
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions, self.KD_tree = self.build_KD_tree()
@@ -54,6 +54,11 @@ class DiceKD(ExplainerBase):
         :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
+        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
+        :param verbose: Parameter to determine whether to print 'Diverse Counterfactuals found!'
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
         """
@@ -70,7 +75,7 @@ class DiceKD(ExplainerBase):
     def predict_fn(self, input_instance):
         """prediction function"""
 
-        temp_preds = self.model.get_output(input_instance)
+        temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes-1]
         return temp_preds
 
     def find_counterfactuals(self, query_instance, desired_class, total_CFs, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):

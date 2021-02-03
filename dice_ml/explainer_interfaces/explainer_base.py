@@ -78,7 +78,7 @@ class ExplainerBase:
         self.num_ouput_nodes = len(self.model.get_output(temp_input))
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
         query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
 
         # find the predicted value of query_instance
