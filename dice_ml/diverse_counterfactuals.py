@@ -112,7 +112,7 @@ class CounterfactualExamples:
 
         if self.posthoc_sparsity_param == None:
             print('\nCounterfactual set (new outcome : %i)' %(self.new_outcome))
-            self.display_df(self.final_cfs__df, show_only_changes)
+            self.display_df(self.final_cfs_df, show_only_changes)
 
         elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_sparse is not None:
             # CFs
