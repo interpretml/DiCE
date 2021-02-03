@@ -83,6 +83,7 @@ class PrivateData:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
 
+        #Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
 
         self.label_encoded_data = self.data_df.copy()
@@ -159,7 +160,6 @@ class PrivateData:
 
     def get_data_params(self):
         """Gets all data related params for DiCE."""
-
         minx, maxx = self.get_minx_maxx(normalized=True)
 
         # get the column indexes of categorical features after one-hot-encoding
@@ -193,6 +193,7 @@ class PrivateData:
             return ixs
 
     def from_label(self, data):
+        """Transforms label encoded data back to categorical values"""
         out = data.copy()
         for column in self.categorical_feature_names:
             out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
@@ -222,7 +223,6 @@ class PrivateData:
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""
-
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
             if encoding == 'one-hot':

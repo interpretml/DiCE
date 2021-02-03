@@ -95,6 +95,7 @@ class PublicData:
             self.one_hot_encoded_data = self.data_df
             self.encoded_feature_names = self.feature_names
 
+        #Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
 
         self.label_encoded_data = self.data_df.copy()
@@ -273,6 +274,7 @@ class PublicData:
             return ixs
 
     def from_label(self, data):
+        """Transforms label encoded data back to categorical values"""
         out = data.copy()
         for column in self.categorical_feature_names:
             out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())

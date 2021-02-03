@@ -168,7 +168,7 @@ class FeasibleBaseVAE(ExplainerBase):
         # Converting query_instance into numpy array
         query_instance_org= query_instance
         
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
         query_instance = np.array([query_instance.iloc[0].values])
         
         print(query_instance.shape[0])

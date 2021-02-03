@@ -38,13 +38,10 @@ class DiceGenetic(ExplainerBase):
 
         self.population_size = 100
 
-        # number of output nodes of ML model
-        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
-
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="l2_loss",
-                                 diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
+                                 diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -73,13 +70,13 @@ class DiceGenetic(ExplainerBase):
         self.check_permitted_range(permitted_range)
         self.do_param_initializations(total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty)
 
-        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        temp_preds = self.model.get_output(input_instance).numpy()
-        return np.array([preds[(self.num_output_nodes - 1):] for preds in temp_preds], dtype=np.float32)
+        temp_preds = self.model.get_output(input_instance)
+        return temp_preds
 
     def compute_yloss(self, cfs):
         """Computes the first part (y-loss) of the loss function."""
@@ -90,7 +87,7 @@ class DiceGenetic(ExplainerBase):
 
             elif self.yloss_type == "log_loss":
                 temp_logits = math.log((abs(self.model.get_output(cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
-                temp_loss = self.target_cf_class[0][0] * (-1) * np.log(sigmoid(temp_logits)) + (1 - self.target_cf_class[0][0]) * (-1) * np.log(1 - sigmoid(temp_logits))
+                temp_loss = self.target_cf_class[0][0] * (-1) * np.log(self.sigmoid(temp_logits)) + (1 - self.target_cf_class[0][0]) * (-1) * np.log(1 - self.sigmoid(temp_logits))
 
             elif self.yloss_type == "hinge_loss":
                 temp_logits = math.log((abs(self.model.get_output(cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(cfs[i]) - 0.000001)))
@@ -172,7 +169,7 @@ class DiceGenetic(ExplainerBase):
                     self.diversity_weight * self.diversity_loss) + (
                                 self.categorical_penalty * self.regularization_loss)
 
-        return self.loss.numpy()
+        return self.loss
 
     def mate(self, k1, k2):
         """Performs mating and produces new offsprings"""
@@ -200,7 +197,7 @@ class DiceGenetic(ExplainerBase):
             child_chromosome.append(np.array(one_init))
         return child_chromosome
 
-    def find_counterfactuals(self, query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm):
+    def find_counterfactuals(self, query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
 
         # Prepares user defined query_instance for DiCE.
@@ -210,7 +207,7 @@ class DiceGenetic(ExplainerBase):
         self.x1 = query_instance
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0][0]
+        test_pred = self.predict_fn(query_instance)[0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
         self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
@@ -265,7 +262,7 @@ class DiceGenetic(ExplainerBase):
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_sparse = copy.deepcopy(self.final_cfs)
             cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             self.final_cfs_sparse = None
             self.cfs_preds_sparse = None
@@ -273,7 +270,8 @@ class DiceGenetic(ExplainerBase):
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
 
-        print('Diverse Counterfactuals found! total time taken: %02d' %
-              m, 'min %02d' % s, 'sec')
+        if verbose:
+            print('Diverse Counterfactuals found! total time taken: %02d' %
+                  m, 'min %02d' % s, 'sec')
 
         return query_instance, test_pred

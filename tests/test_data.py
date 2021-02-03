@@ -51,7 +51,11 @@ class TestCommonDataMethods:
         Tests prepare_query_instance method that covnerts continuous features into [0,1] range and one-hot encodes categorical features.
         """
         for d in self.d:
-            prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encode=encode_categorical).iloc[0].tolist()
+            if encode_categorical:
+                encode_categorical = 'one-hot'
+            else:
+                encode_categorical = 'label'
+            prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encoding=encode_categorical).iloc[0].tolist()
             if encode_categorical:
                 assert output_query == pytest.approx(prepared_query, abs=1e-3)
             else:

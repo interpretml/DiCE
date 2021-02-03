@@ -6,6 +6,7 @@ import numpy as np
 import timeit
 from sklearn.neighbors import KDTree
 import pandas as pd
+import copy
 
 from dice_ml import diverse_counterfactuals as exp
 
@@ -28,7 +29,7 @@ class DiceKD(ExplainerBase):
         self.model.load_model()
 
         # number of output nodes of ML model
-        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.encoded_feature_names))
+        # self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.encoded_feature_names))
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions, self.KD_tree = self.build_KD_tree()
@@ -38,18 +39,16 @@ class DiceKD(ExplainerBase):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=self.data_interface.data_df[self.data_interface.feature_names], encoding='one-hot')
         dataset_dict_output = np.array([dataset_instance.values], dtype=np.float32)
-        predictions = self.predict_fn(dataset_dict_output)
-        predictions_vals = np.reshape(predictions[0], (predictions.shape[1],))
-
+        predictions = self.predict_fn(dataset_dict_output[0])
         # segmenting the dataset according to outcome
-        dataset_with_predictions = {i: self.data_interface.data_df.loc[np.round(predictions_vals) == i] for i in
+        dataset_with_predictions = {i: self.data_interface.data_df.loc[np.round(predictions) == i] for i in
                                     range(2)}
         # Prepares the KD trees for DiCE - 1 for each outcome (here only 0 and 1, binary classification)
         return dataset_with_predictions, {
             i: KDTree(pd.get_dummies(dataset_with_predictions[i][self.data_interface.feature_names])) for i in range(2)}
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite",
-                                 feature_weights="inverse_mad"):
+                                 feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -64,32 +63,38 @@ class DiceKD(ExplainerBase):
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
         query_instance, test_pred, final_cfs, cfs_preds = self.find_counterfactuals(query_instance, desired_class,
-                                                                                    total_CFs)
+                                                                                    total_CFs, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
 
-        return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, final_cfs, cfs_preds,
-                                          desired_class=desired_class)
+        return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, final_cfs, cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
 
     def predict_fn(self, input_instance):
         """prediction function"""
 
-        temp_preds = self.model.get_output(input_instance).numpy()
-        return np.array([preds[(self.num_output_nodes - 1):] for preds in temp_preds], dtype=np.float32)
+        temp_preds = self.model.get_output(input_instance)
+        return temp_preds
 
-    def find_counterfactuals(self, query_instance, desired_class, total_cfs):
+    def find_counterfactuals(self, query_instance, desired_class, total_CFs, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
         query_instance = np.array([query_instance.iloc[0].values])
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0][0]
+        test_pred = self.predict_fn(query_instance)[0]
 
         if desired_class == "opposite":
             desired_class = 1.0 - np.round(test_pred)
         else:
             desired_class = np.round(test_pred)
+        self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
+
+        self.stopping_threshold = stopping_threshold
+        if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
+            self.stopping_threshold = 0.25
+        elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
+            self.stopping_threshold = 0.75
 
         query_instance_copy = query_instance_orig.copy()
 
@@ -107,7 +112,7 @@ class DiceKD(ExplainerBase):
                 query_instance_df_dummies[col] = 0
 
         # Finding counterfactuals from the KD Tree
-        indices = self.KD_tree[desired_class].query(query_instance_df_dummies, total_cfs)[1][0].tolist()
+        indices = self.KD_tree[desired_class].query(query_instance_df_dummies, total_CFs)[1][0].tolist()
         final_cfs = self.dataset_with_predictions[desired_class][self.data_interface.feature_names].iloc[indices].copy()
 
         # finding the predicted outcome for each cf
@@ -115,10 +120,9 @@ class DiceKD(ExplainerBase):
         for i in range(len(indices)):
             cfs = final_cfs.iloc[i].copy()
             cfs_dict = cfs.to_dict()
-            cfs_dict = self.data_interface.prepare_query_instance(query_instance=cfs_dict, encode=True)
+            cfs_dict = self.data_interface.prepare_query_instance(query_instance=cfs_dict, encoding='one-hot')
             cfs_dict = np.array([cfs_dict.iloc[0].values])
             test_pred_cf = self.predict_fn(cfs_dict)
-            test_pred_cf = np.reshape(test_pred_cf[0], (test_pred_cf.shape[1],))
 
             cfs_preds.append(test_pred_cf)
 
@@ -139,14 +143,21 @@ class DiceKD(ExplainerBase):
 
         final_cfs = rows
 
-        # Not enhancing sparsity now
-        # TODO: enhance sparsity later
+        # post-hoc operation on continuous features to enhance sparsity - only for public data
+        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+            final_cfs_sparse = copy.deepcopy(final_cfs)
+            cfs_preds_sparse = copy.deepcopy(cfs_preds)
+            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+        else:
+            self.final_cfs_sparse = None
+            self.cfs_preds_sparse = None
 
         self.elapsed = timeit.default_timer() - start_time
 
         m, s = divmod(self.elapsed, 60)
 
-        print('Diverse Counterfactuals found! total time taken: %02d' %
-              m, 'min %02d' % s, 'sec')
+        if verbose:
+            print('Diverse Counterfactuals found! total time taken: %02d' %
+                  m, 'min %02d' % s, 'sec')
 
         return query_instance, test_pred, final_cfs, cfs_preds
