@@ -143,7 +143,7 @@ class ExplainerBase:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance)[:, self.num_output_nodes]
+        return self.model.get_output(input_instance)[:, self.num_output_nodes-1]
 
     def do_posthoc_sparsity_enhancement(self, total_CFs, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
