@@ -26,7 +26,6 @@ class BaseModel:
 
     def get_output(self, input_instance):
         """returns prediction probabilities"""
-        # returning the 2nd prediction probability as the outcome (works only if binary classification)
         return self.model.predict_proba(input_instance)
 
     def get_gradient(self):

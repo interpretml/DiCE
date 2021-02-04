@@ -43,6 +43,7 @@ class DicePyTorch(ExplainerBase):
         self.optimizer_weights = []  # optimizer, learning_rate
 
         # number of output nodes of ML model
+        #TODO: call the function itself
         temp_input = torch.rand([len(self.data_interface.encoded_feature_names)]).float()
         self.num_ouput_nodes = len(self.model.get_output(temp_input).data)
 

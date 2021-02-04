@@ -43,22 +43,20 @@ class TestCommonDataMethods:
 
     @pytest.mark.parametrize(
     "encode_categorical, output_query",
-    [(False, [0.068, 'Private', 'HS-grad', 'Single', 'Service', 'White', 'Female', 0.449]),
-    (True, [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0])]
+    [('label', [0.068, 'Private', 'HS-grad', 'Single', 'Service', 'White', 'Female', 0.449]),
+    ('one-hot', [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0])]
     )
     def test_prepare_query_instance(self, sample_adultincome_query, encode_categorical, output_query):
         """
         Tests prepare_query_instance method that covnerts continuous features into [0,1] range and one-hot encodes categorical features.
         """
         for d in self.d:
-            if encode_categorical:
-                encode_categorical = 'one-hot'
-            else:
-                encode_categorical = 'label'
             prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encoding=encode_categorical).iloc[0].tolist()
-            if encode_categorical:
+
+            if encode_categorical == 'one-hot':
                 assert output_query == pytest.approx(prepared_query, abs=1e-3)
             else:
+                prepared_query = d.from_label(prepared_query)
                 for ix, name in enumerate(d.feature_names):
                     if name in d.continuous_feature_names:
                         assert output_query[ix] == pytest.approx(prepared_query[ix], abs=1e-3)

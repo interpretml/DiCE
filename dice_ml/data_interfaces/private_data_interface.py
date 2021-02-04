@@ -83,14 +83,14 @@ class PrivateData:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
 
-        #Initializing a label encoder to obtain label-encoded values for categorical variables
+        # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
 
-        self.label_encoded_data = self.data_df.copy()
+        self.label_encoded_data = {}
 
         for column in self.categorical_feature_names:
             self.labelencoder[column] = LabelEncoder()
-            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.categorical_levels[column])
 
         if 'data_name' in params:
             self.data_name = params['data_name']
@@ -160,6 +160,7 @@ class PrivateData:
 
     def get_data_params(self):
         """Gets all data related params for DiCE."""
+
         minx, maxx = self.get_minx_maxx(normalized=True)
 
         # get the column indexes of categorical features after one-hot-encoding
@@ -195,9 +196,14 @@ class PrivateData:
     def from_label(self, data):
         """Transforms label encoded data back to categorical values"""
         out = data.copy()
-        for column in self.categorical_feature_names:
-            out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
-        return out
+        if isinstance(data, pd.DataFrame) or isinstance(data, dict):
+            for column in self.categorical_feature_names:
+                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+            return out
+        elif isinstance(data, list):
+            for column in self.categorical_feature_indexes:
+                out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
+            return out
 
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""

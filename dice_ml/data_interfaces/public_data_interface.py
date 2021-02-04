@@ -276,10 +276,14 @@ class PublicData:
     def from_label(self, data):
         """Transforms label encoded data back to categorical values"""
         out = data.copy()
-        for column in self.categorical_feature_names:
-            out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
-        return out
-
+        if isinstance(data, pd.DataFrame) or isinstance(data, dict):
+            for column in self.categorical_feature_names:
+                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+            return out
+        elif isinstance(data, list):
+            for column in self.categorical_feature_indexes:
+                out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
+            return out
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()

@@ -74,7 +74,6 @@ class DiceKD(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-
         temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes-1]
         return temp_preds
 

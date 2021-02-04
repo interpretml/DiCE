@@ -28,6 +28,9 @@ class DiceGenetic(ExplainerBase):
         # loading trained model
         self.model.load_model()
 
+        # number of output nodes of ML model
+        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
+
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
         self.features_to_vary = []
@@ -40,7 +43,7 @@ class DiceGenetic(ExplainerBase):
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
-                                 features_to_vary="all", permitted_range=None, yloss_type="l2_loss",
+                                 features_to_vary="all", permitted_range=None, yloss_type="log_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
 
@@ -73,7 +76,7 @@ class DiceGenetic(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        temp_preds = self.model.get_output(input_instance)
+        temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes-1]
         return temp_preds
 
     def compute_yloss(self, cfs):
@@ -81,14 +84,14 @@ class DiceGenetic(ExplainerBase):
         yloss = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
-                temp_loss = pow((self.model.get_output(cfs[i]) - self.target_cf_class), 2)[0][0]
+                temp_loss = pow((self.predict_fn(cfs[i]) - self.target_cf_class), 2)[0][0]
 
             elif self.yloss_type == "log_loss":
-                temp_logits = math.log((abs(self.model.get_output(cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = math.log((abs(self.predict_fn(cfs[i]) - 0.000001))/(1 - abs(self.predict_fn(cfs[i]) - 0.000001)))
                 temp_loss = self.target_cf_class[0][0] * (-1) * np.log(self.sigmoid(temp_logits)) + (1 - self.target_cf_class[0][0]) * (-1) * np.log(1 - self.sigmoid(temp_logits))
 
             elif self.yloss_type == "hinge_loss":
-                temp_logits = math.log((abs(self.model.get_output(cfs[i]) - 0.000001))/(1 - abs(self.model.get_output(cfs[i]) - 0.000001)))
+                temp_logits = math.log((abs(self.predict_fn(cfs[i]) - 0.000001))/(1 - abs(self.predict_fn(cfs[i]) - 0.000001)))
                 temp_loss = max(0, 1-temp_logits*self.target_cf_class[0])
 
             yloss += temp_loss

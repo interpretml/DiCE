@@ -75,7 +75,7 @@ class ExplainerBase:
 
         # number of output nodes of ML model
         temp_input = np.random.rand(1,len(self.data_interface.encoded_feature_names))
-        self.num_ouput_nodes = len(self.model.get_output(temp_input))
+        self.num_output_nodes = len(self.model.get_output(temp_input))
 
         # Prepares user defined query_instance for DiCE.
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
@@ -85,8 +85,8 @@ class ExplainerBase:
         test_pred = self.predict_fn(query_instance)[0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
-        self.target_cf_class = desired_class
 
+        self.target_cf_class = desired_class
         self.stopping_threshold = stopping_threshold
         if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
             self.stopping_threshold = 0.25
@@ -143,7 +143,7 @@ class ExplainerBase:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance)
+        return self.model.get_output(input_instance)[:, self.num_output_nodes]
 
     def do_posthoc_sparsity_enhancement(self, total_CFs, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
