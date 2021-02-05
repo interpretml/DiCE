@@ -164,7 +164,15 @@ class ExplainerBase:
             features_sorted[ix] = features_sorted[ix][0]
         decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
 
-        for cf_ix in range(self.total_CFs):
+        # looping the find CFs depending on whether its random initialization or not
+        loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
+
+        for cf_ix in range(max(loop_find_CFs, self.total_CFs)):
+            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+            if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
+               (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
+               continue
+
             for feature in features_sorted:
                 current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
                 feat_ix = self.data_interface.encoded_feature_names.index(feature)
