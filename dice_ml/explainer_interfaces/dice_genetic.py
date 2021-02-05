@@ -1,6 +1,8 @@
 """
 Module to generate diverse counterfactual explanations based on genetic algorithm
+This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time': https://arxiv.org/pdf/2101.01292.pdf
 """
+
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import math
 import numpy as np

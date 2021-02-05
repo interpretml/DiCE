@@ -1,5 +1,6 @@
 """
 Module to generate counterfactual explanations from a KD-Tree
+This code is similar to 'Interpretable Counterfactual Explanations Guided by Prototypes': https://arxiv.org/pdf/1907.02584.pdf
 """
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import numpy as np
