@@ -96,7 +96,7 @@ class DiceTensorFlow2(ExplainerBase):
                 for feature in self.data_interface.continuous_feature_names:
                     self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                     self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
-                    
+
         if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
         if([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
@@ -406,14 +406,15 @@ class DiceTensorFlow2(ExplainerBase):
         start_time = timeit.default_timer()
         self.final_cfs = []
 
-        # variables to backup best known CFs so far in the optimization process - if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
-        self.best_backup_cfs = [0]*self.total_CFs
-        self.best_backup_cfs_preds = [0]*self.total_CFs
-        self.min_dist_from_threshold = 100
-
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
-        for _ in range(loop_find_CFs):
+
+        # variables to backup best known CFs so far in the optimization process - if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
+        self.best_backup_cfs = [0]*max(self.total_CFs, loop_find_CFs)
+        self.best_backup_cfs_preds = [0]*max(self.total_CFs, loop_find_CFs)
+        self.min_dist_from_threshold = [100]*loop_find_CFs # for backup CFs
+
+        for loop_ix in range(loop_find_CFs):
             # CF init
             if self.total_random_inits > 0:
                 self.initialize_CFs(query_instance, False)
@@ -466,11 +467,11 @@ class DiceTensorFlow2(ExplainerBase):
 
                 if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred[0][0]-self.stopping_threshold) for pred in test_preds_stored])
-                    if avg_preds_dist < self.min_dist_from_threshold:
-                        self.min_dist_from_threshold = avg_preds_dist
+                    if avg_preds_dist < self.min_dist_from_threshold[loop_ix]:
+                        self.min_dist_from_threshold[loop_ix] = avg_preds_dist
                         for ix in range(self.total_CFs):
-                            self.best_backup_cfs[ix] = temp_cfs_stored[ix].copy()
-                            self.best_backup_cfs_preds[ix] = test_preds_stored[ix].copy()
+                            self.best_backup_cfs[loop_ix+ix] = copy.deepcopy(temp_cfs_stored[ix])
+                            self.best_backup_cfs_preds[loop_ix+ix] = copy.deepcopy(test_preds_stored[ix])
 
             # rounding off final cfs - not necessary when inter_project=True
             self.round_off_cfs(assign=True)
@@ -488,18 +489,12 @@ class DiceTensorFlow2(ExplainerBase):
         self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
         # update final_cfs from backed up CFs if valid CFs are not found - currently works for DiverseCF only
-        self.valid_cfs_found = False
-        if((self.target_cf_class == 0 and any(i > self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class == 1 and any(i < self.stopping_threshold for i in test_preds_stored))):
-            if self.min_dist_from_threshold != 100:
-                for ix in range(self.total_CFs):
-                    self.final_cfs[ix] = self.best_backup_cfs[ix].copy()
-                    self.cfs_preds[ix] = self.best_backup_cfs_preds[ix].copy()
-
-                self.valid_cfs_found = True # final_cfs have valid CFs through backup CFs
-            else:
-                self.valid_cfs_found = False # neither final_cfs nor backup cfs are valid
-        else:
-            self.valid_cfs_found = True # final_cfs have valid CFs
+        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in self.cfs_preds))):
+            for loop_ix in range(loop_find_CFs):
+                if self.min_dist_from_threshold[loop_ix] != 100:
+                    for ix in range(self.total_CFs):
+                        self.final_cfs[loop_ix+ix] = copy.deepcopy(self.best_backup_cfs[loop_ix+ix])
+                        self.cfs_preds[loop_ix+ix] = copy.deepcopy(self.best_backup_cfs_preds[loop_ix+ix])
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
@@ -511,8 +506,8 @@ class DiceTensorFlow2(ExplainerBase):
             self.cfs_preds_sparse = None
 
         m, s = divmod(self.elapsed, 60)
-        if self.valid_cfs_found:
-            self.total_CFs_found = self.total_CFs
+        if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in self.cfs_preds))):
+            self.total_CFs_found = max(loop_find_CFs, self.total_CFs)
             print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
         else:
@@ -521,6 +516,6 @@ class DiceTensorFlow2(ExplainerBase):
                 if((self.target_cf_class == 0 and pred < self.stopping_threshold) or (self.target_cf_class == 1 and pred > self.stopping_threshold)):
                     self.total_CFs_found += 1
 
-            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return query_instance, test_pred
