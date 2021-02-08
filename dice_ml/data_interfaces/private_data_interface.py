@@ -3,10 +3,12 @@
 import sys
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 import collections
 from collections import OrderedDict
 import logging
 logging.basicConfig(level=logging.NOTSET)
+from sklearn.preprocessing import LabelEncoder
 
 class PrivateData:
     """A data interface for private data with meta information."""
@@ -80,6 +82,15 @@ class PrivateData:
         for feature_name in self.continuous_feature_names:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
+
+        # Initializing a label encoder to obtain label-encoded values for categorical variables
+        self.labelencoder = {}
+
+        self.label_encoded_data = {}
+
+        for column in self.categorical_feature_names:
+            self.labelencoder[column] = LabelEncoder()
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.categorical_levels[column])
 
         if 'data_name' in params:
             self.data_name = params['data_name']
@@ -182,6 +193,18 @@ class PrivateData:
                     ixs.append(colidx)
             return ixs
 
+    def from_label(self, data):
+        """Transforms label encoded data back to categorical values"""
+        out = data.copy()
+        if isinstance(data, pd.DataFrame) or isinstance(data, dict):
+            for column in self.categorical_feature_names:
+                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+            return out
+        elif isinstance(data, list):
+            for column in self.categorical_feature_indexes:
+                out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
+            return out
+
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
@@ -204,13 +227,18 @@ class PrivateData:
                 precisions[ix] = self.type_and_precision[feature_name][1]
         return precisions
 
-    def get_decoded_data(self, data):
-        """Gets the original data from dummy encoded data."""
+    def get_decoded_data(self, data, encoding='one-hot'):
+        """Gets the original data from encoded data."""
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
-            data = pd.DataFrame(data=data, index=index,
-                                columns=self.encoded_feature_names)
-        return self.from_dummies(data)
+            if encoding == 'one-hot':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.encoded_feature_names)
+                return self.from_dummies(data)
+            elif encoding == 'label':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.feature_names)
+                return data
 
     def prepare_df_for_encoding(self):
         """Facilitates get_test_inputs() function."""
@@ -235,9 +263,8 @@ class PrivateData:
         """One-hot-encodes the data."""
         return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
-    def prepare_query_instance(self, query_instance, encode):
-        """Prepares user defined test input for DiCE."""
-
+    def prepare_query_instance(self, query_instance, encoding='one-hot'):
+        """Prepares user defined test input(s) for DiCE."""
         if isinstance(query_instance, list):
             if isinstance(query_instance[0], dict):  # prepare a list of query instances
                 test = pd.DataFrame(query_instance, columns=self.feature_names)
@@ -255,9 +282,12 @@ class PrivateData:
 
         test = test.reset_index(drop=True)
 
-        if encode is False:
+        if encoding == 'label':
+            for column in self.categorical_feature_names:
+                test[column] = self.labelencoder[column].transform(test[column])
             return self.normalize_data(test)
-        else:
+
+        elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)

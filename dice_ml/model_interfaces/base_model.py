@@ -3,6 +3,7 @@
    All model interface methods are in dice_ml.model_interfaces"""
 
 import pickle
+import numpy as np
 
 class BaseModel:
 
@@ -30,5 +31,7 @@ class BaseModel:
     def get_gradient(self):
         raise NotImplementedError
 
-    def get_num_output_nodes(self):
-        return 0
+    def get_num_output_nodes(self, inp_size):
+        temp_input = np.transpose(np.array([np.random.uniform(0, 1) for i in range(inp_size)]).reshape(-1, 1))
+        return self.get_output(temp_input).shape[1]
+

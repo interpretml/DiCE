@@ -33,7 +33,7 @@ class ExplainerBase:
         # decimal precisions for continuous features
         self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -75,18 +75,18 @@ class ExplainerBase:
 
         # number of output nodes of ML model
         temp_input = np.random.rand(1,len(self.data_interface.encoded_feature_names))
-        self.num_ouput_nodes = len(self.model.get_output(temp_input))
+        self.num_output_nodes = len(self.model.get_output(temp_input))
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
         query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
-        self.target_cf_class = desired_class
 
+        self.target_cf_class = desired_class
         self.stopping_threshold = stopping_threshold
         if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
             self.stopping_threshold = 0.25
@@ -97,19 +97,19 @@ class ExplainerBase:
         start_time = timeit.default_timer()
         samples = get_samples(self, self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
 
-        cfs = self.data_interface.prepare_query_instance(query_instance=samples, encode=True).values
+        cfs = self.data_interface.prepare_query_instance(query_instance=samples, encoding='one-hot').values
         cf_preds = self.predict_fn(cfs)
         cfs_df = pd.DataFrame(np.append(cfs, np.array([cf_preds]).T, axis=1), columns = self.data_interface.encoded_feature_names + [self.data_interface.outcome_name])
 
         # check validity of CFs
         cfs_df['validity'] = cfs_df[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
-        self.total_CFs_found = cfs_df[cfs_df['validity']==1].shape[0]
+        self.total_cfs_found = cfs_df[cfs_df['validity']==1].shape[0]
 
-        if self.total_CFs_found >= self.total_CFs:
+        if self.total_cfs_found >= self.total_CFs:
             cfs_df = cfs_df[cfs_df['validity']==1].sample(n=self.total_CFs, random_state=random_seed)
             self.valid_cfs_found = True
         else:
-            temp_df = cfs_df[cfs_df['validity']==0].sample(n=self.total_CFs-self.total_CFs_found, random_state=random_seed)
+            temp_df = cfs_df[cfs_df['validity']==0].sample(n=self.total_CFs-self.total_cfs_found, random_state=random_seed)
             cfs_df = pd.concat([cfs_df[cfs_df['validity']==1], temp_df], ignore_index=True)
             self.valid_cfs_found = False
 
@@ -123,7 +123,7 @@ class ExplainerBase:
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_sparse = copy.deepcopy(self.final_cfs)
             cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             self.final_cfs_sparse = None
             self.cfs_preds_sparse = None
@@ -131,10 +131,11 @@ class ExplainerBase:
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
         if self.valid_cfs_found:
-            print('Diverse Counterfactuals found! total time taken: %02d' %
-                  m, 'min %02d' % s, 'sec')
+            if verbose:
+                print('Diverse Counterfactuals found! total time taken: %02d' %
+                      m, 'min %02d' % s, 'sec')
         else:
-            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return exp.CounterfactualExamples(self.data_interface, query_instance,
         test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
@@ -142,9 +143,9 @@ class ExplainerBase:
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance)[:,(self.num_ouput_nodes-1)]
+        return self.model.get_output(input_instance)[:, self.num_output_nodes-1]
 
-    def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
+    def do_posthoc_sparsity_enhancement(self, total_CFs, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
 
         :param final_cfs_sparse: List of final CFs in numpy format.
@@ -188,6 +189,112 @@ class ExplainerBase:
             cfs_preds_sparse[cf_ix] = self.predict_fn(final_cfs_sparse[cf_ix])
 
         return final_cfs_sparse, cfs_preds_sparse
+
+    def check_permitted_range(self, permitted_range):
+        """checks permitted range for continuous features"""
+        if permitted_range is not None:
+            if not self.data_interface.check_features_range():
+                raise ValueError(
+                    "permitted range of features should be within their original range")
+            else:
+                self.data_interface.permitted_range = permitted_range
+                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+                self.cont_minx = []
+                self.cont_maxx = []
+                for feature in self.data_interface.continuous_feature_names:
+                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+
+    def check_mad_validity(self, feature_weights):
+        """checks feature MAD validity and throw warnings"""
+        if feature_weights == "inverse_mad":
+            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
+
+    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
+        """Intializes CFs and other related variables."""
+
+        self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
+
+        if algorithm == "RandomInitCF":
+            # no. of times to run the experiment with random inits for diversity
+            self.total_random_inits = total_CFs
+            self.total_CFs = 1  # size of counterfactual set
+        else:
+            self.total_random_inits = 0
+            self.total_CFs = total_CFs  # size of counterfactual set
+
+        # freeze those columns that need to be fixed
+        if features_to_vary != self.features_to_vary:
+            self.features_to_vary = features_to_vary
+            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(
+                features_to_vary=features_to_vary)
+            self.freezer = [1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))]
+
+        # CF initialization
+        if len(self.cfs) != self.total_CFs:
+            self.cfs = []
+            for kx in range(self.population_size):
+                self.temp_cfs = []
+                for ix in range(self.total_CFs):
+                    one_init = [[]]
+                    for jx in range(len(self.data_interface.feature_names)):
+                        one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                    self.temp_cfs.append(np.array(one_init))
+                self.cfs.append(self.temp_cfs)
+
+    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoding = 'one-hot'):
+        """Intializes variables related to main loss function"""
+
+        self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
+        # define the loss parts
+        self.yloss_type = yloss_type
+        self.diversity_loss_type = diversity_loss_type
+
+        # define feature weights
+        if feature_weights != self.feature_weights_input:
+            self.feature_weights_input = feature_weights
+            if feature_weights == "inverse_mad":
+                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
+                feature_weights = {}
+                for feature in normalized_mads:
+                    feature_weights[feature] = round(1 / normalized_mads[feature], 2)
+
+            feature_weights_list = []
+            if(encoding == 'one-hot'):
+                for feature in self.data_interface.encoded_feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(1.0)
+            elif(encoding == 'label'):
+                for feature in self.data_interface.feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
+            self.feature_weights_list = [feature_weights_list]
+
+    def sigmoid(z):
+        return 1 / (1 + np.exp(-z))
+
+    def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
+        if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
+            self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
+        if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
+            self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
+        if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
+            self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+
+    def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
+        """Update hyperparameters of the loss function"""
+
+        self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
+        self.proximity_weight = proximity_weight
+        self.diversity_weight = diversity_weight
+        self.categorical_penalty = categorical_penalty
+
+    def sigmoid(self, z):
+            return 1 / (1 + np.exp(-z))
 
 def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
 

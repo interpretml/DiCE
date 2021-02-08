@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 import logging
 
 import tensorflow as tf
+from sklearn.preprocessing import LabelEncoder
 
 class PublicData:
     """A data interface for public data."""
@@ -90,9 +91,18 @@ class PublicData:
             self.encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
             ) if x not in np.array([self.outcome_name])]
         else:
-            # one-hot-encoded data is same as orignial data if there is no categorical features.
+            # one-hot-encoded data is same as original data if there is no categorical features.
             self.one_hot_encoded_data = self.data_df
             self.encoded_feature_names = self.feature_names
+
+        #Initializing a label encoder to obtain label-encoded values for categorical variables
+        self.labelencoder = {}
+
+        self.label_encoded_data = self.data_df.copy()
+
+        for column in self.categorical_feature_names:
+            self.labelencoder[column] = LabelEncoder()
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
         self.train_df, self.test_df = self.split_data(self.data_df)
 
@@ -155,8 +165,8 @@ class PublicData:
         """De-normalizes continuous features from [0,1] range to original range."""
         result = df.copy()
         for feature_name in self.continuous_feature_names:
-            max_value = self.train_df[feature_name].max()
-            min_value = self.train_df[feature_name].min()
+            max_value = self.permitted_range[feature_name][1]
+            min_value = self.permitted_range[feature_name][0]
             result[feature_name] = (
                 df[feature_name]*(max_value - min_value)) + min_value
         return result
@@ -187,7 +197,6 @@ class PublicData:
 
     def get_mads(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
-
         mads = {}
         if normalized is False:
             for feature in self.continuous_feature_names:
@@ -208,6 +217,7 @@ class PublicData:
                 mads[feature] = 1.0
                 if display_warnings:
                     logging.warning(" MAD for feature %s is 0, so replacing it with 1.0 to avoid error.", feature)
+
         if return_mads:
             return mads
 
@@ -263,6 +273,17 @@ class PublicData:
                     ixs.append(colidx)
             return ixs
 
+    def from_label(self, data):
+        """Transforms label encoded data back to categorical values"""
+        out = data.copy()
+        if isinstance(data, pd.DataFrame) or isinstance(data, dict):
+            for column in self.categorical_feature_names:
+                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+            return out
+        elif isinstance(data, list):
+            for column in self.categorical_feature_indexes:
+                out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
+            return out
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
@@ -298,13 +319,20 @@ class PublicData:
                 precisions[ix] = maxp
         return precisions
 
-    def get_decoded_data(self, data):
-        """Gets the original data from dummy encoded data."""
+    def get_decoded_data(self, data, encoding='one-hot'):
+        """Gets the original data from encoded data."""
+
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
-            data = pd.DataFrame(data=data, index=index,
-                                columns=self.encoded_feature_names)
-        return self.from_dummies(data)
+            if encoding == 'one-hot':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.encoded_feature_names)
+                return self.from_dummies(data)
+
+            elif encoding == 'label':
+                data = pd.DataFrame(data=data, index=index,
+                                    columns=self.feature_names)
+                return data
 
     def prepare_df_for_encoding(self):
         """Facilitates prepare_query_instance() function."""
@@ -329,7 +357,7 @@ class PublicData:
 
         return df
 
-    def prepare_query_instance(self, query_instance, encode):
+    def prepare_query_instance(self, query_instance, encoding='one-hot'):
         """Prepares user defined test input(s) for DiCE."""
         if isinstance(query_instance, list):
             if isinstance(query_instance[0], dict):  # prepare a list of query instances
@@ -348,9 +376,12 @@ class PublicData:
 
         test = test.reset_index(drop=True)
 
-        if encode is False:
+        if encoding == 'label':
+            for column in self.categorical_feature_names:
+                test[column] = self.labelencoder[column].transform(test[column])
             return self.normalize_data(test)
-        else:
+
+        elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
             temp = self.one_hot_encode_data(temp)

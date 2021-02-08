@@ -6,7 +6,7 @@ from IPython.display import display
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
-    def __init__(self, data_interface, test_instance, test_pred, final_cfs, final_cfs_preds, final_cfs_sparse=None, cfs_preds_sparse=None, posthoc_sparsity_param=0, desired_class="opposite"):
+    def __init__(self, data_interface, test_instance, test_pred, final_cfs, final_cfs_preds, final_cfs_sparse=None, cfs_preds_sparse=None, posthoc_sparsity_param=0, desired_class="opposite", encoding='one-hot'):
 
         self.data_interface = data_interface
         self.test_instance = test_instance
@@ -20,18 +20,26 @@ class CounterfactualExamples:
             self.new_outcome = 1.0 - round(self.test_pred)
         else:
             self.new_outcome = desired_class
-
+        self.encoding = encoding
         self.convert_to_dataframe() # transforming the test input from numpy to pandas dataframe
         if self.final_cfs_sparse is not None:
             self.convert_to_dataframe_sparse()
 
 
     def convert_to_dataframe(self):
-        test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns = self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+        if self.encoding == 'one-hot':
+            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+            org_instance = self.data_interface.from_dummies(test_instance_updated)
 
-        org_instance = self.data_interface.from_dummies(test_instance_updated)
+        elif self.encoding == 'label':
+            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.feature_names+[self.data_interface.outcome_name])
+            org_instance = test_instance_updated.copy()
+
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.org_instance = self.data_interface.de_normalize_data(org_instance)
+
+        if self.encoding == 'label':
+            self.org_instance = self.data_interface.from_label(self.org_instance)
 
         precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
@@ -39,8 +47,11 @@ class CounterfactualExamples:
 
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
 
-        result = self.data_interface.get_decoded_data(cfs)
+        result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
         result = self.data_interface.de_normalize_data(result)
+
+        if self.encoding=='label':
+            result =  self.data_interface.from_label(result)
 
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             result[feature] = result[feature].astype(float).round(precisions[ix])
@@ -55,11 +66,19 @@ class CounterfactualExamples:
         self.final_cfs_list = self.final_cfs_df.values.tolist()
 
     def convert_to_dataframe_sparse(self):
-        test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns = self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+        if self.encoding == 'one-hot':
+            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+            org_instance = self.data_interface.from_dummies(test_instance_updated)
 
-        org_instance = self.data_interface.from_dummies(test_instance_updated)
+        elif self.encoding == 'label':
+            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.feature_names+[self.data_interface.outcome_name])
+            org_instance = test_instance_updated.copy()
+
         org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-        self.org_instance = self.data_interface.de_normalize_data(org_instance)
+        self.org_instance = self.data_interface.de_normalize_data(df=org_instance)
+
+        if self.encoding == 'label':
+            self.org_instance = self.data_interface.from_label(self.org_instance)
 
         precisions = self.data_interface.get_decimal_precisions() # to display the values with the same precision as the original data
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
@@ -67,8 +86,11 @@ class CounterfactualExamples:
 
         cfs = np.array([self.final_cfs_sparse[i][0] for i in range(len(self.final_cfs_sparse))])
 
-        result = self.data_interface.get_decoded_data(cfs)
+        result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
         result = self.data_interface.de_normalize_data(result)
+
+        if self.encoding == 'label':
+            result = self.data_interface.from_label(result)
 
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             result[feature] = result[feature].astype(float).round(precisions[ix])

@@ -280,7 +280,6 @@ class DiceTensorFlow2(ExplainerBase):
         self.regularization_loss = self.compute_regularization_loss()
 
         self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (self.diversity_weight * self.diversity_loss) + (self.categorical_penalty * self.regularization_loss)
-        #print(self.yloss, self.proximity_loss, self.diversity_loss, self.regularization_loss)
         return self.loss
 
     def initialize_CFs(self, query_instance, init_near_query_instance=False):
@@ -375,7 +374,7 @@ class DiceTensorFlow2(ExplainerBase):
         """Finds counterfactuals by gradient-descent."""
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encode=True)
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
         query_instance = np.array([query_instance.iloc[0].values])
         self.x1 = tf.constant(query_instance, dtype=tf.float32)
 
@@ -501,7 +500,7 @@ class DiceTensorFlow2(ExplainerBase):
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_sparse = copy.deepcopy(self.final_cfs)
             cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             self.final_cfs_sparse = None
             self.cfs_preds_sparse = None
