@@ -84,6 +84,9 @@ class DiceKD(ExplainerBase):
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
         query_instance, test_pred, final_cfs, cfs_preds = self.find_counterfactuals(query_instance, desired_class,
                                                                                     total_CFs, features_to_vary,
                                                                                     permitted_range,
@@ -150,7 +153,6 @@ class DiceKD(ExplainerBase):
         indices = self.KD_tree[desired_class].query(KD_query_instance, num_queries)[1][0]
 
         cfs = self.dataset_with_predictions[desired_class][self.data_interface.feature_names].iloc[indices].copy()
-
         final_cfs = []
         final_indices = []
         cfs_preds = []
@@ -174,15 +176,15 @@ class DiceKD(ExplainerBase):
             final_cfs_temp = cfs.iloc[final_indices].to_dict('records')
             final_cfs_temp = self.data_interface.prepare_query_instance(query_instance=final_cfs_temp,
                                                                         encoding='one-hot').values
-            final_cfs = [final_cfs_temp[i, :] for i in range(final_cfs_temp.shape[0])]
+            final_cfs = [final_cfs_temp[i, :].reshape(1, -1) for i in range(final_cfs_temp.shape[0])]
 
             # Finding the predicted outcome for each cf
             for i in range(total_cfs_found):
                 cfs_preds.append(
                     self.dataset_with_predictions[desired_class].iloc[final_indices[i]][self.predicted_outcome_name])
 
-        if total_cfs_found == total_CFs or training_points_only:
-            return final_cfs, cfs_preds
+        if total_cfs_found >= total_CFs or training_points_only:
+            return final_cfs[:total_CFs], cfs_preds
 
         print(total_cfs_found, "Counterfactuals found so far. Moving on to non-training points")
 
@@ -298,6 +300,7 @@ class DiceKD(ExplainerBase):
                                                                features_to_vary,
                                                                query_instance_orig,
                                                                training_points_only)
+
         total_cfs_found = len(final_cfs)
         if total_cfs_found > 0:
             # post-hoc operation on continuous features to enhance sparsity - only for public data
@@ -313,6 +316,9 @@ class DiceKD(ExplainerBase):
             else:
                 self.final_cfs_sparse = None
                 self.cfs_preds_sparse = None
+        else:
+            self.final_cfs_sparse = None
+            self.cfs_preds_sparse = None
 
         self.elapsed = timeit.default_timer() - start_time
 
