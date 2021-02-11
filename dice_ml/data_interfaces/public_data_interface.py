@@ -115,6 +115,10 @@ class PublicData:
                 raise ValueError(
                     "permitted range of features should be within their original range")
 
+	self.max_range = -np.inf
+        for feature in self.continuous_feature_names:
+            self.max_range = max(self.max_range, self.permitted_range[feature][1])
+
         if 'data_name' in params:
             self.data_name = params['data_name']
         else:
