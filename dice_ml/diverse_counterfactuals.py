@@ -64,6 +64,7 @@ class CounterfactualExamples:
         result[self.data_interface.outcome_name] = test_preds
         self.final_cfs_df = result[self.data_interface.feature_names + [self.data_interface.outcome_name]]
         self.final_cfs_list = self.final_cfs_df.values.tolist()
+        #return self.final_cfs_df
 
     def convert_to_dataframe_sparse(self):
         if self.encoding == 'one-hot':

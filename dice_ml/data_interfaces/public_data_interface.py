@@ -106,13 +106,14 @@ class PublicData:
 
         self.train_df, self.test_df = self.split_data(self.data_df)
 
+
+        self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
-            self.permitted_range = params['permitted_range']
+            for feature_name, feature_range in params['permitted_range'].items():
+                self.permitted_range[feature_name] = feature_range
             if not self.check_features_range():
                 raise ValueError(
                     "permitted range of features should be within their original range")
-        else:
-            self.permitted_range = self.get_features_range()
 
         if 'data_name' in params:
             self.data_name = params['data_name']
