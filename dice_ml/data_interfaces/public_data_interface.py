@@ -164,6 +164,8 @@ class PublicData:
 
     def de_normalize_data(self, df):
         """De-normalizes continuous features from [0,1] range to original range."""
+        if len(df) == 0:
+            return df
         result = df.copy()
         for feature_name in self.continuous_feature_names:
             max_value = self.permitted_range[feature_name][1]
@@ -322,7 +324,8 @@ class PublicData:
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""
-
+        if len(data) == 0:
+            return data
         if isinstance(data, np.ndarray):
             index = [i for i in range(0, len(data))]
             if encoding == 'one-hot':

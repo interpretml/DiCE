@@ -19,6 +19,9 @@ class ExplainerBase:
         :param data_interface: an interface class to access data related params.
         :param model_interface: an interface class to access trained ML model.
         """
+        # TODO: This assignment simply the error. Need to verify if it makes sense
+        self.total_random_inits = 0
+
         self.model = model_interface
         # get data-related parameters - minx and max for normalized continuous features
         self.data_interface = data_interface
