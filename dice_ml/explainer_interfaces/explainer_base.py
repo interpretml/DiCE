@@ -274,9 +274,6 @@ class ExplainerBase:
                         feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
             self.feature_weights_list = [feature_weights_list]
 
-    def sigmoid(z):
-        return 1 / (1 + np.exp(-z))
-
     def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
         if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
