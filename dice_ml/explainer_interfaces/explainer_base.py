@@ -4,6 +4,7 @@
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 import random
 import timeit
 import copy
@@ -18,9 +19,13 @@ class ExplainerBase:
         :param data_interface: an interface class to access data related params.
         :param model_interface: an interface class to access trained ML model.
         """
+        # TODO: This assignment simply the error. Need to verify if it makes sense
+        self.total_random_inits = 0
+
         self.model = model_interface
         # get data-related parameters - minx and max for normalized continuous features
         self.data_interface = data_interface
+        self.total_random_inits = 0
         self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()
 
         # min and max for continuous features in original scale
@@ -32,6 +37,23 @@ class ExplainerBase:
 
         # decimal precisions for continuous features
         self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
+
+
+    def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
+        res_arr = []
+        for query_instance in query_instances:
+            res = self.generate_counterfactuals(query_instance, total_CFs,
+                    desired_class=desired_class,
+                    permitted_range=permitted_range,
+                    features_to_vary=features_to_vary,
+                    stopping_threshold=stopping_threshold,
+                    posthoc_sparsity_param=posthoc_sparsity_param,
+                    posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                    sample_size=sample_size,
+                    random_seed=random_seed,
+                    verbose=verbose)
+            res_arr.append(res)
+        return res_arr
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
@@ -55,13 +77,14 @@ class ExplainerBase:
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:
-                self.data_interface.permitted_range = permitted_range
+                for feature_name, feature_range in permitted_range.items():
+                    self.data_interface.permitted_range[feature_name] = feature_range
                 self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                self.cont_minx = []
-                self.cont_maxx = []
                 for feature in self.data_interface.continuous_feature_names:
-                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+                    if feature in self.data_interface.permitted_range:
+                        feat_ix = self.data_interface.encoded_feature_names.index(feature)
+                        self.cont_minx[feat_ix] = self.data_interface.permitted_range[feature][0]
+                        self.cont_maxx[feat_ix] = self.data_interface.permitted_range[feature][1]
 
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
@@ -109,8 +132,9 @@ class ExplainerBase:
             cfs_df = cfs_df[cfs_df['validity']==1].sample(n=self.total_CFs, random_state=random_seed)
             self.valid_cfs_found = True
         else:
-            temp_df = cfs_df[cfs_df['validity']==0].sample(n=self.total_CFs-self.total_cfs_found, random_state=random_seed)
-            cfs_df = pd.concat([cfs_df[cfs_df['validity']==1], temp_df], ignore_index=True)
+            #temp_df = cfs_df[cfs_df['validity']==0].sample(n=self.total_CFs-self.total_cfs_found, random_state=random_seed)
+            #cfs_df = pd.concat([cfs_df[cfs_df['validity']==1], temp_df], ignore_index=True)
+            cfs_df = cfs_df[cfs_df['validity']==1]
             self.valid_cfs_found = False
 
         # convert to the format that is consistent with dice_tensorflow
@@ -141,6 +165,42 @@ class ExplainerBase:
         test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
 
 
+    def local_feature_importance(self, cf_object):
+        org_instance = cf_object.org_instance
+        importance = {}
+        for col in org_instance.columns:
+            importance[col] = 0
+        for index, row in cf_object.final_cfs_df.iterrows():
+            for col in self.data_interface.continuous_feature_names:
+                if not np.isclose(org_instance[col][0], row[col]):
+                    importance[col] += 1
+            for col in self.data_interface.categorical_feature_names:
+                if org_instance[col][0] != row[col]:
+                        importance[col] += 1
+
+        for col in org_instance.columns:
+            importance[col] = importance[col]/cf_object.final_cfs_df.shape[0]
+        return importance
+
+    def global_feature_importance(self, cf_object_list):
+        importance = {}
+        allcols = self.data_interface.categorical_feature_names +self.data_interface.continuous_feature_names
+        for col in allcols:
+            importance[col]= 0
+        for cf_object in cf_object_list:
+            org_instance = cf_object.org_instance
+            for index, row in cf_object.final_cfs_df.iterrows():
+                for col in self.data_interface.continuous_feature_names:
+                    if not np.isclose(org_instance[col][0], row[col]):
+                        importance[col] += 1
+                for col in self.data_interface.categorical_feature_names:
+                    if org_instance[col][0] != row[col]:
+                            importance[col] += 1
+
+        for col in allcols:
+            importance[col] = importance[col]/(cf_object_list[0].final_cfs_df.shape[0]*len(cf_object_list))
+        return importance
+
     def predict_fn(self, input_instance):
         """prediction function"""
         return self.model.get_output(input_instance)[:, self.num_output_nodes-1]
@@ -167,8 +227,7 @@ class ExplainerBase:
 
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
-
-        for cf_ix in range(max(loop_find_CFs, self.total_CFs)):
+        for cf_ix in range(min(max(loop_find_CFs, self.total_CFs), len(final_cfs_sparse))):
             current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
             if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
                (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
