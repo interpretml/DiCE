@@ -115,7 +115,7 @@ class ExplainerBase:
 
         # get random samples for each feature independently
         start_time = timeit.default_timer()
-        samples = get_samples(self, self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
+        samples = self.get_samples(self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
 
         cfs = self.data_interface.prepare_query_instance(query_instance=samples, encoding='one-hot').values
         cf_preds = self.predict_fn(cfs)
@@ -245,10 +245,10 @@ class ExplainerBase:
 
                 if(abs(diff) <= normalized_quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
-                        final_cfs_sparse[cf_ix] = do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
+                        final_cfs_sparse[cf_ix] = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
 
                     elif posthoc_sparsity_algorithm == "binary":
-                        final_cfs_sparse[cf_ix] = do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
+                        final_cfs_sparse[cf_ix] = self.do_binary_search(diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
 
             cfs_preds_sparse[cf_ix] = self.predict_fn(final_cfs_sparse[cf_ix])
 
@@ -274,204 +274,124 @@ class ExplainerBase:
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
-    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
-        """Intializes CFs and other related variables."""
-
-        self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
-
-        if algorithm == "RandomInitCF":
-            # no. of times to run the experiment with random inits for diversity
-            self.total_random_inits = total_CFs
-            self.total_CFs = 1  # size of counterfactual set
-        else:
-            self.total_random_inits = 0
-            self.total_CFs = total_CFs  # size of counterfactual set
-
-        # freeze those columns that need to be fixed
-        if features_to_vary != self.features_to_vary:
-            self.features_to_vary = features_to_vary
-            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(
-                features_to_vary=features_to_vary)
-            self.freezer = [1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))]
-
-        # CF initialization
-        if len(self.cfs) != self.total_CFs:
-            self.cfs = []
-            for kx in range(self.population_size):
-                self.temp_cfs = []
-                for ix in range(self.total_CFs):
-                    one_init = [[]]
-                    for jx in range(len(self.data_interface.feature_names)):
-                        one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
-                    self.temp_cfs.append(np.array(one_init))
-                self.cfs.append(self.temp_cfs)
-
-    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoding = 'one-hot'):
-        """Intializes variables related to main loss function"""
-
-        self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
-        # define the loss parts
-        self.yloss_type = yloss_type
-        self.diversity_loss_type = diversity_loss_type
-
-        # define feature weights
-        if feature_weights != self.feature_weights_input:
-            self.feature_weights_input = feature_weights
-            if feature_weights == "inverse_mad":
-                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
-                feature_weights = {}
-                for feature in normalized_mads:
-                    feature_weights[feature] = round(1 / normalized_mads[feature], 2)
-
-            feature_weights_list = []
-            if(encoding == 'one-hot'):
-                for feature in self.data_interface.encoded_feature_names:
-                    if feature in feature_weights:
-                        feature_weights_list.append(feature_weights[feature])
-                    else:
-                        feature_weights_list.append(1.0)
-            elif(encoding == 'label'):
-                for feature in self.data_interface.feature_names:
-                    if feature in feature_weights:
-                        feature_weights_list.append(feature_weights[feature])
-                    else:
-                        feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
-            self.feature_weights_list = [feature_weights_list]
-
-    def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
-        if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
-            self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
-        if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
-            self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
-        if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
-            self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
-
-    def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
-        """Update hyperparameters of the loss function"""
-
-        self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
-        self.proximity_weight = proximity_weight
-        self.diversity_weight = diversity_weight
-        self.categorical_penalty = categorical_penalty
-
     def sigmoid(self, z):
             return 1 / (1 + np.exp(-z))
 
-def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
+    def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
 
-    # first get required parameters
-    precisions = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
+        # first get required parameters
+        precisions = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
 
-    categorical_features_frequencies = {}
-    for feature in self.data_interface.categorical_feature_names:
-        categorical_features_frequencies[feature] = len(self.data_interface.train_df[feature].value_counts())
+        categorical_features_frequencies = {}
+        for feature in self.data_interface.categorical_feature_names:
+            categorical_features_frequencies[feature] = len(self.data_interface.train_df[feature].value_counts())
 
-    if sampling_random_seed is not None:
-        random.seed(sampling_random_seed)
+        if sampling_random_seed is not None:
+            random.seed(sampling_random_seed)
 
-    samples = []
-    for feature in self.data_interface.feature_names:
-        if feature in fixed_features_values:
-            sample = [fixed_features_values[feature]]*sampling_size
-        elif feature in self.data_interface.continuous_feature_names:
-            low, high = self.data_interface.permitted_range[feature]
-            feat_ix = self.data_interface.encoded_feature_names.index(feature)
-            sample = get_continuous_samples(low, high, precisions[feat_ix], size=sampling_size, seed=sampling_random_seed)
+        samples = []
+        for feature in self.data_interface.feature_names:
+            if feature in fixed_features_values:
+                sample = [fixed_features_values[feature]]*sampling_size
+            elif feature in self.data_interface.continuous_feature_names:
+                low, high = self.data_interface.permitted_range[feature]
+                feat_ix = self.data_interface.encoded_feature_names.index(feature)
+                sample = self.get_continuous_samples(low, high, precisions[feat_ix], size=sampling_size, seed=sampling_random_seed)
+            else:
+                if sampling_random_seed is not None:
+                    random.seed(sampling_random_seed)
+                sample = random.choices(self.data_interface.train_df[feature].unique(), k=sampling_size)
+
+            samples.append(sample)
+
+        samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))).to_dict(orient='records')#.values
+        return samples
+
+
+    def get_continuous_samples(self, low, high, precision, size=1000, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
+
+        if precision == 0:
+            result = np.random.randint(low, high+1, size).tolist()
+            result = [float(r) for r in result]
         else:
-            if sampling_random_seed is not None:
-                random.seed(sampling_random_seed)
-            sample = random.choices(self.data_interface.train_df[feature].unique(), k=sampling_size)
+            result = np.random.uniform(low, high+(10**-precision), size)
+            result = [round(r, precision) for r in result]
+        return result
 
-        samples.append(sample)
+    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred):
+        """Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes."""
 
-    samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))).to_dict(orient='records')#.values
-    return samples
-
-
-def get_continuous_samples(low, high, precision, size=1000, seed=None):
-    if seed is not None:
-        np.random.seed(seed)
-
-    if precision == 0:
-        result = np.random.randint(low, high+1, size).tolist()
-        result = [float(r) for r in result]
-    else:
-        result = np.random.uniform(low, high+(10**-precision), size)
-        result = [round(r, precision) for r in result]
-    return result
-
-def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred):
-    """Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes."""
-
-    old_diff = diff
-    change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix]) # the minimal possible change for a feature
-    while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
-          ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
-           (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
-        old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
-        final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff)*change
-        current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
         old_diff = diff
+        change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix]) # the minimal possible change for a feature
+        while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
+              ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
+               (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
+            old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+            final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff)*change
+            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+            old_diff = diff
 
-        if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
-            final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+            if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+                diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                return final_cfs_sparse[cf_ix]
+
             diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
-            return final_cfs_sparse[cf_ix]
 
-        diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
-
-    return final_cfs_sparse[cf_ix]
-
-def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred):
-    """Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes."""
-
-    old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
-    final_cfs_sparse[cf_ix].ravel()[feat_ix] = query_instance.ravel()[feat_ix]
-    current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
-
-    # first check if assigning query_instance values to a CF is required.
-    if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
         return final_cfs_sparse[cf_ix]
-    else:
-        final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
 
-    # move the CF values towards the query_instance
-    if diff > 0:
-        left = final_cfs_sparse[cf_ix].ravel()[feat_ix]
-        right = query_instance.ravel()[feat_ix]
+    def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred):
+        """Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes."""
 
-        while left <= right:
-            current_val = left + ((right - left)/2)
-            current_val = round(current_val, decimal_prec[feat_ix])
+        old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+        final_cfs_sparse[cf_ix].ravel()[feat_ix] = query_instance.ravel()[feat_ix]
+        current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
 
-            final_cfs_sparse[cf_ix].ravel()[feat_ix] = current_val
-            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+        # first check if assigning query_instance values to a CF is required.
+        if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+            return final_cfs_sparse[cf_ix]
+        else:
+            final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
 
-            if current_val == right or current_val == left:
-                break
+        # move the CF values towards the query_instance
+        if diff > 0:
+            left = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+            right = query_instance.ravel()[feat_ix]
 
-            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                left = current_val + (10**-decimal_prec[feat_ix])
-            else:
-                right = current_val - (10**-decimal_prec[feat_ix])
+            while left <= right:
+                current_val = left + ((right - left)/2)
+                current_val = round(current_val, decimal_prec[feat_ix])
 
-    else:
-        left = query_instance.ravel()[feat_ix]
-        right = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] = current_val
+                current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
 
-        while right >= left:
-            current_val = right - ((right - left)/2)
-            current_val = round(current_val, decimal_prec[feat_ix])
+                if current_val == right or current_val == left:
+                    break
 
-            final_cfs_sparse[cf_ix].ravel()[feat_ix] = current_val
-            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+                if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                    left = current_val + (10**-decimal_prec[feat_ix])
+                else:
+                    right = current_val - (10**-decimal_prec[feat_ix])
 
-            if current_val == right or current_val == left:
-                break
+        else:
+            left = query_instance.ravel()[feat_ix]
+            right = final_cfs_sparse[cf_ix].ravel()[feat_ix]
 
-            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                right = current_val - (10**-decimal_prec[feat_ix])
-            else:
-                left = current_val + (10**-decimal_prec[feat_ix])
+            while right >= left:
+                current_val = right - ((right - left)/2)
+                current_val = round(current_val, decimal_prec[feat_ix])
 
-    return final_cfs_sparse[cf_ix]
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] = current_val
+                current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+
+                if current_val == right or current_val == left:
+                    break
+
+                if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                    right = current_val - (10**-decimal_prec[feat_ix])
+                else:
+                    left = current_val + (10**-decimal_prec[feat_ix])
+
+        return final_cfs_sparse[cf_ix]

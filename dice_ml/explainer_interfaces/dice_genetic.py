@@ -43,6 +43,91 @@ class DiceGenetic(ExplainerBase):
 
         self.population_size = 100
 
+    def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
+        """Update hyperparameters of the loss function"""
+
+        self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
+        self.proximity_weight = proximity_weight
+        self.diversity_weight = diversity_weight
+        self.categorical_penalty = categorical_penalty
+
+    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoding = 'one-hot'):
+        """Intializes variables related to main loss function"""
+
+        self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
+        # define the loss parts
+        self.yloss_type = yloss_type
+        self.diversity_loss_type = diversity_loss_type
+
+        # define feature weights
+        if feature_weights != self.feature_weights_input:
+            self.feature_weights_input = feature_weights
+            if feature_weights == "inverse_mad":
+                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
+                feature_weights = {}
+                for feature in normalized_mads:
+                    feature_weights[feature] = round(1 / normalized_mads[feature], 2)
+
+            feature_weights_list = []
+            if(encoding == 'one-hot'):
+                for feature in self.data_interface.encoded_feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(1.0)
+            elif(encoding == 'label'):
+                for feature in self.data_interface.feature_names:
+                    if feature in feature_weights:
+                        feature_weights_list.append(feature_weights[feature])
+                    else:
+                        feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
+            self.feature_weights_list = [feature_weights_list]
+
+    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary, desired_class):
+        """Intializes CFs and other related variables."""
+
+        self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
+
+        if algorithm == "RandomInitCF":
+            # no. of times to run the experiment with random inits for diversity
+            self.total_random_inits = total_CFs
+            self.total_CFs = 1  # size of counterfactual set
+        else:
+            self.total_random_inits = 0
+            self.total_CFs = total_CFs  # size of counterfactual set
+
+        # freeze those columns that need to be fixed
+        if features_to_vary != self.features_to_vary:
+            self.features_to_vary = features_to_vary
+            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(
+                features_to_vary=features_to_vary)
+            self.freezer = [1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))]
+
+        # CF initialization
+        self.cfs = []
+        for kx in range(self.population_size):
+            temp_cfs = []
+            ix = 0
+            while ix < self.total_CFs:
+                one_init = [[]]
+                for jx in range(len(self.data_interface.feature_names)):
+                    one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                if np.round(self.predict_fn(np.array(one_init))[0]) != desired_class:
+                    ix -= 1
+                else:
+                    temp_cfs.append(np.array(one_init))
+                ix += 1
+            self.cfs.append(temp_cfs)
+
+    def do_param_initializations(self, total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
+        print("Initializing initial parameters to the genetic algorithm...")
+        if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
+            self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_class)
+        if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
+            self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
+        if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
+            self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="log_loss",
@@ -71,9 +156,22 @@ class DiceGenetic(ExplainerBase):
         """
         self.check_mad_validity(feature_weights)
         self.check_permitted_range(permitted_range)
-        self.do_param_initializations(total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty)
 
-        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
+        # Prepares user defined query_instance for DiCE.
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='label')
+        query_instance = np.array([query_instance.iloc[0].values])
+        self.x1 = query_instance
+
+        # find the predicted value of query_instance
+        test_pred = self.predict_fn(query_instance)[0]
+        if desired_class == "opposite":
+            desired_class = 1.0 - round(test_pred)
+
+        self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
+
+        self.do_param_initializations(total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty)
+
+        query_instance = self.find_counterfactuals(query_instance, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
 
     def predict_fn(self, input_instance):
@@ -200,20 +298,9 @@ class DiceGenetic(ExplainerBase):
             child_chromosome.append(np.array(one_init))
         return child_chromosome
 
-    def find_counterfactuals(self, query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
+    def find_counterfactuals(self, query_instance, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
 
-        # Prepares user defined query_instance for DiCE.
-
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='label')
-        query_instance = np.array([query_instance.iloc[0].values])
-        self.x1 = query_instance
-
-        # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
-        if desired_class == "opposite":
-            desired_class = 1.0 - round(test_pred)
-        self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
 
         self.stopping_threshold = stopping_threshold
         if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
@@ -277,4 +364,4 @@ class DiceGenetic(ExplainerBase):
             print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
 
-        return query_instance, test_pred
+        return query_instance
