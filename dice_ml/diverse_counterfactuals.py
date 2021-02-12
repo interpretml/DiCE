@@ -52,8 +52,8 @@ class CounterfactualExamples:
         result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
         result = self.data_interface.de_normalize_data(result)
 
-        if self.encoding=='label':
-            result =  self.data_interface.from_label(result)
+        if self.encoding == 'label':
+            result = self.data_interface.from_label(result)
 
         if len(result) > 0:
             for ix, feature in enumerate(self.data_interface.continuous_feature_names):
@@ -63,6 +63,7 @@ class CounterfactualExamples:
         test_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.final_cfs_preds]
         test_preds = [item for sublist in test_preds for item in sublist]
         test_preds = np.array(test_preds)
+
         if len(result) > 0:
             result[self.data_interface.outcome_name] = test_preds
             self.final_cfs_df = result[self.data_interface.feature_names + [self.data_interface.outcome_name]]
@@ -95,17 +96,19 @@ class CounterfactualExamples:
         if self.encoding == 'label':
             result = self.data_interface.from_label(result)
 
-        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
-            result[feature] = result[feature].astype(float).round(precisions[ix])
+        if len(result) > 0:
+            for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+                result[feature] = result[feature].astype(float).round(precisions[ix])
 
         # predictions for CFs
         test_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds_sparse]
         test_preds = [item for sublist in test_preds for item in sublist]
         test_preds = np.array(test_preds)
 
-        result[self.data_interface.outcome_name] = test_preds
-        self.final_cfs_df_sparse = result[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-        self.final_cfs_list_sparse = self.final_cfs_df_sparse.values.tolist()
+        if len(result) > 0:
+            result[self.data_interface.outcome_name] = test_preds
+            self.final_cfs_df_sparse = result[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+            self.final_cfs_list_sparse = self.final_cfs_df_sparse.values.tolist()
 
     def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
 

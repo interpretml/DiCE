@@ -329,7 +329,7 @@ class DiceKD(ExplainerBase):
                 self.elapsed = timeit.default_timer() - start_time
                 m, s = divmod(self.elapsed, 60)
                 print(
-                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (
+                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps change the query instance or the features to vary...' % (
                         total_cfs_found, total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
