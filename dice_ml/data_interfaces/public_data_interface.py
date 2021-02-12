@@ -8,6 +8,7 @@ import logging
 import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
+
 class PublicData:
     """A data interface for public data."""
 
@@ -95,7 +96,7 @@ class PublicData:
             self.one_hot_encoded_data = self.data_df
             self.encoded_feature_names = self.feature_names
 
-        #Initializing a label encoder to obtain label-encoded values for categorical variables
+        # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
 
         self.label_encoded_data = self.data_df.copy()
@@ -106,7 +107,6 @@ class PublicData:
 
         self.train_df, self.test_df = self.split_data(self.data_df)
 
-
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
             for feature_name, feature_range in params['permitted_range'].items():
@@ -115,7 +115,7 @@ class PublicData:
                 raise ValueError(
                     "permitted range of features should be within their original range")
 
-	self.max_range = -np.inf
+        self.max_range = -np.inf
         for feature in self.continuous_feature_names:
             self.max_range = max(self.max_range, self.permitted_range[feature][1])
 
@@ -130,7 +130,7 @@ class PublicData:
                 min_value = self.train_df[feature].min()
                 max_value = self.train_df[feature].max()
 
-                if self.permitted_range[feature][0] < min_value and self.permitted_range[feature][1] > max_value:
+                if self.permitted_range[feature][0] < min_value or self.permitted_range[feature][1] > max_value:
                     return False
             else:
                 self.permitted_range[feature] = [self.train_df[feature].min(), self.train_df[feature].max()]
@@ -144,7 +144,7 @@ class PublicData:
         return ranges
 
     def get_data_type(self, col):
-        """Infers data type of a feature from the training data."""
+        """Infers data type of a continuous feature from the training data."""
         if ((self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32)):
             return 'int'
         elif ((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
@@ -163,7 +163,7 @@ class PublicData:
             max_value = self.train_df[feature_name].max()
             min_value = self.train_df[feature_name].min()
             result[feature_name] = (
-                df[feature_name] - min_value) / (max_value - min_value)
+                                           df[feature_name] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -172,10 +172,10 @@ class PublicData:
             return df
         result = df.copy()
         for feature_name in self.continuous_feature_names:
-            max_value = self.permitted_range[feature_name][1]
-            min_value = self.permitted_range[feature_name][0]
+            max_value = self.train_df[feature_name].max()
+            min_value = self.train_df[feature_name].min()
             result[feature_name] = (
-                df[feature_name]*(max_value - min_value)) + min_value
+                                           df[feature_name] * (max_value - min_value)) + min_value
         return result
 
     def get_minx_maxx(self, normalized=True):
@@ -267,6 +267,7 @@ class PublicData:
 
     def get_indexes_of_features_to_vary(self, features_to_vary='all'):
         """Gets indexes from feature names of one-hot-encoded data."""
+        # TODO: add encoding as a parameter and use the function get_indexes_of_features_to_vary for label encoding too
         if features_to_vary == "all":
             return [i for i in range(len(self.encoded_feature_names))]
         else:
@@ -288,9 +289,10 @@ class PublicData:
                 out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
             return out
         elif isinstance(data, list):
-            for column in self.categorical_feature_indexes:
-                out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
+            for c in self.categorical_feature_indexes:
+                out[c] = self.labelencoder[self.feature_names[c]].inverse_transform([round(out[c])])[0]
             return out
+
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
@@ -298,8 +300,10 @@ class PublicData:
             # first, derive column names in the one-hot-encoded data from the original data
             cat_col_values = []
             for val in list(self.data_df[feat].unique()):
-                cat_col_values.append(feat + prefix_sep + str(val)) # join original feature name and its unique values , ex: education_school
-            match_cols = [c for c in data.columns if c in cat_col_values] # check for the above matching columns in the encoded data
+                cat_col_values.append(feat + prefix_sep + str(
+                    val))  # join original feature name and its unique values , ex: education_school
+            match_cols = [c for c in data.columns if
+                          c in cat_col_values]  # check for the above matching columns in the encoded data
 
             # then, recreate original data by removing the suffixes - based on the GitHub issue comment: https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271
             cols, labs = [[c.replace(

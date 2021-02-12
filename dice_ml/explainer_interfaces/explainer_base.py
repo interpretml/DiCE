@@ -4,7 +4,6 @@
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_numeric_dtype
 import random
 import timeit
 import copy
@@ -38,7 +37,6 @@ class ExplainerBase:
         # decimal precisions for continuous features
         self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-
     def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         res_arr = []
         for query_instance in query_instances:
@@ -70,7 +68,6 @@ class ExplainerBase:
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
         """
-
         # permitted range for continuous features
         if permitted_range is not None:
             if not self.data_interface.check_features_range():
@@ -129,12 +126,10 @@ class ExplainerBase:
         self.total_cfs_found = cfs_df[cfs_df['validity']==1].shape[0]
 
         if self.total_cfs_found >= self.total_CFs:
-            cfs_df = cfs_df[cfs_df['validity']==1].sample(n=self.total_CFs, random_state=random_seed)
+            cfs_df = cfs_df[cfs_df['validity'] == 1].sample(n=self.total_CFs, random_state=random_seed)
             self.valid_cfs_found = True
         else:
-            #temp_df = cfs_df[cfs_df['validity']==0].sample(n=self.total_CFs-self.total_cfs_found, random_state=random_seed)
-            #cfs_df = pd.concat([cfs_df[cfs_df['validity']==1], temp_df], ignore_index=True)
-            cfs_df = cfs_df[cfs_df['validity']==1]
+            cfs_df = cfs_df[cfs_df['validity'] == 1]
             self.valid_cfs_found = False
 
         # convert to the format that is consistent with dice_tensorflow
@@ -164,38 +159,48 @@ class ExplainerBase:
         return exp.CounterfactualExamples(self.data_interface, query_instance,
         test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
 
-
     def local_feature_importance(self, cf_object):
         org_instance = cf_object.org_instance
         importance = {}
         for col in org_instance.columns:
             importance[col] = 0
-        for index, row in cf_object.final_cfs_df.iterrows():
+
+        if cf_object.final_cfs_sparse is not None:
+            df = cf_object.final_cfs_df_sparse
+        else:
+            df = cf_object.final_cfs_df
+
+        for index, row in df.iterrows():
             for col in self.data_interface.continuous_feature_names:
-                if not np.isclose(org_instance[col][0], row[col]):
+                if not np.isclose(org_instance[col], row[col]):
                     importance[col] += 1
             for col in self.data_interface.categorical_feature_names:
                 if org_instance[col][0] != row[col]:
-                        importance[col] += 1
-
+                    importance[col] += 1
         for col in org_instance.columns:
-            importance[col] = importance[col]/cf_object.final_cfs_df.shape[0]
+            importance[col] = importance[col] / cf_object.final_cfs_df.shape[0]
         return importance
 
     def global_feature_importance(self, cf_object_list):
         importance = {}
-        allcols = self.data_interface.categorical_feature_names +self.data_interface.continuous_feature_names
+        allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
         for col in allcols:
             importance[col]= 0
         for cf_object in cf_object_list:
             org_instance = cf_object.org_instance
-            for index, row in cf_object.final_cfs_df.iterrows():
+
+            if cf_object.final_cfs_sparse is not None:
+                df = cf_object.final_cfs_df_sparse
+            else:
+                df = cf_object.final_cfs_df
+
+            for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col][0], row[col]):
                         importance[col] += 1
                 for col in self.data_interface.categorical_feature_names:
                     if org_instance[col][0] != row[col]:
-                            importance[col] += 1
+                        importance[col] += 1
 
         for col in allcols:
             importance[col] = importance[col]/(cf_object_list[0].final_cfs_df.shape[0]*len(cf_object_list))
@@ -227,7 +232,7 @@ class ExplainerBase:
 
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
-        for cf_ix in range(min(max(loop_find_CFs, self.total_CFs), len(final_cfs_sparse))):
+        for cf_ix in range(min(max(loop_find_CFs, total_CFs), len(final_cfs_sparse))):
             current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
             if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
                (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
@@ -332,9 +337,6 @@ class ExplainerBase:
                     else:
                         feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
             self.feature_weights_list = [feature_weights_list]
-
-    def sigmoid(z):
-        return 1 / (1 + np.exp(-z))
 
     def do_param_initializations(self, total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
         if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
