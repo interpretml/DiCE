@@ -119,8 +119,10 @@ class DiceGenetic(ExplainerBase):
                 ix += 1
             self.cfs.append(temp_cfs)
 
-    def do_param_initializations(self, total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
-        print("Initializing initial parameters to the genetic algorithm...")
+    def do_param_initializations(self, total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose):
+        if verbose:
+            print("Initializing initial parameters to the genetic algorithm...")
+
         if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_class)
         if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
@@ -169,7 +171,7 @@ class DiceGenetic(ExplainerBase):
 
         self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
 
-        self.do_param_initializations(total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty)
+        self.do_param_initializations(total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance = self.find_counterfactuals(query_instance, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
