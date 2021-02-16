@@ -86,12 +86,7 @@ class PublicData:
                 else:
                     self.data_df[feature] = self.data_df[feature].astype(
                         np.int32)
-        # can use any user-provided transform
-        if 'data_transformer' in params:
-            self.transformer = params['data_transformer']
-        else:
-            self.transformer = "default"
-        self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df, self.transformer)
+        self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
         self.encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
             ) if x not in np.array([self.outcome_name])]
 
@@ -152,13 +147,9 @@ class PublicData:
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
 
-    def one_hot_encode_data(self, data, transformer):
+    def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
-        if transformer == "default":
-            return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
-        else:
-            t_arr = transformer[0].fit_transform(data)
-            return pd.DataFrame(t_arr, columns=transformer[1])
+        return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
@@ -402,7 +393,7 @@ class PublicData:
         elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
-            temp = self.one_hot_encode_data(temp, self.transformer)
+            temp = self.one_hot_encode_data(temp)
             temp = self.normalize_data(temp)
 
             return temp.tail(test.shape[0]).reset_index(drop=True)

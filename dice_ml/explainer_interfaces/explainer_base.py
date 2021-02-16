@@ -245,7 +245,6 @@ class ExplainerBase:
                 current_pred = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
                 feat_ix = self.data_interface.encoded_feature_names.index(feature)
                 diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[[cf_ix]][feature].iloc[0]
-
                 if(abs(diff) <= normalized_quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse[cf_ix] = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
