@@ -30,15 +30,17 @@ class CounterfactualExamples:
 
     def convert_to_dataframe(self):
         if self.encoding == 'one-hot':
-            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
-            org_instance = self.data_interface.from_dummies(test_instance_updated)
+            #test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+            #org_instance = self.data_interface.from_dummies(test_instance_updated)
+            org_instance = self.test_instance.copy()
+            org_instance[self.data_interface.outcome_name] = self.test_pred
 
         elif self.encoding == 'label':
             test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.feature_names+[self.data_interface.outcome_name])
             org_instance = test_instance_updated.copy()
 
-        org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-        self.org_instance = self.data_interface.de_normalize_data(org_instance)
+        self.org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+        #self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
         if self.encoding == 'label':
             self.org_instance = self.data_interface.from_label(self.org_instance)
@@ -47,9 +49,10 @@ class CounterfactualExamples:
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
 
-        cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
+        #cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
 
-        result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
+        #result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)a
+        result = self.final_cfs
         result = self.data_interface.de_normalize_data(result)
 
         if self.encoding == 'label':
@@ -71,15 +74,17 @@ class CounterfactualExamples:
 
     def convert_to_dataframe_sparse(self):
         if self.encoding == 'one-hot':
-            test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
-            org_instance = self.data_interface.from_dummies(test_instance_updated)
+            #test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.encoded_feature_names+[self.data_interface.outcome_name])
+            #org_instance = self.data_interface.from_dummies(test_instance_updated)
+            org_instance = self.test_instance.copy()
+            org_instance[self.data_interface.outcome_name] = self.test_pred
 
         elif self.encoding == 'label':
             test_instance_updated = pd.DataFrame(np.array([np.append(self.test_instance, self.test_pred)]), columns=self.data_interface.feature_names+[self.data_interface.outcome_name])
             org_instance = test_instance_updated.copy()
 
-        org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-        self.org_instance = self.data_interface.de_normalize_data(org_instance)
+        self.org_instance = org_instance[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+        #self.org_instance = self.data_interface.de_normalize_data(org_instance)
 
         if self.encoding == 'label':
             self.org_instance = self.data_interface.from_label(self.org_instance)
@@ -88,10 +93,11 @@ class CounterfactualExamples:
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             self.org_instance[feature] = self.org_instance[feature].astype(float).round(precisions[ix])
 
-        cfs = np.array([self.final_cfs_sparse[i][0] for i in range(len(self.final_cfs_sparse))])
+        #cfs = np.array([self.final_cfs_sparse[i][0] for i in range(len(self.final_cfs_sparse))])
 
-        result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
-        result = self.data_interface.de_normalize_data(result)
+        #result = self.data_interface.get_decoded_data(cfs, encoding=self.encoding)
+        #result = self.data_interface.de_normalize_data(result)
+        result = self.final_cfs_sparse
 
         if self.encoding == 'label':
             result = self.data_interface.from_label(result)

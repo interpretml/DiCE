@@ -94,12 +94,12 @@ class ExplainerBase:
                     self.fixed_features_values[feature] = query_instance[feature]
 
         # number of output nodes of ML model
-        temp_input = np.random.rand(1,len(self.data_interface.encoded_feature_names))
+        temp_input = query_instance #np.random.rand(1,len(self.data_interface.encoded_feature_names))
         self.num_output_nodes = len(self.model.get_output(temp_input))
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
+        #query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
+        #query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
@@ -116,10 +116,11 @@ class ExplainerBase:
         # get random samples for each feature independently
         start_time = timeit.default_timer()
         samples = self.get_samples(self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
-
-        cfs = self.data_interface.prepare_query_instance(query_instance=samples, encoding='one-hot').values
+        #cfs = self.data_interface.prepare_query_instance(query_instance=samples, encoding='one-hot').values
+        cfs = samples
         cf_preds = self.predict_fn(cfs)
-        cfs_df = pd.DataFrame(np.append(cfs, np.array([cf_preds]).T, axis=1), columns = self.data_interface.encoded_feature_names + [self.data_interface.outcome_name])
+        cfs_df = cfs # pd.DataFrame(np.append(cfs, np.array([cf_preds]).T, axis=1), columns = self.data_interface.encoded_feature_names + [self.data_interface.outcome_name])
+        cfs_df[self.data_interface.outcome_name] = cf_preds
 
         # check validity of CFs
         cfs_df['validity'] = cfs_df[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
@@ -133,10 +134,12 @@ class ExplainerBase:
             self.valid_cfs_found = False
 
         # convert to the format that is consistent with dice_tensorflow
-        temp = cfs_df[self.data_interface.encoded_feature_names].values
-        self.final_cfs = [np.array([arr]) for arr in temp]
-        temp = cfs_df[[self.data_interface.outcome_name]].values
-        self.cfs_preds = [np.array([arr]) for arr in temp]
+        #temp = cfs_df[self.data_interface.feature_names].values
+        #self.final_cfs = [np.array([arr]) for arr in temp]
+        #temp = cfs_df[[self.data_interface.outcome_name]].values
+        #self.cfs_preds = [np.array([arr]) for arr in temp]
+        self.final_cfs =cfs_df[self.data_interface.feature_names]
+        self.cfs_preds =cfs_df[[self.data_interface.outcome_name]].values
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
@@ -228,20 +231,20 @@ class ExplainerBase:
         features_sorted = sorted(normalized_quantiles.items(), key=lambda kv: kv[1], reverse=True)
         for ix in range(len(features_sorted)):
             features_sorted[ix] = features_sorted[ix][0]
-        decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
+        decimal_prec = self.data_interface.get_decimal_precisions()[0:len(self.data_interface.continuous_feature_names)]
 
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
         for cf_ix in range(min(max(loop_find_CFs, total_CFs), len(final_cfs_sparse))):
-            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+            current_pred = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
             if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
                (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
                continue
 
             for feature in features_sorted:
-                current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+                current_pred = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
                 feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[[cf_ix]][feature].iloc[0]
 
                 if(abs(diff) <= normalized_quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
@@ -250,7 +253,7 @@ class ExplainerBase:
                     elif posthoc_sparsity_algorithm == "binary":
                         final_cfs_sparse[cf_ix] = self.do_binary_search(diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred)
 
-            cfs_preds_sparse[cf_ix] = self.predict_fn(final_cfs_sparse[cf_ix])
+            cfs_preds_sparse[cf_ix] = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
 
         return final_cfs_sparse, cfs_preds_sparse
 
@@ -304,7 +307,7 @@ class ExplainerBase:
 
             samples.append(sample)
 
-        samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))).to_dict(orient='records')#.values
+        samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))) #to_dict(orient='records')#.values
         return samples
 
 

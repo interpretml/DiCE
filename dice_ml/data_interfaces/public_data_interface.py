@@ -15,7 +15,7 @@ class PublicData:
     def __init__(self, params):
         """Init method
 
-        :param dataframe: Pandas DataFrame.
+        :param dataframe: The train dataframe used by explainer method.
         :param continuous_features: List of names of continuous features. The remaining features are categorical features.
         :param outcome_name: Outcome feature name.
         :param permitted_range (optional): Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data.
@@ -86,15 +86,14 @@ class PublicData:
                 else:
                     self.data_df[feature] = self.data_df[feature].astype(
                         np.int32)
-
-        if len(self.categorical_feature_names) > 0:
-            self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
-            self.encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
-            ) if x not in np.array([self.outcome_name])]
+        # can use any user-provided transform
+        if 'data_transformer' in params:
+            self.transformer = params['data_transformer']
         else:
-            # one-hot-encoded data is same as original data if there is no categorical features.
-            self.one_hot_encoded_data = self.data_df
-            self.encoded_feature_names = self.feature_names
+            self.transformer = "default"
+        self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df, self.transformer)
+        self.encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
+            ) if x not in np.array([self.outcome_name])]
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
@@ -105,7 +104,8 @@ class PublicData:
             self.labelencoder[column] = LabelEncoder()
             self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
-        self.train_df, self.test_df = self.split_data(self.data_df)
+        #self.train_df, self.test_df = self.split_data(self.data_df)
+        self.train_df = self.data_df
 
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
@@ -152,9 +152,13 @@ class PublicData:
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
 
-    def one_hot_encode_data(self, data):
+    def one_hot_encode_data(self, data, transformer):
         """One-hot-encodes the data."""
-        return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
+        if transformer == "default":
+            return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
+        else:
+            t_arr = transformer[0].fit_transform(data)
+            return pd.DataFrame(t_arr, columns=transformer[1])
 
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
@@ -197,11 +201,12 @@ class PublicData:
                 maxx[0][idx] = self.permitted_range[feature_name][1]
         return minx, maxx
 
+    """
     def split_data(self, data):
         train_df, test_df = train_test_split(
             data, test_size=self.test_size, random_state=self.test_split_random_state)
         return train_df, test_df
-
+    """
     def get_mads(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
         mads = {}
@@ -316,6 +321,7 @@ class PublicData:
     def get_decimal_precisions(self):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
+        # TODO: check if this should be self.continuous_feature_names
         precisions = [0] * len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
             if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
@@ -396,7 +402,7 @@ class PublicData:
         elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
             temp = temp.append(test, ignore_index=True, sort=False)
-            temp = self.one_hot_encode_data(temp)
+            temp = self.one_hot_encode_data(temp, self.transformer)
             temp = self.normalize_data(temp)
 
             return temp.tail(test.shape[0]).reset_index(drop=True)
