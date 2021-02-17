@@ -98,7 +98,7 @@ class DiceTensorFlow1(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range():
+            if not self.data_interface.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:

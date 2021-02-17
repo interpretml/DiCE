@@ -109,11 +109,12 @@ class PublicData:
 
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
-            for feature_name, feature_range in params['permitted_range'].items():
-                self.permitted_range[feature_name] = feature_range
-            if not self.check_features_range():
+            permitted_range = params['permitted_range']
+            if not self.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
+            for feature_name, feature_range in permitted_range.items():
+                self.permitted_range[feature_name] = feature_range
 
         self.max_range = -np.inf
         for feature in self.continuous_feature_names:
@@ -124,16 +125,16 @@ class PublicData:
         else:
             self.data_name = 'mydata'
 
-    def check_features_range(self):
+    def check_features_range(self, permitted_range):
         for feature in self.continuous_feature_names:
-            if feature in self.permitted_range:
+            if feature in permitted_range:
                 min_value = self.train_df[feature].min()
                 max_value = self.train_df[feature].max()
 
-                if self.permitted_range[feature][0] < min_value or self.permitted_range[feature][1] > max_value:
+                if permitted_range[feature][0] < min_value or permitted_range[feature][0] > max_value or permitted_range[feature][1] < permitted_range[feature][0] or permitted_range[feature][1] > max_value:
                     return False
             else:
-                self.permitted_range[feature] = [self.train_df[feature].min(), self.train_df[feature].max()]
+                permitted_range[feature] = [self.train_df[feature].min(), self.train_df[feature].max()]
         return True
 
     def get_features_range(self):
@@ -156,14 +157,20 @@ class PublicData:
         """One-hot-encodes the data."""
         return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
-    def normalize_data(self, df):
+    def normalize_data(self, df, encoding='one-hot'):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
-        for feature_name in self.continuous_feature_names:
-            max_value = self.train_df[feature_name].max()
-            min_value = self.train_df[feature_name].min()
-            result[feature_name] = (
-                                           df[feature_name] - min_value) / (max_value - min_value)
+        if encoding == 'one-hot':
+            for feature_name in self.continuous_feature_names:
+                max_value = self.train_df[feature_name].max()
+                min_value = self.train_df[feature_name].min()
+                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+
+        elif encoding == 'label':
+            for feature_name in self.categorical_feature_names:
+                max_value = len(self.train_df[feature_name].unique())-1
+                min_value = 0
+                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -178,23 +185,43 @@ class PublicData:
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
 
-    def get_minx_maxx(self, normalized=True):
+    def get_minx_maxx(self, normalized=True, encoding='one-hot'):
         """Gets the min/max value of features in normalized or de-normalized form."""
-        minx = np.array([[0.0] * len(self.encoded_feature_names)])
-        maxx = np.array([[1.0] * len(self.encoded_feature_names)])
+        if encoding=='one-hot':
+            minx = np.array([[0.0] * len(self.encoded_feature_names)])
+            maxx = np.array([[1.0] * len(self.encoded_feature_names)])
 
-        for idx, feature_name in enumerate(self.continuous_feature_names):
-            max_value = self.train_df[feature_name].max()
-            min_value = self.train_df[feature_name].min()
+            for idx, feature_name in enumerate(self.continuous_feature_names):
+                max_value = self.train_df[feature_name].max()
+                min_value = self.train_df[feature_name].min()
 
-            if normalized:
-                minx[0][idx] = (self.permitted_range[feature_name]
-                                [0] - min_value) / (max_value - min_value)
-                maxx[0][idx] = (self.permitted_range[feature_name]
-                                [1] - min_value) / (max_value - min_value)
-            else:
-                minx[0][idx] = self.permitted_range[feature_name][0]
-                maxx[0][idx] = self.permitted_range[feature_name][1]
+                if normalized:
+                    minx[0][idx] = (self.permitted_range[feature_name]
+                                    [0] - min_value) / (max_value - min_value)
+                    maxx[0][idx] = (self.permitted_range[feature_name]
+                                    [1] - min_value) / (max_value - min_value)
+                else:
+                    minx[0][idx] = self.permitted_range[feature_name][0]
+                    maxx[0][idx] = self.permitted_range[feature_name][1]
+        else:
+            minx = np.array([[0.0] * len(self.feature_names)])
+            maxx = np.array([[1.0] * len(self.feature_names)])
+
+            for idx in self.continuous_feature_indexes:
+                feature_name = self.feature_names[idx]
+
+                max_value = self.train_df[feature_name].max()
+                min_value = self.train_df[feature_name].min()
+
+                if normalized:
+                    minx[0][idx] = (self.permitted_range[feature_name]
+                                    [0] - min_value) / (max_value - min_value)
+                    maxx[0][idx] = (self.permitted_range[feature_name]
+                                    [1] - min_value) / (max_value - min_value)
+                else:
+                    minx[0][idx] = self.permitted_range[feature_name][0]
+                    maxx[0][idx] = self.permitted_range[feature_name][1]
+
         return minx, maxx
 
     def split_data(self, data):
@@ -391,7 +418,7 @@ class PublicData:
         if encoding == 'label':
             for column in self.categorical_feature_names:
                 test[column] = self.labelencoder[column].transform(test[column])
-            return self.normalize_data(test)
+            return self.normalize_data(test, encoding)
 
         elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()
