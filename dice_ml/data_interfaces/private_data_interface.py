@@ -101,14 +101,20 @@ class PrivateData:
         else:
             self.data_name = 'mydata'
 
-    def normalize_data(self, df):
+    def normalize_data(self, df, encoding='one-hot'):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
         for feature_name in self.continuous_feature_names:
             max_value = self.permitted_range[feature_name][1]
             min_value = self.permitted_range[feature_name][0]
-            result[feature_name] = (
-                df[feature_name] - min_value) / (max_value - min_value)
+            result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+
+        if encoding == 'label':
+            for ix in self.categorical_feature_indexes:
+                feature_name = self.feature_names[ix]
+                max_value = len(self.categorical_levels[feature_name])-1
+                min_value = 0
+                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -293,7 +299,7 @@ class PrivateData:
         if encoding == 'label':
             for column in self.categorical_feature_names:
                 test[column] = self.labelencoder[column].transform(test[column])
-            return self.normalize_data(test)
+            return self.normalize_data(test, encoding)
 
         elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()

@@ -160,14 +160,14 @@ class PublicData:
     def normalize_data(self, df, encoding='one-hot'):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
-        if encoding == 'one-hot':
-            for feature_name in self.continuous_feature_names:
-                max_value = self.train_df[feature_name].max()
-                min_value = self.train_df[feature_name].min()
-                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        for feature_name in self.continuous_feature_names:
+            max_value = self.train_df[feature_name].max()
+            min_value = self.train_df[feature_name].min()
+            result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
 
-        elif encoding == 'label':
-            for feature_name in self.categorical_feature_names:
+        if encoding == 'label':
+            for ix in self.categorical_feature_indexes:
+                feature_name = self.feature_names[ix]
                 max_value = len(self.train_df[feature_name].unique())-1
                 min_value = 0
                 result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
