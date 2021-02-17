@@ -60,7 +60,7 @@ class DiceKD(ExplainerBase):
                 range(2)}, predictions
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", features_to_vary="all",
-                                 permitted_range=None, training_points_only=True,
+                                 permitted_range=None, training_points_only=True, sparsity_weight=1,
                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
                                  posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
@@ -71,6 +71,7 @@ class DiceKD(ExplainerBase):
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
         :param training_points_only: Parameter to determine if the returned counterfactuals should be a subset of the training data points
+        :param sparsity_weight: Parameter to determine how much importance to give to sparsity
         :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
@@ -91,6 +92,7 @@ class DiceKD(ExplainerBase):
                                                                                     total_CFs, features_to_vary,
                                                                                     permitted_range,
                                                                                     training_points_only,
+                                                                                    sparsity_weight,
                                                                                     stopping_threshold,
                                                                                     posthoc_sparsity_param,
                                                                                     posthoc_sparsity_algorithm, verbose)
@@ -103,6 +105,26 @@ class DiceKD(ExplainerBase):
         """prediction function"""
         temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes - 1]
         return temp_preds
+
+    def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
+        cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)
+        for index, row in cfs.iterrows():
+            cnt = 0
+            for column in self.data_interface.continuous_feature_names:
+                if not np.isclose(row[column], query_instance[column]):
+                    cnt += 1
+            for column in self.data_interface.categorical_feature_names:
+                if row[column] != query_instance[column]:
+                    cnt += 1
+
+            cfs.at[index, "sparsity"] = cnt
+
+        cfs["distance"] = (cfs["distance"] - cfs["distance"].min()) / (cfs["distance"].max() - cfs["distance"].min())
+        cfs["sparsity"] = (cfs["sparsity"] - cfs["sparsity"].min()) / (cfs["sparsity"].max() - cfs["sparsity"].min())
+        cfs["distancesparsity"] = cfs["distance"] + sparsity_weight * cfs["sparsity"]
+        cfs = cfs.sort_values(by="distancesparsity")
+
+        return cfs
 
     def get_samples_eps(self, features_to_vary, eps, sample_size, cf, mads, query_instance, desired_class, cfs_needed):
         """This function generates counterfactuals in the epsilon-vicinity of a given counterfactual such that it
@@ -143,16 +165,19 @@ class DiceKD(ExplainerBase):
         return cfs_found, cfs_found_preds
 
     def vary_only_features_to_vary(self, desired_class, KD_query_instance, total_CFs, features_to_vary, query_instance,
-                                   training_points_only):
+                                   training_points_only, sparsity_weight):
         """This function ensures that we only vary features_to_vary when generating counterfactuals"""
 
         # sampling k^2 points closest points from the KD tree.
         # TODO: this should be a user-specified parameter
-        points_from_KD_tree = total_CFs * total_CFs
-        num_queries = min(points_from_KD_tree, self.dataset_with_predictions_size[desired_class])
-        indices = self.KD_tree[desired_class].query(KD_query_instance, num_queries)[1][0]
+        num_queries = min(self.dataset_with_predictions_size[desired_class], total_CFs*total_CFs)
+        KD_tree_output = self.KD_tree[desired_class].query(KD_query_instance, num_queries)
+        distances = KD_tree_output[0][0]
+        indices = KD_tree_output[1][0]
 
         cfs = self.dataset_with_predictions[desired_class][self.data_interface.feature_names].iloc[indices].copy()
+        cfs['distance'] = distances
+        cfs = self.do_sparsity_check(cfs, query_instance, sparsity_weight)
         final_cfs = []
         final_indices = []
         cfs_preds = []
@@ -255,7 +280,7 @@ class DiceKD(ExplainerBase):
         return final_cfs, cfs_preds
 
     def find_counterfactuals(self, query_instance, desired_class, total_CFs, features_to_vary, permitted_range,
-                             training_points_only, stopping_threshold,
+                             training_points_only, sparsity_weight, stopping_threshold,
                              posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
@@ -299,7 +324,7 @@ class DiceKD(ExplainerBase):
                                                                total_CFs,
                                                                features_to_vary,
                                                                query_instance_orig,
-                                                               training_points_only)
+                                                               training_points_only, sparsity_weight)
 
         total_cfs_found = len(final_cfs)
         if total_cfs_found > 0:
