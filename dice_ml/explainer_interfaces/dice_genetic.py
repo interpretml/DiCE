@@ -164,8 +164,15 @@ class DiceGenetic(ExplainerBase):
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
-        if desired_class == "opposite":
-            desired_class = 1.0 - round(test_pred)
+
+        if desired_class == "opposite" and self.num_output_nodes == 2:
+            desired_class = 1.0 - test_pred
+
+        if desired_class == "opposite" and self.num_output_nodes > 2:
+            raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
+
+        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
+            raise ValueError("Desired class should be within 0 and num_classes-1.")
 
         self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
 
