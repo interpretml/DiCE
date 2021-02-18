@@ -50,14 +50,15 @@ class DiceKD(ExplainerBase):
         # segmenting the dataset according to outcome
         dataset_with_predictions = {}
         dataset_with_predictions_size = {}
-        for i in range(2):
-            dataset_with_predictions[i] = self.data_interface.data_df.loc[np.round(predictions) == i].copy()
-            dataset_with_predictions_size[i] = len(self.data_interface.data_df.loc[np.round(predictions) == i])
+
+        for i in range(self.num_output_nodes):
+            dataset_with_predictions[i] = self.data_interface.data_df.loc[predictions == i].copy()
+            dataset_with_predictions_size[i] = len(self.data_interface.data_df.loc[predictions == i])
 
         # Prepares the KD trees for DiCE - 1 for each outcome (here only 0 and 1, binary classification)
         return dataset_with_predictions, dataset_with_predictions_size, \
                {i: KDTree(pd.get_dummies(dataset_with_predictions[i][self.data_interface.feature_names])) for i in
-                range(2)}, predictions
+                range(self.num_output_nodes)}, predictions
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", features_to_vary="all",
                                  permitted_range=None, training_points_only=True, sparsity_weight=1,
@@ -102,9 +103,8 @@ class DiceKD(ExplainerBase):
                                           desired_class)
 
     def predict_fn(self, input_instance):
-        """prediction function"""
-        temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes - 1]
-        return temp_preds
+        """returns predictions"""
+        return self.model.model.predict(input_instance)
 
     def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
         cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)
@@ -155,7 +155,7 @@ class DiceKD(ExplainerBase):
             test_pred = self.predict_fn(temp_cf)[0]
 
             # if the instance generated is actually a counterfactual
-            if np.round(test_pred) == desired_class:
+            if test_pred == desired_class:
                 cfs_found.append(temp_cf)
                 cfs_found_preds.append(test_pred)
 
@@ -292,10 +292,15 @@ class DiceKD(ExplainerBase):
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
 
-        if desired_class == "opposite":
-            desired_class = 1.0 - np.round(test_pred)
-        else:
-            desired_class = np.round(test_pred)
+        if desired_class == "opposite" and self.num_output_nodes == 2:
+            desired_class = 1.0 - test_pred
+
+        if desired_class == "opposite" and self.num_output_nodes > 2:
+            raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
+
+        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
+            raise ValueError("Desired class should be within 0 and num_classes-1.")
+
         self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
 
         self.stopping_threshold = stopping_threshold
