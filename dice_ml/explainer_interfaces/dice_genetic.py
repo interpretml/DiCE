@@ -37,7 +37,7 @@ class DiceGenetic(ExplainerBase):
         self.cfs = []
         self.features_to_vary = []
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
-        self.loss_weights = []  # diversity_loss_type, feature_weights
+        self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.feature_weights_input = ''
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
 
@@ -51,11 +51,12 @@ class DiceGenetic(ExplainerBase):
         self.diversity_weight = diversity_weight
         self.categorical_penalty = categorical_penalty
 
-    def do_loss_initializations(self, diversity_loss_type, feature_weights, encoding = 'one-hot'):
+    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoding = 'one-hot'):
         """Intializes variables related to main loss function"""
 
-        self.loss_weights = [diversity_loss_type, feature_weights]
+        self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
         # define the loss parts
+        self.yloss_type = yloss_type
         self.diversity_loss_type = diversity_loss_type
 
         # define feature weights
@@ -118,18 +119,18 @@ class DiceGenetic(ExplainerBase):
             self.cfs.append(temp_cfs)
         print("Initialization complete! Generating counterfactuals...")
 
-    def do_param_initializations(self, total_CFs, desired_class, query_instance, algorithm, features_to_vary, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose):
+    def do_param_initializations(self, total_CFs, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
         self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True, encoding='label')
         self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_class, query_instance)
-        self.do_loss_initializations(diversity_loss_type, feature_weights, encoding='label')
+        self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
-                                 features_to_vary="all", permitted_range=None,
+                                 features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
 
@@ -142,6 +143,7 @@ class DiceGenetic(ExplainerBase):
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+        :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
         :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
         :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
@@ -170,7 +172,7 @@ class DiceGenetic(ExplainerBase):
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
-        self.do_param_initializations(total_CFs, desired_class, query_instance, algorithm, features_to_vary, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
+        self.do_param_initializations(total_CFs, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance = self.find_counterfactuals(query_instance, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
@@ -187,17 +189,16 @@ class DiceGenetic(ExplainerBase):
     def compute_yloss(self, cfs, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
+        if self.yloss_type == 'hinge_loss':
+            for i in range(self.total_CFs):
+                predicted_values = self.predict_proba_fn(cfs[i])
 
-        for i in range(self.total_CFs):
-            predicted_values = self.predict_proba_fn(cfs[i])
-
-            maxvalue = -np.inf
-            for c in range(self.num_output_nodes):
-                if c != desired_class:
-                    maxvalue = max(maxvalue, predicted_values[c])
-            temp_loss = max(0, maxvalue - predicted_values[int(desired_class)])
-
-            yloss += temp_loss
+                maxvalue = -np.inf
+                for c in range(self.num_output_nodes):
+                    if c != desired_class:
+                        maxvalue = max(maxvalue, predicted_values[c])
+                temp_loss = max(0, maxvalue - predicted_values[int(desired_class)])
+                yloss += temp_loss
         return yloss/self.total_CFs
 
     def compute_dist(self, x_hat, x1):
