@@ -200,3 +200,10 @@ class CounterfactualExamples:
                     if newli[ix][jx] == org[jx]:
                         newli[ix][jx] = '-'
                 print(newli[ix])
+
+    def to_json(self):
+        if self.final_cfs_sparse is not None:
+            df = self.final_cfs_df_sparse
+        else:
+            df = self.final_cfs_df
+        return df.to_json()
