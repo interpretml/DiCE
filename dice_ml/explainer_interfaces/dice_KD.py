@@ -54,9 +54,13 @@ class DiceKD(ExplainerBase):
         elif self.model.model_type == 'regressor':
             dataset_with_predictions = data_df_copy.loc[[desired_range[0] <= pred <= desired_range[1] for pred in predictions]].copy()
 
-        # Prepares the KD trees for DiCE - 1 for each outcome (here only 0 and 1, binary classification)
-        return dataset_with_predictions, \
-               KDTree(pd.get_dummies(dataset_with_predictions[self.data_interface.feature_names])), predictions
+        KD_tree = None
+        # Prepares the KD trees for DiCE
+        if len(dataset_with_predictions) > 0:
+            dummies = pd.get_dummies(dataset_with_predictions[self.data_interface.feature_names])
+            KD_tree = KDTree(dummies)
+
+        return dataset_with_predictions, KD_tree, predictions
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", features_to_vary="all",
                                  permitted_range=None, training_points_only=True, sparsity_weight=1,
@@ -178,6 +182,7 @@ class DiceKD(ExplainerBase):
                 if desired_range[0] <= test_pred <= desired_range[1]:
                     cfs_found.append(temp_cf)
                     cfs_found_preds.append(test_pred)
+                    print(test_pred)
 
             if len(cfs_found) == cfs_needed:
                 return cfs_found, cfs_found_preds
@@ -191,14 +196,17 @@ class DiceKD(ExplainerBase):
         # sampling k^2 points closest points from the KD tree.
         # TODO: this should be a user-specified parameter
         num_queries = min(len(self.dataset_with_predictions), total_CFs*total_CFs)
-        KD_tree_output = self.KD_tree.query(KD_query_instance, num_queries)
-        distances = KD_tree_output[0][0]
-        indices = KD_tree_output[1][0]
+        cfs = []
 
-        cfs = self.dataset_with_predictions.iloc[indices].copy()
-        cfs['distance'] = distances
-        cfs = self.do_sparsity_check(cfs, query_instance, sparsity_weight)
-        cfs = cfs.drop(self.data_interface.outcome_name, axis=1)
+        if self.KD_tree is not None:
+            KD_tree_output = self.KD_tree.query(KD_query_instance, num_queries)
+            distances = KD_tree_output[0][0]
+            indices = KD_tree_output[1][0]
+
+            cfs = self.dataset_with_predictions.iloc[indices].copy()
+            cfs['distance'] = distances
+            cfs = self.do_sparsity_check(cfs, query_instance, sparsity_weight)
+            cfs = cfs.drop(self.data_interface.outcome_name, axis=1)
         final_cfs = []
         final_indices = []
         cfs_preds = []
@@ -253,7 +261,13 @@ class DiceKD(ExplainerBase):
         while (not stop_method_1) or (not stop_method_2):
             # Method 1 implements perturbations of all valid radii before proceeding to the next instance
             if not stop_method_1:
-                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps1, sample_size, cfs.iloc[i],
+
+                if self.KD_tree is None:
+                    cf_to_send = query_instance
+                else:
+                    cf_to_send = cfs.iloc[i]
+
+                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps1, sample_size,cf_to_send ,
                                                                   mads, query_instance, desired_range, desired_class,
                                                                   total_CFs - total_cfs_found)
                 final_cfs.extend(cfs_found)
@@ -277,7 +291,12 @@ class DiceKD(ExplainerBase):
 
             # Method 2 implements perturbations of particular radius for all instances before doubling the radius
             if not stop_method_2:
-                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps2, sample_size, cfs.iloc[j],
+                if self.KD_tree is None:
+                    cf_to_send = query_instance
+                else:
+                    cf_to_send = cfs.iloc[j]
+
+                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps2, sample_size, cf_to_send,
                                                                   mads, query_instance, desired_range, desired_class,
                                                                   total_CFs - total_cfs_found)
                 final_cfs.extend(cfs_found)
