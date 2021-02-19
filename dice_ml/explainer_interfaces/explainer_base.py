@@ -9,6 +9,7 @@ import timeit
 import copy
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 class ExplainerBase:
 
@@ -37,8 +38,8 @@ class ExplainerBase:
         # decimal precisions for continuous features
         self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
-        res_arr = []
+    def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+        cf_examples_arr = []
         for query_instance in query_instances:
             res = self.generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
@@ -47,11 +48,9 @@ class ExplainerBase:
                     stopping_threshold=stopping_threshold,
                     posthoc_sparsity_param=posthoc_sparsity_param,
                     posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
-                    sample_size=sample_size,
-                    random_seed=random_seed,
-                    verbose=verbose)
-            res_arr.append(res)
-        return res_arr
+                    **kwargs)
+            cf_examples_arr.append(res)
+        return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
@@ -159,52 +158,68 @@ class ExplainerBase:
         return exp.CounterfactualExamples(self.data_interface, query_instance,
         test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
 
-    def local_feature_importance(self, cf_object):
-        org_instance = cf_object.org_instance
-        importance = {}
-        for col in org_instance.columns:
-            importance[col] = 0
+    def feature_importance(self, query_instances, cf_examples_list=None, total_CFs=10, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+        """ Estimate feature importance scores for the given inputs.
 
-        if cf_object.final_cfs_sparse is not None:
-            df = cf_object.final_cfs_df_sparse
-        else:
-            df = cf_object.final_cfs_df
+        TODO: do not return global importance if only one query instance is given.
 
-        for index, row in df.iterrows():
-            for col in self.data_interface.continuous_feature_names:
-                if not np.isclose(org_instance[col], row[col]):
-                    importance[col] += 1
-            for col in self.data_interface.categorical_feature_names:
-                if org_instance[col][0] != row[col]:
-                    importance[col] += 1
-        for col in org_instance.columns:
-            importance[col] = importance[col] / cf_object.final_cfs_df.shape[0]
-        return importance
+        :param query_instances: A list of inputs for which to compute the
+        feature importances. These can be provided as a dataframe.
+        :param cf_examples_list: If precomputed, a list of counterfactual
+        examples for every input point. If cf_examples_list is provided, then
+        all the following parameters are ignored.
+        :param total_CFs: The number of counterfactuals to generate per input
+        (default is 10)
+        :param other parameters: These are the same as the
+        generate_counterfactuals method.
 
-    def global_feature_importance(self, cf_object_list):
-        importance = {}
+        :returns: An object of class CounterfactualExplanations that includes
+        the list of counterfactuals per input, local feature importances per
+        input, and the global feature importance summarized over all inputs.
+        """
+        if cf_examples_list is None:
+            cf_examples_list = self.generate_counterfactuals_batch(query_instances, total_CFs,
+                    desired_class=desired_class,
+                    permitted_range=permitted_range,
+                    features_to_vary=features_to_vary,
+                    stopping_threshold=stopping_threshold,
+                    posthoc_sparsity_param=posthoc_sparsity_param,
+                    posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                    **kwargs).cf_examples_list
+        summary_importance = {} # initializes all values to 0
+        local_importances = [{} for _ in range(len(cf_examples_list))]
+        # Initializing importance vector
         allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
         for col in allcols:
-            importance[col]= 0
-        for cf_object in cf_object_list:
-            org_instance = cf_object.org_instance
+            summary_importance[col] = 0
+        # Summarizing the found counterfactuals
+        for i in range(len(cf_examples_list)):
+            cf_examples = cf_examples_list[i]
+            org_instance = cf_examples.org_instance
 
-            if cf_object.final_cfs_sparse is not None:
-                df = cf_object.final_cfs_df_sparse
+            if cf_examples.final_cfs_sparse is not None:
+                df = cf_examples.final_cfs_df_sparse
             else:
-                df = cf_object.final_cfs_df
-
+                df = cf_examples.final_cfs_df
+            # Initializing local importance for the ith query instance
+            for col in allcols:
+                local_importances[i][col] = 0
             for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col][0], row[col]):
-                        importance[col] += 1
+                        summary_importance[col] += 1
+                        local_importances[i][col] += 1
                 for col in self.data_interface.categorical_feature_names:
                     if org_instance[col][0] != row[col]:
-                        importance[col] += 1
-
+                        summary_importance[col] += 1
+                        local_importances[i][col] += 1
+            for col in allcols:
+                local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
         for col in allcols:
-            importance[col] = importance[col]/(cf_object_list[0].final_cfs_df.shape[0]*len(cf_object_list))
-        return importance
+            summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
+        return CounterfactualExplanations(cf_examples_list,
+                local_importance=local_importances,
+                summary_importance=summary_importance)
 
     def predict_fn(self, input_instance):
         """prediction function"""

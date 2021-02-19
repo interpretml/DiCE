@@ -10,7 +10,7 @@ class Dice:
         """Init method
 
         :param data_interface: an interface to access data related params.
-        :param model_interface: an interface to access the output or gradients of a trained ML model.a
+        :param model_interface: an interface to access the output or gradients of a trained ML model.
         :param method: Name of the method to use for generating counterfactuals
 
         """
