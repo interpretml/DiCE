@@ -1,4 +1,4 @@
-"""Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch."""
+"""Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
 import tensorflow as tf
 
@@ -20,15 +20,15 @@ class Dice:
     def decide_implementation_type(self, data_interface, model_interface, method, **kwargs):
         """Decides DiCE implementation type."""
 
-        self.__class__  = decide(data_interface, model_interface, method)
+        self.__class__  = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
 
 # To add new implementations of DiCE, add the class in explainer_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.
 
-def decide(data_interface, model_interface, method):
+def decide(model_interface, method):
     """Decides DiCE implementation type."""
 
-    if model_interface.backend is None: # random sampling of CFs
+    if model_interface.backend == 'sklearn': # random sampling of CFs
         if method == "random":
             from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
             return ExplainerBase
