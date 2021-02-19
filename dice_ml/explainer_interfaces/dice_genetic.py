@@ -137,7 +137,7 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_range = None, desired_class="opposite", proximity_weight=0.5,
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary", verbose=True):
@@ -200,7 +200,18 @@ class DiceGenetic(ExplainerBase):
         self.do_param_initializations(total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
-        return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=query_instance,
+                                          test_pred=test_pred,
+                                          final_cfs=self.final_cfs,
+                                          final_cfs_preds=self.cfs_preds,
+                                          final_cfs_sparse=self.final_cfs_sparse,
+                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          posthoc_sparsity_param=posthoc_sparsity_param,
+                                          desired_range=desired_range,
+                                          desired_class=desired_class,
+                                          encoding='label',
+                                          model_type=self.model.model_type)
 
     def predict_proba_fn(self, input_instance):
         """returns prediction probabilities"""
