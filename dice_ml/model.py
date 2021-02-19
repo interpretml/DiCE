@@ -10,7 +10,7 @@ class Model:
 
         :param model: trained ML model.
         :param model_path: path to trained ML model.
-        :param backend: "TF1" ("TF2") for TensorFLow 1.0 (2.0) and "PYT" for PyTorch implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with "model" and "explainer" as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class "SklearnModel" in module "sklearn_model.py" inside the subpackage dice_ml.model_interfaces, and dice interface class "DiceSklearn" in module "dice_sklearn" inside dice_ml.explainer_interfaces, then backend parameter should be {"model": "sklearn_model.SklearnModel", "explainer": dice_sklearn.DiceSklearn}.
+        :param backend: "TF1" ("TF2") for TensorFLow 1.0 (2.0), "PYT" for PyTorch implementations, "sklearn" for Scikit-Learn implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with "model" and "explainer" as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class "XGBoostModel" in module "xgboost_model.py" inside the subpackage dice_ml.model_interfaces, and dice interface class "DiceXGBoost" in module "dice_xgboost" inside dice_ml.explainer_interfaces, then backend parameter should be {"model": "xgboost_model.XGBoostModel", "explainer": dice_xgboost.DiceXGBoost}.
 
         """
         self.model_type = model_type
@@ -30,7 +30,7 @@ class Model:
 def decide(backend):
     """Decides the Model implementation type."""
 
-    if backend is None: # random sampling of CFs
+    if backend == 'sklearn': # random sampling of CFs
         from dice_ml.model_interfaces.base_model import BaseModel
         return BaseModel
 
