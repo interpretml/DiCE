@@ -7,6 +7,14 @@ with open("README.rst", "r") as fh:
 with open('requirements.txt', encoding='utf-8') as f:
     install_requires = f.read().splitlines()
 
+# Deep learning packages are optional to install
+extras = ["deeplearning"]
+extras_require = dict()
+for e in extras:
+    req_file = "requirements-{0}.txt".format(e)
+    with open(req_file) as f:
+        extras_require[e] = [line.strip() for line in f]
+
 setuptools.setup(
     name="dice_ml",
     version="0.4",
@@ -27,6 +35,7 @@ setuptools.setup(
     ],
     keywords='machine-learning explanation interpretability counterfactual',
     install_requires=install_requires,
+    extras_require=extras_require,
     include_package_data=True,
     package_data={
         # If any package contains *.h5 files, include them:
