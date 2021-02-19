@@ -1,5 +1,5 @@
 """Module containing a template class as an interface to ML model.
-   Subclasses implement model interfaces for different ML frameworks such as TensorFlow or PyTorch.
+   Subclasses implement model interfaces for different ML frameworks such as TensorFlow, PyTorch OR Sklearn.
    All model interface methods are in dice_ml.model_interfaces"""
 
 import pickle

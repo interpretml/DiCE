@@ -89,7 +89,7 @@ class DicePyTorch(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range():
+            if not self.data_interface.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:
@@ -109,9 +109,15 @@ class DicePyTorch(ExplainerBase):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
         query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, optimizer, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
-
-        return exp.CounterfactualExamples(self.data_interface, query_instance,
-        test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=query_instance,
+                                          test_pred=test_pred,
+                                          final_cfs=self.final_cfs,
+                                          final_cfs_preds=self.cfs_preds,
+                                          final_cfs_sparse=self.final_cfs_sparse,
+                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          posthoc_sparsity_param=posthoc_sparsity_param,
+                                          desired_class=desired_class)
 
     def get_model_output(self, input_instance):
         """get output probability of ML model"""

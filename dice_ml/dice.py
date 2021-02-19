@@ -1,4 +1,4 @@
-"""Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch."""
+"""Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
 import tensorflow as tf
 
@@ -6,31 +6,39 @@ import tensorflow as tf
 class Dice:
     """An interface class to different DiCE implementations."""
 
-    def __init__(self, data_interface, model_interface, **kwargs):
+    def __init__(self, data_interface, model_interface, method="genetic",  **kwargs):
         """Init method
 
         :param data_interface: an interface to access data related params.
-        :param model_interface: an interface to access the output or gradients of a trained ML model.
+        :param model_interface: an interface to access the output or gradients of a trained ML model.a
+        :param method: Name of the method to use for generating counterfactuals
 
         """
 
-        self.decide_implementation_type(data_interface, model_interface, **kwargs)
+        self.decide_implementation_type(data_interface, model_interface, method, **kwargs)
 
-    def decide_implementation_type(self, data_interface, model_interface, **kwargs):
+    def decide_implementation_type(self, data_interface, model_interface, method, **kwargs):
         """Decides DiCE implementation type."""
 
-        self.__class__  = decide(data_interface, model_interface)
+        self.__class__  = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
 
 # To add new implementations of DiCE, add the class in explainer_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.
 
-def decide(data_interface, model_interface):
+def decide(model_interface, method):
     """Decides DiCE implementation type."""
 
-    if model_interface.backend is None: # random sampling of CFs
-        from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-        return ExplainerBase
-    
+    if model_interface.backend == 'sklearn': # random sampling of CFs
+        if method == "random":
+            from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+            return ExplainerBase
+        elif method == "genetic":
+            from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
+            return DiceGenetic
+        elif method == "kdtree":
+            from dice_ml.explainer_interfaces.dice_KD import DiceKD
+            return DiceKD
+
     elif model_interface.backend == 'TF1': # pretrained Keras Sequential model with Tensorflow 1.x backend
         from dice_ml.explainer_interfaces.dice_tensorflow1 import DiceTensorFlow1
         return DiceTensorFlow1

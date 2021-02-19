@@ -71,7 +71,7 @@ class ExplainerBase:
         """
         # permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range():
+            if not self.data_interface.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:
@@ -160,8 +160,15 @@ class ExplainerBase:
         else:
             print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
-        return exp.CounterfactualExamples(self.data_interface, query_instance,
-        test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=query_instance,
+                                          test_pred=test_pred,
+                                          final_cfs=self.final_cfs,
+                                          final_cfs_preds=self.cfs_preds,
+                                          final_cfs_sparse=self.final_cfs_sparse,
+                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          posthoc_sparsity_param=posthoc_sparsity_param,
+                                          desired_class=desired_class)
 
     def local_feature_importance(self, cf_object):
         org_instance = cf_object.org_instance
@@ -239,9 +246,15 @@ class ExplainerBase:
         loop_find_CFs = total_random_inits if total_random_inits > 0 else 1
         for cf_ix in range(min(max(loop_find_CFs, total_CFs), len(final_cfs_sparse))):
             current_pred = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
-            if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
-               (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
-               continue
+            if self.model.model_type == 'classifier':
+                if((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or # perform sparsity correction for only valid CFs
+                   (self.target_cf_class == 1 and current_pred < self.stopping_threshold)):
+                   continue
+
+            elif self.model.model_type == 'regressor':
+                if not self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                   continue
+
 
             for feature in features_sorted:
                 current_pred = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
@@ -261,7 +274,7 @@ class ExplainerBase:
     def check_permitted_range(self, permitted_range):
         """checks permitted range for continuous features"""
         if permitted_range is not None:
-            if not self.data_interface.check_features_range():
+            if not self.data_interface.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:
@@ -329,20 +342,36 @@ class ExplainerBase:
 
         old_diff = diff
         change = (10**-decimal_prec[feat_ix])/(self.cont_maxx[feat_ix] - self.cont_minx[feat_ix]) # the minimal possible change for a feature
-        while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
-              ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
-               (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
-            old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
-            final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff)*change
-            current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
-            old_diff = diff
+        if self.model.model_type == 'classifier':
+            while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
+                  ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
+                   (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
+                old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff)*change
+                current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+                old_diff = diff
 
-            if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
-                final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+                if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
+                    final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+                    diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                    return final_cfs_sparse[cf_ix]
+
                 diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
-                return final_cfs_sparse[cf_ix]
 
-            diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
+        elif self.model.model_type == 'regressor':
+            while ((abs(diff) > 10e-4) and (np.sign(diff * old_diff) > 0) and
+                   self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]):  # move until the prediction class changes
+                old_val = final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] += np.sign(diff) * change
+                current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
+                old_diff = diff
+
+                if not self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                    final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+                    diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
+                    return final_cfs_sparse[cf_ix]
+
+                diff = query_instance.ravel()[feat_ix] - final_cfs_sparse[cf_ix].ravel()[feat_ix]
 
         return final_cfs_sparse[cf_ix]
 
@@ -353,11 +382,19 @@ class ExplainerBase:
         final_cfs_sparse[cf_ix].ravel()[feat_ix] = query_instance.ravel()[feat_ix]
         current_pred = self.predict_fn(final_cfs_sparse[cf_ix])
 
-        # first check if assigning query_instance values to a CF is required.
-        if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-            return final_cfs_sparse[cf_ix]
-        else:
-            final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+        if self.model.model_type == 'classifier':
+            # first check if assigning query_instance values to a CF is required.
+            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                return final_cfs_sparse[cf_ix]
+            else:
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
+
+        elif self.model.model_type == 'regressor':
+            # first check if assigning query_instance values to a CF is required.
+            if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                return final_cfs_sparse[cf_ix]
+            else:
+                final_cfs_sparse[cf_ix].ravel()[feat_ix] = old_val
 
         # move the CF values towards the query_instance
         if diff > 0:
@@ -374,10 +411,18 @@ class ExplainerBase:
                 if current_val == right or current_val == left:
                     break
 
-                if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                    left = current_val + (10**-decimal_prec[feat_ix])
-                else:
-                    right = current_val - (10**-decimal_prec[feat_ix])
+                if self.model.model_type == 'classifier':
+                    if (((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (
+                            self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                        left = current_val + (10 ** -decimal_prec[feat_ix])
+                    else:
+                        right = current_val - (10 ** -decimal_prec[feat_ix])
+
+                elif self.model.model_type == 'regressor':
+                    if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                        left = current_val + (10 ** -decimal_prec[feat_ix])
+                    else:
+                        right = current_val - (10 ** -decimal_prec[feat_ix])
 
         else:
             left = query_instance.ravel()[feat_ix]
@@ -393,9 +438,16 @@ class ExplainerBase:
                 if current_val == right or current_val == left:
                     break
 
-                if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                    right = current_val - (10**-decimal_prec[feat_ix])
-                else:
-                    left = current_val + (10**-decimal_prec[feat_ix])
+                if self.model.model_type == 'classifier':
+                    if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                        right = current_val - (10**-decimal_prec[feat_ix])
+                    else:
+                        left = current_val + (10**-decimal_prec[feat_ix])
+
+                elif self.model.model_type == 'regressor':
+                    if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                        right = current_val - (10**-decimal_prec[feat_ix])
+                    else:
+                        left = current_val + (10**-decimal_prec[feat_ix])
 
         return final_cfs_sparse[cf_ix]

@@ -89,11 +89,12 @@ class PublicData:
 
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
-            for feature_name, feature_range in params['permitted_range'].items():
-                self.permitted_range[feature_name] = feature_range
-            if not self.check_features_range():
+            permitted_range = params['permitted_range']
+            if not self.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
+            for feature_name, feature_range in permitted_range.items():
+                self.permitted_range[feature_name] = feature_range
 
         # should move the below snippet to model agnostic dice interfaces
                                 # self.max_range = -np.inf
@@ -105,16 +106,17 @@ class PublicData:
         else:
             self.data_name = 'mydata'
 
-    def check_features_range(self):
+    def check_features_range(self, permitted_range):
         for feature in self.continuous_feature_names:
-            if feature in self.permitted_range:
+            if feature in permitted_range:
                 min_value = self.data_df[feature].min()
                 max_value = self.data_df[feature].max()
 
-                if self.permitted_range[feature][0] < min_value or self.permitted_range[feature][1] > max_value:
+                if permitted_range[feature][0] < min_value or permitted_range[feature][0] > max_value or permitted_range[feature][1] < permitted_range[feature][0] or permitted_range[feature][1] > max_value:
                     return False
             else:
-                self.permitted_range[feature] = [self.data_df[feature].min(), self.data_df[feature].max()]
+                #self.permitted_range[feature] = [self.data_df[feature].min(), self.data_df[feature].max()]
+                permitted_range[feature] = [self.train_df[feature].min(), self.train_df[feature].max()]
         return True
 
     def get_features_range(self):
@@ -145,6 +147,12 @@ class PublicData:
             min_value = self.data_df[feature_name].min()
             result[feature_name] = (
                                            df[feature_name] - min_value) / (max_value - min_value)
+        #if encoding == 'label':
+        #    for ix in self.categorical_feature_indexes:
+        #        feature_name = self.feature_names[ix]
+        #        max_value = len(self.train_df[feature_name].unique())-1
+        #        min_value = 0
+        #        result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -160,7 +168,7 @@ class PublicData:
         return result
 
     def get_minx_maxx(self, normalized=True):
-        """Gets the min/max value of features in normalized or de-normalized form."""
+        """Gets the min/max value of features in normalized or de-normalized form.""
         minx = np.array([[0.0] * len(self.encoded_feature_names)])
         maxx = np.array([[1.0] * len(self.encoded_feature_names)])
 
@@ -177,6 +185,25 @@ class PublicData:
                 minx[0][idx] = self.permitted_range[feature_name][0]
                 maxx[0][idx] = self.permitted_range[feature_name][1]
         return minx, maxx
+        #if encoding=='one-hot':
+        #    minx = np.array([[0.0] * len(self.encoded_feature_names)])
+        #    maxx = np.array([[1.0] * len(self.encoded_feature_names)])
+
+        #    for idx, feature_name in enumerate(self.continuous_feature_names):
+        #        max_value = self.train_df[feature_name].max()
+        #        min_value = self.train_df[feature_name].min()
+
+        #        if normalized:
+        #            minx[0][idx] = (self.permitted_range[feature_name]
+        #                            [0] - min_value) / (max_value - min_value)
+        #            maxx[0][idx] = (self.permitted_range[feature_name]
+        #                            [1] - min_value) / (max_value - min_value)
+        #        else:
+        #            minx[0][idx] = self.permitted_range[feature_name][0]
+        #            maxx[0][idx] = self.permitted_range[feature_name][1]
+        #else:
+        #    minx = np.array([[0.0] * len(self.feature_names)])
+        #    maxx = np.array([[1.0] * len(self.feature_names)])
 
     def get_mads(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
@@ -385,7 +412,7 @@ class PublicData:
         if encoding == 'label':
             for column in self.categorical_feature_names:
                 test[column] = self.labelencoder[column].transform(test[column])
-            return self.normalize_data(test)
+            return self.normalize_data(test, encoding)
 
         elif encoding == 'one-hot':
             temp = self.prepare_df_for_encoding()

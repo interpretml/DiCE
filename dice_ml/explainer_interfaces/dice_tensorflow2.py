@@ -89,7 +89,7 @@ class DiceTensorFlow2(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range():
+            if not self.data_interface.check_features_range(permitted_range):
                 raise ValueError(
                     "permitted range of features should be within their original range")
             else:
@@ -110,7 +110,12 @@ class DiceTensorFlow2(ExplainerBase):
 
         final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(query_instance, desired_class, optimizer, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
-        return exp.CounterfactualExamples(self.data_interface, final_cfs_df, test_instance_df, final_cfs_df_sparse, posthoc_sparsity_param, desired_class)
+        return exp.CounterfactualExamples(self.data_interface, 
+                                          final_cfs_df=final_cfs_df, 
+                                          test_instance_df=test_instance_df, 
+                                          final_cfs_df_sparse = final_cfs_df_sparse, 
+                                          posthoc_sparsity_param=posthoc_sparsity_param, 
+                                          desired_class=desired_class)
 
     def predict_fn(self, input_instance):
         """prediction function"""

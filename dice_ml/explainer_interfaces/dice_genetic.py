@@ -31,7 +31,8 @@ class DiceGenetic(ExplainerBase):
         self.model.load_model()
 
         # number of output nodes of ML model
-        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
+        if self.model.model_type == 'classifier':
+            self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
@@ -83,7 +84,7 @@ class DiceGenetic(ExplainerBase):
                         feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
             self.feature_weights_list = [feature_weights_list]
 
-    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary, desired_class):
+    def do_cf_initializations(self, total_CFs, algorithm, features_to_vary, desired_range, desired_class, query_instance, verbose):
         """Intializes CFs and other related variables."""
 
         self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
@@ -97,11 +98,7 @@ class DiceGenetic(ExplainerBase):
             self.total_CFs = total_CFs  # size of counterfactual set
 
         # freeze those columns that need to be fixed
-        if features_to_vary != self.features_to_vary:
-            self.features_to_vary = features_to_vary
-            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(
-                features_to_vary=features_to_vary)
-            self.freezer = [1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))]
+        self.features_to_vary = features_to_vary
 
         # CF initialization
         self.cfs = []
@@ -110,33 +107,46 @@ class DiceGenetic(ExplainerBase):
             ix = 0
             while ix < self.total_CFs:
                 one_init = [[]]
-                for jx in range(len(self.data_interface.feature_names)):
-                    one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
-                if np.round(self.predict_fn(np.array(one_init))[0]) != desired_class:
-                    ix -= 1
-                else:
-                    temp_cfs.append(np.array(one_init))
+                for jx, feature in enumerate(self.data_interface.feature_names):
+                    if feature in features_to_vary:
+                        one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                    else:
+                        one_init[0].append(query_instance[0][jx])
+                if self.model.model_type == 'classifier':
+                    if self.predict_fn(np.array(one_init)) != desired_class:
+                        ix -= 1
+                    else:
+                        temp_cfs.append(np.array(one_init))
+                elif self.model.model_type == 'regressor':
+                    predicted_value = self.predict_fn(np.array(one_init))
+                    if not desired_range[0] <= predicted_value <= desired_range[1]:
+                        ix -= 1
+                    else:
+                        temp_cfs.append(np.array(one_init))
                 ix += 1
             self.cfs.append(temp_cfs)
+        if verbose:
+            print("Initialization complete! Generating counterfactuals...")
 
-    def do_param_initializations(self, total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty):
-        print("Initializing initial parameters to the genetic algorithm...")
-        if ([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
-            self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_class)
-        if ([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
-            self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
-        if ([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
-            self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+    def do_param_initializations(self, total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose):
+        if verbose:
+            print("Initializing initial parameters to the genetic algorithm...")
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
+        self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True, encoding='label')
+        self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_range, desired_class, query_instance, verbose)
+        self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
+        self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
-                                 features_to_vary="all", permitted_range=None, yloss_type="log_loss",
-                                 diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=True):
+                                 features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
+                                 diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary", verbose=True):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
-        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
+        :param desired_class: For classification problems. Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
         :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the query_instance.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
         :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
@@ -163,39 +173,81 @@ class DiceGenetic(ExplainerBase):
         self.x1 = query_instance
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
-        if desired_class == "opposite":
-            desired_class = 1.0 - round(test_pred)
+        test_pred = self.predict_fn(query_instance)
 
-        self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
+        if desired_range != None:
+            if desired_range[0] > desired_range[1]:
+                raise ValueError("Invalid Range!")
 
-        self.do_param_initializations(total_CFs, desired_class, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty)
+        if desired_class == "opposite" and self.model.model_type == 'classifier':
+            if self.num_output_nodes == 2:
+                desired_class = 1.0 - test_pred
 
-        query_instance = self.find_counterfactuals(query_instance, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
-        return exp.CounterfactualExamples(self.data_interface, query_instance, test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class, encoding='label')
+            elif self.num_output_nodes > 2:
+                raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
+
+        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
+            raise ValueError("Desired class should be within 0 and num_classes-1.")
+
+        if self.model.model_type == 'classifier':
+            self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
+        elif self.model.model_type == 'regressor':
+            self.target_cf_range = desired_range
+
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
+        self.do_param_initializations(total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
+
+        query_instance = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=query_instance,
+                                          test_pred=test_pred,
+                                          final_cfs=self.final_cfs,
+                                          final_cfs_preds=self.cfs_preds,
+                                          final_cfs_sparse=self.final_cfs_sparse,
+                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          posthoc_sparsity_param=posthoc_sparsity_param,
+                                          desired_range=desired_range,
+                                          desired_class=desired_class,
+                                          encoding='label',
+                                          model_type=self.model.model_type)
+
+    def predict_proba_fn(self, input_instance):
+        """returns prediction probabilities"""
+        return self.model.get_output(input_instance)[0]
 
     def predict_fn(self, input_instance):
-        """prediction function"""
-        temp_preds = self.model.get_output(input_instance)[:, self.num_output_nodes-1]
-        return temp_preds
+        """returns predictions"""
+        return self.model.model.predict(input_instance)[0]
 
-    def compute_yloss(self, cfs):
+
+    def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
-        for i in range(self.total_CFs):
-            if self.yloss_type == "l2_loss":
-                temp_loss = pow((self.predict_fn(cfs[i]) - self.target_cf_class), 2)[0][0]
+        if self.model.model_type == 'classifier':
+            if self.yloss_type == 'hinge_loss':
+                for i in range(self.total_CFs):
+                    predicted_values = self.predict_proba_fn(cfs[i])
 
-            elif self.yloss_type == "log_loss":
-                temp_logits = math.log((abs(self.predict_fn(cfs[i]) - 0.000001))/(1 - abs(self.predict_fn(cfs[i]) - 0.000001)))
-                temp_loss = self.target_cf_class[0][0] * (-1) * np.log(self.sigmoid(temp_logits)) + (1 - self.target_cf_class[0][0]) * (-1) * np.log(1 - self.sigmoid(temp_logits))
+                    maxvalue = -np.inf
+                    for c in range(self.num_output_nodes):
+                        if c != desired_class:
+                            maxvalue = max(maxvalue, predicted_values[c])
+                    temp_loss = max(0, maxvalue - predicted_values[int(desired_class)])
+                    yloss += temp_loss
+            return yloss/self.total_CFs
 
-            elif self.yloss_type == "hinge_loss":
-                temp_logits = math.log((abs(self.predict_fn(cfs[i]) - 0.000001))/(1 - abs(self.predict_fn(cfs[i]) - 0.000001)))
-                temp_loss = max(0, 1-temp_logits*self.target_cf_class[0])
-
-            yloss += temp_loss
-        return yloss/self.total_CFs
+        elif self.model.model_type == 'regressor':
+            if self.yloss_type == 'hinge_loss':
+                for i in range(self.total_CFs):
+                    predicted_value = self.predict_fn(cfs[i])
+                    if desired_range[0] <= predicted_value <= desired_range[1]:
+                        temp_loss = 0
+                    else:
+                        temp_loss = min(abs(predicted_value - desired_range[0]), abs(predicted_value - desired_range[1]))
+                    yloss += temp_loss
+            return yloss / self.total_CFs
 
     def compute_dist(self, x_hat, x1):
         """Compute weighted distance between two vectors."""
@@ -258,14 +310,13 @@ class DiceGenetic(ExplainerBase):
 
         return regularization_loss
 
-    def compute_loss(self, cfs):
+    def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
-        self.yloss = self.compute_yloss(cfs)
+        self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
         self.proximity_loss = self.compute_proximity_loss(cfs) if self.proximity_weight > 0 else 0.0
         self.diversity_loss = self.compute_diversity_loss(cfs) if self.diversity_weight > 0 else 0.0
         self.regularization_loss = self.compute_regularization_loss(cfs)
 
-        # self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) + (self.categorical_penalty * self.regularization_loss)
         self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (
                     self.diversity_weight * self.diversity_loss) + (
                                 self.categorical_penalty * self.regularization_loss)
@@ -298,15 +349,15 @@ class DiceGenetic(ExplainerBase):
             child_chromosome.append(np.array(one_init))
         return child_chromosome
 
-    def find_counterfactuals(self, query_instance, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
+    def find_counterfactuals(self, query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
 
-
         self.stopping_threshold = stopping_threshold
-        if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
-            self.stopping_threshold = 0.25
-        elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
-            self.stopping_threshold = 0.75
+        if self.model.model_type == 'classifier':
+            if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
+                self.stopping_threshold = 0.25
+            elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
+                self.stopping_threshold = 0.75
 
         population = self.cfs.copy()
 
@@ -315,9 +366,9 @@ class DiceGenetic(ExplainerBase):
         while True:
             population_fitness = []
             current_best_loss = np.inf
-
+            current_best_cf = []
             for k in range(self.population_size):
-                loss = self.compute_loss(population[k])
+                loss = self.compute_loss(population[k], desired_range, desired_class)
                 population_fitness.append((k, loss))
 
                 if loss < current_best_loss:
@@ -325,10 +376,16 @@ class DiceGenetic(ExplainerBase):
                     current_best_cf = population[k]
 
             pop_pred = [self.predict_fn(cfs) for cfs in current_best_cf]
-            if ((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in pop_pred)) or
-                    (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in pop_pred))):
-                self.valid_cfs_found = True
-                break
+
+            if self.model.model_type == 'classifier':
+                if all(i == desired_class for i in pop_pred):
+                    self.valid_cfs_found = True
+                    break
+
+            elif self.model.model_type == 'regressor':
+                if all(desired_range[0] <= i <= desired_range[1] for i in pop_pred):
+                    self.valid_cfs_found = True
+                    break
 
             # 10% of the next generation is fittest members of current generation
             population_fitness = sorted(population_fitness, key=lambda x: x[1])

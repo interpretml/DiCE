@@ -43,7 +43,7 @@ class TestCommonDataMethods:
 
     @pytest.mark.parametrize(
     "encode_categorical, output_query",
-    [('label', [0.068, 'Private', 'HS-grad', 'Single', 'Service', 'White', 'Female', 0.449]),
+    [('label', [0.068, (2/3), (3/7), (3/4), (4/5), 1.0, 0.0, 0.449]),
     ('one-hot', [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0])]
     )
     def test_prepare_query_instance(self, sample_adultincome_query, encode_categorical, output_query):
@@ -52,16 +52,7 @@ class TestCommonDataMethods:
         """
         for d in self.d:
             prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encoding=encode_categorical).iloc[0].tolist()
-
-            if encode_categorical == 'one-hot':
-                assert output_query == pytest.approx(prepared_query, abs=1e-3)
-            else:
-                prepared_query = d.from_label(prepared_query)
-                for ix, name in enumerate(d.feature_names):
-                    if name in d.continuous_feature_names:
-                        assert output_query[ix] == pytest.approx(prepared_query[ix], abs=1e-3)
-                    else:
-                        assert output_query[ix] == prepared_query[ix]
+            assert output_query == pytest.approx(prepared_query, abs=1e-3)
 
     def test_encoded_categorical_features(self):
         """
