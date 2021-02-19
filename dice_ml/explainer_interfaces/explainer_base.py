@@ -156,8 +156,15 @@ class ExplainerBase:
         else:
             print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
-        return exp.CounterfactualExamples(self.data_interface, query_instance,
-        test_pred, self.final_cfs, self.cfs_preds, self.final_cfs_sparse, self.cfs_preds_sparse, posthoc_sparsity_param, desired_class)
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=query_instance,
+                                          test_pred=test_pred,
+                                          final_cfs=self.final_cfs,
+                                          final_cfs_preds=self.cfs_preds,
+                                          final_cfs_sparse=self.final_cfs_sparse,
+                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          posthoc_sparsity_param=posthoc_sparsity_param,
+                                          desired_class=desired_class)
 
     def local_feature_importance(self, cf_object):
         org_instance = cf_object.org_instance
@@ -399,10 +406,18 @@ class ExplainerBase:
                 if current_val == right or current_val == left:
                     break
 
-                if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                    left = current_val + (10**-decimal_prec[feat_ix])
-                else:
-                    right = current_val - (10**-decimal_prec[feat_ix])
+                if self.model.model_type == 'classifier':
+                    if (((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (
+                            self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
+                        left = current_val + (10 ** -decimal_prec[feat_ix])
+                    else:
+                        right = current_val - (10 ** -decimal_prec[feat_ix])
+
+                elif self.model.model_type == 'regressor':
+                    if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                        left = current_val + (10 ** -decimal_prec[feat_ix])
+                    else:
+                        right = current_val - (10 ** -decimal_prec[feat_ix])
 
         else:
             left = query_instance.ravel()[feat_ix]

@@ -227,4 +227,9 @@ class FeasibleBaseVAE(ExplainerBase):
         result['CF-Pred']= final_cf_pred[0]
         
         # Adding empty list for sparse cf gen and pred; adding 'NA' for the posthoc sparsity cofficient
-        return exp.CounterfactualExamples(self.data_interface, result['query-instance'], result['test-pred'], result['CF'], result['CF-Pred'],  posthoc_sparsity_param=None)
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
+                                          test_instance=result['query-instance'],
+                                          test_pred=result['test-pred'],
+                                          final_cfs=result['CF'],
+                                          final_cfs_preds=result['CF-Pred'],
+                                          posthoc_sparsity_param=None)
