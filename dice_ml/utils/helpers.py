@@ -19,6 +19,9 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
 
+# for data transformations
+from sklearn.preprocessing import FunctionTransformer
+
 def load_adult_income_dataset():
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
@@ -69,7 +72,6 @@ def load_adult_income_dataset():
 
     return adult_data
 
-
 def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
     model_ext = '.h5' if 'TF' in backend else '.pth'
@@ -88,40 +90,84 @@ def get_adult_data_info():
                         'income': '0 (<=50K) vs 1 (>50K)'}
     return feature_description
 
-def get_base_gen_cf_initialization( data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
-    
-        # Dataset for training Variational Encoder Decoder model for CF Generation        
-        df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
-        encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]] 
-        dataset = encoded_data.to_numpy()        
-        print('Dataset Shape:',  encoded_data.shape)
-        print('Datasets Columns:', encoded_data.columns)
-        
-        #Normalise_Weights
-        normalise_weights={}      
-        for idx in range(len(cont_minx)):
-            _max= cont_maxx[idx]
-            _min= cont_minx[idx]
-            normalise_weights[idx]=[_min, _max]
-    
-        #Train, Val, Test Splits
-        np.random.shuffle(dataset)
-        test_size= int(data_interface.test_size)
-        vae_test_dataset= dataset[:test_size]
-        dataset= dataset[test_size:]
-        vae_val_dataset= dataset[:test_size]
-        vae_train_dataset= dataset[test_size:]
+def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
 
-        #BaseGenCF Model
-        cf_vae = CF_VAE(data_interface, encoded_size)
-        
-        #Optimizer    
-        cf_vae_optimizer = optim.Adam([
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
-            ], lr=learning_rate
-        )
-        
-        # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
-        return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer
+    # Dataset for training Variational Encoder Decoder model for CF Generation
+    df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
+    encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]]
+    dataset = encoded_data.to_numpy()
+    print('Dataset Shape:',  encoded_data.shape)
+    print('Datasets Columns:', encoded_data.columns)
+
+    #Normalise_Weights
+    normalise_weights={}
+    for idx in range(len(cont_minx)):
+        _max= cont_maxx[idx]
+        _min= cont_minx[idx]
+        normalise_weights[idx]=[_min, _max]
+
+    #Train, Val, Test Splits
+    np.random.shuffle(dataset)
+    test_size= int(data_interface.test_size)
+    vae_test_dataset= dataset[:test_size]
+    dataset= dataset[test_size:]
+    vae_val_dataset= dataset[:test_size]
+    vae_train_dataset= dataset[test_size:]
+
+    #BaseGenCF Model
+    cf_vae = CF_VAE(data_interface, encoded_size)
+
+    #Optimizer
+    cf_vae_optimizer = optim.Adam([
+        {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
+        {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
+        {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
+        ], lr=learning_rate
+    )
+
+    # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
+    return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer
+
+def default_data_transformation(data, dobj):
+    """By default, the data is one-hot-encoded and min-max normalized and fed to the ML model"""
+    if not isinstance(data, pd.DataFrame) and not isinstance(data, np.ndarray):
+        raise ValueError("Input data should either be a pandas dataframe or a numpy array of input features only")
+
+    if isinstance(data, np.ndarray):
+        data = pd.DataFrame(data=data, columns=dobj.feature_names)
+
+    return dobj.normalize_data(dobj.one_hot_encode_data(data))
+
+class DataTransfomer:
+    """A class to transform data based on user-defined function to get predicted outcomes. This class calls FunctionTransformer of scikit-learn internally (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)."""
+
+    def __init__(self, func=None):
+        self.dobj = None
+        if func is not None:
+            self.data_transformer = FunctionTransformer(func,kw_args=None)
+        else:
+            self.data_transformer = FunctionTransformer(default_data_transformation,kw_args={'dobj':self.dobj})
+
+    def feed_data_params(self, dobj):
+        self.dobj = dobj
+
+    def fit_transform(self, data):
+        return self.data_transformer.fit_transform(data)
+
+    def inverse_transform(self, data):
+        return self.data_transformer.inverse_transform(data)
+
+def do_inverse_trans_gradient_dice(inp, outp, dobj):
+    """Inverse transforming gradient-based CFs to original user-fed format"""
+    cfs = np.array([inp[i][0] for i in range(len(inp))])
+    cfs_df = dobj.get_decoded_data(cfs, encoding='one-hot')
+    cfs_df = dobj.de_normalize_data(cfs_df)
+
+    precisions = dobj.get_decimal_precisions() # to display the values with the same precision as the original data
+    for ix, feature in enumerate(dobj.continuous_feature_names):
+        cfs_df[feature] = cfs_df[feature].astype(float).round(precisions[ix])
+
+    cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in outp]
+    cfs_preds = [item for sublist in cfs_preds for item in sublist]
+    cfs_df[dobj.outcome_name] = np.array(cfs_preds)
+    return cfs_df[dobj.feature_names + [dobj.outcome_name]]
