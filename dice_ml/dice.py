@@ -1,8 +1,5 @@
 """Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
-import tensorflow as tf
-
-
 class Dice:
     """An interface class to different DiCE implementations."""
 
@@ -10,7 +7,7 @@ class Dice:
         """Init method
 
         :param data_interface: an interface to access data related params.
-        :param model_interface: an interface to access the output or gradients of a trained ML model.a
+        :param model_interface: an interface to access the output or gradients of a trained ML model.
         :param method: Name of the method to use for generating counterfactuals
 
         """

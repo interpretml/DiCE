@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
 
-import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
 
