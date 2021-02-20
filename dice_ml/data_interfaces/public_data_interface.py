@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
 
-import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
 
@@ -430,7 +429,7 @@ class PublicData:
 
     def get_dev_data(self, model_interface, desired_class, filter_threshold=0.5):
         """Constructs dev data by extracting part of the test data for which finding counterfactuals make sense."""
-
+        import tensorflow as tf
         # create TensorFLow session if one is not already created
         if tf.get_default_session() is not None:
             self.data_sess = tf.get_default_session()
