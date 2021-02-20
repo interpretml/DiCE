@@ -1,8 +1,5 @@
 """Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
-import tensorflow as tf
-
-
 class Dice:
     """An interface class to different DiCE implementations."""
 
