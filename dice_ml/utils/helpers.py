@@ -147,7 +147,7 @@ class DataTransfomer:
 
     def initialize(self):
         if self.func is not None:
-            self.data_transformer = FunctionTransformer(func=func, kw_args=self.kw_args)
+            self.data_transformer = FunctionTransformer(func=self.func, kw_args=self.kw_args)
         else:
             self.data_transformer = FunctionTransformer(func=default_data_transformation, kw_args=self.kw_args)
 
