@@ -20,22 +20,16 @@ class KerasTensorFlowModel(BaseModel):
         if self.model_path != '':
             self.model = keras.models.load_model(self.model_path)
 
-    def get_output(self, input_tensor, training=False, transformed=True):
+    def get_output(self, input_tensor, training=False):
         """returns prediction probabilities
 
         :param input_tensor: test input.
         :param training: to determine training mode in TF2
-        :param transformed: check if input is already transformed.
         """
+        input_tensor = tf.constant(self.transformer.transform(input_tensor), dtype=tf.float32)
         if self.backend == 'TF2':
-            if not transformed:
-                input_tensor = input_tensor.numpy()
-                input_tensor = tf.constant(self.transformer.fit_transform(input_tensor), dtype=tf.float32)
             return self.model(input_tensor, training=training)
         else:
-            if not transformed:
-                input_tensor = tf.InteractiveSession().run(input_tensor)
-                input_tensor = tf.constant(self.transformer.fit_transform(input_tensor), dtype=tf.float32)
             return self.model(input_tensor)
 
     def get_gradient(self, input):

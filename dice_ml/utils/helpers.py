@@ -7,18 +7,6 @@ import os
 
 import dice_ml
 
-#Dice Imports
-from dice_ml.utils.sample_architecture.vae_model import CF_VAE
-
-#Pytorch
-import torch
-import torch.utils.data
-from torch import nn, optim
-from torch.nn import functional as F
-from torchvision import datasets, transforms
-from torchvision.utils import save_image
-from torch.autograd import Variable
-
 # for data transformations
 from sklearn.preprocessing import FunctionTransformer
 
@@ -92,6 +80,18 @@ def get_adult_data_info():
 
 def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
 
+    #Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py. Check dependencies.
+    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+
+    #Pytorch
+    import torch
+    import torch.utils.data
+    from torch import nn, optim
+    from torch.nn import functional as F
+    from torchvision import datasets, transforms
+    from torchvision.utils import save_image
+    from torch.autograd import Variable
+
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
     encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]]
@@ -128,46 +128,31 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
     # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
     return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer
 
-def default_data_transformation(data, dobj):
+def default_data_transformation(data, data_interface):
     """By default, the data is one-hot-encoded and min-max normalized and fed to the ML model"""
-    if not isinstance(data, pd.DataFrame) and not isinstance(data, np.ndarray):
-        raise ValueError("Input data should either be a pandas dataframe or a numpy array of input features only")
-
-    if isinstance(data, np.ndarray):
-        data = pd.DataFrame(data=data, columns=dobj.feature_names)
-
-    return dobj.normalize_data(dobj.one_hot_encode_data(data))
+    return data_interface.get_ohe_min_max_normalized_data(data)
 
 class DataTransfomer:
     """A class to transform data based on user-defined function to get predicted outcomes. This class calls FunctionTransformer of scikit-learn internally (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)."""
 
-    def __init__(self, func=None):
-        self.dobj = None
-        if func is not None:
-            self.data_transformer = FunctionTransformer(func,kw_args=None)
+    def __init__(self, func=None, kw_args=None):
+        self.func = func
+        self.kw_args = kw_args
+
+    def feed_data_params(self, data_interface):
+        if self.kw_args is not None:
+            self.kw_args['data_interface'] = data_interface
         else:
-            self.data_transformer = FunctionTransformer(default_data_transformation,kw_args={'dobj':self.dobj})
+            self.kw_args = {'data_interface': data_interface}
 
-    def feed_data_params(self, dobj):
-        self.dobj = dobj
+    def initialize(self):
+        if self.func is not None:
+            self.data_transformer = FunctionTransformer(func=func, kw_args=self.kw_args)
+        else:
+            self.data_transformer = FunctionTransformer(func=default_data_transformation, kw_args=self.kw_args)
 
-    def fit_transform(self, data):
-        return self.data_transformer.fit_transform(data)
+    def transform(self, data):
+        return self.data_transformer.transform(data)
 
     def inverse_transform(self, data):
         return self.data_transformer.inverse_transform(data)
-
-def do_inverse_trans_gradient_dice(inp, outp, dobj):
-    """Inverse transforming gradient-based CFs to original user-fed format"""
-    cfs = np.array([inp[i][0] for i in range(len(inp))])
-    cfs_df = dobj.get_decoded_data(cfs, encoding='one-hot')
-    cfs_df = dobj.de_normalize_data(cfs_df)
-
-    precisions = dobj.get_decimal_precisions() # to display the values with the same precision as the original data
-    for ix, feature in enumerate(dobj.continuous_feature_names):
-        cfs_df[feature] = cfs_df[feature].astype(float).round(precisions[ix])
-
-    cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in outp]
-    cfs_preds = [item for sublist in cfs_preds for item in sublist]
-    cfs_df[dobj.outcome_name] = np.array(cfs_preds)
-    return cfs_df[dobj.feature_names + [dobj.outcome_name]]
