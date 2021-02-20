@@ -7,6 +7,7 @@ import pandas as pd
 import random
 import timeit
 import copy
+from collections.abc import Iterable
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
@@ -39,10 +40,17 @@ class ExplainerBase:
                 # # decimal precisions for continuous features
                 # self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+    def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
         cf_examples_arr = []
-        for query_instance in query_instances:
-            res = self.generate_counterfactuals(query_instance, total_CFs,
+        query_instances_list = []
+        if isinstance(query_instances, pd.DataFrame):
+            for ix in range(query_instances.shape[0]):
+                query_instances_list.append(query_instances[ix:(ix+1)])
+        elif isinstance(query_instances, Iterable):
+            query_instances_list = query_instances
+            #query_instances = query_instances.to_dict("records")
+        for query_instance in query_instances_list:
+            res = self._generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
@@ -53,7 +61,7 @@ class ExplainerBase:
             cf_examples_arr.append(res)
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -160,12 +168,10 @@ class ExplainerBase:
             print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          test_instance=query_instance,
-                                          test_pred=test_pred,
-                                          final_cfs=self.final_cfs,
-                                          final_cfs_preds=self.cfs_preds,
-                                          final_cfs_sparse=self.final_cfs_sparse,
-                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          test_instance_df=query_instance,
+                                          test_instance_pred=test_pred,
+                                          final_cfs_df=self.final_cfs,
+                                          final_cfs_df_sparse=self.final_cfs_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_class=desired_class)
 
@@ -189,7 +195,7 @@ class ExplainerBase:
         input, and the global feature importance summarized over all inputs.
         """
         if cf_examples_list is None:
-            cf_examples_list = self.generate_counterfactuals_batch(query_instances, total_CFs,
+            cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
                     desired_class=desired_class,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
@@ -206,9 +212,9 @@ class ExplainerBase:
         # Summarizing the found counterfactuals
         for i in range(len(cf_examples_list)):
             cf_examples = cf_examples_list[i]
-            org_instance = cf_examples.org_instance
+            org_instance = cf_examples.test_instance_df
 
-            if cf_examples.final_cfs_sparse is not None:
+            if cf_examples.final_cfs_df_sparse is not None:
                 df = cf_examples.final_cfs_df_sparse
             else:
                 df = cf_examples.final_cfs_df
@@ -217,11 +223,11 @@ class ExplainerBase:
                 local_importances[i][col] = 0
             for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
-                    if not np.isclose(org_instance[col][0], row[col]):
+                    if not np.isclose(org_instance[col].iloc[0], row[col]):
                         summary_importance[col] += 1
                         local_importances[i][col] += 1
                 for col in self.data_interface.categorical_feature_names:
-                    if org_instance[col][0] != row[col]:
+                    if org_instance[col].iloc[0] != row[col]:
                         summary_importance[col] += 1
                         local_importances[i][col] += 1
             for col in allcols:
@@ -312,11 +318,10 @@ class ExplainerBase:
     def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
 
         # first get required parameters
-        precisions = self.data_interface.get_decimal_precisions()[0:len(self.encoded_continuous_feature_indexes)]
-
+        precisions = self.data_interface.get_decimal_precisions(output_type="dict")
         categorical_features_frequencies = {}
         for feature in self.data_interface.categorical_feature_names:
-            categorical_features_frequencies[feature] = len(self.data_interface.train_df[feature].value_counts())
+            categorical_features_frequencies[feature] = len(self.data_interface.data_df[feature].value_counts())
 
         if sampling_random_seed is not None:
             random.seed(sampling_random_seed)
@@ -327,12 +332,12 @@ class ExplainerBase:
                 sample = [fixed_features_values[feature]]*sampling_size
             elif feature in self.data_interface.continuous_feature_names:
                 low, high = self.data_interface.permitted_range[feature]
-                feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                sample = self.get_continuous_samples(low, high, precisions[feat_ix], size=sampling_size, seed=sampling_random_seed)
+                #feat_ix = self.data_interface.encoded_feature_names.index(feature)
+                sample = self.get_continuous_samples(low, high, precisions[feature], size=sampling_size, seed=sampling_random_seed)
             else:
                 if sampling_random_seed is not None:
                     random.seed(sampling_random_seed)
-                sample = random.choices(self.data_interface.train_df[feature].unique(), k=sampling_size)
+                sample = random.choices(self.data_interface.data_df[feature].unique(), k=sampling_size)
 
             samples.append(sample)
 

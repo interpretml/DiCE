@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
+from collections import defaultdict
 
 from sklearn.preprocessing import LabelEncoder
 
@@ -336,13 +337,15 @@ class PublicData:
             out.drop(cols, axis=1, inplace=True)
         return out
 
-    def get_decimal_precisions(self):
+    def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
+        precisions_dict = defaultdict(int)
         precisions = [0] * len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
             if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]
+                precisions_dict[col] = self.continuous_features_precision[col]
             elif ((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
                 modes = self.data_df[col].mode()
                 maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
@@ -351,7 +354,11 @@ class PublicData:
                     if prec > maxp:
                         maxp = prec
                 precisions[ix] = maxp
-        return precisions
+                precisions_dict[col] = maxp
+        if output_type == "list":
+            return precisions
+        elif output_type == "dict":
+            return precisions_dict
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""

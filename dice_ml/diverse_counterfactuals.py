@@ -3,21 +3,27 @@ import pandas as pd
 import copy
 from IPython.display import display
 
+import json
+import dice_ml.utils.serialize
+
+
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
 
-    def __init__(self, data_interface, final_cfs_df, test_instance_df, final_cfs_df_sparse, posthoc_sparsity_param=0, desired_range=None, desired_class="opposite", encoding='one-hot', model_type='classifier'):
+    def __init__(self, data_interface, final_cfs_df, test_instance_df, test_instance_pred,  final_cfs_df_sparse, posthoc_sparsity_param=0, desired_range=None, desired_class="opposite", encoding='one-hot', model_type='classifier'):
 
         self.data_interface = data_interface
         self.final_cfs_df = final_cfs_df
         self.test_instance_df = test_instance_df
         self.final_cfs_df_sparse = final_cfs_df_sparse
-
+        self.model_type = model_type
+        self.desired_class = desired_class
+        self.desired_range = desired_range
         self.final_cfs_list = None
         self.posthoc_sparsity_param = posthoc_sparsity_param # might be useful for future additions
 
-        self.test_pred = self.test_instance_df[self.data_interface.outcome_name].iloc[0]
+        self.test_pred = test_instance_pred # self.test_instance_df[self.data_interface.outcome_name].iloc[0]
         if model_type == 'classifier':
             if desired_class == "opposite":
                 self.new_outcome = 1.0 - round(self.test_pred)
@@ -34,7 +40,7 @@ class CounterfactualExamples:
         display(self.test_instance_df) #  works only in Jupyter notebook
         if len(self.final_cfs_df) > 0:
             if self.posthoc_sparsity_param == None:
-                print('\nCounterfactual set (new outcome: ', self.new_outcome)
+                print('\nCounterfactual set (new outcome: {0})'.format(self.new_outcome))
                 self.display_df(self.final_cfs_df, show_only_changes)
 
             elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is not None:
@@ -116,8 +122,14 @@ class CounterfactualExamples:
                 print(newli[ix])
 
     def to_json(self):
-        if self.final_cfs_sparse is not None:
+        if self.final_cfs_df_sparse is not None:
             df = self.final_cfs_df_sparse
         else:
             df = self.final_cfs_df
-        return df.to_json()
+        obj = {'model_type': self.model_type,
+               'desired_class': self.desired_class,
+               'desired_range': self.desired_range,
+               'test_instance_df': self.test_instance_df,
+               'test_instance_pred': self.test_pred,
+               'final_cfs_df': df}
+        return json.dumps(obj, default=dice_ml.utils.serialize.json_converter)
