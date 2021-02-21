@@ -10,8 +10,7 @@ import dice_ml.utils.serialize
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
-
-    def __init__(self, data_interface, final_cfs_df, test_instance_df, test_instance_pred,  final_cfs_df_sparse, posthoc_sparsity_param=0, desired_range=None, desired_class="opposite", encoding='one-hot', model_type='classifier'):
+    def __init__(self, data_interface=None, final_cfs_df=None, test_instance_df=None, test_instance_pred=None,  final_cfs_df_sparse=None, posthoc_sparsity_param=0, desired_range=None, desired_class="opposite", model_type='classifier'):
 
         self.data_interface = data_interface
         self.final_cfs_df = final_cfs_df
@@ -31,8 +30,6 @@ class CounterfactualExamples:
                 self.new_outcome = desired_class
         elif model_type == 'regressor':
             self.new_outcome = desired_range
-
-        self.encoding = encoding
 
     def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
         # original instance

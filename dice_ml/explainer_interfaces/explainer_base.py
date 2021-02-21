@@ -21,8 +21,14 @@ class ExplainerBase:
         :param model_interface: an interface class to access trained ML model.
         """
 
-        self.model = model_interface
+        # initiating data and model related parameters
         self.data_interface = data_interface
+        if model_interface is not None: # ExplainerBase is used for random sampling of CFs
+            self.data_interface.create_ohe_params()
+            self.model = model_interface
+            self.model.load_model() # loading pickled trained model if applicable
+            self.model.transformer.feed_data_params(data_interface)
+            self.model.transformer.initialize_transform_func()
 
         # get data-related parameters for gradient-based DiCE - minx and max for normalized continuous features
         # self.total_random_inits = 0 # redundant
@@ -64,7 +70,7 @@ class ExplainerBase:
     def _generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
 
-        :param query_instance: A dictionary of feature names and values. Test point of interest.
+        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
         :param total_CFs: Total number of counterfactuals required.
 
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
@@ -102,13 +108,9 @@ class ExplainerBase:
                     self.fixed_features_values[feature] = query_instance[feature]
 
         # number of output nodes of ML model
-        temp_input = query_instance #np.random.rand(1,len(self.data_interface.encoded_feature_names))
-        self.num_output_nodes = len(self.model.get_output(temp_input))
+        self.num_output_nodes = self.model.get_output(query_instance).shape[1]
 
-        # Prepares user defined query_instance for DiCE.
-        #query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        #query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
-
+        # query_instance need no transformation for generating CFs using random sampling.
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
         if desired_class == "opposite":
@@ -123,40 +125,34 @@ class ExplainerBase:
 
         # get random samples for each feature independently
         start_time = timeit.default_timer()
-        samples = self.get_samples(self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
-        #cfs = self.data_interface.prepare_query_instance(query_instance=samples, encoding='one-hot').values
-        cfs = samples
-        cf_preds = self.predict_fn(cfs)
-        cfs_df = cfs # pd.DataFrame(np.append(cfs, np.array([cf_preds]).T, axis=1), columns = self.data_interface.encoded_feature_names + [self.data_interface.outcome_name])
-        cfs_df[self.data_interface.outcome_name] = cf_preds
+        self.final_cfs = self.get_samples(self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
+        self.cfs_preds = self.predict_fn(self.final_cfs)
+        self.final_cfs[self.data_interface.outcome_name] = self.cfs_preds
 
         # check validity of CFs
-        cfs_df['validity'] = cfs_df[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
-        self.total_cfs_found = cfs_df[cfs_df['validity']==1].shape[0]
+        self.final_cfs['validity'] = self.final_cfs[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
+        self.total_cfs_found = self.final_cfs[self.final_cfs['validity']==1].shape[0]
 
         if self.total_cfs_found >= self.total_CFs:
-            cfs_df = cfs_df[cfs_df['validity'] == 1].sample(n=self.total_CFs, random_state=random_seed)
+            self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].sample(n=self.total_CFs, random_state=random_seed).reset_index(drop=True)
             self.valid_cfs_found = True
         else:
-            cfs_df = cfs_df[cfs_df['validity'] == 1]
+            self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].reset_index(drop=True)
             self.valid_cfs_found = False
 
-        # convert to the format that is consistent with dice_tensorflow
-        #temp = cfs_df[self.data_interface.feature_names].values
-        #self.final_cfs = [np.array([arr]) for arr in temp]
-        #temp = cfs_df[[self.data_interface.outcome_name]].values
-        #self.cfs_preds = [np.array([arr]) for arr in temp]
-        self.final_cfs =cfs_df[self.data_interface.feature_names]
-        self.cfs_preds =cfs_df[[self.data_interface.outcome_name]].values
+        final_cfs_df = self.final_cfs[self.data_interface.feature_names + [self.data_interface.outcome_name]].copy()
+        final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(3)
+        self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
+        self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+        test_instance_df = self.data_interface.prepare_query_instance(query_instance)
+        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            final_cfs_sparse = copy.deepcopy(self.final_cfs)
-            cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = final_cfs_df.copy()
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
-            self.final_cfs_sparse = None
-            self.cfs_preds_sparse = None
+            final_cfs_df_sparse = None
 
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
@@ -165,82 +161,63 @@ class ExplainerBase:
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')
         else:
-            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            if self.total_CFs_found == 0 :
+                print('No Counterfactuals found for the given configuation, perhaps try with different parameters...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            else:
+                print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different parameters...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          test_instance_df=query_instance,
-                                          test_instance_pred=test_pred,
-                                          final_cfs_df=self.final_cfs,
-                                          final_cfs_df_sparse=self.final_cfs_sparse,
+                                          final_cfs_df=final_cfs_df,
+                                          test_instance_df=test_instance_df,
+                                          final_cfs_df_sparse = final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_class=desired_class)
-
-    def feature_importance(self, query_instances, cf_examples_list=None, total_CFs=10, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
-        """ Estimate feature importance scores for the given inputs.
-
-        TODO: do not return global importance if only one query instance is given.
-
-        :param query_instances: A list of inputs for which to compute the
-        feature importances. These can be provided as a dataframe.
-        :param cf_examples_list: If precomputed, a list of counterfactual
-        examples for every input point. If cf_examples_list is provided, then
-        all the following parameters are ignored.
-        :param total_CFs: The number of counterfactuals to generate per input
-        (default is 10)
-        :param other parameters: These are the same as the
-        generate_counterfactuals method.
-
-        :returns: An object of class CounterfactualExplanations that includes
-        the list of counterfactuals per input, local feature importances per
-        input, and the global feature importance summarized over all inputs.
-        """
-        if cf_examples_list is None:
-            cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
-                    desired_class=desired_class,
-                    permitted_range=permitted_range,
-                    features_to_vary=features_to_vary,
-                    stopping_threshold=stopping_threshold,
-                    posthoc_sparsity_param=posthoc_sparsity_param,
-                    posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
-                    **kwargs).cf_examples_list
-        summary_importance = {} # initializes all values to 0
-        local_importances = [{} for _ in range(len(cf_examples_list))]
-        # Initializing importance vector
-        allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
-        for col in allcols:
-            summary_importance[col] = 0
-        # Summarizing the found counterfactuals
-        for i in range(len(cf_examples_list)):
-            cf_examples = cf_examples_list[i]
-            org_instance = cf_examples.test_instance_df
-
-            if cf_examples.final_cfs_df_sparse is not None:
-                df = cf_examples.final_cfs_df_sparse
-            else:
-                df = cf_examples.final_cfs_df
-            # Initializing local importance for the ith query instance
-            for col in allcols:
-                local_importances[i][col] = 0
-            for index, row in df.iterrows():
-                for col in self.data_interface.continuous_feature_names:
-                    if not np.isclose(org_instance[col].iloc[0], row[col]):
-                        summary_importance[col] += 1
-                        local_importances[i][col] += 1
-                for col in self.data_interface.categorical_feature_names:
-                    if org_instance[col].iloc[0] != row[col]:
-                        summary_importance[col] += 1
-                        local_importances[i][col] += 1
-            for col in allcols:
-                local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
-        for col in allcols:
-            summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
-        return CounterfactualExplanations(cf_examples_list,
-                local_importance=local_importances,
-                summary_importance=summary_importance)
 
     def predict_fn(self, input_instance):
         """prediction function"""
         return self.model.get_output(input_instance)[:, self.num_output_nodes-1]
+
+    def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
+
+        # first get required parameters
+        precisions = self.data_interface.get_decimal_precisions()
+
+        categorical_features_frequencies = {}
+        for feature in self.data_interface.categorical_feature_names:
+            categorical_features_frequencies[feature] = len(self.data_interface.data_df[feature].value_counts())
+
+        if sampling_random_seed is not None:
+            random.seed(sampling_random_seed)
+
+        samples = []
+        for feature in self.data_interface.feature_names:
+            if feature in fixed_features_values:
+                sample = [fixed_features_values[feature]]*sampling_size
+            elif feature in self.data_interface.continuous_feature_names:
+                low, high = self.data_interface.permitted_range[feature]
+                feat_ix = self.data_interface.continuous_feature_names.index(feature)
+                sample = self.get_continuous_samples(low, high, precisions[feat_ix], size=sampling_size, seed=sampling_random_seed)
+            else:
+                if sampling_random_seed is not None:
+                    random.seed(sampling_random_seed)
+                sample = random.choices(self.data_interface.data_df[feature].unique(), k=sampling_size)
+
+            samples.append(sample)
+
+        samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))) #to_dict(orient='records')#.values
+        return samples
+
+    def get_continuous_samples(self, low, high, precision, size=1000, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
+
+        if precision == 0:
+            result = np.random.randint(low, high+1, size).tolist()
+            result = [float(r) for r in result]
+        else:
+            result = np.random.uniform(low, high+(10**-precision), size)
+            result = [round(r, precision) for r in result]
+        return result
 
     def do_posthoc_sparsity_enhancement(self, total_CFs, final_cfs_sparse, cfs_preds_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm, total_random_inits=0):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
@@ -291,71 +268,6 @@ class ExplainerBase:
             cfs_preds_sparse[cf_ix] = self.predict_fn(final_cfs_sparse.iloc[[cf_ix]])
 
         return final_cfs_sparse, cfs_preds_sparse
-
-    def check_permitted_range(self, permitted_range):
-        """checks permitted range for continuous features"""
-        if permitted_range is not None:
-            if not self.data_interface.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            else:
-                self.data_interface.permitted_range = permitted_range
-                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                self.cont_minx = []
-                self.cont_maxx = []
-                for feature in self.data_interface.continuous_feature_names:
-                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
-
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings"""
-        if feature_weights == "inverse_mad":
-            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
-
-    def sigmoid(self, z):
-            return 1 / (1 + np.exp(-z))
-
-    def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
-
-        # first get required parameters
-        precisions = self.data_interface.get_decimal_precisions(output_type="dict")
-        categorical_features_frequencies = {}
-        for feature in self.data_interface.categorical_feature_names:
-            categorical_features_frequencies[feature] = len(self.data_interface.data_df[feature].value_counts())
-
-        if sampling_random_seed is not None:
-            random.seed(sampling_random_seed)
-
-        samples = []
-        for feature in self.data_interface.feature_names:
-            if feature in fixed_features_values:
-                sample = [fixed_features_values[feature]]*sampling_size
-            elif feature in self.data_interface.continuous_feature_names:
-                low, high = self.data_interface.permitted_range[feature]
-                #feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                sample = self.get_continuous_samples(low, high, precisions[feature], size=sampling_size, seed=sampling_random_seed)
-            else:
-                if sampling_random_seed is not None:
-                    random.seed(sampling_random_seed)
-                sample = random.choices(self.data_interface.data_df[feature].unique(), k=sampling_size)
-
-            samples.append(sample)
-
-        samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))) #to_dict(orient='records')#.values
-        return samples
-
-
-    def get_continuous_samples(self, low, high, precision, size=1000, seed=None):
-        if seed is not None:
-            np.random.seed(seed)
-
-        if precision == 0:
-            result = np.random.randint(low, high+1, size).tolist()
-            result = [float(r) for r in result]
-        else:
-            result = np.random.uniform(low, high+(10**-precision), size)
-            result = [round(r, precision) for r in result]
-        return result
 
     def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feat_ix, final_cfs_sparse, current_pred):
         """Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes."""
@@ -471,3 +383,90 @@ class ExplainerBase:
                         left = current_val + (10**-decimal_prec[feat_ix])
 
         return final_cfs_sparse[cf_ix]
+
+    def feature_importance(self, query_instances, cf_examples_list=None, total_CFs=10, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+        """ Estimate feature importance scores for the given inputs.
+
+        TODO: do not return global importance if only one query instance is given.
+
+        :param query_instances: A list of inputs for which to compute the
+        feature importances. These can be provided as a dataframe.
+        :param cf_examples_list: If precomputed, a list of counterfactual
+        examples for every input point. If cf_examples_list is provided, then
+        all the following parameters are ignored.
+        :param total_CFs: The number of counterfactuals to generate per input
+        (default is 10)
+        :param other parameters: These are the same as the
+        generate_counterfactuals method.
+
+        :returns: An object of class CounterfactualExplanations that includes
+        the list of counterfactuals per input, local feature importances per
+        input, and the global feature importance summarized over all inputs.
+        """
+        if cf_examples_list is None:
+            cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
+                    desired_class=desired_class,
+                    permitted_range=permitted_range,
+                    features_to_vary=features_to_vary,
+                    stopping_threshold=stopping_threshold,
+                    posthoc_sparsity_param=posthoc_sparsity_param,
+                    posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                    **kwargs).cf_examples_list
+        summary_importance = {} # initializes all values to 0
+        local_importances = [{} for _ in range(len(cf_examples_list))]
+        # Initializing importance vector
+        allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
+        for col in allcols:
+            summary_importance[col] = 0
+        # Summarizing the found counterfactuals
+        for i in range(len(cf_examples_list)):
+            cf_examples = cf_examples_list[i]
+            org_instance = cf_examples.test_instance_df
+
+            if cf_examples.final_cfs_df_sparse is not None:
+                df = cf_examples.final_cfs_df_sparse
+            else:
+                df = cf_examples.final_cfs_df
+            # Initializing local importance for the ith query instance
+            for col in allcols:
+                local_importances[i][col] = 0
+            for index, row in df.iterrows():
+                for col in self.data_interface.continuous_feature_names:
+                    if not np.isclose(org_instance[col].iloc[0], row[col]):
+                        summary_importance[col] += 1
+                        local_importances[i][col] += 1
+                for col in self.data_interface.categorical_feature_names:
+                    if org_instance[col].iloc[0] != row[col]:
+                        summary_importance[col] += 1
+                        local_importances[i][col] += 1
+            for col in allcols:
+                local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
+        for col in allcols:
+            summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
+        return CounterfactualExplanations(cf_examples_list,
+                local_importance=local_importances,
+                summary_importance=summary_importance)
+
+
+    def check_permitted_range(self, permitted_range): # TODO: add comments as to where this is used if this function is necessary, else remove.
+        """checks permitted range for continuous features"""
+        if permitted_range is not None:
+            if not self.data_interface.check_features_range(permitted_range):
+                raise ValueError(
+                    "permitted range of features should be within their original range")
+            else:
+                self.data_interface.permitted_range = permitted_range
+                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+                self.cont_minx = []
+                self.cont_maxx = []
+                for feature in self.data_interface.continuous_feature_names:
+                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+
+    def check_mad_validity(self, feature_weights): # TODO: add comments as to where this is used if this function is necessary, else remove.
+        """checks feature MAD validity and throw warnings"""
+        if feature_weights == "inverse_mad":
+            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
+
+    def sigmoid(self, z): # used in VAE-based CF explainers
+            return 1 / (1 + np.exp(-z))
