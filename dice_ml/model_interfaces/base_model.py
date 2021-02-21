@@ -14,7 +14,7 @@ class BaseModel:
         :param model: trained ML Model.
         :param model_path: path to trained model.
         :param backend: ML framework. For frameworks other than TensorFlow or PyTorch, or for implementations other than standard DiCE (https://arxiv.org/pdf/1905.07697.pdf), provide both the module and class names as module_name.class_name. For instance, if there is a model interface class "SklearnModel" in module "sklearn_model.py" inside the subpackage dice_ml.model_interfaces, then backend parameter should be "sklearn_model.SklearnModel".
-        :param func: function transformation required for ML model.
+        :param func: function transformation required for ML model. If func is None, then func will be the identity function.
         :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the dictionary of kw_args, by default.
         """
 
@@ -30,6 +30,7 @@ class BaseModel:
 
     def get_output(self, input_instance):
         """returns prediction probabilities"""
+        input_instance = self.transformer.transform(input_instance)
         return self.model.predict_proba(input_instance)
 
     def get_gradient(self):

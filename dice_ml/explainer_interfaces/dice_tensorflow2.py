@@ -5,14 +5,11 @@ from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import tensorflow as tf
 
 import numpy as np
-import pandas as pd
 import random
-import collections
 import timeit
 import copy
 
 from dice_ml import diverse_counterfactuals as exp
-from dice_ml.utils import helpers
 
 class DiceTensorFlow2(ExplainerBase):
 
@@ -24,14 +21,16 @@ class DiceTensorFlow2(ExplainerBase):
 
         """
 
+        # initiating data related parameters
         super().__init__(data_interface)
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice() # initiating data related parameters
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
 
-        # initializing model variables
+        # initializing model related variables
         self.model = model_interface
         self.model.load_model() # loading trained model
-        self.model.transformer.feed_data_params(self.data_interface) # provide data_interface to transformer for default_data_transformation
-        self.model.transformer.initialize()
+        if self.model.transformer.func is not None: # TODO: this error is probably too big - need to change it.
+            raise ValueError("Gradient-based DiCE currently (1) accepts the data only in raw categorical and continuous formats, (2) does one-hot-encoding and min-max-normalization internally, (3) expects the ML model the accept the data in this same format. If your problem supports this, please initialize model class again with no custom transformation function.")
+        self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names)).shape[1] # number of output nodes of ML model
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
@@ -41,11 +40,6 @@ class DiceTensorFlow2(ExplainerBase):
         self.feature_weights_input = ''
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
-
-        # number of output nodes of ML model
-        #temp_input = tf.convert_to_tensor([tf.random.uniform([len(self.data_interface.ohe_encoded_feature_names)])], dtype=tf.float32)
-        #temp_input = self.data_interface.data_df #self.transform_TF_cfs_to_raw(temp_input)
-        self.num_ouput_nodes = self.model.get_output(self.data_interface.data_df.iloc[0:1][self.data_interface.feature_names]).shape[1]
 
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
         """Generates diverse counterfactual explanations
@@ -110,7 +104,7 @@ class DiceTensorFlow2(ExplainerBase):
 
         final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(query_instance, desired_class, optimizer, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
-        return exp.CounterfactualExamples(self.data_interface,
+        return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
                                           test_instance_df=test_instance_df,
                                           final_cfs_df_sparse = final_cfs_df_sparse,
@@ -119,17 +113,8 @@ class DiceTensorFlow2(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        input_instance = input_instance.numpy()
-        input_instance = self.data_interface.get_inverse_ohe_min_max_normalized_data(input_instance)
         temp_preds = self.model.get_output(input_instance).numpy()
-        return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds], dtype=np.float32)
-
-    def get_model_tensor(self, ix):
-        input_instance = self.cfs[ix].numpy()
-        input_instance = self.data_interface.get_inverse_ohe_min_max_normalized_data(input_instance)
-        input_instance = np.array(self.model.transformer.transform(input_instance).values, dtype=np.float32)
-        self.cfs[ix].assign(input_instance) # if T1 and T2 are different and give different output shapes, assign will throw error since self.cfs's shape is changed. But it should not happend since self.cfs is our variable that is optimized.
-        return self.model.model(self.cfs[ix])
+        return np.array([preds[(self.num_output_nodes-1):] for preds in temp_preds], dtype=np.float32)
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes CFs and other related variables."""
@@ -149,7 +134,6 @@ class DiceTensorFlow2(ExplainerBase):
             self.features_to_vary = features_to_vary
             self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)
             self.freezer = tf.constant([1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))])
-
 
         # CF initialization
         if len(self.cfs) != self.total_CFs:
@@ -210,16 +194,16 @@ class DiceTensorFlow2(ExplainerBase):
         yloss = 0.0
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
-                temp_loss = tf.pow((self.get_model_tensor(i) - self.target_cf_class), 2)
-                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):][0][0]
+                temp_loss = tf.pow((self.model.get_output(self.cfs[i]) - self.target_cf_class), 2)
+                temp_loss = temp_loss[:,(self.num_output_nodes-1):][0][0]
             elif self.yloss_type == "log_loss":
-                temp_logits = tf.compat.v1.log((tf.abs(self.get_model_tensor(i) - 0.000001))/(1 - tf.abs(self.get_model_tensor(i) - 0.000001)))
-                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
+                temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = temp_logits[:,(self.num_output_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf_class)[0][0]
             elif self.yloss_type == "hinge_loss":
-                temp_logits = tf.compat.v1.log((tf.abs(self.get_model_tensor(i) - 0.000001))/(1 - tf.abs(self.get_model_tensor(i) - 0.000001)))
-                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
+                temp_logits = tf.compat.v1.log((tf.abs(self.model.get_output(self.cfs[i]) - 0.000001))/(1 - tf.abs(self.model.get_output(self.cfs[i]) - 0.000001)))
+                temp_logits = temp_logits[:,(self.num_output_nodes-1):]
                 temp_loss = tf.compat.v1.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf_class)
 
@@ -504,7 +488,7 @@ class DiceTensorFlow2(ExplainerBase):
 
         self.elapsed = timeit.default_timer() - start_time
 
-        self.cfs_preds = [self.predict_fn(tf.constant(cfs, dtype=tf.float32)) for cfs in self.final_cfs]
+        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
         # update final_cfs from backed up CFs if valid CFs are not found
         if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in self.cfs_preds))):

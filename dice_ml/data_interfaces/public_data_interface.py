@@ -247,9 +247,7 @@ class PublicData:
                         list(set(normalized_train_df[feature].tolist())))), quantile)
         return quantiles
 
-    def get_data_params_for_gradient_dice(self):
-        """Gets all data related params for DiCE."""
-
+    def create_ohe_params(self):
         if len(self.categorical_feature_names) > 0:
             one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
             self.ohe_encoded_feature_names = [x for x in one_hot_encoded_data.columns.tolist(
@@ -261,6 +259,10 @@ class PublicData:
         self.ohe_base_df = self.prepare_df_for_ohe_encoding() # base dataframe for doing one-hot-encoding
         # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters) when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
 
+    def get_data_params_for_gradient_dice(self):
+        """Gets all data related params for DiCE."""
+
+        self.create_ohe_params()
         minx, maxx = self.get_minx_maxx(normalized=True)
 
         # get the column indexes of categorical and continuous features after one-hot-encoding
@@ -274,7 +276,7 @@ class PublicData:
         cont_maxx = list(org_maxx[0][encoded_continuous_feature_indexes])
 
         # decimal precisions for continuous features
-        cont_precisions = [self.get_decimal_precisions()[ix] for ix in encoded_continuous_feature_indexes]
+        cont_precisions = [self.get_decimal_precisions()[ix] for ix in range(len(self.continuous_feature_names))]
 
         return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, cont_minx, cont_maxx, cont_precisions
 
@@ -339,7 +341,7 @@ class PublicData:
     def get_decimal_precisions(self):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
-        precisions = [0] * len(self.feature_names)
+        precisions = [0] * len(self.continuous_feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
             if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]
