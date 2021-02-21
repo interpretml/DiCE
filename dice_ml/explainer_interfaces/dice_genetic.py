@@ -6,11 +6,14 @@ This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time'
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import math
 import numpy as np
+import pandas as pd
 import random
 import timeit
 import copy
+from sklearn.preprocessing import LabelEncoder
 
 from dice_ml import diverse_counterfactuals as exp
+
 
 class DiceGenetic(ExplainerBase):
 
@@ -32,7 +35,8 @@ class DiceGenetic(ExplainerBase):
 
         # number of output nodes of ML model
         if self.model.model_type == 'classifier':
-            self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
+            #self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
+            self.num_output_nodes = self.model.get_num_output_nodes2(self.data_interface.data_df[0:1])
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
@@ -43,6 +47,14 @@ class DiceGenetic(ExplainerBase):
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
 
         self.population_size = 100
+        # # Initializing a label encoder to obtain label-encoded values for categorical variables
+        self.labelencoder = {}
+        #
+        self.label_encoded_data = self.data_interface.data_df.copy()
+        #
+        for column in self.data_interface.categorical_feature_names:
+            self.labelencoder[column] = LabelEncoder()
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_interface.data_df[column])
 
     def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
         """Update hyperparameters of the loss function"""
@@ -64,7 +76,7 @@ class DiceGenetic(ExplainerBase):
         if feature_weights != self.feature_weights_input:
             self.feature_weights_input = feature_weights
             if feature_weights == "inverse_mad":
-                normalized_mads = self.data_interface.get_valid_mads(normalized=True)
+                normalized_mads = self.data_interface.get_valid_mads(normalized=False)
                 feature_weights = {}
                 for feature in normalized_mads:
                     feature_weights[feature] = round(1 / normalized_mads[feature], 2)
@@ -81,7 +93,8 @@ class DiceGenetic(ExplainerBase):
                     if feature in feature_weights:
                         feature_weights_list.append(feature_weights[feature])
                     else:
-                        feature_weights_list.append(self.data_interface.label_encoded_data[feature].max())
+                        # TODO: why is the weight the max value of the encoded feature
+                        feature_weights_list.append(self.label_encoded_data[feature].max())
             self.feature_weights_list = [feature_weights_list]
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary, desired_range, desired_class, query_instance, verbose):
@@ -109,7 +122,10 @@ class DiceGenetic(ExplainerBase):
                 one_init = [[]]
                 for jx, feature in enumerate(self.data_interface.feature_names):
                     if feature in features_to_vary:
-                        one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                        if feature in self.data_interface.continuous_feature_names:
+                            one_init[0].append(np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]))
+                        else:
+                            one_init[0].append(np.random.choice(self.feature_range[feature]))
                     else:
                         one_init[0].append(query_instance[0][jx])
                 if self.model.model_type == 'classifier':
@@ -132,12 +148,12 @@ class DiceGenetic(ExplainerBase):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
-        self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True, encoding='label')
+        self.feature_range = self.get_valid_feature_range(normalized=False) #, encoding='label')
         self.do_cf_initializations(total_CFs, algorithm, features_to_vary, desired_range, desired_class, query_instance, verbose)
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", proximity_weight=0.5,
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary", verbose=True):
@@ -168,7 +184,8 @@ class DiceGenetic(ExplainerBase):
         self.check_permitted_range(permitted_range)
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='label')
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance = self.label_encode(query_instance)
         query_instance = np.array([query_instance.iloc[0].values])
         self.x1 = query_instance
 
@@ -200,13 +217,14 @@ class DiceGenetic(ExplainerBase):
         self.do_param_initializations(total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
+        query_instance_df = self.label_decode(query_instance)
+        self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+        self.final_cfs_df_sparse = self.label_decode_cfs(self.final_cfs_sparse)
         return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          test_instance=query_instance,
-                                          test_pred=test_pred,
-                                          final_cfs=self.final_cfs,
-                                          final_cfs_preds=self.cfs_preds,
-                                          final_cfs_sparse=self.final_cfs_sparse,
-                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          test_instance_df=query_instance_df,
+                                          test_instance_pred=test_pred,
+                                          final_cfs_df=self.final_cfs_df,
+                                          final_cfs_df_sparse=self.final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
                                           desired_class=desired_class,
@@ -215,10 +233,12 @@ class DiceGenetic(ExplainerBase):
 
     def predict_proba_fn(self, input_instance):
         """returns prediction probabilities"""
+        input_instance = self.label_decode(input_instance)
         return self.model.get_output(input_instance)[0]
 
     def predict_fn(self, input_instance):
         """returns predictions"""
+        input_instance = self.label_decode(input_instance)
         return self.model.model.predict(input_instance)[0]
 
 
@@ -258,7 +278,7 @@ class DiceGenetic(ExplainerBase):
         proximity_loss = 0.0
         for i in range(self.total_CFs):
             proximity_loss += self.compute_dist(cfs[i], self.x1)
-        return proximity_loss / len(self.minx[0])
+        return proximity_loss / len(self.data_interface.feature_names)
 
     def dpp_style(self, submethod, cfs):
         """Computes the DPP of a matrix."""
@@ -315,11 +335,12 @@ class DiceGenetic(ExplainerBase):
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
         self.proximity_loss = self.compute_proximity_loss(cfs) if self.proximity_weight > 0 else 0.0
         self.diversity_loss = self.compute_diversity_loss(cfs) if self.diversity_weight > 0 else 0.0
-        self.regularization_loss = self.compute_regularization_loss(cfs)
+        # TODO this is not needed for label encoding
+        #self.regularization_loss = self.compute_regularization_loss(cfs)
 
         self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) - (
-                    self.diversity_weight * self.diversity_loss) + (
-                                self.categorical_penalty * self.regularization_loss)
+                    self.diversity_weight * self.diversity_loss) #+ (
+                                #self.categorical_penalty * self.regularization_loss)
 
         return self.loss
 
@@ -331,7 +352,12 @@ class DiceGenetic(ExplainerBase):
         for i in range(self.total_CFs):
             # temp_child_chromosome = []
             one_init = [[]]
-            for jx, (gp1, gp2) in enumerate(zip(k1[i][0], k2[i][0])):
+            for j in range(len(self.data_interface.feature_names)):
+            #for jx, (gp1, gp2) in enumerate(zip(k1[i][0], k2[i][0])):
+                gp1 = k1[i][0][j]
+                gp2 = k2[i][0][j]
+                feat_name = self.data_interface.feature_names[j]
+
                 # random probability
                 prob = random.random()
 
@@ -345,7 +371,11 @@ class DiceGenetic(ExplainerBase):
 
                 #otherwise insert random gene(mutate) for maintaining diversity
                 else:
-                     one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                    if feat_name in self.data_interface.continuous_feature_names:
+                        one_init[0].append(np.random.uniform(self.feature_range[feat_name][0], self.feature_range[feat_name][0]))
+                    else:
+                        one_init[0].append(np.random.choice(self.feature_range[feat_name]))
+
             child_chromosome.append(np.array(one_init))
         return child_chromosome
 
@@ -422,3 +452,40 @@ class DiceGenetic(ExplainerBase):
                   m, 'min %02d' % s, 'sec')
 
         return query_instance
+
+    def label_encode(self, input_instance):
+        for column in self.data_interface.categorical_feature_names:
+            input_instance[column] = self.labelencoder[column].transform(input_instance[column])
+        return input_instance
+
+    def label_decode(self, labelled_input):
+        labelled_input = labelled_input[0]
+        input_instance = {}
+        for i in range(len(labelled_input)):
+            if self.data_interface.feature_names[i] in self.data_interface.categorical_feature_names:
+                enc = self.labelencoder[self.data_interface.feature_names[i]]
+                val  = enc.inverse_transform(np.array([labelled_input[i]], dtype=np.int32))
+                input_instance[self.data_interface.feature_names[i]] = val
+            else:
+                input_instance[self.data_interface.feature_names[i]] =labelled_input[i]
+
+        input_instance_df = pd.DataFrame(input_instance, columns=self.data_interface.feature_names, index=[0])
+        return input_instance_df
+
+    def label_decode_cfs(self, cfs_arr):
+        ret_df = None
+        if cfs_arr is None:
+            return None
+        for cf in cfs_arr:
+            df = self.label_decode(cf)
+            if ret_df is None:
+                ret_df = df
+            else:
+                ret_df = ret_df.append(df)
+        return ret_df
+
+    def get_valid_feature_range(self, normalized=True):
+        ret = self.data_interface.get_valid_feature_range(normalized=normalized)
+        for feat_name in self.data_interface.categorical_feature_names:
+            ret[feat_name] = self.labelencoder[feat_name].transform(ret[feat_name])
+        return ret

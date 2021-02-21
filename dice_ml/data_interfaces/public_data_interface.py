@@ -6,8 +6,6 @@ from sklearn.model_selection import train_test_split
 import logging
 from collections import defaultdict
 
-from sklearn.preprocessing import LabelEncoder
-
 
 class PublicData:
     """A data interface for public data. This class is an interface to DiCE explainers and contains methods to transform user-fed raw data into the format a DiCE explainer requires, and vice versa."""
@@ -78,14 +76,6 @@ class PublicData:
                                 #     ) if x not in np.array([self.outcome_name])]
 
         # should move the below snippet to model agnostic dice interfaces
-                                # # Initializing a label encoder to obtain label-encoded values for categorical variables
-                                # self.labelencoder = {}
-                                #
-                                # self.label_encoded_data = self.data_df.copy()
-                                #
-                                # for column in self.categorical_feature_names:
-                                #     self.labelencoder[column] = LabelEncoder()
-                                #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
@@ -124,6 +114,8 @@ class PublicData:
         for feature_name in self.continuous_feature_names:
             ranges[feature_name] = [
                 self.data_df[feature_name].min(), self.data_df[feature_name].max()]
+        for feature_name in self.categorical_feature_names:
+            ranges[feature_name] = self.data_df[feature_name].unique()
         return ranges
 
     def get_data_type(self, col):
@@ -166,6 +158,37 @@ class PublicData:
             result[feature_name] = (
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
+
+    def get_valid_feature_range(self, normalized=True):
+        """Gets the min/max value of features in normalized or de-normalized
+        form. Assumes that all features are already encoded to numerical form
+        such that the number of features remains the same.
+
+        # TODO needs work adhere to label encoded max and to support permitted_range for
+        both continuous and discrete when provided in _generate_counterfactuals.
+        """
+        feature_range = {}
+
+        for idx, feature_name in enumerate(self.feature_names):
+            feature_range[feature_name] = []
+            if feature_name in self.continuous_feature_names:
+                max_value = self.data_df[feature_name].max()
+                min_value = self.data_df[feature_name].min()
+
+                if normalized:
+                    minx = (self.permitted_range[feature_name]
+                                    [0] - min_value) / (max_value - min_value)
+                    maxx = (self.permitted_range[feature_name]
+                                    [1] - min_value) / (max_value - min_value)
+                else:
+                    minx = self.permitted_range[feature_name][0]
+                    maxx = self.permitted_range[feature_name][1]
+                feature_range[feature_name].append(minx)
+                feature_range[feature_name].append(maxx)
+            else:
+                # categorical features
+                feature_range[feature_name] =  self.permitted_range[feature_name]
+        return feature_range
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
