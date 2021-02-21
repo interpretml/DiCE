@@ -47,6 +47,24 @@ class ExplainerBase:
                 # self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
     def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+        """Generate counterfactuals by randomly sampling features.
+
+        :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.
+        :param total_CFs: Total number of counterfactuals required.
+
+        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+        :param features_to_vary: Either a string "all" or a list of feature names to vary.
+        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
+        :param sample_size: Sampling size
+        :param random_seed: Random seed for reproducibility
+
+        :returns: A CounterfactualExplanations object that contains the list of
+        counterfactual examples per query_instance as one of its attributes.
+        """
+
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
@@ -81,6 +99,9 @@ class ExplainerBase:
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
+
+        :returns: A CounterfactualExamples object that contains the dataframe
+        of generated counterfactuals as an attribute.
         """
         # permitted range for continuous features
         if permitted_range is not None:
@@ -396,7 +417,7 @@ class ExplainerBase:
         all the following parameters are ignored.
         :param total_CFs: The number of counterfactuals to generate per input
         (default is 10)
-        :param other parameters: These are the same as the
+        :param other_parameters: These are the same as the
         generate_counterfactuals method.
 
         :returns: An object of class CounterfactualExplanations that includes
