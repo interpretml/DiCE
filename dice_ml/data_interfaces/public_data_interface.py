@@ -379,7 +379,7 @@ class PublicData:
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
         levels = []
-        colnames = self.categorical_feature_names
+        colnames = [feat for feat in self.categorical_feature_names]
         for cat_feature in colnames:
             levels.append(self.data_df[cat_feature].cat.categories.tolist())
 
@@ -392,7 +392,7 @@ class PublicData:
             temp_df = pd.DataFrame({colnames[col]: levels[col]})
             df = pd.concat([df, temp_df], axis=1, sort=False)
 
-        colnames = self.continuous_feature_names
+        colnames = [feat for feat in self.continuous_feature_names]
         for col in range(0, len(colnames)):
             temp_df = pd.DataFrame({colnames[col]: []})
             df = pd.concat([df, temp_df], axis=1, sort=False)
