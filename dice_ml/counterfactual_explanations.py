@@ -14,11 +14,9 @@ def as_counterfactual_explanations(json_dict):
             cf_examples_dict = json.loads(cf_examples_str)
             test_instance_df = pd.read_json(cf_examples_dict["test_instance_df"])
             cfs_df = pd.read_json(cf_examples_dict["final_cfs_df"])
-            test_pred = cf_examples_dict["test_instance_pred"]
             cf_examples_list.append(
                     counterfactual_examples.CounterfactualExamples(data_interface=None,
                                           test_instance_df=test_instance_df,
-                                          test_instance_pred=test_pred,
                                           final_cfs_df=cfs_df,
                                           final_cfs_df_sparse=cfs_df,
                                           posthoc_sparsity_param=None,
