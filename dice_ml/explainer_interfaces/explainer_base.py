@@ -342,9 +342,9 @@ class ExplainerBase:
 
                 elif self.model.model_type == 'regressor':
                     if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
-                        left = current_val + (10 ** -decimal_prec[feat_ix])
+                        left = current_val + (10 ** -decimal_prec[feature])
                     else:
-                        right = current_val - (10 ** -decimal_prec[feat_ix])
+                        right = current_val - (10 ** -decimal_prec[feature])
 
         else:
             left = query_instance[feature].iloc[0]
