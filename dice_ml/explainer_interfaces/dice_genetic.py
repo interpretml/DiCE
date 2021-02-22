@@ -218,17 +218,20 @@ class DiceGenetic(ExplainerBase):
 
         query_instance = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         query_instance_df = self.label_decode(query_instance)
+        query_instance_df[self.data_interface.outcome_name] = test_pred
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+        if self.final_cfs_df is not None:
+            self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
         self.final_cfs_df_sparse = self.label_decode_cfs(self.final_cfs_sparse)
+        if self.final_cfs_df_sparse is not None:
+            self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.cfs_preds_sparse
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
-                                          test_instance_pred=test_pred,
                                           final_cfs_df=self.final_cfs_df,
                                           final_cfs_df_sparse=self.final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
                                           desired_class=desired_class,
-                                          encoding='label',
                                           model_type=self.model.model_type)
 
     def predict_proba_fn(self, input_instance):
@@ -239,6 +242,8 @@ class DiceGenetic(ExplainerBase):
     def predict_fn(self, input_instance):
         """returns predictions"""
         input_instance = self.label_decode(input_instance)
+        # TODO this line needs to change---we should not call model.model directly here
+        # that functionality should be in the model class
         return self.model.model.predict(input_instance)[0]
 
 

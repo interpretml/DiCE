@@ -167,7 +167,7 @@ class PublicData:
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
 
-    def get_valid_feature_range2(self, normalized=True):
+    def get_valid_feature_range(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized
         form. Assumes that all features are already encoded to numerical form
         such that the number of features remains the same.
