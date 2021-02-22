@@ -25,24 +25,33 @@ class DiceKD(ExplainerBase):
         self.total_random_inits = 0
         super().__init__(data_interface)  # initiating data related parameters
 
+        # As DiCE KD uses one-hot-encoding
+        self.data_interface.create_ohe_params()
+
         # initializing model variables
         self.model = model_interface
+        self.model.load_model()  # loading pickled trained model if applicable
+        self.model.transformer.feed_data_params(data_interface)
+        self.model.transformer.initialize_transform_func()
+
 
         # loading trained model
         self.model.load_model()
 
         # number of output nodes of ML model
         if self.model.model_type == 'classifier':
-            self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.encoded_feature_names))
+            self.num_output_nodes = self.model.get_num_output_nodes2(
+                self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
     def build_KD_tree(self, data_df_copy, desired_range, desired_class):
         # Stores the predictions on the training data
         dataset_instance = self.data_interface.prepare_query_instance(
-            query_instance=data_df_copy[self.data_interface.feature_names], encoding='one-hot')
-        dataset_dict_output = np.array([dataset_instance.values], dtype=np.float32)
-        predictions = self.predict_fn(dataset_dict_output[0])
+            query_instance=data_df_copy[self.data_interface.feature_names])
+
+        # dataset_dict_output = np.array([dataset_instance.values], dtype=np.float32)
+        predictions = self.predict_fn(dataset_instance)
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[self.predicted_outcome_name] = predictions
 
@@ -62,8 +71,8 @@ class DiceKD(ExplainerBase):
 
         return dataset_with_predictions, KD_tree, predictions
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", features_to_vary="all",
-                                 permitted_range=None, training_points_only=True, sparsity_weight=1,
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite", features_to_vary="all",
+                                 permitted_range=None, sparsity_weight=1,
                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
                                  posthoc_sparsity_algorithm="linear", verbose=True):
         """Generates diverse counterfactual explanations
@@ -74,7 +83,6 @@ class DiceKD(ExplainerBase):
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
-        :param training_points_only: Parameter to determine if the returned counterfactuals should be a subset of the training data points
         :param sparsity_weight: Parameter to determine how much importance to give to sparsity
         :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
@@ -94,27 +102,48 @@ class DiceKD(ExplainerBase):
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
+        # Prepares user defined query_instance for DiCE.
+        query_instance_orig = query_instance.copy()
+        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+
+        # find the predicted value of query_instance
+        test_pred = self.predict_fn(query_instance)[0]
+
+        query_instance[self.data_interface.outcome_name] = test_pred
+
+        if desired_range != None:
+            if desired_range[0] > desired_range[1]:
+                raise ValueError("Invalid Range!")
+
+        if desired_class == "opposite" and self.model.model_type == 'classifier':
+            if self.num_output_nodes == 2:
+                desired_class = 1.0 - test_pred
+
+            elif self.num_output_nodes > 2:
+                raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
+
+        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
+            raise ValueError("Desired class should be within 0 and num_classes-1.")
+
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions,self.KD_tree, self.predictions = self.build_KD_tree(data_df_copy, desired_range, desired_class)
 
-        query_instance, test_pred, final_cfs, cfs_preds = self.find_counterfactuals(data_df_copy,
-                                                                                    query_instance, desired_range,
+
+        query_instance, final_cfs, cfs_preds = self.find_counterfactuals(data_df_copy,
+                                                                                    query_instance, query_instance_orig,
+                                                                                    desired_range,
                                                                                     desired_class,
                                                                                     total_CFs, features_to_vary,
                                                                                     permitted_range,
-                                                                                    training_points_only,
                                                                                     sparsity_weight,
                                                                                     stopping_threshold,
                                                                                     posthoc_sparsity_param,
                                                                                     posthoc_sparsity_algorithm, verbose)
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          test_instance=query_instance,
-                                          test_pred=test_pred,
-                                          final_cfs=final_cfs,
-                                          final_cfs_preds=cfs_preds,
-                                          final_cfs_sparse=self.final_cfs_sparse,
-                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          final_cfs_df=final_cfs,
+                                          test_instance_df=query_instance,
+                                          final_cfs_df_sparse=self.final_cfs_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
                                           desired_class=desired_class,
@@ -132,7 +161,7 @@ class DiceKD(ExplainerBase):
                 if not np.isclose(row[column], query_instance[column]):
                     cnt += 1
             for column in self.data_interface.categorical_feature_names:
-                if row[column] != query_instance[column]:
+                if row[column] != query_instance[column].values[0]:
                     cnt += 1
 
             cfs.at[index, "sparsity"] = cnt
@@ -141,6 +170,7 @@ class DiceKD(ExplainerBase):
         cfs["sparsity"] = (cfs["sparsity"] - cfs["sparsity"].min()) / (cfs["sparsity"].max() - cfs["sparsity"].min())
         cfs["distancesparsity"] = cfs["distance"] + sparsity_weight * cfs["sparsity"]
         cfs = cfs.sort_values(by="distancesparsity")
+        cfs = cfs.drop(["distance", "sparsity", "distancesparsity"], axis=1)
 
         return cfs
 
@@ -182,20 +212,17 @@ class DiceKD(ExplainerBase):
                 if desired_range[0] <= test_pred <= desired_range[1]:
                     cfs_found.append(temp_cf)
                     cfs_found_preds.append(test_pred)
-                    print(test_pred)
 
             if len(cfs_found) == cfs_needed:
                 return cfs_found, cfs_found_preds
 
         return cfs_found, cfs_found_preds
 
-    def vary_only_features_to_vary(self, data_df_copy, desired_range, desired_class, KD_query_instance, total_CFs, features_to_vary, query_instance,
-                                   training_points_only, sparsity_weight):
+    def vary_only_features_to_vary(self, KD_query_instance, total_CFs, features_to_vary, permitted_range, query_instance, sparsity_weight):
         """This function ensures that we only vary features_to_vary when generating counterfactuals"""
 
-        # sampling k^2 points closest points from the KD tree.
         # TODO: this should be a user-specified parameter
-        num_queries = min(len(self.dataset_with_predictions), total_CFs*total_CFs)
+        num_queries = min(len(self.dataset_with_predictions), total_CFs * 10)
         cfs = []
 
         if self.KD_tree is not None:
@@ -207,7 +234,8 @@ class DiceKD(ExplainerBase):
             cfs['distance'] = distances
             cfs = self.do_sparsity_check(cfs, query_instance, sparsity_weight)
             cfs = cfs.drop(self.data_interface.outcome_name, axis=1)
-        final_cfs = []
+
+
         final_indices = []
         cfs_preds = []
         total_cfs_found = 0
@@ -223,129 +251,30 @@ class DiceKD(ExplainerBase):
                     break
 
             if valid_cf_found:
-                total_cfs_found += 1
-                final_indices.append(i)
+                if not self.duplicates(cfs, final_indices.copy(), i):
+                    total_cfs_found += 1
+                    final_indices.append(i)
 
         if total_cfs_found > 0:
-            final_cfs_temp = cfs.iloc[final_indices].to_dict('records')
-            final_cfs_temp = self.data_interface.prepare_query_instance(query_instance=final_cfs_temp,
-                                                                        encoding='one-hot').values
-            final_cfs = [final_cfs_temp[i, :].reshape(1, -1) for i in range(final_cfs_temp.shape[0])]
+            final_cfs = cfs.iloc[final_indices]
 
             # Finding the predicted outcome for each cf
             for i in range(total_cfs_found):
                 cfs_preds.append(
                     self.dataset_with_predictions.iloc[final_indices[i]][self.predicted_outcome_name])
 
-        if total_cfs_found >= total_CFs or training_points_only:
             return final_cfs[:total_CFs], cfs_preds
 
-        print(total_cfs_found, "Counterfactuals found so far. Moving on to non-training points")
+    def duplicates(self, cfs, final_indices, i):
+        final_indices.append(i)
+        temp_cfs = cfs.iloc[final_indices]
+        return temp_cfs.duplicated().iloc[-1]
 
-        # Now, generating counterfactuals that aren't part of the training data
-        i = 0
-        j = 0
-        start_eps = 1
-        eps1 = start_eps
-        eps2 = start_eps
-
-        mads = self.data_interface.get_valid_mads()
-        max_eps = self.data_interface.max_range
-        # TODO: this should be a user-specified parameter
-        sample_size = max(50, total_CFs*4)
-
-        stop_method_1 = False
-        stop_method_2 = False
-
-        # This part of the code randomly samples points within a ball of epsilon around each point obtained from the KD tree.
-        while (not stop_method_1) or (not stop_method_2):
-            # Method 1 implements perturbations of all valid radii before proceeding to the next instance
-            if not stop_method_1:
-
-                if self.KD_tree is None:
-                    cf_to_send = query_instance
-                else:
-                    cf_to_send = cfs.iloc[i]
-
-                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps1, sample_size,cf_to_send ,
-                                                                  mads, query_instance, desired_range, desired_class,
-                                                                  total_CFs - total_cfs_found)
-                final_cfs.extend(cfs_found)
-                cfs_preds.extend(cfs_found_preds)
-                total_cfs_found += len(cfs_found)
-
-                # if total_CFs number of counterfactuals are already found, return
-                if total_cfs_found == total_CFs:
-                    return final_cfs, cfs_preds
-
-                # double epsilon until it reaches the maximum value
-                eps1 *= 2
-
-                if eps1 > max_eps:
-                    eps1 = start_eps
-                    i += 1
-
-                # stop method 1 when you have iterated through all instances
-                if i == num_queries:
-                    stop_method_1 = True
-
-            # Method 2 implements perturbations of particular radius for all instances before doubling the radius
-            if not stop_method_2:
-                if self.KD_tree is None:
-                    cf_to_send = query_instance
-                else:
-                    cf_to_send = cfs.iloc[j]
-
-                cfs_found, cfs_found_preds = self.get_samples_eps(data_df_copy, features_to_vary, eps2, sample_size, cf_to_send,
-                                                                  mads, query_instance, desired_range, desired_class,
-                                                                  total_CFs - total_cfs_found)
-                final_cfs.extend(cfs_found)
-                cfs_preds.extend(cfs_found_preds)
-                total_cfs_found += len(cfs_found)
-
-                # if total_CFs number of counterfactuals are already found, return
-                if total_cfs_found == total_CFs:
-                    return final_cfs, cfs_preds
-
-                # double epsilon when all instances have been covered
-                if j == num_queries - 1:
-                    j = -1
-                    eps2 *= 2
-
-                # stop method 2 when epsilon has reached the maximum value
-                if eps2 > max_eps:
-                    stop_method_2 = True
-                j += 1
-
-        return final_cfs, cfs_preds
-
-    def find_counterfactuals(self, data_df_copy, query_instance, desired_range, desired_class, total_CFs, features_to_vary, permitted_range,
-                             training_points_only, sparsity_weight, stopping_threshold,
-                             posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
+    def find_counterfactuals(self, data_df_copy, query_instance, query_instance_orig, desired_range, desired_class, total_CFs, features_to_vary, permitted_range,
+                            sparsity_weight, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose):
         """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
-        # Prepares user defined query_instance for DiCE.
-        query_instance_orig = query_instance
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        query_instance = np.array([query_instance.iloc[0].values])
-
-        # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
-
-        if desired_range != None:
-            if desired_range[0] > desired_range[1]:
-                raise ValueError("Invalid Range!")
-
-        if desired_class == "opposite" and self.model.model_type == 'classifier':
-            if self.num_output_nodes == 2:
-                desired_class = 1.0 - test_pred
-
-            elif self.num_output_nodes > 2:
-                raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
-
-        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
-            raise ValueError("Desired class should be within 0 and num_classes-1.")
-
+        self.stopping_threshold = stopping_threshold
         if self.model.model_type == 'classifier':
             self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
         elif self.model.model_type == 'regressor':
@@ -357,48 +286,38 @@ class DiceKD(ExplainerBase):
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
                 self.stopping_threshold = 0.75
 
-        query_instance_copy = query_instance_orig.copy()
-
-        # preparing query instance for conversion to pandas dataframe
-        for q in query_instance_copy:
-            query_instance_copy[q] = [query_instance_copy[q]]
-        query_instance_df = pd.DataFrame.from_dict(query_instance_copy)
-
         start_time = timeit.default_timer()
 
         # Making the one-hot-encoded version of query instance match the one-hot encoded version of the dataset
-        query_instance_df_dummies = pd.get_dummies(query_instance_df)
+        query_instance_df_dummies = pd.get_dummies(query_instance_orig)
         for col in pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns:
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
 
-        final_cfs, cfs_preds = self.vary_only_features_to_vary(data_df_copy,
-                                                               desired_range,
-                                                               desired_class,
-                                                               query_instance_df_dummies,
+        final_cfs, cfs_preds = self.vary_only_features_to_vary(query_instance_df_dummies,
                                                                total_CFs,
                                                                features_to_vary,
+                                                               permitted_range,
                                                                query_instance_orig,
-                                                               training_points_only, sparsity_weight)
+                                                               sparsity_weight)
 
+        final_cfs = final_cfs.drop([self.predicted_outcome_name], axis=1)
         total_cfs_found = len(final_cfs)
         if total_cfs_found > 0:
             # post-hoc operation on continuous features to enhance sparsity - only for public data
             if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
                 final_cfs_sparse = copy.deepcopy(final_cfs)
-                cfs_preds_sparse = copy.deepcopy(cfs_preds)
-                self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(total_CFs,
-                                                                                                    final_cfs_sparse,
-                                                                                                    cfs_preds_sparse,
-                                                                                                    query_instance,
-                                                                                                    posthoc_sparsity_param,
-                                                                                                    posthoc_sparsity_algorithm)
+                self.final_cfs_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
             else:
                 self.final_cfs_sparse = None
-                self.cfs_preds_sparse = None
         else:
             self.final_cfs_sparse = None
-            self.cfs_preds_sparse = None
+
+        # to display the values with the same precision as the original data
+        precisions = self.data_interface.get_decimal_precisions()
+        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+            final_cfs[feature] = final_cfs[feature].astype(float).round(precisions[ix])
+            self.final_cfs_sparse[feature] = self.final_cfs_sparse[feature].astype(float).round(precisions[ix])
 
         self.elapsed = timeit.default_timer() - start_time
 
@@ -414,4 +333,4 @@ class DiceKD(ExplainerBase):
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
-        return query_instance, test_pred, final_cfs, cfs_preds
+        return query_instance, final_cfs, cfs_preds
