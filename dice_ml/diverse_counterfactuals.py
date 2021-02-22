@@ -2,10 +2,16 @@ import numpy as np
 import pandas as pd
 import copy
 from IPython.display import display
-
 import json
-import dice_ml.utils.serialize
 
+
+def json_converter(obj):
+    """ Helper function to convert object to json.
+    """
+    try:
+        return obj.to_json()
+    except AttributeError:
+        return obj.__dict__
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
@@ -129,4 +135,4 @@ class CounterfactualExamples:
                'desired_range': self.desired_range,
                'test_instance_df': self.test_instance_df,
                'final_cfs_df': df}
-        return json.dumps(obj, default=dice_ml.utils.serialize.json_converter)
+        return json.dumps(obj, default=json_converter)
