@@ -85,8 +85,6 @@ class TestDiceTensorFlowMethods:
         Tets correctness of final CFs and their predictions for sample query instance.
         """
         dice_exp = self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
-        test_cfs = [[70.0, 'Private', 'Masters', 'Single', 'White-Collar', 'White', 'Female', 51.0, 0.534], [19.0, 'Self-Employed', 'Doctorate', 'Married', 'Service', 'White', 'Female', 44.0, 0.815], [47.0, 'Private', 'HS-grad', 'Married', 'Service', 'White', 'Female', 45.0, 0.589], [36.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Female', 62.0, 0.937]]
-        assert dice_exp.final_cfs_list == test_cfs
+        test_cfs = [[70.0, 'Private', 'Masters', 'Single', 'White-Collar', 'White', 'Female', 51.0, 0.534], [22.0, 'Self-Employed', 'Doctorate', 'Married', 'Service', 'White', 'Female', 45.0, 0.861], [47.0, 'Private', 'HS-grad', 'Married', 'Service', 'White', 'Female', 45.0, 0.589], [36.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Female', 62.0, 0.937]]
+        assert dice_exp.final_cfs_df_sparse.values.tolist() == test_cfs
 
-        preds = [np.round(preds.flatten().tolist(), 3)[0] for preds in dice_exp.final_cfs_preds]
-        assert pytest.approx(preds, abs=1e-3) == [0.534, 0.815, 0.589, 0.937]
