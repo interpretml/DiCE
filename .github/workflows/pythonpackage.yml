@@ -40,7 +40,7 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-	- name: Check package consistency with twine
-	  run: |
-		python setup.py check sdist bdist_wheel
-		twine check dist/* 
+    - name: Check package consistency with twine
+      run: |
+        python setup.py check sdist bdist_wheel
+        twine check dist/* 
