@@ -3,6 +3,7 @@ import pytest
 
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.utils.helpers import DataTransfomer
 
 pyt = pytest.importorskip("torch")
 
@@ -10,7 +11,7 @@ pyt = pytest.importorskip("torch")
 def pyt_model_object():
     backend = 'PYT'
     ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
-    m = dice_ml.Model(model_path= ML_modelpath, backend=backend)
+    m = dice_ml.Model(model_path= ML_modelpath, backend=backend, func='ohe-min-max')
     return m
 
 def test_model_initiation(pyt_model_object):
@@ -36,9 +37,16 @@ class TestPyTorchModelMethods:
         self.m.load_model()
         assert self.m.model is not None
 
-    @pytest.mark.parametrize("input_instance, prediction",[(np.array([[0.5]*29], dtype=np.float32), 0.0957)])
-    def test_model_output(self, input_instance, prediction):
-        self.m.load_model()
-        input_instance_pyt = pyt.tensor(input_instance)
-        prediction = self.m.get_output(input_instance_pyt).detach().numpy()[0][0]
+    # @pytest.mark.parametrize("input_instance, prediction",[(np.array([[0.5]*29], dtype=np.float32), 0.0957)])
+    # def test_model_output(self, input_instance, prediction):
+    #     self.m.load_model()
+    #     input_instance_pyt = pyt.tensor(input_instance)
+    #     prediction = self.m.get_output(input_instance_pyt).detach().numpy()[0][0]
+    #     pytest.approx(prediction, abs=1e-3) == prediction
+    def test_model_output(self, sample_adultincome_query, public_data_object, prediction):
+        # initializing data transormation required for ML model
+        self.m.transformer = DataTransfomer(func='ohe-min-max', kw_args=None)
+        self.m.transformer.feed_data_params(public_data_object)
+        self.m.transformer.initialize_transform_func()
+        output_instance = self.m.get_output(sample_adultincome_query, transform_data=True).detach().numpy()[0][0]        
         pytest.approx(prediction, abs=1e-3) == prediction

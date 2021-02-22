@@ -76,6 +76,14 @@ class PublicData:
                                 #     ) if x not in np.array([self.outcome_name])]
 
         # should move the below snippet to model agnostic dice interfaces
+                                # # Initializing a label encoder to obtain label-encoded values for categorical variables
+                                # self.labelencoder = {}
+                                #
+                                # self.label_encoded_data = self.data_df.copy()
+                                #
+                                # for column in self.categorical_feature_names:
+                                #     self.labelencoder[column] = LabelEncoder()
+                                #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
         self.permitted_range = self.get_features_range()
         if 'permitted_range' in params:
@@ -159,7 +167,7 @@ class PublicData:
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
 
-    def get_valid_feature_range(self, normalized=True):
+    def get_valid_feature_range2(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized
         form. Assumes that all features are already encoded to numerical form
         such that the number of features remains the same.
@@ -410,7 +418,7 @@ class PublicData:
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
         levels = []
-        colnames = self.categorical_feature_names
+        colnames = [feat for feat in self.categorical_feature_names]
         for cat_feature in colnames:
             levels.append(self.data_df[cat_feature].cat.categories.tolist())
 
@@ -423,7 +431,7 @@ class PublicData:
             temp_df = pd.DataFrame({colnames[col]: levels[col]})
             df = pd.concat([df, temp_df], axis=1, sort=False)
 
-        colnames = self.continuous_feature_names
+        colnames = [feat for feat in self.continuous_feature_names]
         for col in range(0, len(colnames)):
             temp_df = pd.DataFrame({colnames[col]: []})
             df = pd.concat([df, temp_df], axis=1, sort=False)

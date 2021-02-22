@@ -182,6 +182,11 @@ class DiceTensorFlow1(ExplainerBase):
         temp_preds = self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
         return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds])
 
+    def predict_fn_for_sparsity(self, input_instance):
+        """prediction function for sparsity correction"""
+        input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance).values
+        return self.predict_fn(input_instance)
+
     def compute_yloss(self, method):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
@@ -587,7 +592,7 @@ class DiceTensorFlow1(ExplainerBase):
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
-            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm, total_random_inits=self.total_random_inits)
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             final_cfs_df_sparse = None
 

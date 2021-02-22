@@ -9,8 +9,9 @@ import dice_ml
 
 # for data transformations
 from sklearn.preprocessing import FunctionTransformer
+from sklearn.model_selection import train_test_split
 
-def load_adult_income_dataset():
+def load_adult_income_dataset(only_train=True):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
     :return adult_data: returns preprocessed adult income dataset.
@@ -57,6 +58,10 @@ def load_adult_income_dataset():
                                           '12th':'School', '5th-6th':'School', '1st-4th':'School', 'Preschool':'School'}})
 
     adult_data = adult_data.rename(columns={'marital-status': 'marital_status', 'hours-per-week': 'hours_per_week'})
+
+    if only_train:
+        train, _ = train_test_split(adult_data, test_size=0.2, random_state=17)
+        adult_data = train.reset_index(drop=True)
 
     return adult_data
 
