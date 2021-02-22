@@ -25,13 +25,7 @@ class DiceGenetic(ExplainerBase):
 
         """
 
-        super().__init__(data_interface)  # initiating data related parameters
-
-        # initializing model variables
-        self.model = model_interface
-
-        # loading trained model
-        self.model.load_model()
+        super().__init__(data_interface, model_interface)  # initiating data related parameters
 
         # number of output nodes of ML model
         if self.model.model_type == 'classifier':
