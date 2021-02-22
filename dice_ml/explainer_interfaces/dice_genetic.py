@@ -464,7 +464,7 @@ class DiceGenetic(ExplainerBase):
             input_instance[column] = self.labelencoder[column].transform(input_instance[column])
         return input_instance
 
-    def from_label(self, data)
+    def from_label(self, data):
         """Transforms label encoded data back to categorical values
         """
 	out = data.copy()
