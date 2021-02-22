@@ -7,6 +7,7 @@ import pandas as pd
 import random
 import timeit
 import copy
+from collections.abc import Iterable
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
@@ -45,10 +46,35 @@ class ExplainerBase:
                 # # decimal precisions for continuous features
                 # self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals_batch(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+    def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+        """Generate counterfactuals by randomly sampling features.
+
+        :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.
+        :param total_CFs: Total number of counterfactuals required.
+
+        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+        :param features_to_vary: Either a string "all" or a list of feature names to vary.
+        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
+        :param sample_size: Sampling size
+        :param random_seed: Random seed for reproducibility
+
+        :returns: A CounterfactualExplanations object that contains the list of
+        counterfactual examples per query_instance as one of its attributes.
+        """
+
         cf_examples_arr = []
-        for query_instance in query_instances:
-            res = self.generate_counterfactuals(query_instance, total_CFs,
+        query_instances_list = []
+        if isinstance(query_instances, pd.DataFrame):
+            for ix in range(query_instances.shape[0]):
+                query_instances_list.append(query_instances[ix:(ix+1)])
+        elif isinstance(query_instances, Iterable):
+            query_instances_list = query_instances
+            #query_instances = query_instances.to_dict("records")
+        for query_instance in query_instances_list:
+            res = self._generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
@@ -59,7 +85,7 @@ class ExplainerBase:
             cf_examples_arr.append(res)
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
@@ -73,6 +99,9 @@ class ExplainerBase:
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
+
+        :returns: A CounterfactualExamples object that contains the dataframe
+        of generated counterfactuals as an attribute.
         """
         # permitted range for continuous features
         if permitted_range is not None:
@@ -386,7 +415,7 @@ class ExplainerBase:
         all the following parameters are ignored.
         :param total_CFs: The number of counterfactuals to generate per input
         (default is 10)
-        :param other parameters: These are the same as the
+        :param other_parameters: These are the same as the
         generate_counterfactuals method.
 
         :returns: An object of class CounterfactualExplanations that includes
@@ -394,7 +423,7 @@ class ExplainerBase:
         input, and the global feature importance summarized over all inputs.
         """
         if cf_examples_list is None:
-            cf_examples_list = self.generate_counterfactuals_batch(query_instances, total_CFs,
+            cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
                     desired_class=desired_class,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
@@ -411,9 +440,9 @@ class ExplainerBase:
         # Summarizing the found counterfactuals
         for i in range(len(cf_examples_list)):
             cf_examples = cf_examples_list[i]
-            org_instance = cf_examples.org_instance
+            org_instance = cf_examples.test_instance_df
 
-            if cf_examples.final_cfs_sparse is not None:
+            if cf_examples.final_cfs_df_sparse is not None:
                 df = cf_examples.final_cfs_df_sparse
             else:
                 df = cf_examples.final_cfs_df
@@ -422,11 +451,11 @@ class ExplainerBase:
                 local_importances[i][col] = 0
             for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
-                    if not np.isclose(org_instance[col][0], row[col]):
+                    if not np.isclose(org_instance[col].iloc[0], row[col]):
                         summary_importance[col] += 1
                         local_importances[i][col] += 1
                 for col in self.data_interface.categorical_feature_names:
-                    if org_instance[col][0] != row[col]:
+                    if org_instance[col].iloc[0] != row[col]:
                         summary_importance[col] += 1
                         local_importances[i][col] += 1
             for col in allcols:

@@ -4,8 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 import logging
-
-from sklearn.preprocessing import LabelEncoder
+from collections import defaultdict
 
 
 class PublicData:
@@ -123,6 +122,8 @@ class PublicData:
         for feature_name in self.continuous_feature_names:
             ranges[feature_name] = [
                 self.data_df[feature_name].min(), self.data_df[feature_name].max()]
+        for feature_name in self.categorical_feature_names:
+            ranges[feature_name] = self.data_df[feature_name].unique()
         return ranges
 
     def get_data_type(self, col):
@@ -165,6 +166,37 @@ class PublicData:
             result[feature_name] = (
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
+
+    def get_valid_feature_range(self, normalized=True):
+        """Gets the min/max value of features in normalized or de-normalized
+        form. Assumes that all features are already encoded to numerical form
+        such that the number of features remains the same.
+
+        # TODO needs work adhere to label encoded max and to support permitted_range for
+        both continuous and discrete when provided in _generate_counterfactuals.
+        """
+        feature_range = {}
+
+        for idx, feature_name in enumerate(self.feature_names):
+            feature_range[feature_name] = []
+            if feature_name in self.continuous_feature_names:
+                max_value = self.data_df[feature_name].max()
+                min_value = self.data_df[feature_name].min()
+
+                if normalized:
+                    minx = (self.permitted_range[feature_name]
+                                    [0] - min_value) / (max_value - min_value)
+                    maxx = (self.permitted_range[feature_name]
+                                    [1] - min_value) / (max_value - min_value)
+                else:
+                    minx = self.permitted_range[feature_name][0]
+                    maxx = self.permitted_range[feature_name][1]
+                feature_range[feature_name].append(minx)
+                feature_range[feature_name].append(maxx)
+            else:
+                # categorical features
+                feature_range[feature_name] =  self.permitted_range[feature_name]
+        return feature_range
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
@@ -338,13 +370,16 @@ class PublicData:
             out.drop(cols, axis=1, inplace=True)
         return out
 
-    def get_decimal_precisions(self):
+    def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
-        precisions = [0] * len(self.continuous_feature_names)
+        precisions_dict = defaultdict(int)
+        precisions = [0] * len(self.feature_names)
+        #precisions = [0] * len(self.continuous_feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
             if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]
+                precisions_dict[col] = self.continuous_features_precision[col]
             elif ((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
                 modes = self.data_df[col].mode()
                 maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
@@ -353,7 +388,11 @@ class PublicData:
                     if prec > maxp:
                         maxp = prec
                 precisions[ix] = maxp
-        return precisions
+                precisions_dict[col] = maxp
+        if output_type == "list":
+            return precisions
+        elif output_type == "dict":
+            return precisions_dict
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""

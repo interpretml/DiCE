@@ -39,3 +39,6 @@ class BaseModel:
     def get_num_output_nodes(self, inp_size):
         temp_input = np.transpose(np.array([np.random.uniform(0, 1) for i in range(inp_size)]).reshape(-1, 1))
         return self.get_output(temp_input).shape[1]
+
+    def get_num_output_nodes2(self, input):
+        return self.get_output(input).shape[1]

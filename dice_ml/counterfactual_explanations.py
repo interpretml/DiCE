@@ -1,15 +1,8 @@
 import json
 import pandas as pd
 
-def json_converter(obj):
-    """ Helper function to convert CounterfactualExplanations object to json.
-    """
-    if isinstance(obj, CounterfactualExplanations):
-        return obj.__dict__
-    try:
-        return obj.to_json()
-    except AttributeError:
-        return obj.__dict__
+import dice_ml.utils.serialize
+import dice_ml.diverse_counterfactuals as counterfactual_examples
 
 def as_counterfactual_explanations(json_dict):
     """ Helper function to convert json string to a CounterfactualExplanations
@@ -18,7 +11,19 @@ def as_counterfactual_explanations(json_dict):
     if 'metadata' in json_dict:
         cf_examples_list = []
         for cf_examples_str in json_dict["cf_examples_list"]:
-            cf_examples_list.append(pd.read_json(cf_examples_str))
+            cf_examples_dict = json.loads(cf_examples_str)
+            test_instance_df = pd.read_json(cf_examples_dict["test_instance_df"])
+            cfs_df = pd.read_json(cf_examples_dict["final_cfs_df"])
+            cf_examples_list.append(
+                    counterfactual_examples.CounterfactualExamples(data_interface=None,
+                                          test_instance_df=test_instance_df,
+                                          final_cfs_df=cfs_df,
+                                          final_cfs_df_sparse=cfs_df,
+                                          posthoc_sparsity_param=None,
+                                          desired_class=cf_examples_dict["desired_class"],
+                                          desired_range=cf_examples_dict["desired_range"],
+                                          model_type=cf_examples_dict["model_type"])
+                    )
         return CounterfactualExplanations(cf_examples_list,
                 local_importance=json_dict["local_importance"],
                 summary_importance=json_dict["summary_importance"])
@@ -39,18 +44,32 @@ class CounterfactualExplanations:
 
     """
     def __init__(self, cf_examples_list,
-            local_importance=None,
-            summary_importance=None):
+                 local_importance=None,
+                 summary_importance=None):
         self.cf_examples_list = cf_examples_list
         self.local_importance = local_importance
         self.summary_importance = summary_importance
         self.metadata = {'version': '1'}
 
+    def visualize_as_dataframe(self, display_sparse_df=True,
+                               show_only_changes=False):
+        for cf_examples in self.cf_examples_list:
+            cf_examples.visualize_as_dataframe(
+                    display_sparse_df=display_sparse_df,
+                    show_only_changes=show_only_changes)
+
+    def visualize_as_list(self, display_sparse_df=True,
+                          show_only_changes=False):
+        for cf_examples in self.cf_examples_list:
+            cf_examples.visualize_as_list(
+                    display_sparse_df=display_sparse_df,
+                    show_only_changes=show_only_changes)
+
     def to_json(self):
         """ Serialize Explanations object to json.
         """
-        return json.dumps(self, default=json_converter,
-                indent=2)
+        return json.dumps(self, default=dice_ml.utils.serialize.json_converter,
+                          indent=2)
 
     @staticmethod
     def from_json(json_str):

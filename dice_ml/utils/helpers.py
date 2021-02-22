@@ -153,6 +153,8 @@ class DataTransfomer:
     def initialize_transform_func(self):
         if self.func == 'ohe-min-max':
             self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args)
+        elif self.func == None: # identity transformation
+            self.data_transformer = FunctionTransformer(func=self.func, kw_args=None) # add more ready-to-use transformers (such as label-encoding) in elif loops.
         else:
             self.data_transformer = FunctionTransformer(func=self.func, kw_args=self.kw_args) # add more ready-to-use transformers (such as label-encoding) in elif loops.
 
