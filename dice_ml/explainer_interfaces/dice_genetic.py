@@ -29,8 +29,8 @@ class DiceGenetic(ExplainerBase):
 
         # number of output nodes of ML model
         if self.model.model_type == 'classifier':
-            #self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.feature_names))
-            self.num_output_nodes = self.model.get_num_output_nodes2(self.data_interface.data_df[0:1])
+            self.num_output_nodes = self.model.get_num_output_nodes2(
+                self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
@@ -212,6 +212,7 @@ class DiceGenetic(ExplainerBase):
         self.do_param_initializations(total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
+
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
                                           final_cfs_df=self.final_cfs_df,
@@ -430,11 +431,11 @@ class DiceGenetic(ExplainerBase):
         self.final_cfs = current_best_cf
         self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
-
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
         query_instance_df[self.data_interface.outcome_name] = self.test_pred
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
         # post-hoc operation on continuous features to enhance sparsity - only for public data
@@ -443,6 +444,12 @@ class DiceGenetic(ExplainerBase):
             self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, query_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             self.final_cfs_df_sparse = None
+
+        # to display the values with the same precision as the original data
+        precisions = self.data_interface.get_decimal_precisions()
+        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+            self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
+            self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
 
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
