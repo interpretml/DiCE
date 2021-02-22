@@ -464,7 +464,23 @@ class DiceGenetic(ExplainerBase):
             input_instance[column] = self.labelencoder[column].transform(input_instance[column])
         return input_instance
 
+    def from_label(self, data)
+        """Transforms label encoded data back to categorical values
+        """
+	out = data.copy()
+	if isinstance(data, pd.DataFrame) or isinstance(data, dict):
+            for column in self.categorical_feature_names:
+                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
+        elif isinstance(data, list):
+            # TODO: make sure that the indexes match the labelencoder and list
+            for c in self.categorical_feature_indexes:
+                out[c] = self.labelencoder[self.feature_names[c]].inverse_transform([round(out[c])])[0]
+        return out
+
+
     def label_decode(self, labelled_input):
+        """Transforms label encoded data back to categorical values
+        """
         labelled_input = labelled_input[0]
         input_instance = {}
         for i in range(len(labelled_input)):
