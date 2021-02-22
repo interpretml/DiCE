@@ -54,6 +54,7 @@ class DiceRandom(ExplainerBase):
         :returns: A CounterfactualExamples object that contains the dataframe
         of generated counterfactuals as an attribute.
         """
+        self.feature_range = self.data_interface.permitted_range.copy()
         # permitted range for continuous features
         if permitted_range is not None:
             if not self.data_interface.check_features_range(permitted_range):
@@ -61,13 +62,13 @@ class DiceRandom(ExplainerBase):
                     "permitted range of features should be within their original range")
             else:
                 for feature_name, feature_range in permitted_range.items():
-                    self.data_interface.permitted_range[feature_name] = feature_range
-                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                for feature in self.data_interface.continuous_feature_names:
-                    if feature in self.data_interface.permitted_range:
-                        feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                        self.cont_minx[feat_ix] = self.data_interface.permitted_range[feature][0]
-                        self.cont_maxx[feat_ix] = self.data_interface.permitted_range[feature][1]
+                    self.feature_range[feature_name] = feature_range
+                #self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+                #for feature in self.data_interface.continuous_feature_names:
+                #    if feature in self.data_interface.permitted_range:
+                #        feat_ix = self.data_interface.encoded_feature_names.index(feature)
+                #        self.cont_minx[feat_ix] = self.data_interface.permitted_range[feature][0]
+                #        self.cont_maxx[feat_ix] = self.data_interface.permitted_range[feature][1]
 
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
@@ -77,8 +78,7 @@ class DiceRandom(ExplainerBase):
             self.fixed_features_values = {}
             for feature in self.data_interface.feature_names:
                 if feature not in features_to_vary:
-                    self.fixed_features_values[feature] = query_instance[feature]
-
+                    self.fixed_features_values[feature] = query_instance[feature].iloc[0]
         # number of output nodes of ML model
         self.num_output_nodes = self.model.get_output(query_instance).shape[1]
 
@@ -97,9 +97,12 @@ class DiceRandom(ExplainerBase):
 
         # get random samples for each feature independently
         start_time = timeit.default_timer()
-        self.final_cfs = self.get_samples(self.fixed_features_values, sampling_random_seed=random_seed, sampling_size=sample_size)
-        self.cfs_preds = self.predict_fn(self.final_cfs)
-        self.final_cfs[self.data_interface.outcome_name] = self.cfs_preds
+        self.final_cfs = self.get_samples(self.fixed_features_values, self.feature_range, sampling_random_seed=random_seed, sampling_size=sample_size)
+        self.cfs_preds = None
+
+        if self.final_cfs is not None:
+            self.cfs_preds = self.predict_fn(self.final_cfs)
+            self.final_cfs[self.data_interface.outcome_name] = self.cfs_preds
 
         # check validity of CFs
         self.final_cfs['validity'] = self.final_cfs[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
@@ -133,10 +136,10 @@ class DiceRandom(ExplainerBase):
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')
         else:
-            if self.total_CFs_found == 0 :
+            if self.total_cfs_found == 0 :
                 print('No Counterfactuals found for the given configuation, perhaps try with different parameters...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
-                print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different parameters...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d) Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...' % (self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
@@ -145,10 +148,10 @@ class DiceRandom(ExplainerBase):
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_class=desired_class)
 
-    def get_samples(self, fixed_features_values, sampling_random_seed, sampling_size):
+    def get_samples(self, fixed_features_values, feature_range, sampling_random_seed, sampling_size):
 
         # first get required parameters
-        precisions = self.data_interface.get_decimal_precisions()
+        precisions = self.data_interface.get_decimal_precisions(output_type="dict")
 
         categorical_features_frequencies = {}
         for feature in self.data_interface.categorical_feature_names:
@@ -162,16 +165,15 @@ class DiceRandom(ExplainerBase):
             if feature in fixed_features_values:
                 sample = [fixed_features_values[feature]]*sampling_size
             elif feature in self.data_interface.continuous_feature_names:
-                low, high = self.data_interface.permitted_range[feature]
-                feat_ix = self.data_interface.continuous_feature_names.index(feature)
-                sample = self.get_continuous_samples(low, high, precisions[feat_ix], size=sampling_size, seed=sampling_random_seed)
+                low = feature_range[feature][0]
+                high = feature_range[feature][1]
+                sample = self.get_continuous_samples(low, high, precisions[feature], size=sampling_size, seed=sampling_random_seed)
             else:
                 if sampling_random_seed is not None:
                     random.seed(sampling_random_seed)
-                sample = random.choices(self.data_interface.data_df[feature].unique(), k=sampling_size)
+                sample = random.choices(feature_range[feature], k=sampling_size)
 
             samples.append(sample)
-
         samples = pd.DataFrame(dict(zip(self.data_interface.feature_names, samples))) #to_dict(orient='records')#.values
         return samples
 
