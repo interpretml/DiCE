@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 import dice_ml.utils.serialize
-import dice_ml.diverse_counterfactuals as counterfactual_examples
+import dice_ml.diverse_counterfactuals as exp
 
 def as_counterfactual_explanations(json_dict):
     """ Helper function to convert json string to a CounterfactualExplanations
@@ -15,7 +15,7 @@ def as_counterfactual_explanations(json_dict):
             test_instance_df = pd.read_json(cf_examples_dict["test_instance_df"])
             cfs_df = pd.read_json(cf_examples_dict["final_cfs_df"])
             cf_examples_list.append(
-                    counterfactual_examples.CounterfactualExamples(data_interface=None,
+                    exp.CounterfactualExamples(data_interface=None,
                                           test_instance_df=test_instance_df,
                                           final_cfs_df=cfs_df,
                                           final_cfs_df_sparse=cfs_df,

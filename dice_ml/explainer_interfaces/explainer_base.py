@@ -9,7 +9,7 @@ import timeit
 import copy
 from collections.abc import Iterable
 
-from dice_ml import diverse_counterfactuals as exp
+import dice_ml.diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 class ExplainerBase:
