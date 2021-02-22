@@ -25,8 +25,8 @@ class Dice:
 def decide(model_interface, method):
     """Decides DiCE implementation type."""
 
-    if model_interface.backend == 'sklearn': # random sampling of CFs
-        if method == "random":
+    if model_interface.backend == 'sklearn':
+        if method == "random": # random sampling of CFs
             from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
             return ExplainerBase
         elif method == "genetic":

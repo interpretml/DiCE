@@ -7,19 +7,11 @@ import os
 
 import dice_ml
 
-#Dice Imports
-from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+# for data transformations
+from sklearn.preprocessing import FunctionTransformer
+from sklearn.model_selection import train_test_split
 
-#Pytorch
-import torch
-import torch.utils.data
-from torch import nn, optim
-from torch.nn import functional as F
-from torchvision import datasets, transforms
-from torchvision.utils import save_image
-from torch.autograd import Variable
-
-def load_adult_income_dataset():
+def load_adult_income_dataset(only_train=True):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares the data for data analysis based on https://rpubs.com/H_Zhu/235617
 
     :return adult_data: returns preprocessed adult income dataset.
@@ -67,8 +59,11 @@ def load_adult_income_dataset():
 
     adult_data = adult_data.rename(columns={'marital-status': 'marital_status', 'hours-per-week': 'hours_per_week'})
 
-    return adult_data
+    if only_train:
+        train, _ = train_test_split(adult_data, test_size=0.2, random_state=17)
+        adult_data = train.reset_index(drop=True)
 
+    return adult_data
 
 def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
@@ -88,40 +83,81 @@ def get_adult_data_info():
                         'income': '0 (<=50K) vs 1 (>50K)'}
     return feature_description
 
-def get_base_gen_cf_initialization( data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
-    
-        # Dataset for training Variational Encoder Decoder model for CF Generation        
-        df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
-        encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]] 
-        dataset = encoded_data.to_numpy()        
-        print('Dataset Shape:',  encoded_data.shape)
-        print('Datasets Columns:', encoded_data.columns)
-        
-        #Normalise_Weights
-        normalise_weights={}      
-        for idx in range(len(cont_minx)):
-            _max= cont_maxx[idx]
-            _min= cont_minx[idx]
-            normalise_weights[idx]=[_min, _max]
-    
-        #Train, Val, Test Splits
-        np.random.shuffle(dataset)
-        test_size= int(data_interface.test_size)
-        vae_test_dataset= dataset[:test_size]
-        dataset= dataset[test_size:]
-        vae_val_dataset= dataset[:test_size]
-        vae_train_dataset= dataset[test_size:]
+def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont_maxx, margin, validity_reg, epochs, wm1, wm2, wm3, learning_rate ):
 
-        #BaseGenCF Model
-        cf_vae = CF_VAE(data_interface, encoded_size)
-        
-        #Optimizer    
-        cf_vae_optimizer = optim.Adam([
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
-            {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
-            ], lr=learning_rate
-        )
-        
-        # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
-        return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer
+    #Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py. Check dependencies.
+    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+
+    #Pytorch
+    import torch
+    import torch.utils.data
+    from torch import nn, optim
+    from torch.nn import functional as F
+    from torchvision import datasets, transforms
+    from torchvision.utils import save_image
+    from torch.autograd import Variable
+
+    # Dataset for training Variational Encoder Decoder model for CF Generation
+    df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
+    encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]]
+    dataset = encoded_data.to_numpy()
+    print('Dataset Shape:',  encoded_data.shape)
+    print('Datasets Columns:', encoded_data.columns)
+
+    #Normalise_Weights
+    normalise_weights={}
+    for idx in range(len(cont_minx)):
+        _max= cont_maxx[idx]
+        _min= cont_minx[idx]
+        normalise_weights[idx]=[_min, _max]
+
+    #Train, Val, Test Splits
+    np.random.shuffle(dataset)
+    test_size= int(data_interface.test_size)
+    vae_test_dataset= dataset[:test_size]
+    dataset= dataset[test_size:]
+    vae_val_dataset= dataset[:test_size]
+    vae_train_dataset= dataset[test_size:]
+
+    #BaseGenCF Model
+    cf_vae = CF_VAE(data_interface, encoded_size)
+
+    #Optimizer
+    cf_vae_optimizer = optim.Adam([
+        {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_mean.parameters()),'weight_decay': wm1},
+        {'params': filter(lambda p: p.requires_grad, cf_vae.encoder_var.parameters()),'weight_decay': wm2},
+        {'params': filter(lambda p: p.requires_grad, cf_vae.decoder_mean.parameters()),'weight_decay': wm3},
+        ], lr=learning_rate
+    )
+
+    # Check: If base_obj was passsed via reference and it mutable; might not need to have a return value at all
+    return vae_train_dataset, vae_val_dataset, vae_test_dataset, normalise_weights, cf_vae, cf_vae_optimizer
+
+def ohe_min_max_transformation(data, data_interface):
+    """the data is one-hot-encoded and min-max normalized and fed to the ML model"""
+    return data_interface.get_ohe_min_max_normalized_data(data).values
+
+class DataTransfomer:
+    """A class to transform data based on user-defined function to get predicted outcomes. This class calls FunctionTransformer of scikit-learn internally (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)."""
+
+    def __init__(self, func=None, kw_args=None):
+        self.func = func
+        self.kw_args = kw_args
+
+    def feed_data_params(self, data_interface):
+        if self.kw_args is not None:
+            self.kw_args['data_interface'] = data_interface
+        else:
+            self.kw_args = {'data_interface': data_interface}
+
+    def initialize_transform_func(self):
+        if self.func == 'ohe-min-max':
+            self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args)
+        else:
+            self.data_transformer = FunctionTransformer(func=self.func, kw_args=self.kw_args) # add more ready-to-use transformers (such as label-encoding) in elif loops.
+
+    def transform(self, data):
+        return self.data_transformer.transform(data) # should return a numpy array
+
+    def inverse_transform(self, data):
+        return self.data_transformer.inverse_transform(data) # should return a numpy array

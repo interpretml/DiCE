@@ -23,15 +23,16 @@ class TestDiceTensorFlowMethods:
         self.exp.do_cf_initializations(total_CFs=4, algorithm="DiverseCF", features_to_vary="all") # initialize required params for CF computations
 
         # prepare query isntance for CF optimization
-        query_instance = self.exp.data_interface.prepare_query_instance(query_instance=sample_adultincome_query, encoding='one-hot')
-        self.query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
+        # query_instance = self.exp.data_interface.prepare_query_instance(query_instance=sample_adultincome_query, encoding='one-hot')
+        # self.query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
+        self.query_instance = self.exp.data_interface.get_ohe_min_max_normalized_data(sample_adultincome_query).values
 
         init_arrs = self.exp.initialize_CFs(self.query_instance, init_near_query_instance=True) # initialize CFs
         self.desired_class = 1 # desired class is 1
 
         # setting random feature weights
         np.random.seed(42)
-        weights = np.random.rand(len(self.exp.data_interface.encoded_feature_names))
+        weights = np.random.rand(len(self.exp.data_interface.ohe_encoded_feature_names))
         weights = np.array([weights], dtype=np.float32)
         if tf.__version__[0] == '1':
             for i in range(4):

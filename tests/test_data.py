@@ -29,8 +29,8 @@ class TestCommonDataMethods:
             errors = 0
             for feature in mads:
                 if not normalized:
-                    min_value = self.d[0].train_df[feature].min()
-                    max_value = self.d[0].train_df[feature].max()
+                    min_value = self.d[0].data_df[feature].min()
+                    max_value = self.d[0].data_df[feature].max()
 
                 if mads[feature] > max_value - min_value:
                     errors += 1
@@ -41,17 +41,27 @@ class TestCommonDataMethods:
             mads = self.d[1].get_valid_mads(normalized=normalized, display_warnings=False, return_mads=True)
             assert all(mads[feature] == 1 for feature in mads) # no mad is provided for private data by default, so a practical alternative is keeping all value at 1. Check get_valid_mads() in data interface classes for more info.
 
-    @pytest.mark.parametrize(
-    "encode_categorical, output_query",
-    [('label', [0.068, (2/3), (3/7), (3/4), (4/5), 1.0, 0.0, 0.449]),
-    ('one-hot', [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0])]
-    )
-    def test_prepare_query_instance(self, sample_adultincome_query, encode_categorical, output_query):
+    # @pytest.mark.parametrize(
+    # "encode_categorical, output_query",
+    # [('label', [0.068, (2/3), (3/7), (3/4), (4/5), 1.0, 0.0, 0.449]),
+    # ('one-hot', [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0])]
+    # )
+    # def test_prepare_query_instance(self, sample_adultincome_query, encode_categorical, output_query):
+    #     """
+    #     Tests prepare_query_instance method that covnerts continuous features into [0,1] range and one-hot encodes categorical features.
+    #     """
+    #     for d in self.d:
+    #         prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encoding=encode_categorical).iloc[0].tolist()
+    #         assert output_query == pytest.approx(prepared_query, abs=1e-3)
+
+    # TODO: add separate test method for label-encoded data
+    def test_ohe_min_max_transformed_query_instance(self, sample_adultincome_query, encode_categorical, output_query):
         """
-        Tests prepare_query_instance method that covnerts continuous features into [0,1] range and one-hot encodes categorical features.
+        Tests method that converts continuous features into [0,1] range and one-hot encodes categorical features.
         """
+        output_query = [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]
         for d in self.d:
-            prepared_query = d.prepare_query_instance(query_instance=sample_adultincome_query, encoding=encode_categorical).iloc[0].tolist()
+            prepared_query = d.get_ohe_min_max_normalized_data(query_instance=sample_adultincome_query).iloc[0].tolist()
             assert output_query == pytest.approx(prepared_query, abs=1e-3)
 
     def test_encoded_categorical_features(self):

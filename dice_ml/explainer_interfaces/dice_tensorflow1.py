@@ -22,7 +22,9 @@ class DiceTensorFlow1(ExplainerBase):
 
         """
 
-        super().__init__(data_interface) # initiating data related parameters
+        # initiating data related parameters
+        super().__init__(data_interface)
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
 
         # create TensorFLow session if one is not already created
         if tf.get_default_session() is not None:
@@ -30,14 +32,14 @@ class DiceTensorFlow1(ExplainerBase):
         else:
             self.dice_sess = tf.InteractiveSession()
 
-        # initializing model variables
+        # initializing model related variables
         self.model = model_interface
-
-        # loading trained model
-        self.model.load_model()
-
-        self.input_tensor = tf.Variable(self.minx, dtype=tf.float32)
+        self.model.load_model() # loading trained model
+        self.input_tensor = tf.Variable(self.minx, dtype=tf.float32) # placeholder variables for model predictions
         self.output_tensor = self.model.get_output(self.input_tensor)
+        if self.model.transformer.func is not None: # TODO: this error is probably too big - need to change it.
+            raise ValueError("Gradient-based DiCE currently (1) accepts the data only in raw categorical and continuous formats, (2) does one-hot-encoding and min-max-normalization internally, (3) expects the ML model the accept the data in this same format. If your problem supports this, please initialize model class again with no custom transformation function.")
+        self.num_output_nodes = self.dice_sess.run(self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names))).shape[1] # number of output nodes of ML model
 
         # hyperparameter initializations
         self.weights = []
@@ -46,20 +48,15 @@ class DiceTensorFlow1(ExplainerBase):
         for i in range(3):
             self.weights.append(tf.Variable(1.0, dtype=tf.float32))
             self.weights_assign.append(tf.assign(self.weights[i], self.weights_inits))
-
         self.hyperparameters = []  # proximity_weight, diversity_weight, categorical_penalty
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.optimizer_weights = []  # optimizer
 
-        # number of output nodes of ML model
-        temp_input = tf.convert_to_tensor([tf.random.uniform([len(self.data_interface.encoded_feature_names)])], dtype=tf.float32)
-        self.num_ouput_nodes = self.dice_sess.run(self.model.get_output(temp_input)).shape[1]
-
     def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
         """Generates diverse counterfactual explanations
 
-        :param query_instance: A dictionary of feature names and values. Test point of interest.
+        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
         :param total_CFs: Total number of counterfactuals required.
 
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
@@ -123,15 +120,12 @@ class DiceTensorFlow1(ExplainerBase):
         if not collections.Counter([proximity_weight, diversity_weight, categorical_penalty]) == collections.Counter(self.hyperparameters):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-        query_instance, test_pred = self.find_counterfactuals(query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+        final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          test_instance=query_instance,
-                                          test_pred=test_pred,
-                                          final_cfs=self.final_cfs,
-                                          final_cfs_preds=self.cfs_preds,
-                                          final_cfs_sparse=self.final_cfs_sparse,
-                                          cfs_preds_sparse=self.cfs_preds_sparse,
+                                          final_cfs_df=final_cfs_df,
+                                          test_instance_df=test_instance_df,
+                                          final_cfs_df_sparse = final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_class=desired_class)
 
@@ -187,6 +181,11 @@ class DiceTensorFlow1(ExplainerBase):
         """prediction function"""
         temp_preds = self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
         return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds])
+
+    def predict_fn_for_sparsity(self, input_instance):
+        """prediction function for sparsity correction"""
+        input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance).values
+        return self.predict_fn(input_instance)
 
     def compute_yloss(self, method):
         """Computes the first part (y-loss) of the loss function."""
@@ -464,8 +463,9 @@ class DiceTensorFlow1(ExplainerBase):
         """Finds counterfactuals by gradient-descent."""
 
         # Prepares user defined query_instance for DiCE.
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
+        # query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
+        # query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
+        query_instance = self.data_interface.get_ohe_min_max_normalized_data(query_instance).values
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0][0]
@@ -579,26 +579,41 @@ class DiceTensorFlow1(ExplainerBase):
                         self.final_cfs[loop_ix+ix] = copy.deepcopy(self.best_backup_cfs[loop_ix+ix])
                         self.cfs_preds[loop_ix+ix] = copy.deepcopy(self.best_backup_cfs_preds[loop_ix+ix])
 
+        # do inverse transform of CFs to original user-fed format
+        cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
+        final_cfs_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(cfs)
+        cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds]
+        cfs_preds = [item for sublist in cfs_preds for item in sublist]
+        final_cfs_df[self.data_interface.outcome_name] = np.array(cfs_preds)
+
+        test_instance_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(query_instance)
+        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
+
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            final_cfs_sparse = copy.deepcopy(self.final_cfs)
-            cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = final_cfs_df.copy()
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
-            self.final_cfs_sparse = None
-            self.cfs_preds_sparse = None
+            final_cfs_df_sparse = None
 
         m, s = divmod(self.elapsed, 60)
         if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in self.cfs_preds))):
             self.total_CFs_found = max(loop_find_CFs, self.total_CFs)
+            valid_ix = [ix for ix in range(max(loop_find_CFs, self.total_CFs))] # indexes of valid CFs
             print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
         else:
             self.total_CFs_found = 0
-            for pred in self.cfs_preds:
-                if((self.target_cf_class[0][0] == 0 and pred[0][0] < self.stopping_threshold) or (self.target_cf_class[0][0] == 1 and pred[0][0] > self.stopping_threshold)):
+            valid_ix = [] # indexes of valid CFs
+            for cf_ix, pred in enumerate(self.cfs_preds):
+                if((self.target_cf_class == 0 and pred < self.stopping_threshold) or (self.target_cf_class == 1 and pred > self.stopping_threshold)):
                     self.total_CFs_found += 1
+                    valid_ix.append(cf_ix)
 
-            print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            if self.total_CFs_found == 0 :
+                print('No Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            else:
+                print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
-        return query_instance, test_pred
+        if final_cfs_df_sparse is not None: final_cfs_df_sparse = final_cfs_df_sparse.iloc[valid_ix].reset_index(drop=True)
+        return final_cfs_df.iloc[valid_ix].reset_index(drop=True), test_instance_df, final_cfs_df_sparse # returning only valid CFs
