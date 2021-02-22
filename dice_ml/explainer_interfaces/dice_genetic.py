@@ -191,6 +191,7 @@ class DiceGenetic(ExplainerBase):
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
+        self.test_pred = test_pred
 
         if desired_range != None:
             if desired_range[0] > desired_range[1]:
@@ -216,15 +217,7 @@ class DiceGenetic(ExplainerBase):
 
         self.do_param_initializations(total_CFs, desired_range, desired_class, query_instance, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
-        query_instance = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
-        query_instance_df = self.label_decode(query_instance)
-        query_instance_df[self.data_interface.outcome_name] = test_pred
-        self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
-        if self.final_cfs_df is not None:
-            self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-        self.final_cfs_df_sparse = self.label_decode_cfs(self.final_cfs_sparse)
-        if self.final_cfs_df_sparse is not None:
-            self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.cfs_preds_sparse
+        query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, verbose)
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
                                           final_cfs_df=self.final_cfs_df,
@@ -246,6 +239,9 @@ class DiceGenetic(ExplainerBase):
         # that functionality should be in the model class
         return self.model.model.predict(input_instance)[0]
 
+    def predict_fn_for_sparsity(self, input_instance):
+        """prediction function for sparsity correction"""
+        return self.model.model.predict(input_instance)[0]
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
@@ -440,14 +436,19 @@ class DiceGenetic(ExplainerBase):
         self.final_cfs = current_best_cf
         self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
+
+        # converting to dataframe
+        query_instance_df = self.label_decode(query_instance)
+        query_instance_df[self.data_interface.outcome_name] = self.test_pred
+        self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+        if self.final_cfs_df is not None:
+            self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            final_cfs_sparse = copy.deepcopy(self.final_cfs)
-            cfs_preds_sparse = copy.deepcopy(self.cfs_preds)
-            self.final_cfs_sparse, self.cfs_preds_sparse = self.do_posthoc_sparsity_enhancement(self.total_CFs, final_cfs_sparse, cfs_preds_sparse,  query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
+            self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, query_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
-            self.final_cfs_sparse = None
-            self.cfs_preds_sparse = None
+            self.final_cfs_df_sparse = None
 
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
@@ -456,7 +457,7 @@ class DiceGenetic(ExplainerBase):
             print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
 
-        return query_instance
+        return query_instance_df
 
     def label_encode(self, input_instance):
         for column in self.data_interface.categorical_feature_names:

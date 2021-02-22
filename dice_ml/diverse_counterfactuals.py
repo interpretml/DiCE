@@ -43,7 +43,7 @@ class CounterfactualExamples:
 
             elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is not None:
                 # CFs
-                print('\nDiverse Counterfactual set (new outcome: ', self.new_outcome)
+                print('\nDiverse Counterfactual set (new outcome: {0})'.format(self.new_outcome))
                 self.display_df(self.final_cfs_df_sparse, show_only_changes)
 
 
