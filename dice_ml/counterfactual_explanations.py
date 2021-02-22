@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 import dice_ml.diverse_counterfactuals as exp
-
+from dice_ml.utils.serialize import DummyDataInterface
 
 def json_converter(obj):
     """ Helper function to convert CounterfactualExplanations object to json.
@@ -24,8 +24,10 @@ def as_counterfactual_explanations(json_dict):
             cf_examples_dict = json.loads(cf_examples_str)
             test_instance_df = pd.read_json(cf_examples_dict["test_instance_df"])
             cfs_df = pd.read_json(cf_examples_dict["final_cfs_df"])
+            # Creating the object for dummy_data_interface
+            dummy_data_interface = DummyDataInterface(**cf_examples_dict["data_interface"])
             cf_examples_list.append(
-                    exp.CounterfactualExamples(data_interface=None,
+                    exp.CounterfactualExamples(data_interface=dummy_data_interface,
                                           test_instance_df=test_instance_df,
                                           final_cfs_df=cfs_df,
                                           final_cfs_df_sparse=cfs_df,
