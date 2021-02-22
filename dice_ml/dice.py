@@ -27,8 +27,8 @@ def decide(model_interface, method):
 
     if model_interface.backend == 'sklearn':
         if method == "random": # random sampling of CFs
-            from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-            return ExplainerBase
+            from dice_ml.explainer_interfaces.dice_random import DiceRandom
+            return DiceRandom
         elif method == "genetic":
             from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
             return DiceGenetic
