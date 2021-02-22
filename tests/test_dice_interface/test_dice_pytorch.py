@@ -25,7 +25,7 @@ class TestDiceTorchMethods:
         # prepare query isntance for CF optimization
         # query_instance = self.exp.data_interface.prepare_query_instance(query_instance=sample_adultincome_query, encoding='one-hot')
         # self.query_instance = query_instance.iloc[0].values
-        query_instance = self.exp.data_interface.get_ohe_min_max_normalized_data(sample_adultincome_query).iloc[0].values
+        self.query_instance = self.exp.data_interface.get_ohe_min_max_normalized_data(sample_adultincome_query).iloc[0].values
 
         self.exp.initialize_CFs(self.query_instance, init_near_query_instance=True) # initialize CFs
         self.exp.target_cf_class = torch.tensor(1).float() # set desired class to 1
@@ -61,8 +61,5 @@ class TestDiceTorchMethods:
         Tets correctness of final CFs and their predictions for sample query instance.
         """
         dice_exp = self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
-        test_cfs = [[72.0, 'Private', 'HS-grad', 'Married', 'White-Collar', 'White', 'Female', 45.0, 0.691], [29.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 42.0, 0.943], [52.0, 'Private', 'Doctorate', 'Married', 'Service', 'White', 'Female', 44.0, 0.97], [47.0, 'Private', 'Masters', 'Married', 'Service', 'White', 'Female', 73.0, 0.971]]
-        assert dice_exp.final_cfs_list == test_cfs
-
-        preds = [np.round(preds.flatten().tolist(), 3)[0] for preds in dice_exp.final_cfs_preds]
-        assert pytest.approx(preds, abs=1e-3) == [0.691, 0.943, 0.97, 0.971]
+        test_cfs = [[72.0, 'Private', 'HS-grad', 'Married', 'White-Collar', 'White', 'Female', 45.0, 0.691], [29.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 45.0, 0.954], [52.0, 'Private', 'Doctorate', 'Married', 'Service', 'White', 'Female', 45.0, 0.971], [47.0, 'Private', 'Masters', 'Married', 'Service', 'White', 'Female', 73.0, 0.971]]
+        assert dice_exp.final_cfs_df_sparse.values.tolist() == test_cfs

@@ -43,10 +43,14 @@ class TestPyTorchModelMethods:
     #     input_instance_pyt = pyt.tensor(input_instance)
     #     prediction = self.m.get_output(input_instance_pyt).detach().numpy()[0][0]
     #     pytest.approx(prediction, abs=1e-3) == prediction
+    @pytest.mark.parametrize("prediction",[0.0957])
     def test_model_output(self, sample_adultincome_query, public_data_object, prediction):
         # initializing data transormation required for ML model
+        public_data_object.create_ohe_params()
+        self.m.load_model()
         self.m.transformer = DataTransfomer(func='ohe-min-max', kw_args=None)
         self.m.transformer.feed_data_params(public_data_object)
         self.m.transformer.initialize_transform_func()
-        output_instance = self.m.get_output(sample_adultincome_query, transform_data=True).detach().numpy()[0][0]        
-        pytest.approx(prediction, abs=1e-3) == prediction
+        output_instance = self.m.get_output(sample_adultincome_query, transform_data=True)
+        predictval = output_instance.detach().numpy()[0][0]
+        pytest.approx(predictval, abs=1e-3) == prediction
