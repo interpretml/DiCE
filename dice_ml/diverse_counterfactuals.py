@@ -3,6 +3,7 @@ import pandas as pd
 import copy
 from IPython.display import display
 import json
+from dice_ml.utils.serialize import DummyDataInterface
 
 
 def json_converter(obj):
@@ -47,17 +48,17 @@ class CounterfactualExamples:
                 print('\nCounterfactual set (new outcome: {0})'.format(self.new_outcome))
                 self.display_df(self.final_cfs_df, show_only_changes)
 
-            elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is not None:
+            elif hasattr(self.data_interface, 'data_df') and display_sparse_df==True and self.final_cfs_df_sparse is not None:
                 # CFs
                 print('\nDiverse Counterfactual set (new outcome: {0})'.format(self.new_outcome))
                 self.display_df(self.final_cfs_df_sparse, show_only_changes)
 
 
-            elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is None:
+            elif hasattr(self.data_interface, 'data_df') and display_sparse_df==True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %(self.new_outcome))
                 self.display_df(self.final_cfs_df, show_only_changes)
 
-            elif 'data_df' not in self.data_interface.__dict__: # for private data
+            elif not hasattr(self.data_interface, 'data_df'):# for private data
                 print('\nDiverse Counterfactual set without sparsity correction since only metadata about each feature is available (new outcome: ', self.new_outcome)
                 self.display_df(self.final_cfs_df, show_only_changes)
 
@@ -92,16 +93,16 @@ class CounterfactualExamples:
                 print('\nCounterfactual set (new outcome : %i)' %(self.new_outcome))
                 self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
 
-            elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is not None:
+            elif hasattr(self.data_interface, 'data_df') and display_sparse_df==True and self.final_cfs_df_sparse is not None:
                 # CFs
                 print('\nDiverse Counterfactual set (new outcome : %i)' %(self.new_outcome))
                 self.print_list(self.final_cfs_df_sparse.values.tolist(), show_only_changes)
 
-            elif 'data_df' in self.data_interface.__dict__ and display_sparse_df==True and self.final_cfs_df_sparse is None:
+            elif hasattr(self.data_interface, 'data_df') and display_sparse_df==True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %(self.new_outcome))
                 self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
 
-            elif 'data_df' not in self.data_interface.__dict__: # for private data
+            elif not hasattr(self.data_interface, 'data_df'): # for private data
                 print('\nDiverse Counterfactual set without sparsity correction since only metadata about each feature is available (new outcome : %i)' %(self.new_outcome))
                 self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
 
@@ -130,7 +131,17 @@ class CounterfactualExamples:
             df = self.final_cfs_df_sparse
         else:
             df = self.final_cfs_df
-        obj = {'model_type': self.model_type,
+
+        dummy_data_interface = None
+        if hasattr(self.data_interface, 'data_df'):
+            dummy_data_interface = DummyDataInterface(
+                    self.data_interface.outcome_name,
+                    "dummy_data")
+        else:
+            dummy_data_interface = DummyDataInterface(
+                    self.data_interface.outcome_name)
+        obj = {'data_interface': dummy_data_interface,
+               'model_type': self.model_type,
                'desired_class': self.desired_class,
                'desired_range': self.desired_range,
                'test_instance_df': self.test_instance_df,
