@@ -2,6 +2,7 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
+import math
 import numpy as np
 import pandas as pd
 import random
@@ -45,7 +46,7 @@ class ExplainerBase:
                 # # decimal precisions for continuous features
                 # self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+    def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.
@@ -57,6 +58,7 @@ class ExplainerBase:
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
+        :param verbose: Whether to output detailed messages.
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
 
@@ -80,6 +82,7 @@ class ExplainerBase:
                     stopping_threshold=stopping_threshold,
                     posthoc_sparsity_param=posthoc_sparsity_param,
                     posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                    verbose=verbose,
                     **kwargs)
             cf_examples_arr.append(res)
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
@@ -312,6 +315,66 @@ class ExplainerBase:
                         left = current_val + (10**-decimal_prec[feature])
 
         return final_cfs_sparse
+
+    def infer_target_cfs_class(self, desired_class_input, original_pred,
+            num_output_nodes):
+        """ Infer the target class for generating CFs. Only called when
+        model_type=="classifier".
+        TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
+        whether it is allowed or not.
+        """
+        target_class = None
+        if desired_class_input == "opposite":
+            if num_output_nodes == 2:
+                original_pred_1 = np.argmax(original_pred)
+                target_class = int(1 - original_pred_1)
+
+            elif num_output_nodes > 2:
+                raise ValueError("Desired class cannot be opposite if the number of classes is more than 2.")
+
+        if isinstance(desired_class_input, int):
+            if desired_class_input >= 0 and desired_class_input < self.num_output_nodes:
+                target_class = desired_class_input
+            else:
+                raise ValueError("Desired class should be within 0 and num_classes-1.")
+        return target_class
+
+    def infer_target_cfs_range(self, desired_range_input):
+        target_range = None
+        if desired_range_input is None:
+            raise ValueError("Need to provide a desired_range for the target counterfactuals for a regression model.")
+        else:
+            if desired_range_input[0] > desired_range_input[1]:
+                raise ValueError("Invalid Range!")
+            else:
+                target_range = desired_range_input
+        return target_range
+
+    def decide_cf_validity(self, model_outputs):
+        validity = [0]*len(model_outputs)
+        for i in range(len(model_outputs)):
+            pred = model_outputs[i]
+            if self.model.model_type == "classifier":
+                if self.num_output_nodes == 2: # binary
+                    pred_1 = pred[self.num_output_nodes-1]
+                    validity[i] = 1 if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else 0
+                else: # multiclass
+                    maxscore = max(pred)
+                    if math.isclose(pred[self.target_cf_class], maxscore):
+                        validity[i] = 1
+            elif self.model.model_type == "regressor":
+                if pred >= self.target_cf_range[0] and pred < self.target_cf_range[1]:
+                    validity[i] = 1
+        return validity
+
+    def get_model_output_from_scores(self, model_scores):
+        model_output = [0]*len(model_scores)
+        for i in range(len(model_scores)):
+            if self.model.model_type == "classifier":
+                model_output[i] = np.argmax(model_scores[i])
+            elif self.model.model_type == "regressor":
+                model_output[i] = model_scores[i]
+        return model_output
 
     def check_permitted_range(self, permitted_range): # TODO: add comments as to where this is used if this function is necessary, else remove.
         """checks permitted range for continuous features"""

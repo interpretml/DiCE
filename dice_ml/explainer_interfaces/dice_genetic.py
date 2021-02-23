@@ -187,24 +187,12 @@ class DiceGenetic(ExplainerBase):
         test_pred = self.predict_fn(query_instance)
         self.test_pred = test_pred
 
-        if desired_range != None:
-            if desired_range[0] > desired_range[1]:
-                raise ValueError("Invalid Range!")
-
-        if desired_class == "opposite" and self.model.model_type == 'classifier':
-            if self.num_output_nodes == 2:
-                desired_class = 1.0 - test_pred
-
-            elif self.num_output_nodes > 2:
-                raise ValueError("Desired class can't be opposite if the number of classes is more than 2.")
-
-        if isinstance(desired_class, int) and desired_class > self.num_output_nodes-1:
-            raise ValueError("Desired class should be within 0 and num_classes-1.")
-
         if self.model.model_type == 'classifier':
-            self.target_cf_class = np.array([[desired_class]], dtype=np.float32)
+            self.target_cf_class = np.array(
+                [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
+                dtype=np.float32)
         elif self.model.model_type == 'regressor':
-            self.target_cf_range = desired_range
+            self.target_cf_range = self.infer_target_cfs_range(desired_range)
 
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
