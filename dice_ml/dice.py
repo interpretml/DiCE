@@ -3,7 +3,7 @@
 class Dice:
     """An interface class to different DiCE implementations."""
 
-    def __init__(self, data_interface, model_interface, method="genetic",  **kwargs):
+    def __init__(self, data_interface, model_interface, method="random",  **kwargs):
         """Init method
 
         :param data_interface: an interface to access data related params.
