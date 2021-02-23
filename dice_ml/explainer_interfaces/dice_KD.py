@@ -49,7 +49,7 @@ class DiceKD(ExplainerBase):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.predict_fn(dataset_instance)
+        predictions = self.predict_fn_KD(dataset_instance)
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[self.predicted_outcome_name] = predictions
 
@@ -107,7 +107,7 @@ class DiceKD(ExplainerBase):
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
+        test_pred = self.predict_fn_KD(query_instance)[0]
 
         query_instance[self.data_interface.outcome_name] = test_pred
 
@@ -149,9 +149,13 @@ class DiceKD(ExplainerBase):
                                           desired_class=desired_class,
                                           model_type=self.model.model_type)
 
-    def predict_fn(self, input_instance):
+    def predict_fn_KD(self, input_instance):
         """returns predictions"""
         return self.model.model.predict(input_instance)
+
+    def predict_fn(self, input_instance):
+        """returns predictions"""
+        return self.model.model.predict_proba(input_instance)
 
     def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
         cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)

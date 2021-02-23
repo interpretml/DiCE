@@ -124,7 +124,7 @@ class PublicData:
             ranges[feature_name] = [
                 self.data_df[feature_name].min(), self.data_df[feature_name].max()]
         for feature_name in self.categorical_feature_names:
-            ranges[feature_name] = self.data_df[feature_name].unique()
+            ranges[feature_name] = self.data_df[feature_name].unique().tolist()
         # Overwriting the ranges for a feature if input provided
         if permitted_range_input is not None:
             for feature_name, feature_range in permitted_range_input.items():
@@ -200,7 +200,7 @@ class PublicData:
                 feature_range[feature_name].append(maxx)
             else:
                 # categorical features
-                feature_range[feature_name] =  self.permitted_range[feature_name]
+                feature_range[feature_name] = self.permitted_range[feature_name]
         return feature_range
 
     def get_minx_maxx(self, normalized=True):
@@ -380,7 +380,6 @@ class PublicData:
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
         precisions_dict = defaultdict(int)
         precisions = [0] * len(self.feature_names)
-        #precisions = [0] * len(self.continuous_feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
             if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]

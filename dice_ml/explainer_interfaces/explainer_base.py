@@ -349,11 +349,11 @@ class ExplainerBase:
         target_cf_class = int(target_cf_class)
 
         if self.model.model_type == "classifier":
-            if self.num_output_nodes == 1: # for tensorflow/pytorch modelsa
+            if self.num_output_nodes == 1:  # for tensorflow/pytorch models
                 pred_1 = model_score[0]
                 validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity
-            if self.num_output_nodes == 2: # binary
+            if self.num_output_nodes == 2:  # binary
                 pred_1 = model_score[self.num_output_nodes-1]
                 validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity
