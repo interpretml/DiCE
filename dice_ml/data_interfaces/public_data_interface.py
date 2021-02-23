@@ -85,14 +85,10 @@ class PublicData:
                                 #     self.labelencoder[column] = LabelEncoder()
                                 #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
-        self.permitted_range = self.get_features_range()
+        input_permitted_range = None
         if 'permitted_range' in params:
-            permitted_range = params['permitted_range']
-            if not self.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            for feature_name, feature_range in permitted_range.items():
-                self.permitted_range[feature_name] = feature_range
+           input_permitted_range = params['permitted_range']
+        self.permitted_range = self.get_features_range(input_permitted_range)
 
         # should move the below snippet to model agnostic dice interfaces
                                 # self.max_range = -np.inf
@@ -117,13 +113,22 @@ class PublicData:
                 permitted_range[feature] = [self.data_df[feature].min(), self.data_df[feature].max()]
         return True
 
-    def get_features_range(self):
+    def get_features_range(self, permitted_range_input=None):
+        if permitted_range_input is not None:
+            if not self.check_features_range(permitted_range_input):
+                raise ValueError(
+                    "permitted range of features should be within their original range")
         ranges = {}
+        # Getting default ranges based on the dataset
         for feature_name in self.continuous_feature_names:
             ranges[feature_name] = [
                 self.data_df[feature_name].min(), self.data_df[feature_name].max()]
         for feature_name in self.categorical_feature_names:
             ranges[feature_name] = self.data_df[feature_name].unique()
+        # Overwriting the ranges for a feature if input provided
+        if permitted_range_input is not None:
+            for feature_name, feature_range in permitted_range_input.items():
+                ranges[feature_name] = feature_range
         return ranges
 
     def get_data_type(self, col):

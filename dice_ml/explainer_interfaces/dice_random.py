@@ -36,12 +36,12 @@ class DiceRandom(ExplainerBase):
 
     # get data-related parameters for gradient-based DiCE - minx and max for normalized continuous features
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None,  desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
         :param total_CFs: Total number of counterfactuals required.
-
+        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
         :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
@@ -54,22 +54,23 @@ class DiceRandom(ExplainerBase):
         :returns: A CounterfactualExamples object that contains the dataframe
         of generated counterfactuals as an attribute.
         """
-        self.feature_range = self.data_interface.permitted_range.copy()
-        # permitted range for continuous features
-        if permitted_range is not None:
-            if not self.data_interface.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            else:
-                for feature_name, feature_range in permitted_range.items():
-                    self.feature_range[feature_name] = feature_range
-                #self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                #for feature in self.data_interface.continuous_feature_names:
-                #    if feature in self.data_interface.permitted_range:
-                #        feat_ix = self.data_interface.encoded_feature_names.index(feature)
-                #        self.cont_minx[feat_ix] = self.data_interface.permitted_range[feature][0]
-                #        self.cont_maxx[feat_ix] = self.data_interface.permitted_range[feature][1]
+        if permitted_range is None: # use the precomputed default
+            self.feature_range = self.data_interface.permitted_range
+        else: # compute the new ranges based on user input
+            self.feature_range = self.data_interface.get_features_range(permitted_range)
 
+        # number of output nodes of ML model
+        self.num_output_nodes = None
+        if self.model.model_type == "classifier":
+            self.num_output_nodes = self.predict_fn(query_instance).shape[1]
+
+        # query_instance need no transformation for generating CFs using random sampling.
+        # find the predicted value of query_instance
+        test_pred = self.predict_fn(query_instance)[0]
+        if self.model.model_type == 'classifier':
+            self.target_cf_class = self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)
+        elif self.model.model_type == 'regressor':
+            self.target_cf_range = self.infer_target_cfs_range(desired_range)
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
         if features_to_vary == "all":
@@ -79,21 +80,14 @@ class DiceRandom(ExplainerBase):
             for feature in self.data_interface.feature_names:
                 if feature not in features_to_vary:
                     self.fixed_features_values[feature] = query_instance[feature].iloc[0]
-        # number of output nodes of ML model
-        self.num_output_nodes = self.model.get_output(query_instance).shape[1]
 
-        # query_instance need no transformation for generating CFs using random sampling.
-        # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
-        if desired_class == "opposite":
-            desired_class = 1.0 - round(test_pred)
-
-        self.target_cf_class = desired_class
         self.stopping_threshold = stopping_threshold
-        if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
-            self.stopping_threshold = 0.25
-        elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
-            self.stopping_threshold = 0.75
+        if self.model.model_type == "classifier":
+            # TODO Generalize this for multi-class
+            if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
+                self.stopping_threshold = 0.25
+            elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
+                self.stopping_threshold = 0.75
 
         # get random samples for each feature independently
         start_time = timeit.default_timer()
@@ -101,11 +95,11 @@ class DiceRandom(ExplainerBase):
         self.cfs_preds = None
 
         if self.final_cfs is not None:
-            self.cfs_preds = self.predict_fn(self.final_cfs)
-            self.final_cfs[self.data_interface.outcome_name] = self.cfs_preds
+            self.cfs_pred_scores = self.predict_fn(self.final_cfs)
+            self.final_cfs[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
 
         # check validity of CFs
-        self.final_cfs['validity'] = self.final_cfs[self.data_interface.outcome_name].apply(lambda pred: 1 if ((self.target_cf_class == 0 and pred<= self.stopping_threshold) or (self.target_cf_class == 1 and pred>= self.stopping_threshold)) else 0)
+        self.final_cfs['validity'] = self.decide_cf_validity(self.cfs_pred_scores)
         self.total_cfs_found = self.final_cfs[self.final_cfs['validity']==1].shape[0]
 
         if self.total_cfs_found >= self.total_CFs:
@@ -114,14 +108,12 @@ class DiceRandom(ExplainerBase):
         else:
             self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].reset_index(drop=True)
             self.valid_cfs_found = False
-
         final_cfs_df = self.final_cfs[self.data_interface.feature_names + [self.data_interface.outcome_name]].copy()
         final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(3)
         self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
         self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
         test_instance_df = self.data_interface.prepare_query_instance(query_instance)
-        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
-
+        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(self.get_model_output_from_scores((test_pred,)), 3))
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
@@ -191,4 +183,4 @@ class DiceRandom(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance)[:, self.num_output_nodes-1]
+        return self.model.get_output(input_instance)
