@@ -61,7 +61,7 @@ class CounterfactualExplanations:
         self.cf_examples_list = cf_examples_list
         self.local_importance = local_importance
         self.summary_importance = summary_importance
-        self.metadata = {'version': '1'}
+        self.metadata = {'version': '1.0'}
 
     def visualize_as_dataframe(self, display_sparse_df=True,
                                show_only_changes=False):
