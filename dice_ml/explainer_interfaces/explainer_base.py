@@ -167,11 +167,16 @@ class ExplainerBase:
 
         # resetting index to make sure .loc works
         final_cfs_sparse = final_cfs_sparse.reset_index(drop=True)
+        # quantiles of the deviation from median for every continuous feature
         quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param)
         mads = self.data_interface.get_valid_mads()
+        # Setting the quantile of a feature to be the minimum of mad and quantile
+        # Thus, the maximum deviation can be mad.
         for feature in quantiles:
             quantiles[feature] = min(quantiles[feature], mads[feature])
 
+        # Sorting features such that the feature with the highest quantile deviation
+        # is first
         features_sorted = sorted(quantiles.items(), key=lambda kv: kv[1], reverse=True)
         for ix in range(len(features_sorted)):
             features_sorted[ix] = features_sorted[ix][0]
@@ -181,9 +186,8 @@ class ExplainerBase:
         cfs_preds_sparse = []
         for cf_ix in range(len(final_cfs_sparse)):
             current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
-
             for feature in features_sorted:
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+                #current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
                 #feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[cf_ix][feature]
                 if(abs(diff) <= quantiles[feature]):
@@ -194,43 +198,30 @@ class ExplainerBase:
                         final_cfs_sparse = self.do_binary_search(diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
 
             temp_preds = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
-            temp_preds = np.round(temp_preds.flatten().tolist(), 3)[0]
+            #temp_preds = np.round(temp_preds.flatten().tolist(), 3)[0]
             cfs_preds_sparse.append(temp_preds)
 
-        final_cfs_sparse[self.data_interface.outcome_name] = np.array(cfs_preds_sparse)
-
+        final_cfs_sparse[self.data_interface.outcome_name] = self.get_model_output_from_scores(cfs_preds_sparse)
+        #final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
         return final_cfs_sparse
 
-    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred):
+    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred_orig):
         """Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes."""
 
         old_diff = diff
         change = (10**-decimal_prec[feature]) # the minimal possible change for a feature
+        current_pred = current_pred_orig
         if self.model.model_type == 'classifier':
-            while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and
-                  ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
-                   (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
+            while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
+#                  ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
+#                   (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
                 old_val = final_cfs_sparse.iloc[cf_ix][feature]
                 final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
-                if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
-                    final_cfs_sparse.loc[cf_ix, feature] = old_val
-                    diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[cf_ix][feature]
-                    return final_cfs_sparse
-
-                diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[cf_ix][feature]
-
-        elif self.model.model_type == 'regressor':
-            while ((abs(diff) > 10e-4) and (np.sign(diff * old_diff) > 0) and
-                   self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]):  # move until the prediction class changes
-                old_val = final_cfs_sparse.iloc[cf_ix][feature]
-                final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff) * change
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
-                old_diff = diff
-
-                if not self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
+                #if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
+                if not self.is_cf_valid(current_pred):
                     final_cfs_sparse.loc[cf_ix, feature] = old_val
                     diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[cf_ix][feature]
                     return final_cfs_sparse
@@ -244,21 +235,14 @@ class ExplainerBase:
 
         old_val = final_cfs_sparse.iloc[cf_ix][feature]
         final_cfs_sparse.loc[cf_ix, feature] = query_instance[feature].iloc[0]
+        # Prediction of the query instance
         current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
 
-        if self.model.model_type == 'classifier':
-            # first check if assigning query_instance values to a CF is required.
-            if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                return final_cfs_sparse
-            else:
-                final_cfs_sparse.loc[cf_ix, feature] = old_val
-
-        elif self.model.model_type == 'regressor':
-            # first check if assigning query_instance values to a CF is required.
-            if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
-                return final_cfs_sparse
-            else:
-                final_cfs_sparse.loc[cf_ix, feature] = old_val
+        # first check if assigning query_instance values to a CF is required.
+        if self.is_cf_valid(current_pred):
+            return final_cfs_sparse
+        else:
+            final_cfs_sparse.loc[cf_ix, feature] = old_val
 
         # move the CF values towards the query_instance
         if diff > 0:
@@ -275,18 +259,10 @@ class ExplainerBase:
                 if current_val == right or current_val == left:
                     break
 
-                if self.model.model_type == 'classifier':
-                    if (((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (
-                            self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                        left = current_val + (10 ** -decimal_prec[feature])
-                    else:
-                        right = current_val - (10 ** -decimal_prec[feature])
-
-                elif self.model.model_type == 'regressor':
-                    if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
-                        left = current_val + (10 ** -decimal_prec[feature])
-                    else:
-                        right = current_val - (10 ** -decimal_prec[feature])
+                if self.is_cf_valid(current_pred):
+                    left = current_val + (10 ** -decimal_prec[feature])
+                else:
+                    right = current_val - (10 ** -decimal_prec[feature])
 
         else:
             left = query_instance[feature].iloc[0]
@@ -302,17 +278,10 @@ class ExplainerBase:
                 if current_val == right or current_val == left:
                     break
 
-                if self.model.model_type == 'classifier':
-                    if(((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or (self.target_cf_class == 1 and current_pred > self.stopping_threshold))):
-                        right = current_val - (10**-decimal_prec[feature])
-                    else:
-                        left = current_val + (10**-decimal_prec[feature])
-
-                elif self.model.model_type == 'regressor':
-                    if self.target_cf_range[0] <= current_pred <= self.target_cf_range[1]:
-                        right = current_val - (10**-decimal_prec[feature])
-                    else:
-                        left = current_val + (10**-decimal_prec[feature])
+                if self.is_cf_valid(current_pred):
+                    right = current_val - (10**-decimal_prec[feature])
+                else:
+                    left = current_val + (10**-decimal_prec[feature])
 
         return final_cfs_sparse
 
@@ -351,7 +320,7 @@ class ExplainerBase:
         return target_range
 
     def decide_cf_validity(self, model_outputs):
-        validity = [0]*len(model_outputs)
+        validity = np.zeros(len(model_outputs), dtype=np.int32)
         for i in range(len(model_outputs)):
             pred = model_outputs[i]
             if self.model.model_type == "classifier":
@@ -367,8 +336,35 @@ class ExplainerBase:
                     validity[i] = 1
         return validity
 
+    def is_cf_valid(self, model_score):
+        """Check if a cf belongs to the target class or target range.
+        """
+        # Converting to single prediction if the prediction is provided as a
+        # singleton array
+        correct_dim = 1 if self.model.model_type == "classifier" else 0
+        if hasattr(model_score, "shape") and len(model_score.shape) > correct_dim:
+            model_score = model_score[0]
+        if self.model.model_type == "classifier":
+            if self.num_output_nodes == 2: # binary
+                pred_1 = model_score[self.num_output_nodes-1]
+                validity = True if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
+                return validity
+            else:
+                maxscore = max(model_score)
+                if math.isclose(model_score[self.target_cf_class], maxscore):
+                    return True
+        elif self.model.model_type == "regressor":
+            if self.target_cf_range[0] <= model_score < self.target_cf_range[1]:
+                return True
+            else:
+                return False
+
     def get_model_output_from_scores(self, model_scores):
-        model_output = [0]*len(model_scores)
+        if self.model.model_type == "classifier":
+            output_type = np.int32
+        else:
+            output_type = np.float32
+        model_output = np.zeros(len(model_scores), dtype=output_type)
         for i in range(len(model_scores)):
             if self.model.model_type == "classifier":
                 model_output[i] = np.argmax(model_scores[i])
