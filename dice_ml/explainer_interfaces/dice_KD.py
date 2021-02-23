@@ -203,9 +203,11 @@ class DiceKD(ExplainerBase):
                 break
             valid_cf_found = True
             for feature in self.data_interface.feature_names:
-                if (feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]) \
-                        or (feature in permitted_range and not permitted_range[feature][0] <= cfs.iloc[i][feature] <=
-                                                               permitted_range[feature][1]):
+                if (feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]):
+                    valid_cf_found = False
+                    break
+                if (permitted_range!=None and feature in permitted_range and not permitted_range[feature][0] <= cfs.iloc[i][feature] <=
+                                                       permitted_range[feature][1]):
                     valid_cf_found = False
                     break
 
