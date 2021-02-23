@@ -174,8 +174,13 @@ class DiceGenetic(ExplainerBase):
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
 
         """
+        if permitted_range is None: # use the precomputed default
+            self.feature_range = self.data_interface.permitted_range
+        else: # compute the new ranges based on user input
+            self.feature_range = self.data_interface.get_features_range(permitted_range)
+
         self.check_mad_validity(feature_weights)
-        self.check_permitted_range(permitted_range)
+        #self.check_permitted_range(permitted_range)
 
         # Prepares user defined query_instance for DiCE.
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)

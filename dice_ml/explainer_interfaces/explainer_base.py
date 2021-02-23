@@ -2,7 +2,6 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
-import math
 import numpy as np
 import pandas as pd
 import random
@@ -213,14 +212,11 @@ class ExplainerBase:
         current_pred = current_pred_orig
         if self.model.model_type == 'classifier':
             while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
-#                  ((self.target_cf_class == 0 and current_pred < self.stopping_threshold) or
-#                   (self.target_cf_class == 1 and current_pred > self.stopping_threshold))): # move until the prediction class changes
                 old_val = final_cfs_sparse.iloc[cf_ix][feature]
                 final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
-                #if(((self.target_cf_class == 0 and current_pred > self.stopping_threshold) or (self.target_cf_class == 1 and current_pred < self.stopping_threshold))):
                 if not self.is_cf_valid(current_pred):
                     final_cfs_sparse.loc[cf_ix, feature] = old_val
                     diff = query_instance[feature].iloc[0] - final_cfs_sparse.iloc[cf_ix][feature]
@@ -328,11 +324,10 @@ class ExplainerBase:
                     pred_1 = pred[self.num_output_nodes-1]
                     validity[i] = 1 if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else 0
                 else: # multiclass
-                    maxscore = max(pred)
-                    if math.isclose(pred[self.target_cf_class], maxscore):
+                    if np.argmax(pred) == self.target_cf_class:
                         validity[i] = 1
             elif self.model.model_type == "regressor":
-                if pred >= self.target_cf_range[0] and pred < self.target_cf_range[1]:
+                if self.target_cf_range[0] <= pred <= self.target_cf_range[1]:
                     validity[i] = 1
         return validity
 
@@ -344,17 +339,29 @@ class ExplainerBase:
         correct_dim = 1 if self.model.model_type == "classifier" else 0
         if hasattr(model_score, "shape") and len(model_score.shape) > correct_dim:
             model_score = model_score[0]
+        # Converting target_cf_class to a scalar (tf/torch have it as (1,1) shape)
+        target_cf_class = self.target_cf_class
+        if hasattr(self.target_cf_class, "shape"):
+            if len(self.target_cf_class.shape) == 1:
+                target_cf_class = self.target_cf_class[0]
+            elif len(self.target_cf_class.shape) == 2:
+                target_cf_class = self.target_cf_class[0][0]
+        target_cf_class = int(target_cf_class)
+
         if self.model.model_type == "classifier":
+            if self.num_output_nodes == 1: # for tensorflow/pytorch modelsa
+                pred_1 = model_score[0]
+                validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
+                return validity
             if self.num_output_nodes == 2: # binary
                 pred_1 = model_score[self.num_output_nodes-1]
-                validity = True if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
+                validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity
-            else:
-                maxscore = max(model_score)
-                if math.isclose(model_score[self.target_cf_class], maxscore):
+            else:  # multiclass
+                if np.argmax(model_score) == target_cf_class:
                     return True
         elif self.model.model_type == "regressor":
-            if self.target_cf_range[0] <= model_score < self.target_cf_range[1]:
+            if self.target_cf_range[0] <= model_score <= self.target_cf_range[1]:
                 return True
             else:
                 return False
