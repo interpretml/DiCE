@@ -123,12 +123,12 @@ class DiceGenetic(ExplainerBase):
                     else:
                         one_init[0].append(query_instance[0][jx])
                 if self.model.model_type == 'classifier':
-                    if self.predict_fn_without_proba(np.array(one_init)) != desired_class:
+                    if self.predict_fn(np.array(one_init)) != desired_class:
                         ix -= 1
                     else:
                         temp_cfs.append(np.array(one_init))
                 elif self.model.model_type == 'regressor':
-                    predicted_value = self.predict_fn_without_proba(np.array(one_init))
+                    predicted_value = self.predict_fn(np.array(one_init))
                     if not desired_range[0] <= predicted_value <= desired_range[1]:
                         ix -= 1
                     else:
@@ -189,7 +189,7 @@ class DiceGenetic(ExplainerBase):
         self.x1 = query_instance
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn_without_proba(query_instance)
+        test_pred = self.predict_fn(query_instance)
         self.test_pred = test_pred
 
         if self.model.model_type == 'classifier':
@@ -215,19 +215,15 @@ class DiceGenetic(ExplainerBase):
                                           desired_class=desired_class,
                                           model_type=self.model.model_type)
 
-    def predict_fn_genetic(self, input_instance):
+    def predict_fn_scores(self, input_instance):
         """returns predictions"""
         input_instance = self.label_decode(input_instance)
         # TODO this line needs to change---we should not call model.model directly here
         # that functionality should be in the model class
-        ans = self.model.model.predict_proba(input_instance)
-        return ans
+        # ans = self.model.model.predict_proba(input_instance)
+        return self.model.get_output(input_instance)
 
     def predict_fn(self, input_instance):
-        """returns predictions"""
-        return self.model.model.predict_proba(input_instance)
-
-    def predict_fn_without_proba(self, input_instance):
         input_instance = self.label_decode(input_instance)
         return self.model.model.predict(input_instance)[0]
 
@@ -237,7 +233,7 @@ class DiceGenetic(ExplainerBase):
         if self.model.model_type == 'classifier':
             if self.yloss_type == 'hinge_loss':
                 for i in range(self.total_CFs):
-                    predicted_values = self.predict_fn_genetic(cfs[i])[0]
+                    predicted_values = self.predict_fn_scores(cfs[i])[0]
 
                     maxvalue = -np.inf
                     for c in range(self.num_output_nodes):
@@ -250,7 +246,7 @@ class DiceGenetic(ExplainerBase):
         elif self.model.model_type == 'regressor':
             if self.yloss_type == 'hinge_loss':
                 for i in range(self.total_CFs):
-                    predicted_value = self.predict_fn_without_proba(cfs[i])
+                    predicted_value = self.predict_fn(cfs[i])
                     if desired_range[0] <= predicted_value <= desired_range[1]:
                         temp_loss = 0
                     else:
@@ -394,7 +390,7 @@ class DiceGenetic(ExplainerBase):
                     current_best_loss = loss
                     current_best_cf = population[k]
 
-            pop_pred = [self.predict_fn_without_proba(cfs) for cfs in current_best_cf]
+            pop_pred = [self.predict_fn(cfs) for cfs in current_best_cf]
 
             if self.model.model_type == 'classifier':
                 if all(i == desired_class for i in pop_pred):
@@ -422,7 +418,7 @@ class DiceGenetic(ExplainerBase):
             population = new_generation.copy()
 
         self.final_cfs = current_best_cf
-        self.cfs_preds = [self.predict_fn_without_proba(cfs) for cfs in self.final_cfs]
+        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
