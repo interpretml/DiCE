@@ -40,7 +40,7 @@ class DiceGenetic(ExplainerBase):
         self.feature_weights_input = ''
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
 
-        self.population_size = 100
+        self.population_size = 20
         # # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
         #
@@ -215,20 +215,14 @@ class DiceGenetic(ExplainerBase):
                                           desired_class=desired_class,
                                           model_type=self.model.model_type)
 
-    def predict_proba_fn(self, input_instance):
-        """returns prediction probabilities"""
-        input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance)[0]
-
-    def predict_fn(self, input_instance):
+    def predict_fn_scores(self, input_instance):
         """returns predictions"""
         input_instance = self.label_decode(input_instance)
-        # TODO this line needs to change---we should not call model.model directly here
-        # that functionality should be in the model class
-        return self.model.model.predict(input_instance)[0]
+        return self.model.get_output(input_instance)
 
-    def predict_fn_for_sparsity(self, input_instance):
-        """prediction function for sparsity correction"""
+    def predict_fn(self, input_instance):
+        input_instance = self.label_decode(input_instance)
+        # TODO this line needs to change---we should not call model.model directly here. That functionality should be in the model class
         return self.model.model.predict(input_instance)[0]
 
     def compute_yloss(self, cfs, desired_range, desired_class):
@@ -237,7 +231,7 @@ class DiceGenetic(ExplainerBase):
         if self.model.model_type == 'classifier':
             if self.yloss_type == 'hinge_loss':
                 for i in range(self.total_CFs):
-                    predicted_values = self.predict_proba_fn(cfs[i])
+                    predicted_values = self.predict_fn_scores(cfs[i])[0]
 
                     maxvalue = -np.inf
                     for c in range(self.num_output_nodes):

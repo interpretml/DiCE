@@ -152,7 +152,7 @@ class ExplainerBase:
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        return self.predict_fn(input_instance)
+        return self.model.get_output(input_instance)
 
     def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, query_instance, posthoc_sparsity_param, posthoc_sparsity_algorithm):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
@@ -349,11 +349,11 @@ class ExplainerBase:
         target_cf_class = int(target_cf_class)
 
         if self.model.model_type == "classifier":
-            if self.num_output_nodes == 1: # for tensorflow/pytorch modelsa
+            if self.num_output_nodes == 1:  # for tensorflow/pytorch models
                 pred_1 = model_score[0]
                 validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity
-            if self.num_output_nodes == 2: # binary
+            if self.num_output_nodes == 2:  # binary
                 pred_1 = model_score[self.num_output_nodes-1]
                 validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity

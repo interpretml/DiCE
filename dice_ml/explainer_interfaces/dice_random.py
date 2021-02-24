@@ -30,9 +30,15 @@ class DiceRandom(ExplainerBase):
 
         self.data_interface.create_ohe_params()
         self.model = model_interface
-        self.model.load_model() # loading pickled trained model if applicable
+        self.model.load_model()  # loading pickled trained model if applicable
         self.model.transformer.feed_data_params(data_interface)
         self.model.transformer.initialize_transform_func()
+
+        self.precisions = self.data_interface.get_decimal_precisions(output_type="dict")
+        if self.data_interface.outcome_name in self.precisions:
+            self.outcome_precision = [self.precisions[self.data_interface.outcome_name]]
+        else:
+            self.outcome_precision = 0
 
     # get data-related parameters for gradient-based DiCE - minx and max for normalized continuous features
 
@@ -109,11 +115,11 @@ class DiceRandom(ExplainerBase):
             self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].reset_index(drop=True)
             self.valid_cfs_found = False
         final_cfs_df = self.final_cfs[self.data_interface.feature_names + [self.data_interface.outcome_name]].copy()
-        final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(3)
+        final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
         self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
         self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
         test_instance_df = self.data_interface.prepare_query_instance(query_instance)
-        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(self.get_model_output_from_scores((test_pred,)), 3))
+        test_instance_df[self.data_interface.outcome_name] = np.array(np.round(self.get_model_output_from_scores((test_pred,)), self.outcome_precision))
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
