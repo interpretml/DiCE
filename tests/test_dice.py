@@ -2,6 +2,8 @@ import pytest
 
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.utils.exception import UserConfigValidationException
+
 
 class TestBaseExplainerLoader:
     def _get_exp(self, backend):
@@ -23,3 +25,11 @@ class TestBaseExplainerLoader:
         backend = 'PYT'
         exp = self._get_exp(backend)
         assert issubclass(type(exp), dice_ml.explainer_interfaces.explainer_base.ExplainerBase)
+
+    def test_minimum_query_instances(self):
+        sklearn_model = pytest.importorskip('sklearn')
+        backend = 'sklearn'
+        exp = self._get_exp(backend)
+        with pytest.raises(UserConfigValidationException):
+            query_instances = helpers.load_adult_income_dataset().drop("income", axis=1)[0:1]
+            exp.feature_importance(query_instances)

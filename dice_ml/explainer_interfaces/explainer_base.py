@@ -11,6 +11,8 @@ from collections.abc import Iterable
 
 import dice_ml.diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.utils.exception import UserConfigValidationException
+
 
 class ExplainerBase:
 
@@ -105,6 +107,9 @@ class ExplainerBase:
         the list of counterfactuals per input, local feature importances per
         input, and the global feature importance summarized over all inputs.
         """
+        if len(query_instances) < 10:
+            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
+
         if cf_examples_list is None:
             cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
                     desired_class=desired_class,
