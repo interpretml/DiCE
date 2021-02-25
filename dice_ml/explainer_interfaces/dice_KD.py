@@ -5,7 +5,6 @@ This code is similar to 'Interpretable Counterfactual Explanations Guided by Pro
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import numpy as np
 import timeit
-from sklearn.neighbors import KDTree
 import pandas as pd
 import copy
 import random
@@ -43,32 +42,6 @@ class DiceKD(ExplainerBase):
                 self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
-
-    def build_KD_tree(self, data_df_copy, desired_range, desired_class):
-        # Stores the predictions on the training data
-        dataset_instance = self.data_interface.prepare_query_instance(
-            query_instance=data_df_copy[self.data_interface.feature_names])
-
-        predictions = self.predict_fn(dataset_instance)
-        # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
-        data_df_copy[self.predicted_outcome_name] = predictions
-
-        # segmenting the dataset according to outcome
-        dataset_with_predictions = None
-        if self.model.model_type == 'classifier':
-            dataset_with_predictions = data_df_copy.loc[predictions == desired_class].copy()
-
-        elif self.model.model_type == 'regressor':
-            dataset_with_predictions = data_df_copy.loc[
-                [desired_range[0] <= pred <= desired_range[1] for pred in predictions]].copy()
-
-        KD_tree = None
-        # Prepares the KD trees for DiCE
-        if len(dataset_with_predictions) > 0:
-            dummies = pd.get_dummies(dataset_with_predictions[self.data_interface.feature_names])
-            KD_tree = KDTree(dummies)
-
-        return dataset_with_predictions, KD_tree, predictions
 
     def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None, desired_class="opposite",
                                   features_to_vary="all",
@@ -127,7 +100,7 @@ class DiceKD(ExplainerBase):
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions, self.KD_tree, self.predictions = self.build_KD_tree(data_df_copy, desired_range,
-                                                                                           desired_class)
+                                                                                           desired_class, self.predicted_outcome_name)
 
         query_instance, final_cfs, cfs_preds = self.find_counterfactuals(data_df_copy,
                                                                          query_instance, query_instance_orig,
@@ -203,11 +176,10 @@ class DiceKD(ExplainerBase):
                 break
             valid_cf_found = True
             for feature in self.data_interface.feature_names:
-                if (feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]):
+                if feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]:
                     valid_cf_found = False
                     break
-                if (permitted_range!=None and feature in permitted_range and not permitted_range[feature][0] <= cfs.iloc[i][feature] <=
-                                                       permitted_range[feature][1]):
+                if permitted_range is not None and feature in permitted_range and not permitted_range[feature][0] <= cfs.iloc[i][feature] <= permitted_range[feature][1]:
                     valid_cf_found = False
                     break
 

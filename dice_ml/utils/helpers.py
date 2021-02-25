@@ -8,6 +8,7 @@ import os
 import dice_ml
 
 # for data transformations
+import sklearn
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.model_selection import train_test_split
 
@@ -152,11 +153,11 @@ class DataTransfomer:
 
     def initialize_transform_func(self):
         if self.func == 'ohe-min-max':
-            self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args)
+            self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args, validate=False)
         elif self.func == None: # identity transformation
-            self.data_transformer = FunctionTransformer(func=self.func, kw_args=None) # add more ready-to-use transformers (such as label-encoding) in elif loops.
+            self.data_transformer = FunctionTransformer(func=self.func, kw_args=None, validate=False) # add more ready-to-use transformers (such as label-encoding) in elif loops.
         else:
-            self.data_transformer = FunctionTransformer(func=self.func, kw_args=self.kw_args) # add more ready-to-use transformers (such as label-encoding) in elif loops.
+            self.data_transformer = FunctionTransformer(func=self.func, kw_args=self.kw_args, validate=False) # add more ready-to-use transformers (such as label-encoding) in elif loops.
 
     def transform(self, data):
         return self.data_transformer.transform(data) # should return a numpy array
