@@ -8,6 +8,7 @@ import random
 import timeit
 import copy
 from collections.abc import Iterable
+from sklearn.neighbors import KDTree
 
 import dice_ml.diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
@@ -401,3 +402,29 @@ class ExplainerBase:
 
     def sigmoid(self, z): # used in VAE-based CF explainers
             return 1 / (1 + np.exp(-z))
+
+    def build_KD_tree(self, data_df_copy, desired_range, desired_class, predicted_outcome_name):
+        # Stores the predictions on the training data
+        dataset_instance = self.data_interface.prepare_query_instance(
+            query_instance=data_df_copy[self.data_interface.feature_names])
+
+        predictions = self.model.model.predict(dataset_instance)
+        # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
+        data_df_copy[predicted_outcome_name] = predictions
+
+        # segmenting the dataset according to outcome
+        dataset_with_predictions = None
+        if self.model.model_type == 'classifier':
+            dataset_with_predictions = data_df_copy.loc[predictions == desired_class].copy()
+
+        elif self.model.model_type == 'regressor':
+            dataset_with_predictions = data_df_copy.loc[
+                [desired_range[0] <= pred <= desired_range[1] for pred in predictions]].copy()
+
+        KD_tree = None
+        # Prepares the KD trees for DiCE
+        if len(dataset_with_predictions) > 0:
+            dummies = pd.get_dummies(dataset_with_predictions[self.data_interface.feature_names])
+            KD_tree = KDTree(dummies)
+
+        return dataset_with_predictions, KD_tree, predictions
