@@ -126,9 +126,13 @@ class DiceGenetic(ExplainerBase):
     def do_KD_init(self, features_to_vary, permitted_range, query_instance, desired_class, desired_range, cfs):
         cfs = self.label_encode(cfs)
         ix = 0
+        done = False
         for kx in range(self.population_size):
             temp_cfs = []
             for _ in range(self.total_CFs):
+                if ix >= len(cfs):
+                    done = True
+                    break
                 one_init = [[]]
                 for jx, feature in enumerate(self.data_interface.feature_names):
                     if feature not in features_to_vary:
@@ -154,7 +158,24 @@ class DiceGenetic(ExplainerBase):
                                     one_init[0].append(np.random.choice(self.feature_range[feature]))
                 temp_cfs.append(np.array(one_init))
                 ix += 1
+            if done:
+                break
+            self.cfs.append(temp_cfs)
 
+
+        for kx in range(self.population_size - len(self.cfs)):
+            temp_cfs = []
+            for _ in range(self.total_CFs):
+                one_init = [[]]
+                for jx, feature in enumerate(self.data_interface.feature_names):
+                    if feature not in features_to_vary:
+                        one_init[0].append(query_instance[0][jx])
+                    else:
+                        if feature in self.data_interface.continuous_feature_names:
+                            one_init[0].append(np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]))
+                        else:
+                            one_init[0].append(np.random.choice(self.feature_range[feature]))
+                temp_cfs.append(np.array(one_init))
             self.cfs.append(temp_cfs)
 
     def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose):
