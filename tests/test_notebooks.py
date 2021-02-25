@@ -16,6 +16,7 @@ advanced_notebooks = [
         "DiCE_with_advanced_options.ipynb", # requires tensorflow 1.x
         "DiCE_with_private_data.ipynb", # requires fixes to code
         "DiCE_getting_started_feasible.ipynb", # needs changes after latest refactor
+        "Benchmarking_different_CF_explanation_methods.ipynb"
         ]
 
 # Adding the dice root folder to the python path so that jupyter notebooks
