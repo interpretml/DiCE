@@ -188,7 +188,8 @@ class DiceGenetic(ExplainerBase):
                 self.do_random_init(features_to_vary, query_instance, desired_class, desired_range)
 
             else:
-                indices = self.KD_tree.query(query_instance_df_dummies, self.population_size*self.total_CFs)[1][0]
+                num_queries = min(len(self.dataset_with_predictions), self.population_size*self.total_CFs)
+                indices = self.KD_tree.query(query_instance_df_dummies, num_queries)[1][0]
                 KD_tree_output = self.dataset_with_predictions.iloc[indices].copy()
                 self.do_KD_init(features_to_vary, permitted_range, query_instance, desired_class, desired_range, KD_tree_output)
 
