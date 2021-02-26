@@ -1,6 +1,6 @@
 import pytest
 from collections import OrderedDict
-
+import pandas as pd
 import dice_ml
 from dice_ml.utils import helpers
 
@@ -35,3 +35,31 @@ def sample_adultincome_query():
     """
     return {'age':22, 'workclass':'Private', 'education':'HS-grad', 'marital_status':'Single', 'occupation':'Service',
     'race': 'White', 'gender':'Female', 'hours_per_week': 45}
+
+@pytest.fixture
+def sample_custom_query_1():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['a'], 'Numerical': [25]})
+
+@pytest.fixture
+def sample_custom_query_2():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['b'], 'Numerical': [25]})
+
+@pytest.fixture
+def sample_custom_query_3():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['d'], 'Numerical': [1000000]})
+
+@pytest.fixture
+def sample_custom_query_4():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['c'], 'Numerical': [13]})
