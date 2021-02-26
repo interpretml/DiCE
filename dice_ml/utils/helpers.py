@@ -84,12 +84,6 @@ def get_adult_income_modelpath(backend='TF1'):
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
     return modelpath
 
-def get_adult_income_modelpath_pipeline():
-    pkg_path = dice_ml.__path__[0]
-    model_ext = '.sav'
-    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
-    return modelpath
-
 def get_custom_dataset_modelpath_pipeline():
     pkg_path = dice_ml.__path__[0]
     model_ext = '.sav'
