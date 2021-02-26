@@ -66,10 +66,46 @@ def load_adult_income_dataset(only_train=True):
 
     return adult_data
 
+def load_custom_testing_dataset():
+    data = [['a', 10, 0], ['b', 10000, 0], ['c', 14, 0], ['a', 88, 0], ['c', 14, 0]]
+    return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
+
+def load_custom_testing_dataset_multiclass():
+    data = [['a', 10, 1], ['b', 20, 2], ['c', 14, 1], ['a', 23, 2], ['c', 7, 0]]
+    return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
+
+def load_custom_testing_dataset_regression():
+    data = [['a', 10, 1], ['b', 20, 2.8], ['c', 14, 3], ['a', 23, 22], ['c', 7, 1.9]]
+    return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
+
 def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
     model_ext = '.h5' if 'TF' in backend else '.pth'
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
+    return modelpath
+
+def get_adult_income_modelpath_pipeline():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
+    return modelpath
+
+def get_custom_dataset_modelpath_pipeline():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom'+model_ext)
+    return modelpath
+
+def get_custom_dataset_modelpath_pipeline_multiclass():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom_multiclass'+model_ext)
+    return modelpath
+
+def get_custom_dataset_modelpath_pipeline_regression():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom_regression'+model_ext)
     return modelpath
 
 def get_adult_data_info():

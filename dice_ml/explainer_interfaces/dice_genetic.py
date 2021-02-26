@@ -221,7 +221,7 @@ class DiceGenetic(ExplainerBase):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
-        self.feature_range = self.get_valid_feature_range(normalized=False) #, encoding='label')
+        self.feature_range = self.get_valid_feature_range(normalized=False)
         self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
@@ -258,13 +258,14 @@ class DiceGenetic(ExplainerBase):
         """
         self.start_time = timeit.default_timer()
 
-        if permitted_range is None: # use the precomputed default
+        if permitted_range is None:  # use the precomputed default
             self.feature_range = self.data_interface.permitted_range
-        else: # compute the new ranges based on user input
+        else:  # compute the new ranges based on user input
             self.feature_range = self.data_interface.get_features_range(permitted_range)
 
+        self.check_query_instance_validity(features_to_vary, query_instance)
+
         self.check_mad_validity(feature_weights)
-        #self.check_permitted_range(permitted_range)
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
