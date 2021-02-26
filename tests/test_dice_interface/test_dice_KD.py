@@ -44,6 +44,7 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp = KD_binary_classification_exp_object  # explainer object
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
+    # When no elements in the desired_class are present
     @pytest.mark.parametrize("desired_range, desired_class, features_to_vary, total_CFs", [(None, 7, "all", 3)])
     def test_empty_KD(self, desired_range, desired_class, features_to_vary, sample_custom_query_1, total_CFs):
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
@@ -74,8 +75,7 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
 
-        assert True
-
+    # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 4, ['Numerical'], {'Categorical': ['b', 'c']})])
     def test_invalid_query_instance(self, desired_range, desired_class, sample_custom_query_1, total_CFs,
@@ -90,6 +90,7 @@ class TestDiceKDBinaryClassificationMethods:
         except ValueError:
             assert True
 
+    # Verifying the output of the KD tree
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 1, "all", None)])
     def test_KD_tree_output(self, desired_range, desired_class, sample_custom_query_1, total_CFs, features_to_vary,
@@ -137,6 +138,7 @@ class TestDiceKDBinaryClassificationMethods:
         assert all(final_cfs.Numerical == expected_output.Numerical[0]) and \
                all(final_cfs.Categorical == expected_output.Categorical[0])
 
+    # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 1, ["Numerical"], None)])
     def test_features_to_vary(self, desired_range, desired_class, sample_custom_query_2, total_CFs, features_to_vary,
@@ -181,6 +183,7 @@ class TestDiceKDBinaryClassificationMethods:
         assert all(final_cfs.Numerical == expected_output.Numerical[1]) and \
                all(final_cfs.Categorical == expected_output.Categorical[1])
 
+    # Testing that the permitted_range argument actually varies the features only within the permitted_range
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 1, "all", {'Numerical': [1000, 10000]})])
     def test_permitted_range(self, desired_range, desired_class, sample_custom_query_2, total_CFs, features_to_vary,
@@ -228,6 +231,7 @@ class TestDiceKDBinaryClassificationMethods:
         assert all(final_cfs.Numerical == expected_output.Numerical[1]) and \
                all(final_cfs.Categorical == expected_output.Categorical[1])
 
+    # Testing if you can provide permitted_range for categorical variables
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 4, "all", {'Categorical': ['b', 'c']})])
     def test_permitted_range_categorical(self, desired_range, desired_class, sample_custom_query_2, total_CFs,
@@ -272,6 +276,7 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              verbose=False)
         assert all(i in permitted_range["Categorical"] for i in final_cfs.Categorical.values)
 
+    # Testing if an error is thrown when the query instance has an unknown categorical variable
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 1, "all", None)])
     def test_query_instance_outside_bounds(self, desired_range, desired_class, sample_custom_query_3, total_CFs,
@@ -291,6 +296,7 @@ class TestDiceKDBinaryClassificationMethods:
         except ValueError:
             assert True
 
+    # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 0, 2, "all", None)])
     def test_duplicates(self, desired_range, desired_class, sample_custom_query_4, total_CFs, features_to_vary,
@@ -348,6 +354,7 @@ class TestDiceKDMultiClassificationMethods:
         self.exp_multi = KD_multi_classification_exp_object  # explainer object
         self.data_df_copy = self.exp_multi.data_interface.data_df.copy()
 
+    # Testing that the output of multiclass classification lies in the desired_class
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [(None, 2, 3, "all", None)])
     def test_KD_tree_output(self, desired_range, desired_class, sample_custom_query_2, total_CFs, features_to_vary,
@@ -417,6 +424,7 @@ class TestDiceKDRegressionMethods:
         self.exp_regr = KD_regression_exp_object  # explainer object
         self.data_df_copy = self.exp_regr.data_interface.data_df.copy()
 
+    # Testing that the output of regression lies in the desired_range
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
                              [([1, 2.8], "opposite", 6, "all", None)])
     def test_KD_tree_output(self, desired_range, desired_class, sample_custom_query_2, total_CFs, features_to_vary,

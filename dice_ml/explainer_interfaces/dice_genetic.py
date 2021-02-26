@@ -258,6 +258,9 @@ class DiceGenetic(ExplainerBase):
         """
         self.start_time = timeit.default_timer()
 
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
         if permitted_range is None:  # use the precomputed default
             self.feature_range = self.data_interface.permitted_range
         else:  # compute the new ranges based on user input
@@ -284,9 +287,6 @@ class DiceGenetic(ExplainerBase):
                 dtype=np.float32)
         elif self.model.model_type == 'regressor':
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
-
-        if features_to_vary == 'all':
-            features_to_vary = self.data_interface.feature_names
 
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
         for col in pd.get_dummies(self.data_interface.data_df[self.data_interface.feature_names]).columns:

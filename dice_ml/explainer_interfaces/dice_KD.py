@@ -65,6 +65,9 @@ class DiceKD(ExplainerBase):
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
         """
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
         if permitted_range is None: # use the precomputed default
             self.feature_range = self.data_interface.permitted_range
         else: # compute the new ranges based on user input
@@ -77,9 +80,6 @@ class DiceKD(ExplainerBase):
         # check feature MAD validity and throw warnings
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
-
-        if features_to_vary == 'all':
-            features_to_vary = self.data_interface.feature_names
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance.copy()
