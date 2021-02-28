@@ -65,15 +65,21 @@ class DiceKD(ExplainerBase):
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
         """
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
+        if permitted_range is None: # use the precomputed default
+            self.feature_range = self.data_interface.permitted_range
+        else: # compute the new ranges based on user input
+            self.feature_range = self.data_interface.get_features_range(permitted_range)
+
+        self.check_query_instance_validity(features_to_vary, query_instance)
 
         data_df_copy = self.data_interface.data_df.copy()
 
         # check feature MAD validity and throw warnings
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
-
-        if features_to_vary == 'all':
-            features_to_vary = self.data_interface.feature_names
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance.copy()
@@ -171,23 +177,29 @@ class DiceKD(ExplainerBase):
         total_cfs_found = 0
 
         # Iterating through the closest points from the KD tree and checking if any of these are valid
-        for i in range(len(cfs)):
-            if total_cfs_found == total_CFs:
-                break
-            valid_cf_found = True
-            for feature in self.data_interface.feature_names:
-                if feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]:
-                    valid_cf_found = False
+        if self.KD_tree is not None:
+            cfs = cfs.reset_index(drop=True)
+            for i in range(len(cfs)):
+                if total_cfs_found == total_CFs:
                     break
-                if permitted_range is not None and feature in permitted_range and not permitted_range[feature][0] <= cfs.iloc[i][feature] <= permitted_range[feature][1]:
-                    valid_cf_found = False
-                    break
+                valid_cf_found = True
+                for feature in self.data_interface.feature_names:
+                    if feature not in features_to_vary and cfs.iloc[i][feature] != query_instance[feature].values[0]:
+                        valid_cf_found = False
+                        break
+                    if feature in self.data_interface.continuous_feature_names:
+                        if not self.feature_range[feature][0] <= cfs.iloc[i][feature] <= self.feature_range[feature][1]:
+                            valid_cf_found = False
+                            break
+                    else:
+                        if not cfs.iloc[i][feature] in self.feature_range[feature]:
+                            valid_cf_found = False
+                            break
 
-            if valid_cf_found:
-                if not self.duplicates(cfs, final_indices.copy(), i):
-                    total_cfs_found += 1
-                    final_indices.append(i)
-
+                if valid_cf_found:
+                    if not self.duplicates(cfs, final_indices.copy(), i):
+                        total_cfs_found += 1
+                        final_indices.append(i)
         if total_cfs_found > 0:
             final_cfs = cfs.iloc[final_indices]
             final_cfs = final_cfs.drop([self.predicted_outcome_name], axis=1)

@@ -87,6 +87,20 @@ class ExplainerBase:
             cf_examples_arr.append(res)
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
+    def check_query_instance_validity(self, features_to_vary, query_instance):
+        for feature in self.data_interface.feature_names:
+            if feature not in features_to_vary:
+                if feature in self.data_interface.continuous_feature_names:
+                    if not self.feature_range[feature][0] <= query_instance[feature].values[0] <= self.feature_range[feature][1]:
+                        raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
+                else:
+                    if query_instance[feature].values[0] not in self.feature_range[feature]:
+                        raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
+            else:
+                if feature in self.data_interface.categorical_feature_names:
+                    if query_instance[feature].values[0] not in self.feature_range[feature]:
+                        raise ValueError("Feature", feature, "has a value outside the dataset.")
+
     def feature_importance(self, query_instances, cf_examples_list=None, total_CFs=10, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
         """ Estimate feature importance scores for the given inputs.
 
@@ -415,7 +429,7 @@ class ExplainerBase:
         # segmenting the dataset according to outcome
         dataset_with_predictions = None
         if self.model.model_type == 'classifier':
-            dataset_with_predictions = data_df_copy.loc[predictions == desired_class].copy()
+            dataset_with_predictions = data_df_copy.loc[[i == desired_class for i in predictions]].copy()
 
         elif self.model.model_type == 'regressor':
             dataset_with_predictions = data_df_copy.loc[
