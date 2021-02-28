@@ -48,13 +48,18 @@ class ExplainerBase:
                 # # decimal precisions for continuous features
                 # self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
-    def generate_counterfactuals(self, query_instances, total_CFs, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+    def generate_counterfactuals(self, query_instances, total_CFs,
+            desired_class="opposite", desired_range=None,
+            permitted_range=None, features_to_vary="all",
+            stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+            posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.
         :param total_CFs: Total number of counterfactuals required.
 
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
         :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
@@ -103,7 +108,101 @@ class ExplainerBase:
                     if query_instance[feature].values[0] not in self.feature_range[feature]:
                         raise ValueError("Feature", feature, "has a value outside the dataset.")
 
-    def feature_importance(self, query_instances, cf_examples_list=None, total_CFs=10, desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
+    def local_feature_importance(self, query_instances, cf_examples_list=None,
+            total_CFs=10,
+            desired_class="opposite", desired_range=None, permitted_range=None,
+            features_to_vary="all", stopping_threshold=0.5,
+            posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear",
+            **kwargs):
+        """ Estimate local feature importance scores for the given inputs.
+
+
+        :param query_instances: A list of inputs for which to compute the
+        feature importances. These can be provided as a dataframe.
+        :param cf_examples_list: If precomputed, a list of counterfactual
+        examples for every input point. If cf_examples_list is provided, then
+        all the following parameters are ignored.
+        :param total_CFs: The number of counterfactuals to generate per input
+        (default is 10)
+        :param other_parameters: These are the same as the
+        generate_counterfactuals method.
+
+        :returns: An object of class CounterfactualExplanations that includes
+        the list of counterfactuals per input, local feature importances per
+        input, and the global feature importance summarized over all inputs.
+        """
+        if cf_examples_list is not None:
+            if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
+                raise UserConfigValidationException("The number of counterfactuals generated per query instance should be greater than or equal to 10")
+        elif total_CFs < 10:
+            raise UserConfigValidationException("The number of counterfactuals generated per query instance should be greater than or equal to 10")
+        importances = self.feature_importance(query_instances,
+                cf_examples_list=cf_examples_list,
+                total_CFs=total_CFs,
+                local_importance=True,
+                global_importance=False,
+                desired_class=desired_class,
+                desired_range=desired_range,
+                permitted_range=permitted_range,
+                features_to_vary=features_to_vary,
+                stopping_threshold=stopping_threshold,
+                posthoc_sparsity_param=posthoc_sparsity_param,
+                posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                **kwargs)
+        return importances
+
+    def global_feature_importance(self, query_instances, cf_examples_list=None,
+            total_CFs=10, local_importance=True,
+            desired_class="opposite", desired_range=None, permitted_range=None,
+            features_to_vary="all", stopping_threshold=0.5,
+            posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear",
+            **kwargs):
+        """ Estimate global feature importance scores for the given inputs.
+
+
+        :param query_instances: A list of inputs for which to compute the
+        feature importances. These can be provided as a dataframe.
+        :param cf_examples_list: If precomputed, a list of counterfactual
+        examples for every input point. If cf_examples_list is provided, then
+        all the following parameters are ignored.
+        :param total_CFs: The number of counterfactuals to generate per input
+        (default is 10)
+        :param local_importance: Binary flag indicating whether local feature
+        importance values should also be returned for each query instance.
+        :param other_parameters: These are the same as the
+        generate_counterfactuals method.
+
+        :returns: An object of class CounterfactualExplanations that includes
+        the list of counterfactuals per input, local feature importances per
+        input, and the global feature importance summarized over all inputs.
+        """
+        if len(query_instances) < 10:
+            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
+        if cf_examples_list is not None:
+            if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
+                raise UserConfigValidationException("The number of counterfactuals generated per query instance should be greater than or equal to 10")
+        elif total_CFs < 10:
+            raise UserConfigValidationException("The number of counterfactuals generated per query instance should be greater than or equal to 10")
+        importances = self.feature_importance(query_instances,
+                cf_examples_list=cf_examples_list,
+                total_CFs=total_CFs,
+                local_importance=local_importance,
+                global_importance=True,
+                desired_class=desired_class,
+                desired_range=desired_range,
+                permitted_range=permitted_range,
+                features_to_vary=features_to_vary,
+                stopping_threshold=stopping_threshold,
+                posthoc_sparsity_param=posthoc_sparsity_param,
+                posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+                **kwargs)
+        return importances
+
+    def feature_importance(self, query_instances, cf_examples_list=None,
+            total_CFs=10, local_importance=True, global_importance=True,
+            desired_class="opposite", desired_range=None,
+            permitted_range=None, features_to_vary="all", stopping_threshold=0.5,
+            posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
         """ Estimate feature importance scores for the given inputs.
 
         TODO: do not return global importance if only one query instance is given.
@@ -122,8 +221,6 @@ class ExplainerBase:
         the list of counterfactuals per input, local feature importances per
         input, and the global feature importance summarized over all inputs.
         """
-        if len(query_instances) < 10:
-            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
 
         if cf_examples_list is None:
             cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
@@ -134,12 +231,22 @@ class ExplainerBase:
                     posthoc_sparsity_param=posthoc_sparsity_param,
                     posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
                     **kwargs).cf_examples_list
-        summary_importance = {} # initializes all values to 0
-        local_importances = [{} for _ in range(len(cf_examples_list))]
-        # Initializing importance vector
         allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
-        for col in allcols:
-            summary_importance[col] = 0
+        summary_importance = None
+        local_importances = None
+        if global_importance:
+            summary_importance = {}
+            # Initializing importance vector
+            for col in allcols:
+                summary_importance[col] = 0
+
+        if local_importance:
+            local_importances = [{} for _ in range(len(cf_examples_list))]
+            # Initializing local importance for the ith query instance
+            for i in range(len(cf_examples_list)):
+                for col in allcols:
+                    local_importances[i][col] = 0
+
         # Summarizing the found counterfactuals
         for i in range(len(cf_examples_list)):
             cf_examples = cf_examples_list[i]
@@ -149,22 +256,26 @@ class ExplainerBase:
                 df = cf_examples.final_cfs_df_sparse
             else:
                 df = cf_examples.final_cfs_df
-            # Initializing local importance for the ith query instance
-            for col in allcols:
-                local_importances[i][col] = 0
             for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iloc[0], row[col]):
-                        summary_importance[col] += 1
-                        local_importances[i][col] += 1
+                        if summary_importance is not None:
+                            summary_importance[col] += 1
+                        if local_importances is not None:
+                            local_importances[i][col] += 1
                 for col in self.data_interface.categorical_feature_names:
                     if org_instance[col].iloc[0] != row[col]:
-                        summary_importance[col] += 1
-                        local_importances[i][col] += 1
+                        if summary_importance is not None:
+                            summary_importance[col] += 1
+                        if local_importances is not None:
+                            local_importances[i][col] += 1
+
+            if local_importances is not None:
+                for col in allcols:
+                    local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
+        if summary_importance is not None:
             for col in allcols:
-                local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
-        for col in allcols:
-            summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
+                summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
         return CounterfactualExplanations(cf_examples_list,
                 local_importance=local_importances,
                 summary_importance=summary_importance)
