@@ -14,3 +14,8 @@ class TestCounterfactualExplanations:
         assert counterfactual_explanations.metadata is not None
         assert counterfactual_explanations.metadata['version'] is not None
         assert counterfactual_explanations.metadata['version'] == '1.0'
+
+        counterfactual_explanations_as_json = counterfactual_explanations.to_json()
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(
+            counterfactual_explanations_as_json)
+        assert counterfactual_explanations == recovered_counterfactual_explanations
