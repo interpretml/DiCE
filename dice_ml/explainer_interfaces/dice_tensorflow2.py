@@ -95,8 +95,8 @@ class DiceTensorFlow2(ExplainerBase):
                     self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                     self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
-        if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
-            self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
+        #if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
+        self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
         if([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
             self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights)
         if([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
@@ -137,8 +137,8 @@ class DiceTensorFlow2(ExplainerBase):
         # freeze those columns that need to be fixed
         if features_to_vary != self.features_to_vary:
             self.features_to_vary = features_to_vary
-            self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)
-            self.freezer = tf.constant([1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))])
+        self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)
+        self.freezer = tf.constant([1.0 if ix in self.feat_to_vary_idxs else 0.0 for ix in range(len(self.minx[0]))])
 
         # CF initialization
         if len(self.cfs) != self.total_CFs:

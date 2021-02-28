@@ -125,8 +125,8 @@ class PrivateData:
 
     def get_minx_maxx(self, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized form."""
-        minx = np.array([[0.0]*len(self.encoded_feature_names)])
-        maxx = np.array([[1.0]*len(self.encoded_feature_names)])
+        minx = np.array([[0.0]*len(self.ohe_encoded_feature_names)])
+        maxx = np.array([[1.0]*len(self.ohe_encoded_feature_names)])
 
         if normalized:
             return minx, maxx
@@ -207,8 +207,8 @@ class PrivateData:
         """Gets the column indexes categorical features after one-hot-encoding."""
         cols = []
         for col_parent in self.categorical_feature_names:
-            temp = [self.encoded_feature_names.index(
-                col) for col in self.encoded_feature_names if col.startswith(col_parent) and
+            temp = [self.ohe_encoded_feature_names.index(
+                col) for col in self.ohe_encoded_feature_names if col.startswith(col_parent) and
                    col not in self.continuous_feature_names]
             cols.append(temp)
         return cols
@@ -216,7 +216,7 @@ class PrivateData:
     def get_indexes_of_features_to_vary(self, features_to_vary='all'):
         """Gets indexes from feature names of one-hot-encoded data."""
         if features_to_vary == "all":
-            return [i for i in range(len(self.encoded_feature_names))]
+            return [i for i in range(len(self.ohe_encoded_feature_names))]
         else:
             ixs = []
             encoded_cats_ixs = self.get_encoded_categorical_feature_indexes()
