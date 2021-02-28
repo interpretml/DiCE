@@ -40,9 +40,7 @@ class DiceRandom(ExplainerBase):
         else:
             self.outcome_precision = 0
 
-    # get data-related parameters for gradient-based DiCE - minx and max for normalized continuous features
-
-    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None,  desired_class="opposite", permitted_range=None, features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=17, verbose=True):
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range,  desired_class, permitted_range, features_to_vary, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=None, verbose=False):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
@@ -79,7 +77,9 @@ class DiceRandom(ExplainerBase):
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
+        self.features_to_vary=features_to_vary
         if features_to_vary == "all":
+            self.features_to_vary = self.data_interface.feature_names
             self.fixed_features_values = {}
         else:
             self.fixed_features_values = {}
@@ -97,31 +97,59 @@ class DiceRandom(ExplainerBase):
 
         # get random samples for each feature independently
         start_time = timeit.default_timer()
-        self.final_cfs = self.get_samples(self.fixed_features_values, self.feature_range, sampling_random_seed=random_seed, sampling_size=sample_size)
-        self.cfs_preds = None
+        random_instances = self.get_samples(self.fixed_features_values,
+                self.feature_range, sampling_random_seed=random_seed, sampling_size=sample_size)
+        # Generate copies of the query instance that will be changed one feature
+        # at a time to encourage sparsity.
+        cfs_df = None
+        candidate_cfs = pd.DataFrame(np.repeat(query_instance.values, sample_size, axis=0),
+                columns=query_instance.columns)
+        # Loop to change one feature at a time, then two features, and so on.
+        for num_features_to_vary in range(1, len(self.features_to_vary)+1):
+            selected_features = np.random.choice(self.features_to_vary, (sample_size, 1), replace=True)
+            for k in range(sample_size):
+                candidate_cfs.at[k,selected_features[k][0]] = random_instances.at[k,selected_features[k][0]]
+            scores = self.predict_fn(candidate_cfs)
+            validity = self.decide_cf_validity(scores)
+            if sum(validity) > 0:
+                rows_to_add = candidate_cfs[validity==1]
 
-        if self.final_cfs is not None:
-            self.cfs_pred_scores = self.predict_fn(self.final_cfs)
-            self.final_cfs[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
+                if cfs_df is None:
+                    cfs_df = rows_to_add.copy()
+                else:
+                    cfs_df = cfs_df.append(rows_to_add)
+                cfs_df.drop_duplicates(inplace=True)
+                # Always change at least 2 features before stopping
+                if num_features_to_vary >=2 and len(cfs_df) >= total_CFs:
+                    break
 
-        # check validity of CFs
-        self.final_cfs['validity'] = self.decide_cf_validity(self.cfs_pred_scores)
-        self.total_cfs_found = self.final_cfs[self.final_cfs['validity']==1].shape[0]
+        self.total_cfs_found = 0
+        self.valid_cfs_found = False
+        if cfs_df is not None and len(cfs_df) > 0:
+            if len(cfs_df) > total_CFs:
+                cfs_df = cfs_df.sample(total_CFs)
+            cfs_df.reset_index(inplace=True, drop=True)
+            self.cfs_pred_scores = self.predict_fn(cfs_df)
+            cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
 
-        if self.total_cfs_found >= self.total_CFs:
-            self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].sample(n=self.total_CFs, random_state=random_seed).reset_index(drop=True)
-            self.valid_cfs_found = True
+            self.total_cfs_found = len(cfs_df)
+
+            self.valid_cfs_found = True if self.total_cfs_found >= self.total_CFs else False
+
+            final_cfs_df = cfs_df[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+            final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
+            self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
+            self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
         else:
-            self.final_cfs = self.final_cfs[self.final_cfs['validity'] == 1].reset_index(drop=True)
-            self.valid_cfs_found = False
-        final_cfs_df = self.final_cfs[self.data_interface.feature_names + [self.data_interface.outcome_name]].copy()
-        final_cfs_df[self.data_interface.outcome_name] = final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
-        self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
-        self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+            final_cfs_df = None
+            self.cfs_preds = None
+            self.cfs_pred_scores = None
+            self.final_cfs = None
         test_instance_df = self.data_interface.prepare_query_instance(query_instance)
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(self.get_model_output_from_scores((test_pred,)), self.outcome_precision))
         # post-hoc operation on continuous features to enhance sparsity - only for public data
-        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and \
+                self.final_cfs is not None and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
             final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
@@ -145,6 +173,7 @@ class DiceRandom(ExplainerBase):
                                           final_cfs_df_sparse = final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_class=desired_class)
+
 
     def get_samples(self, fixed_features_values, feature_range, sampling_random_seed, sampling_size):
 

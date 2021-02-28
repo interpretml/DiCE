@@ -68,6 +68,7 @@ class ExplainerBase:
         :param verbose: Whether to output detailed messages.
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
+        :param kwargs: Other parameters accepted by specific explanation method
 
         :returns: A CounterfactualExplanations object that contains the list of
         counterfactual examples per query_instance as one of its attributes.
