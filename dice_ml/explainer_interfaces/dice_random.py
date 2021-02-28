@@ -99,9 +99,12 @@ class DiceRandom(ExplainerBase):
         start_time = timeit.default_timer()
         random_instances = self.get_samples(self.fixed_features_values,
                 self.feature_range, sampling_random_seed=random_seed, sampling_size=sample_size)
+        # Generate copies of the query instance that will be changed one feature
+        # at a time to encourage sparsity.
         cfs_df = None
         candidate_cfs = pd.DataFrame(np.repeat(query_instance.values, sample_size, axis=0),
                 columns=query_instance.columns)
+        # Loop to change one feature at a time, then two features, and so on.
         for num_features_to_vary in range(1, len(self.features_to_vary)+1):
             selected_features = np.random.choice(self.features_to_vary, (sample_size, 1), replace=True)
             for k in range(sample_size):
@@ -116,6 +119,7 @@ class DiceRandom(ExplainerBase):
                 else:
                     cfs_df = cfs_df.append(rows_to_add)
                 cfs_df.drop_duplicates(inplace=True)
+                # Always change at least 2 features before stopping
                 if num_features_to_vary >=2 and len(cfs_df) >= total_CFs:
                     break
 
