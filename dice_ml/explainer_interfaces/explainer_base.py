@@ -84,6 +84,7 @@ class ExplainerBase:
         for query_instance in query_instances_list:
             res = self._generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
+                    desired_range=desired_range,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
                     stopping_threshold=stopping_threshold,
@@ -205,8 +206,6 @@ class ExplainerBase:
             posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", **kwargs):
         """ Estimate feature importance scores for the given inputs.
 
-        TODO: do not return global importance if only one query instance is given.
-
         :param query_instances: A list of inputs for which to compute the
         feature importances. These can be provided as a dataframe.
         :param cf_examples_list: If precomputed, a list of counterfactual
@@ -225,6 +224,7 @@ class ExplainerBase:
         if cf_examples_list is None:
             cf_examples_list = self.generate_counterfactuals(query_instances, total_CFs,
                     desired_class=desired_class,
+                    desired_range=desired_range,
                     permitted_range=permitted_range,
                     features_to_vary=features_to_vary,
                     stopping_threshold=stopping_threshold,
