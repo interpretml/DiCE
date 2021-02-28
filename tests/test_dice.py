@@ -32,4 +32,4 @@ class TestBaseExplainerLoader:
         exp = self._get_exp(backend)
         with pytest.raises(UserConfigValidationException):
             query_instances = helpers.load_adult_income_dataset().drop("income", axis=1)[0:1]
-            exp.feature_importance(query_instances)
+            exp.global_feature_importance(query_instances)
