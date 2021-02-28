@@ -4,15 +4,18 @@ import pandas as pd
 import dice_ml.diverse_counterfactuals as exp
 from dice_ml.utils.serialize import DummyDataInterface
 
+
 def json_converter(obj):
     """ Helper function to convert CounterfactualExplanations object to json.
     """
     if isinstance(obj, CounterfactualExplanations):
-        return obj.__dict__
+        rdict = obj.__dict__
+        return rdict
     try:
         return obj.to_json()
     except AttributeError:
         return obj.__dict__
+
 
 def as_counterfactual_explanations(json_dict):
     """ Helper function to convert json string to a CounterfactualExplanations
@@ -43,6 +46,7 @@ def as_counterfactual_explanations(json_dict):
     else:
         return json_dict
 
+
 class CounterfactualExplanations:
     """A class to store counterfactual examples for one or more inputs
     and feature importance scores.
@@ -58,10 +62,53 @@ class CounterfactualExplanations:
     def __init__(self, cf_examples_list,
                  local_importance=None,
                  summary_importance=None):
-        self.cf_examples_list = cf_examples_list
-        self.local_importance = local_importance
-        self.summary_importance = summary_importance
-        self.metadata = {'version': '1.0'}
+        self._cf_examples_list = cf_examples_list
+        self._local_importance = local_importance
+        self._summary_importance = summary_importance
+        self._metadata = {'version': '1.0'}
+
+    def __eq__(self, other_cf):
+        if (isinstance(other_cf, CounterfactualExplanations)):
+            return self.cf_examples_list == other_cf.cf_examples_list and \
+                    self.local_importance == other_cf.local_importance and \
+                    self.summary_importance == other_cf.summary_importance and \
+                    self.metadata == other_cf.metadata
+        return False
+
+    @property
+    def __dict__(self):
+        return {'cf_examples_list': self.cf_examples_list,
+                 'local_importance': self.local_importance,
+                 'summary_importance': self.summary_importance,
+                 'metadata': self.metadata}
+
+    @property
+    def cf_examples_list(self):
+        return self._cf_examples_list
+
+    @property
+    def local_importance(self):
+        if isinstance(self._local_importance, list):
+            sorted_local_importance = []
+            for local_importance_instance in self._local_importance:
+                local_importance_instance = \
+                    dict(sorted(local_importance_instance.items(),
+                                key=lambda x: x[1], reverse=True))
+                sorted_local_importance.append(local_importance_instance)
+            self._local_importance = sorted_local_importance
+        return self._local_importance
+
+    @property
+    def summary_importance(self):
+        if isinstance(self._summary_importance, dict):
+            self._summary_importance = \
+                dict(sorted(self._summary_importance.items(),
+                            key=lambda x: x[1], reverse=True))
+        return self._summary_importance
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def visualize_as_dataframe(self, display_sparse_df=True,
                                show_only_changes=False):
