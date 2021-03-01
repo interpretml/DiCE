@@ -61,7 +61,7 @@ class DiceRandom(ExplainerBase):
         if permitted_range is None: # use the precomputed default
             self.feature_range = self.data_interface.permitted_range
         else: # compute the new ranges based on user input
-            self.feature_range = self.data_interface.get_features_range(permitted_range)
+            self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
 
         # number of output nodes of ML model
         self.num_output_nodes = None

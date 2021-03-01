@@ -94,19 +94,34 @@ class ExplainerBase:
             cf_examples_arr.append(res)
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
-    def check_query_instance_validity(self, features_to_vary, query_instance):
-        for feature in self.data_interface.feature_names:
-            if feature not in features_to_vary:
-                if feature in self.data_interface.continuous_feature_names:
-                    if not self.feature_range[feature][0] <= query_instance[feature].values[0] <= self.feature_range[feature][1]:
+    def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        if features_to_vary == 'all':
+            features_to_vary = self.data_interface.feature_names
+
+        if permitted_range is None:  # use the precomputed default
+            self.feature_range = self.data_interface.permitted_range
+            feature_ranges_orig = self.feature_range
+        else: # compute the new ranges based on user input
+            self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+        self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
+
+        # check feature MAD validity and throw warnings
+        self.check_mad_validity(feature_weights)
+
+        return features_to_vary
+
+    def check_query_instance_validity(self, features_to_vary, permitted_range, query_instance, feature_ranges_orig):
+        for feature in self.data_interface.categorical_feature_names:
+            if query_instance[feature].values[0] not in feature_ranges_orig[feature]:
+                raise ValueError("Feature", feature, "has a value outside the dataset.")
+
+            if feature not in features_to_vary and permitted_range is not None:
+                if feature in permitted_range and feature in self.data_interface.continuous_feature_names:
+                    if not permitted_range[feature][0] <= query_instance[feature].values[0] <= permitted_range[feature][1]:
                         raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
-                else:
+                elif feature in permitted_range and feature in self.data_interface.categorical_feature_names:
                     if query_instance[feature].values[0] not in self.feature_range[feature]:
                         raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
-            else:
-                if feature in self.data_interface.categorical_feature_names:
-                    if query_instance[feature].values[0] not in self.feature_range[feature]:
-                        raise ValueError("Feature", feature, "has a value outside the dataset.")
 
     def local_feature_importance(self, query_instances, cf_examples_list=None,
             total_CFs=10,
@@ -428,7 +443,7 @@ class ExplainerBase:
                 raise ValueError("Desired class cannot be opposite if the number of classes is more than 2.")
 
         if isinstance(desired_class_input, int):
-            if desired_class_input >= 0 and desired_class_input < self.num_output_nodes:
+            if desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
             else:
                 raise ValueError("Desired class should be within 0 and num_classes-1.")
@@ -512,17 +527,17 @@ class ExplainerBase:
     def check_permitted_range(self, permitted_range): # TODO: add comments as to where this is used if this function is necessary, else remove.
         """checks permitted range for continuous features"""
         if permitted_range is not None:
-            if not self.data_interface.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            else:
-                self.data_interface.permitted_range = permitted_range
-                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                self.cont_minx = []
-                self.cont_maxx = []
-                for feature in self.data_interface.continuous_feature_names:
-                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+        #     if not self.data_interface.check_features_range(permitted_range):
+        #         raise ValueError(
+        #             "permitted range of features should be within their original range")
+        #     else:
+            self.data_interface.permitted_range = permitted_range
+            self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+            self.cont_minx = []
+            self.cont_maxx = []
+            for feature in self.data_interface.continuous_feature_names:
+                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
     def check_mad_validity(self, feature_weights): # TODO: add comments as to where this is used if this function is necessary, else remove.
         """checks feature MAD validity and throw warnings"""

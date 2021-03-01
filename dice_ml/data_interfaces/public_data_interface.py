@@ -88,7 +88,7 @@ class PublicData:
         input_permitted_range = None
         if 'permitted_range' in params:
            input_permitted_range = params['permitted_range']
-        self.permitted_range = self.get_features_range(input_permitted_range)
+        self.permitted_range, feature_ranges_orig = self.get_features_range(input_permitted_range)
 
         # should move the below snippet to model agnostic dice interfaces
                                 # self.max_range = -np.inf
@@ -100,24 +100,7 @@ class PublicData:
         else:
             self.data_name = 'mydata'
 
-    def check_features_range(self, permitted_range):
-        for feature in self.continuous_feature_names:
-            if feature in permitted_range:
-                min_value = self.data_df[feature].min()
-                max_value = self.data_df[feature].max()
-
-                if permitted_range[feature][0] < min_value or permitted_range[feature][0] > max_value or permitted_range[feature][1] < permitted_range[feature][0] or permitted_range[feature][1] > max_value:
-                    return False
-            else:
-                #self.permitted_range[feature] = [self.data_df[feature].min(), self.data_df[feature].max()]
-                permitted_range[feature] = [self.data_df[feature].min(), self.data_df[feature].max()]
-        return True
-
     def get_features_range(self, permitted_range_input=None):
-        if permitted_range_input is not None:
-            if not self.check_features_range(permitted_range_input):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
         ranges = {}
         # Getting default ranges based on the dataset
         for feature_name in self.continuous_feature_names:
@@ -125,11 +108,12 @@ class PublicData:
                 self.data_df[feature_name].min(), self.data_df[feature_name].max()]
         for feature_name in self.categorical_feature_names:
             ranges[feature_name] = self.data_df[feature_name].unique().tolist()
+        feature_ranges_orig = ranges.copy()
         # Overwriting the ranges for a feature if input provided
         if permitted_range_input is not None:
             for feature_name, feature_range in permitted_range_input.items():
                 ranges[feature_name] = feature_range
-        return ranges
+        return ranges, feature_ranges_orig
 
     def get_data_type(self, col):
         """Infers data type of a continuous feature from the training data."""
@@ -172,7 +156,7 @@ class PublicData:
                                            df[feature_name] * (max_value - min_value)) + min_value
         return result
 
-    def get_valid_feature_range(self, normalized=True):
+    def get_valid_feature_range(self, feature_range_input, normalized=True):
         """Gets the min/max value of features in normalized or de-normalized
         form. Assumes that all features are already encoded to numerical form
         such that the number of features remains the same.
@@ -189,18 +173,18 @@ class PublicData:
                 min_value = self.data_df[feature_name].min()
 
                 if normalized:
-                    minx = (self.permitted_range[feature_name]
+                    minx = (feature_range_input[feature_name]
                                     [0] - min_value) / (max_value - min_value)
-                    maxx = (self.permitted_range[feature_name]
+                    maxx = (feature_range_input[feature_name]
                                     [1] - min_value) / (max_value - min_value)
                 else:
-                    minx = self.permitted_range[feature_name][0]
-                    maxx = self.permitted_range[feature_name][1]
+                    minx = feature_range_input[feature_name][0]
+                    maxx = feature_range_input[feature_name][1]
                 feature_range[feature_name].append(minx)
                 feature_range[feature_name].append(maxx)
             else:
                 # categorical features
-                feature_range[feature_name] = self.permitted_range[feature_name]
+                feature_range[feature_name] = feature_range_input[feature_name]
         return feature_range
 
     def get_minx_maxx(self, normalized=True):

@@ -84,17 +84,17 @@ class DicePyTorch(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            else:
-                self.data_interface.permitted_range = permitted_range
-                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                self.cont_minx = []
-                self.cont_maxx = []
-                for feature in self.data_interface.continuous_feature_names:
-                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+            # if not self.data_interface.check_features_range(permitted_range):
+            #     raise ValueError(
+            #         "permitted range of features should be within their original range")
+            # else:
+            self.data_interface.permitted_range = permitted_range
+            self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+            self.cont_minx = []
+            self.cont_maxx = []
+            for feature in self.data_interface.continuous_feature_names:
+                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
         if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)

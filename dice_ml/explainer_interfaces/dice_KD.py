@@ -47,7 +47,7 @@ class DiceKD(ExplainerBase):
                                   features_to_vary="all",
                                   permitted_range=None, sparsity_weight=1,
                                   feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="linear", verbose=True):
+                                  posthoc_sparsity_algorithm="linear", verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -65,21 +65,9 @@ class DiceKD(ExplainerBase):
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
         """
-        if features_to_vary == 'all':
-            features_to_vary = self.data_interface.feature_names
-
-        if permitted_range is None: # use the precomputed default
-            self.feature_range = self.data_interface.permitted_range
-        else: # compute the new ranges based on user input
-            self.feature_range = self.data_interface.get_features_range(permitted_range)
-
-        self.check_query_instance_validity(features_to_vary, query_instance)
-
         data_df_copy = self.data_interface.data_df.copy()
 
-        # check feature MAD validity and throw warnings
-        if feature_weights == "inverse_mad":
-            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
+        features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights)
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance.copy()

@@ -100,10 +100,11 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
+            feature_ranges_orig = self.exp.feature_range
         else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
 
-        self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_1)
+        self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_1, feature_ranges_orig)
 
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
@@ -148,10 +149,11 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
+            feature_ranges_orig = self.exp.feature_range
         else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
 
-        self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_2)
+        self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_2, feature_ranges_orig)
 
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
@@ -193,10 +195,11 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
+            feature_ranges_orig = self.exp.feature_range
         else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
 
-        self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_2)
+        self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_2, feature_ranges_orig)
 
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
@@ -242,10 +245,12 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
-        else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            feature_ranges_orig = self.exp.feature_range
 
-        self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_2)
+        else:  # compute the new ranges based on user input
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
+
+        self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_2, feature_ranges_orig)
 
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
@@ -287,11 +292,13 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
+            feature_ranges_orig = self.exp.feature_range
+
         else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
 
         try:
-            self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_3)
+            self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_3, feature_ranges_orig)
             assert False
         except ValueError:
             assert True
@@ -306,10 +313,11 @@ class TestDiceKDBinaryClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp.feature_range = self.exp.data_interface.permitted_range
+            feature_ranges_orig = self.exp.feature_range
         else:  # compute the new ranges based on user input
-            self.exp.feature_range = self.exp.data_interface.get_features_range(permitted_range)
+            self.exp.feature_range, feature_ranges_orig = self.exp.data_interface.get_features_range(permitted_range)
 
-        self.exp.check_query_instance_validity(features_to_vary, sample_custom_query_4)
+        self.exp.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_4, feature_ranges_orig)
 
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
@@ -364,10 +372,11 @@ class TestDiceKDMultiClassificationMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp_multi.feature_range = self.exp_multi.data_interface.permitted_range
+            feature_ranges_orig = self.exp_multi.feature_range
         else:  # compute the new ranges based on user input
-            self.exp_multi.feature_range = self.exp_multi.data_interface.get_features_range(permitted_range)
+            self.exp_multi.feature_range, feature_ranges_orig = self.exp_multi.data_interface.get_features_range(permitted_range)
 
-        self.exp_multi.check_query_instance_validity(features_to_vary, sample_custom_query_2)
+        self.exp_multi.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_2, feature_ranges_orig)
         predictions = [0, 2, 1, 0, 2]
         predicted_outcome_name = self.exp_multi.data_interface.outcome_name + '_pred'
         self.data_df_copy[predicted_outcome_name] = predictions
@@ -434,10 +443,11 @@ class TestDiceKDRegressionMethods:
 
         if permitted_range is None:  # use the precomputed default
             self.exp_regr.feature_range = self.exp_regr.data_interface.permitted_range
+            feature_ranges_orig = self.exp_regr.feature_range
         else:  # compute the new ranges based on user input
-            self.exp_regr.feature_range = self.exp_regr.data_interface.get_features_range(permitted_range)
+            self.exp_regr.feature_range, feature_ranges_orig = self.exp_regr.data_interface.get_features_range(permitted_range)
 
-        self.exp_regr.check_query_instance_validity(features_to_vary, sample_custom_query_2)
+        self.exp_regr.check_query_instance_validity(features_to_vary, permitted_range, sample_custom_query_2, feature_ranges_orig)
 
         # Stores the predictions on the training data
         dataset_instance = self.exp_regr.data_interface.prepare_query_instance(
