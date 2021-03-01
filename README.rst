@@ -121,7 +121,7 @@ For more details, check out the `docs/source/notebooks <https://github.com/inter
 * `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_: Generate CF examples for a `sklearn`, `tensorflow` or `pytorch` binary classifier and compute feature importance scores.
 * `Explaining Multi-class Classifiers and Regressors
   <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_multiclass_classification_and_regression.ipynb>`_: Generate CF explanations for a multi-class classifier or regressor.
-* `Local and Global Feature Importance`_: Estimate local and global feature importance scores using generated counterfactuals.
+* `Local and Global Feature Importance <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_feature_importances.ipynb>`_: Estimate local and global feature importance scores using generated counterfactuals.
 * `Providing Constraints on Counterfactual Generation
   <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb>`_: Specifying which features to vary and their permissible ranges for valid counterfactual examples.
 
@@ -134,6 +134,9 @@ DiCE can generate counterfactual examples using the following methods.
 * Randomized sampling 
 * KD-Tree (for counterfactuals within the training data)
 * Genetic algorithm 
+
+See `model-agnostic notebook
+<https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb>`_ for code examples on using these methods.
 
 **Gradient-based methods**
 
@@ -227,9 +230,9 @@ list of features to vary.
 
 It also supports simple constraints on
 features that reflect practical constraints (e.g., working hours per week
-cannot be more than 50).
+should be between 10 and 50 using the `permitted_range` parameter).
 
-For more details, check out `this <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_with_advanced_options.ipynb>`_ notebook.
+For more details, check out `this <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb>`_ notebook.
 
 The promise of counterfactual explanations
 -------------------------------------------
