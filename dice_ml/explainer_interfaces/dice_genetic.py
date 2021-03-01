@@ -123,8 +123,9 @@ class DiceGenetic(ExplainerBase):
                 ix += 1
             self.cfs.append(temp_cfs)
 
-    def do_KD_init(self, features_to_vary, permitted_range, query_instance, desired_class, desired_range, cfs):
+    def do_KD_init(self, features_to_vary, query_instance, cfs):
         cfs = self.label_encode(cfs)
+        cfs = cfs.reset_index(drop=True)
         ix = 0
         done = False
         for kx in range(self.population_size):
@@ -212,7 +213,7 @@ class DiceGenetic(ExplainerBase):
                 num_queries = min(len(self.dataset_with_predictions), self.population_size*self.total_CFs)
                 indices = self.KD_tree.query(query_instance_df_dummies, num_queries)[1][0]
                 KD_tree_output = self.dataset_with_predictions.iloc[indices].copy()
-                self.do_KD_init(features_to_vary, permitted_range, query_instance, desired_class, desired_range, KD_tree_output)
+                self.do_KD_init(features_to_vary, query_instance, KD_tree_output)
 
         if verbose:
             print("Initialization complete! Generating counterfactuals...")
@@ -230,7 +231,7 @@ class DiceGenetic(ExplainerBase):
                                  diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary",
-                                 maxiterations=10000, verbose=True):
+                                 maxiterations=10000, verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -258,17 +259,7 @@ class DiceGenetic(ExplainerBase):
         """
         self.start_time = timeit.default_timer()
 
-        if features_to_vary == 'all':
-            features_to_vary = self.data_interface.feature_names
-
-        if permitted_range is None:  # use the precomputed default
-            self.feature_range = self.data_interface.permitted_range
-        else:  # compute the new ranges based on user input
-            self.feature_range = self.data_interface.get_features_range(permitted_range)
-
-        self.check_query_instance_validity(features_to_vary, query_instance)
-
-        self.check_mad_validity(feature_weights)
+        features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights)
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
@@ -308,14 +299,14 @@ class DiceGenetic(ExplainerBase):
 
     def predict_fn_scores(self, input_instance):
         """returns predictions"""
-        # print(input_instance)
         input_instance = self.label_decode(input_instance)
         return self.model.get_output(input_instance)
 
     def predict_fn(self, input_instance):
         input_instance = self.label_decode(input_instance)
         # TODO this line needs to change---we should not call model.model directly here. That functionality should be in the model class
-        return self.model.model.predict(input_instance)[0]
+        output = self.model.model.predict(input_instance)[0]
+        return output
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
@@ -417,11 +408,6 @@ class DiceGenetic(ExplainerBase):
         self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) + (
                     self.diversity_weight * self.diversity_loss)
 
-        # print(self.yloss, (self.proximity_weight * self.proximity_loss), self.diversity_weight * self.diversity_loss)
-        #
-        # print(self.loss, "\n")
-
-
         return self.loss
 
     def mate(self, k1, k2, features_to_vary, query_instance):
@@ -477,9 +463,9 @@ class DiceGenetic(ExplainerBase):
         current_best_loss = np.inf
         current_best_cf = []
         stop_cnt = 0
-
+        cfs_preds = [np.inf]*self.total_CFs
         while iterations < maxiterations:
-            if abs(previous_best_loss - current_best_loss) <= 1e-2:
+            if abs(previous_best_loss - current_best_loss) <= 1e-2: #and (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:
                 stop_cnt = 0
@@ -497,6 +483,7 @@ class DiceGenetic(ExplainerBase):
                     current_best_loss = loss
                     current_best_cf = population[k]
 
+            cfs_preds = [self.predict_fn(cfs) for cfs in current_best_cf]
             # 10% of the next generation is fittest members of current generation
             population_fitness = sorted(population_fitness, key=lambda x: x[1])
             s = int((10 * self.population_size) / 100)
@@ -591,8 +578,8 @@ class DiceGenetic(ExplainerBase):
                 ret_df = ret_df.append(df)
         return ret_df
 
-    def get_valid_feature_range(self, normalized=True):
-        ret = self.data_interface.get_valid_feature_range(normalized=normalized)
+    def get_valid_feature_range(self, normalized=False):
+        ret = self.data_interface.get_valid_feature_range(self.feature_range, normalized=normalized)
         for feat_name in self.data_interface.categorical_feature_names:
             ret[feat_name] = self.labelencoder[feat_name].transform(ret[feat_name])
         return ret

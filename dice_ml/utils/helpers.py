@@ -70,12 +70,16 @@ def load_custom_testing_dataset():
     data = [['a', 10, 0], ['b', 10000, 0], ['c', 14, 0], ['a', 88, 0], ['c', 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
+def load_custom_testing_dataset_binary():
+    data = [['a', 1, 0], ['b', 5, 1], ['c', 2, 0], ['a', 3, 0], ['c', 4, 1]]
+    return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
+
 def load_custom_testing_dataset_multiclass():
     data = [['a', 10, 1], ['b', 20, 2], ['c', 14, 1], ['a', 23, 2], ['c', 7, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 def load_custom_testing_dataset_regression():
-    data = [['a', 10, 1], ['b', 20, 2.8], ['c', 14, 3], ['a', 23, 22], ['c', 7, 1.9]]
+    data = [['a', 10, 1], ['b', 21, 2.1], ['c', 14, 1.4], ['a', 23, 2.3], ['c', 7, 0.7]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 def get_adult_income_modelpath(backend='TF1'):
@@ -88,6 +92,12 @@ def get_custom_dataset_modelpath_pipeline():
     pkg_path = dice_ml.__path__[0]
     model_ext = '.sav'
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom'+model_ext)
+    return modelpath
+
+def get_custom_dataset_modelpath_pipeline_binary():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom_binary'+model_ext)
     return modelpath
 
 def get_custom_dataset_modelpath_pipeline_multiclass():
@@ -130,7 +140,7 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
-    encoded_data= df[data_interface.ohe_encoded_feature_names + [data_interface.outcome_name]]
+    encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]]
     dataset = encoded_data.to_numpy()
     print('Dataset Shape:',  encoded_data.shape)
     print('Datasets Columns:', encoded_data.columns)
@@ -144,8 +154,7 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
     #Train, Val, Test Splits
     np.random.shuffle(dataset)
-    test_fraction =0.2
-    test_size= int(test_fraction*len(data_interface.data_df)) #TODO:create an input parameter for data interface
+    test_size= int(data_interface.test_size)
     vae_test_dataset= dataset[:test_size]
     dataset= dataset[test_size:]
     vae_val_dataset= dataset[:test_size]
