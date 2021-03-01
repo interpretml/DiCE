@@ -32,8 +32,6 @@ class ExplainerBase:
             self.model.load_model() # loading pickled trained model if applicable
             self.model.transformer.feed_data_params(data_interface)
             self.model.transformer.initialize_transform_func()
-        # get data-related parameters for gradient-based DiCE - minx and max for normalized continuous features
-        # self.total_random_inits = 0 # redundant
 
         # moved the following snippet to a method in public_data_interface
                 # self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()

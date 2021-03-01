@@ -140,7 +140,7 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
-    encoded_data= df[data_interface.encoded_feature_names + [data_interface.outcome_name]]
+    encoded_data= df[data_interface.ohe_encoded_feature_names + [data_interface.outcome_name]]
     dataset = encoded_data.to_numpy()
     print('Dataset Shape:',  encoded_data.shape)
     print('Datasets Columns:', encoded_data.columns)
@@ -154,7 +154,8 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
     #Train, Val, Test Splits
     np.random.shuffle(dataset)
-    test_size= int(data_interface.test_size)
+    test_fraction =0.2
+    test_size= int(test_fraction*len(data_interface.data_df)) #TODO:create an input parameter for data interface
     vae_test_dataset= dataset[:test_size]
     dataset= dataset[test_size:]
     vae_val_dataset= dataset[:test_size]
