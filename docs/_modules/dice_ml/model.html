@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.model &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.model &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> DiCE
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -72,6 +73,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -86,7 +88,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -99,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -137,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -164,31 +169,37 @@
 
 <div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;An interface class to different ML Model implementations.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF1&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF1&#39;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param model: trained ML model.</span>
 <span class="sd">        :param model_path: path to trained ML model.</span>
-<span class="sd">        :param backend: &quot;TF1&quot; (&quot;TF2&quot;) for TensorFLow 1.0 (2.0) and &quot;PYT&quot; for PyTorch implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with &quot;model&quot; and &quot;explainer&quot; as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class &quot;SklearnModel&quot; in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces, and dice interface class &quot;DiceSklearn&quot; in module &quot;dice_sklearn&quot; inside dice_ml.explainer_interfaces, then backend parameter should be {&quot;model&quot;: &quot;sklearn_model.SklearnModel&quot;, &quot;explainer&quot;: dice_sklearn.DiceSklearn}.</span>
-
+<span class="sd">        :param backend: &quot;TF1&quot; (&quot;TF2&quot;) for TensorFLow 1.0 (2.0), &quot;PYT&quot; for PyTorch implementations, &quot;sklearn&quot; for Scikit-Learn implementations of standard DiCE (https://arxiv.org/pdf/1905.07697.pdf). For all other frameworks and implementations, provide a dictionary with &quot;model&quot; and &quot;explainer&quot; as keys, and include module and class names as values in the form module_name.class_name. For instance, if there is a model interface class &quot;XGBoostModel&quot; in module &quot;xgboost_model.py&quot; inside the subpackage dice_ml.model_interfaces, and dice interface class &quot;DiceXGBoost&quot; in module &quot;dice_xgboost&quot; inside dice_ml.explainer_interfaces, then backend parameter should be {&quot;model&quot;: &quot;xgboost_model.XGBoostModel&quot;, &quot;explainer&quot;: dice_xgboost.DiceXGBoost}.</span>
+<span class="sd">        :param func: function transformation required for ML model. If func is None, then func will be the identity function.</span>
+<span class="sd">        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE&#39;s data_interface is appended to the dictionary of kw_args, by default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
         <span class="k">if</span><span class="p">((</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">model_path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;should provide either a trained model or the path to a model&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Model.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.model.Model.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.model.Model.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decides the Model implementation type.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>  <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="p">)</span></div></div>
 
 <span class="c1"># To add new implementations of Model, add the class in model_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.</span>
 
 <div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.model.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">backend</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decides the Model implementation type.&quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="s1">&#39;TF&#39;</span> <span class="ow">in</span> <span class="n">backend</span><span class="p">:</span> <span class="c1"># Tensorflow 1 or 2 backend</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sklearn&#39;</span><span class="p">:</span> <span class="c1"># random sampling of CFs</span>
+        <span class="kn">from</span> <span class="nn">dice_ml.model_interfaces.base_model</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+        <span class="k">return</span> <span class="n">BaseModel</span>
+
+    <span class="k">elif</span> <span class="s1">&#39;TF&#39;</span> <span class="ow">in</span> <span class="n">backend</span><span class="p">:</span> <span class="c1"># Tensorflow 1 or 2 backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.model_interfaces.keras_tensorflow_model</span> <span class="kn">import</span> <span class="n">KerasTensorFlowModel</span>
         <span class="k">return</span> <span class="n">KerasTensorFlowModel</span>
 
@@ -213,11 +224,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -228,7 +247,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

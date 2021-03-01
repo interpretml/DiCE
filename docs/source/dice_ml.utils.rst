@@ -12,10 +12,26 @@ Subpackages
 Submodules
 ----------
 
+dice\_ml.utils.exception module
+-------------------------------
+
+.. automodule:: dice_ml.utils.exception
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.utils.helpers module
 -----------------------------
 
 .. automodule:: dice_ml.utils.helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dice\_ml.utils.serialize module
+-------------------------------
+
+.. automodule:: dice_ml.utils.serialize
    :members:
    :undoc-members:
    :show-inheritance:

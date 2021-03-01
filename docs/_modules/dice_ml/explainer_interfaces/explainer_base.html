@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -72,6 +73,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -86,7 +88,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -99,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -137,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -162,143 +167,575 @@
 <span class="sd">   All methods are in dice_ml.explainer_interfaces&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KDTree</span>
+
+<span class="kn">import</span> <span class="nn">dice_ml.diverse_counterfactuals</span> <span class="k">as</span> <span class="nn">exp</span>
+<span class="kn">from</span> <span class="nn">dice_ml.counterfactual_explanations</span> <span class="kn">import</span> <span class="n">CounterfactualExplanations</span>
+<span class="kn">from</span> <span class="nn">dice_ml.utils.exception</span> <span class="kn">import</span> <span class="n">UserConfigValidationException</span>
+
 
 <div class="viewcode-block" id="ExplainerBase"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase">[docs]</a><span class="k">class</span> <span class="nc">ExplainerBase</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param data_interface: an interface class to access data related params.</span>
+<span class="sd">        :param model_interface: an interface class to access trained ML model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># get data-related parameters - minx and max for normalized continuous features</span>
+
+        <span class="c1"># initiating data and model related parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span> <span class="o">=</span> <span class="n">data_interface</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_categorical_feature_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_data_params</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model_interface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#self.data_interface.create_ohe_params()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_interface</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span> <span class="c1"># loading pickled trained model if applicable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">feed_data_params</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">initialize_transform_func</span><span class="p">()</span>
 
-        <span class="c1"># min and max for continuous features in original scale</span>
-        <span class="n">flattened_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_categorical_feature_indexes</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ix</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">if</span> <span class="n">ix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flattened_indexes</span><span class="p">]</span>
-        <span class="n">org_minx</span><span class="p">,</span> <span class="n">org_maxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_minx_maxx</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">org_minx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">org_maxx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">])</span>
+        <span class="c1"># moved the following snippet to a method in public_data_interface</span>
+                <span class="c1"># self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()</span>
+                <span class="c1">#</span>
+                <span class="c1"># # min and max for continuous features in original scale</span>
+                <span class="c1"># flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]</span>
+                <span class="c1"># self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]</span>
+                <span class="c1"># org_minx, org_maxx = self.data_interface.get_minx_maxx(normalized=False)</span>
+                <span class="c1"># self.cont_minx = list(org_minx[0][self.encoded_continuous_feature_indexes])</span>
+                <span class="c1"># self.cont_maxx = list(org_maxx[0][self.encoded_continuous_feature_indexes])</span>
+                <span class="c1">#</span>
+                <span class="c1"># # decimal precisions for continuous features</span>
+                <span class="c1"># self.cont_precisions = [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]</span>
 
-        <span class="c1"># decimal precisions for continuous features</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cont_precisions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()[</span><span class="n">ix</span><span class="p">]</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">]</span>
+<div class="viewcode-block" id="ExplainerBase.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+            <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+            <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate counterfactuals by randomly sampling features.</span>
 
-<div class="viewcode-block" id="ExplainerBase.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<span class="sd">        :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.</span>
+<span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
 
-<div class="viewcode-block" id="ExplainerBase.do_posthoc_sparsity_enhancement"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement">[docs]</a>    <span class="k">def</span> <span class="nf">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">cfs_preds_sparse</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">):</span>
+<span class="sd">        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the outcome class of query_instance for binary classification.</span>
+<span class="sd">        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.</span>
+<span class="sd">        :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.</span>
+<span class="sd">        :param features_to_vary: Either a string &quot;all&quot; or a list of feature names to vary.</span>
+<span class="sd">        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.</span>
+<span class="sd">        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.</span>
+<span class="sd">        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes &quot;linear&quot; or &quot;binary&quot;. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</span>
+<span class="sd">        :param verbose: Whether to output detailed messages.</span>
+<span class="sd">        :param sample_size: Sampling size</span>
+<span class="sd">        :param random_seed: Random seed for reproducibility</span>
+<span class="sd">        :param kwargs: Other parameters accepted by specific explanation method</span>
+
+<span class="sd">        :returns: A CounterfactualExplanations object that contains the list of</span>
+<span class="sd">        counterfactual examples per query_instance as one of its attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cf_examples_arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">query_instances_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">query_instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">query_instances_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instances</span><span class="p">[</span><span class="n">ix</span><span class="p">:(</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="n">query_instances_list</span> <span class="o">=</span> <span class="n">query_instances</span>
+            <span class="c1">#query_instances = query_instances.to_dict(&quot;records&quot;)</span>
+        <span class="k">for</span> <span class="n">query_instance</span> <span class="ow">in</span> <span class="n">query_instances_list</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+                    <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                    <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
+                    <span class="n">permitted_range</span><span class="o">=</span><span class="n">permitted_range</span><span class="p">,</span>
+                    <span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span><span class="p">,</span>
+                    <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">stopping_threshold</span><span class="p">,</span>
+                    <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                    <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">cf_examples_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CounterfactualExplanations</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="o">=</span><span class="n">cf_examples_arr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.setup"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">features_to_vary</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">features_to_vary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span>
+
+        <span class="k">if</span> <span class="n">permitted_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># use the precomputed default</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span>
+            <span class="n">feature_ranges_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># compute the new ranges based on user input</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">,</span> <span class="n">feature_ranges_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_features_range</span><span class="p">(</span><span class="n">permitted_range</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_query_instance_validity</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_ranges_orig</span><span class="p">)</span>
+
+        <span class="c1"># check feature MAD validity and throw warnings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_mad_validity</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">features_to_vary</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.check_query_instance_validity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity">[docs]</a>    <span class="k">def</span> <span class="nf">check_query_instance_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_ranges_orig</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">feature_ranges_orig</span><span class="p">[</span><span class="n">feature</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Feature&quot;</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;has a value outside the dataset.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">features_to_vary</span> <span class="ow">and</span> <span class="n">permitted_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">permitted_range</span> <span class="ow">and</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Feature:&quot;</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;is outside the permitted range and isn&#39;t allowed to vary.&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">permitted_range</span> <span class="ow">and</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Feature:&quot;</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;is outside the permitted range and isn&#39;t allowed to vary.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.local_feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.local_feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">local_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate local feature importance scores for the given inputs.</span>
+
+
+<span class="sd">        :param query_instances: A list of inputs for which to compute the</span>
+<span class="sd">        feature importances. These can be provided as a dataframe.</span>
+<span class="sd">        :param cf_examples_list: If precomputed, a list of counterfactual</span>
+<span class="sd">        examples for every input point. If cf_examples_list is provided, then</span>
+<span class="sd">        all the following parameters are ignored.</span>
+<span class="sd">        :param total_CFs: The number of counterfactuals to generate per input</span>
+<span class="sd">        (default is 10)</span>
+<span class="sd">        :param other_parameters: These are the same as the</span>
+<span class="sd">        generate_counterfactuals method.</span>
+
+<span class="sd">        :returns: An object of class CounterfactualExplanations that includes</span>
+<span class="sd">        the list of counterfactuals per input, local feature importances per</span>
+<span class="sd">        input, and the global feature importance summarized over all inputs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cf_examples_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">cf_examples</span> <span class="ow">in</span> <span class="n">cf_examples_list</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The number of counterfactuals generated per query instance should be greater than or equal to 10&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">total_CFs</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The number of counterfactuals generated per query instance should be greater than or equal to 10&quot;</span><span class="p">)</span>
+        <span class="n">importances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_importance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span>
+                <span class="n">cf_examples_list</span><span class="o">=</span><span class="n">cf_examples_list</span><span class="p">,</span>
+                <span class="n">total_CFs</span><span class="o">=</span><span class="n">total_CFs</span><span class="p">,</span>
+                <span class="n">local_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">global_importance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
+                <span class="n">permitted_range</span><span class="o">=</span><span class="n">permitted_range</span><span class="p">,</span>
+                <span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span><span class="p">,</span>
+                <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">stopping_threshold</span><span class="p">,</span>
+                <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">importances</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.global_feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">global_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">local_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate global feature importance scores for the given inputs.</span>
+
+
+<span class="sd">        :param query_instances: A list of inputs for which to compute the</span>
+<span class="sd">        feature importances. These can be provided as a dataframe.</span>
+<span class="sd">        :param cf_examples_list: If precomputed, a list of counterfactual</span>
+<span class="sd">        examples for every input point. If cf_examples_list is provided, then</span>
+<span class="sd">        all the following parameters are ignored.</span>
+<span class="sd">        :param total_CFs: The number of counterfactuals to generate per input</span>
+<span class="sd">        (default is 10)</span>
+<span class="sd">        :param local_importance: Binary flag indicating whether local feature</span>
+<span class="sd">        importance values should also be returned for each query instance.</span>
+<span class="sd">        :param other_parameters: These are the same as the</span>
+<span class="sd">        generate_counterfactuals method.</span>
+
+<span class="sd">        :returns: An object of class CounterfactualExplanations that includes</span>
+<span class="sd">        the list of counterfactuals per input, local feature importances per</span>
+<span class="sd">        input, and the global feature importance summarized over all inputs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_instances</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The number of query instances should be greater than or equal to 10&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cf_examples_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">cf_examples</span> <span class="ow">in</span> <span class="n">cf_examples_list</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The number of counterfactuals generated per query instance should be greater than or equal to 10&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">total_CFs</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The number of counterfactuals generated per query instance should be greater than or equal to 10&quot;</span><span class="p">)</span>
+        <span class="n">importances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_importance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span>
+                <span class="n">cf_examples_list</span><span class="o">=</span><span class="n">cf_examples_list</span><span class="p">,</span>
+                <span class="n">total_CFs</span><span class="o">=</span><span class="n">total_CFs</span><span class="p">,</span>
+                <span class="n">local_importance</span><span class="o">=</span><span class="n">local_importance</span><span class="p">,</span>
+                <span class="n">global_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
+                <span class="n">permitted_range</span><span class="o">=</span><span class="n">permitted_range</span><span class="p">,</span>
+                <span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span><span class="p">,</span>
+                <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">stopping_threshold</span><span class="p">,</span>
+                <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">importances</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">local_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">global_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate feature importance scores for the given inputs.</span>
+
+<span class="sd">        :param query_instances: A list of inputs for which to compute the</span>
+<span class="sd">        feature importances. These can be provided as a dataframe.</span>
+<span class="sd">        :param cf_examples_list: If precomputed, a list of counterfactual</span>
+<span class="sd">        examples for every input point. If cf_examples_list is provided, then</span>
+<span class="sd">        all the following parameters are ignored.</span>
+<span class="sd">        :param total_CFs: The number of counterfactuals to generate per input</span>
+<span class="sd">        (default is 10)</span>
+<span class="sd">        :param other_parameters: These are the same as the</span>
+<span class="sd">        generate_counterfactuals method.</span>
+
+<span class="sd">        :returns: An object of class CounterfactualExplanations that includes</span>
+<span class="sd">        the list of counterfactuals per input, local feature importances per</span>
+<span class="sd">        input, and the global feature importance summarized over all inputs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">cf_examples_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cf_examples_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+                    <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                    <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
+                    <span class="n">permitted_range</span><span class="o">=</span><span class="n">permitted_range</span><span class="p">,</span>
+                    <span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span><span class="p">,</span>
+                    <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">stopping_threshold</span><span class="p">,</span>
+                    <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                    <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">cf_examples_list</span>
+        <span class="n">allcols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span>
+        <span class="n">summary_importance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">local_importances</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">global_importance</span><span class="p">:</span>
+            <span class="n">summary_importance</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># Initializing importance vector</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">allcols</span><span class="p">:</span>
+                <span class="n">summary_importance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">local_importance</span><span class="p">:</span>
+            <span class="n">local_importances</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">))]</span>
+            <span class="c1"># Initializing local importance for the ith query instance</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">allcols</span><span class="p">:</span>
+                    <span class="n">local_importances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Summarizing the found counterfactuals</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">)):</span>
+            <span class="n">cf_examples</span> <span class="o">=</span> <span class="n">cf_examples_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">org_instance</span> <span class="o">=</span> <span class="n">cf_examples</span><span class="o">.</span><span class="n">test_instance_df</span>
+
+            <span class="k">if</span> <span class="n">cf_examples</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">cf_examples</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">cf_examples</span><span class="o">.</span><span class="n">final_cfs_df</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">org_instance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
+                        <span class="k">if</span> <span class="n">summary_importance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">summary_importance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">local_importances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">local_importances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">org_instance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">summary_importance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">summary_importance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">local_importances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">local_importances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">local_importances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">allcols</span><span class="p">:</span>
+                    <span class="n">local_importances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">/=</span> <span class="p">(</span><span class="n">cf_examples_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">summary_importance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">allcols</span><span class="p">:</span>
+                <span class="n">summary_importance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">/=</span> <span class="p">(</span><span class="n">cf_examples_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">CounterfactualExplanations</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">,</span>
+                <span class="n">local_importance</span><span class="o">=</span><span class="n">local_importances</span><span class="p">,</span>
+                <span class="n">summary_importance</span><span class="o">=</span><span class="n">summary_importance</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExplainerBase.predict_fn_for_sparsity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn_for_sparsity">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;prediction function for sparsity correction&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.do_posthoc_sparsity_enhancement"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement">[docs]</a>    <span class="k">def</span> <span class="nf">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Post-hoc method to encourage sparsity in a generated counterfactuals.</span>
 
-<span class="sd">        :param final_cfs_sparse: List of final CFs in numpy format.</span>
-<span class="sd">        :param cfs_preds_sparse: List of predicted outcomes of final CFs in numpy format.</span>
-<span class="sd">        :param query_instance: Query instance in numpy format.</span>
+<span class="sd">        :param final_cfs_sparse: Final CFs in original user-fed format, in a pandas dataframe.</span>
+<span class="sd">        :param query_instance: Query instance in original user-fed format, in a pandas dataframe.</span>
 <span class="sd">        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.</span>
 <span class="sd">        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># :param total_random_inits: total random initialization required for algorithm = RandomInitCF (where k CFs are generated by running a CF generation algorithm k times with random initializations.)</span>
 
-        <span class="n">normalized_quantiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_quantiles_from_training_data</span><span class="p">(</span><span class="n">quantile</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">normalized_mads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_valid_mads</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">normalized_quantiles</span><span class="p">:</span>
-            <span class="n">normalized_quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">normalized_quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="n">normalized_mads</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+        <span class="c1"># resetting index to make sure .loc works</span>
+        <span class="n">final_cfs_sparse</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># quantiles of the deviation from median for every continuous feature</span>
+        <span class="n">quantiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_quantiles_from_training_data</span><span class="p">(</span><span class="n">quantile</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">)</span>
+        <span class="n">mads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_valid_mads</span><span class="p">()</span>
+        <span class="c1"># Setting the quantile of a feature to be the minimum of mad and quantile</span>
+        <span class="c1"># Thus, the maximum deviation can be mad.</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">quantiles</span><span class="p">:</span>
+            <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="n">mads</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
 
-        <span class="n">features_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">normalized_quantiles</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">kv</span><span class="p">:</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Sorting features such that the feature with the highest quantile deviation</span>
+        <span class="c1"># is first</span>
+        <span class="n">features_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">quantiles</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">kv</span><span class="p">:</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features_sorted</span><span class="p">)):</span>
             <span class="n">features_sorted</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">features_sorted</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">decimal_prec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">)]</span>
+        <span class="n">precs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()</span>
+        <span class="n">decimal_prec</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">,</span> <span class="n">precs</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">cf_ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+        <span class="n">cfs_preds_sparse</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cf_ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">)):</span>
+            <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features_sorted</span><span class="p">:</span>
-                <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
-                <span class="n">feat_ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
-                <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-
-                <span class="k">if</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">normalized_quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]):</span>
+                <span class="c1">#current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])</span>
+                <span class="c1">#feat_ix = self.data_interface.continuous_feature_names.index(feature)</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">posthoc_sparsity_algorithm</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
-                        <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">do_linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feat_ix</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">)</span>
+                        <span class="n">final_cfs_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_linear_search</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">)</span>
 
                     <span class="k">elif</span> <span class="n">posthoc_sparsity_algorithm</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
-                        <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">do_binary_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feat_ix</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">)</span>
+                        <span class="n">final_cfs_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_binary_search</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">)</span>
 
-            <span class="n">cfs_preds_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
+            <span class="n">temp_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+            <span class="c1">#temp_preds = np.round(temp_preds.flatten().tolist(), 3)[0]</span>
+            <span class="n">cfs_preds_sparse</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_preds</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">cfs_preds_sparse</span></div></div>
+        <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_output_from_scores</span><span class="p">(</span><span class="n">cfs_preds_sparse</span><span class="p">)</span>
+        <span class="c1">#final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)</span>
+        <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
 
-<div class="viewcode-block" id="do_linear_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.do_linear_search">[docs]</a><span class="k">def</span> <span class="nf">do_linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feat_ix</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ExplainerBase.do_linear_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search">[docs]</a>    <span class="k">def</span> <span class="nf">do_linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred_orig</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes.&quot;&quot;&quot;</span>
 
-    <span class="n">old_diff</span> <span class="o">=</span> <span class="n">diff</span>
-    <span class="n">change</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span> <span class="c1"># the minimal possible change for a feature</span>
-    <span class="k">while</span><span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">10e-4</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="o">*</span><span class="n">old_diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span>
-          <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span>
-           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))):</span> <span class="c1"># move until the prediction class changes</span>
-        <span class="n">old_val</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-        <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="o">*</span><span class="n">change</span>
-        <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
         <span class="n">old_diff</span> <span class="o">=</span> <span class="n">diff</span>
+        <span class="n">change</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span> <span class="c1"># the minimal possible change for a feature</span>
+        <span class="n">current_pred</span> <span class="o">=</span> <span class="n">current_pred_orig</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="k">while</span><span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="o">&gt;</span><span class="mf">10e-4</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="o">*</span><span class="n">old_diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">)):</span>
+                <span class="n">old_val</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+                <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="o">*</span><span class="n">change</span>
+                <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+                <span class="n">old_diff</span> <span class="o">=</span> <span class="n">diff</span>
 
-        <span class="k">if</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))):</span>
-            <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_val</span>
-            <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">):</span>
+                    <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_val</span>
+                    <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">final_cfs_sparse</span>
 
-        <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
 
-<div class="viewcode-block" id="do_binary_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.do_binary_search">[docs]</a><span class="k">def</span> <span class="nf">do_binary_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feat_ix</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ExplainerBase.do_binary_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search">[docs]</a>    <span class="k">def</span> <span class="nf">do_binary_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes.&quot;&quot;&quot;</span>
 
-    <span class="n">old_val</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-    <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-    <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
+        <span class="n">old_val</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+        <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Prediction of the query instance</span>
+        <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
 
-    <span class="c1"># first check if assigning query_instance values to a CF is required.</span>
-    <span class="k">if</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))):</span>
-        <span class="k">return</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_val</span>
+        <span class="c1"># first check if assigning query_instance values to a CF is required.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">final_cfs_sparse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_val</span>
 
-    <span class="c1"># move the CF values towards the query_instance</span>
-    <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
+        <span class="c1"># move the CF values towards the query_instance</span>
+        <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">:</span>
-            <span class="n">current_val</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="p">((</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">current_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
+            <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">current_val</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="p">((</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">current_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
 
-            <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
-            <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
+                <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
+                <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
 
-            <span class="k">if</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">left</span><span class="p">:</span>
-                <span class="k">break</span>
+                <span class="k">if</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">left</span><span class="p">:</span>
+                    <span class="k">break</span>
 
-            <span class="k">if</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))):</span>
-                <span class="n">left</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">):</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">][</span><span class="n">feature</span><span class="p">]</span>
+
+            <span class="k">while</span> <span class="n">right</span> <span class="o">&gt;=</span> <span class="n">left</span><span class="p">:</span>
+                <span class="n">current_val</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="p">((</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">current_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+
+                <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
+                <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_for_sparsity</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">cf_ix</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">left</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">):</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_class"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_class">[docs]</a>    <span class="k">def</span> <span class="nf">infer_target_cfs_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_class_input</span><span class="p">,</span> <span class="n">original_pred</span><span class="p">,</span>
+            <span class="n">num_output_nodes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Infer the target class for generating CFs. Only called when</span>
+<span class="sd">        model_type==&quot;classifier&quot;.</span>
+<span class="sd">        TODO: Add support for opposite desired class in multiclass. Downstream methods should decide</span>
+<span class="sd">        whether it is allowed or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target_class</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">desired_class_input</span> <span class="o">==</span> <span class="s2">&quot;opposite&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">num_output_nodes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">original_pred_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">original_pred</span><span class="p">)</span>
+                <span class="n">target_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">original_pred_1</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">num_output_nodes</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Desired class cannot be opposite if the number of classes is more than 2.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">desired_class_input</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">desired_class_input</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">desired_class_input</span> <span class="o">&lt;</span> <span class="n">num_output_nodes</span><span class="p">:</span>
+                <span class="n">target_class</span> <span class="o">=</span> <span class="n">desired_class_input</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">right</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Desired class should be within 0 and num_classes-1.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">target_class</span></div>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">query_instance</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span>
-
-        <span class="k">while</span> <span class="n">right</span> <span class="o">&gt;=</span> <span class="n">left</span><span class="p">:</span>
-            <span class="n">current_val</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="p">((</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">current_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
-
-            <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">feat_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
-            <span class="n">current_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">])</span>
-
-            <span class="k">if</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">left</span><span class="p">:</span>
-                <span class="k">break</span>
-
-            <span class="k">if</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">current_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))):</span>
-                <span class="n">right</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
+<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_range"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_range">[docs]</a>    <span class="k">def</span> <span class="nf">infer_target_cfs_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_range_input</span><span class="p">):</span>
+        <span class="n">target_range</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">desired_range_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Need to provide a desired_range for the target counterfactuals for a regression model.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">desired_range_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">desired_range_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid Range!&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">left</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">decimal_prec</span><span class="p">[</span><span class="n">feat_ix</span><span class="p">])</span>
+                <span class="n">target_range</span> <span class="o">=</span> <span class="n">desired_range_input</span>
+        <span class="k">return</span> <span class="n">target_range</span></div>
 
-    <span class="k">return</span> <span class="n">final_cfs_sparse</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">]</span></div>
+<div class="viewcode-block" id="ExplainerBase.decide_cf_validity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity">[docs]</a>    <span class="k">def</span> <span class="nf">decide_cf_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_outputs</span><span class="p">):</span>
+        <span class="n">validity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_outputs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_outputs</span><span class="p">)):</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">model_outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># binary</span>
+                    <span class="n">pred_1</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">validity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># multiclass</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">:</span>
+                        <span class="n">validity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;regressor&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">pred</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">validity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">validity</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.is_cf_valid"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.is_cf_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_cf_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_score</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if a cf belongs to the target class or target range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Converting to single prediction if the prediction is provided as a</span>
+        <span class="c1"># singleton array</span>
+        <span class="n">correct_dim</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model_score</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">model_score</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">correct_dim</span><span class="p">:</span>
+            <span class="n">model_score</span> <span class="o">=</span> <span class="n">model_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Converting target_cf_class to a scalar (tf/torch have it as (1,1) shape)</span>
+        <span class="n">target_cf_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">target_cf_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">target_cf_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">target_cf_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_cf_class</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># for tensorflow/pytorch models</span>
+                <span class="n">pred_1</span> <span class="o">=</span> <span class="n">model_score</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">validity</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="p">((</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))</span> <span class="k">else</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="n">validity</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># binary</span>
+                <span class="n">pred_1</span> <span class="o">=</span> <span class="n">model_score</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">validity</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="p">((</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred_1</span><span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span><span class="p">))</span> <span class="k">else</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="n">validity</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># multiclass</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model_score</span><span class="p">)</span> <span class="o">==</span> <span class="n">target_cf_class</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;regressor&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">model_score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.get_model_output_from_scores"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_scores</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+            <span class="n">output_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="n">model_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_scores</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">output_type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_scores</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+                <span class="n">model_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model_scores</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;regressor&quot;</span><span class="p">:</span>
+                <span class="n">model_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">model_output</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.check_permitted_range"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">[docs]</a>    <span class="k">def</span> <span class="nf">check_permitted_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">):</span> <span class="c1"># TODO: add comments as to where this is used if this function is necessary, else remove.</span>
+        <span class="sd">&quot;&quot;&quot;checks permitted range for continuous features&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">permitted_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#     if not self.data_interface.check_features_range(permitted_range):</span>
+        <span class="c1">#         raise ValueError(</span>
+        <span class="c1">#             &quot;permitted range of features should be within their original range&quot;)</span>
+        <span class="c1">#     else:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span> <span class="o">=</span> <span class="n">permitted_range</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_minx_maxx</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.check_mad_validity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_mad_validity">[docs]</a>    <span class="k">def</span> <span class="nf">check_mad_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">):</span> <span class="c1"># TODO: add comments as to where this is used if this function is necessary, else remove.</span>
+        <span class="sd">&quot;&quot;&quot;checks feature MAD validity and throw warnings&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">feature_weights</span> <span class="o">==</span> <span class="s2">&quot;inverse_mad&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_valid_mads</span><span class="p">(</span><span class="n">display_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_mads</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.sigmoid"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid">[docs]</a>    <span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span> <span class="c1"># used in VAE-based CF explainers</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ExplainerBase.build_KD_tree"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.build_KD_tree">[docs]</a>    <span class="k">def</span> <span class="nf">build_KD_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df_copy</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">predicted_outcome_name</span><span class="p">):</span>
+        <span class="c1"># Stores the predictions on the training data</span>
+        <span class="n">dataset_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span>
+            <span class="n">query_instance</span><span class="o">=</span><span class="n">data_df_copy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dataset_instance</span><span class="p">)</span>
+        <span class="c1"># TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient</span>
+        <span class="n">data_df_copy</span><span class="p">[</span><span class="n">predicted_outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">predictions</span>
+
+        <span class="c1"># segmenting the dataset according to outcome</span>
+        <span class="n">dataset_with_predictions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="n">dataset_with_predictions</span> <span class="o">=</span> <span class="n">data_df_copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">i</span> <span class="o">==</span> <span class="n">desired_class</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;regressor&#39;</span><span class="p">:</span>
+            <span class="n">dataset_with_predictions</span> <span class="o">=</span> <span class="n">data_df_copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="p">[</span><span class="n">desired_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">pred</span> <span class="o">&lt;=</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">KD_tree</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Prepares the KD trees for DiCE</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_with_predictions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">dataset_with_predictions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+            <span class="n">KD_tree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="n">dummies</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dataset_with_predictions</span><span class="p">,</span> <span class="n">KD_tree</span><span class="p">,</span> <span class="n">predictions</span></div></div>
 </pre></div>
 
            </div>
@@ -311,11 +748,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -326,7 +771,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

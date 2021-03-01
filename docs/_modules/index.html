@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; DiCE 0.4 documentation</title>
+  <title>Overview: module code &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> DiCE
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -72,6 +73,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -86,7 +88,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -99,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -137,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Overview: module code</li>
     
@@ -155,12 +160,16 @@
            <div itemprop="articleBody">
             
   <h1>All modules for which code is available</h1>
-<ul><li><a href="dice_ml/data.html">dice_ml.data</a></li>
+<ul><li><a href="dice_ml/counterfactual_explanations.html">dice_ml.counterfactual_explanations</a></li>
+<li><a href="dice_ml/data.html">dice_ml.data</a></li>
 <li><a href="dice_ml/data_interfaces/private_data_interface.html">dice_ml.data_interfaces.private_data_interface</a></li>
 <li><a href="dice_ml/data_interfaces/public_data_interface.html">dice_ml.data_interfaces.public_data_interface</a></li>
 <li><a href="dice_ml/dice.html">dice_ml.dice</a></li>
 <li><a href="dice_ml/diverse_counterfactuals.html">dice_ml.diverse_counterfactuals</a></li>
+<li><a href="dice_ml/explainer_interfaces/dice_KD.html">dice_ml.explainer_interfaces.dice_KD</a></li>
+<li><a href="dice_ml/explainer_interfaces/dice_genetic.html">dice_ml.explainer_interfaces.dice_genetic</a></li>
 <li><a href="dice_ml/explainer_interfaces/dice_pytorch.html">dice_ml.explainer_interfaces.dice_pytorch</a></li>
+<li><a href="dice_ml/explainer_interfaces/dice_random.html">dice_ml.explainer_interfaces.dice_random</a></li>
 <li><a href="dice_ml/explainer_interfaces/dice_tensorflow1.html">dice_ml.explainer_interfaces.dice_tensorflow1</a></li>
 <li><a href="dice_ml/explainer_interfaces/dice_tensorflow2.html">dice_ml.explainer_interfaces.dice_tensorflow2</a></li>
 <li><a href="dice_ml/explainer_interfaces/explainer_base.html">dice_ml.explainer_interfaces.explainer_base</a></li>
@@ -170,7 +179,9 @@
 <li><a href="dice_ml/model_interfaces/base_model.html">dice_ml.model_interfaces.base_model</a></li>
 <li><a href="dice_ml/model_interfaces/keras_tensorflow_model.html">dice_ml.model_interfaces.keras_tensorflow_model</a></li>
 <li><a href="dice_ml/model_interfaces/pytorch_model.html">dice_ml.model_interfaces.pytorch_model</a></li>
+<li><a href="dice_ml/utils/exception.html">dice_ml.utils.exception</a></li>
 <li><a href="dice_ml/utils/helpers.html">dice_ml.utils.helpers</a></li>
+<li><a href="dice_ml/utils/serialize.html">dice_ml.utils.serialize</a></li>
 </ul>
 
            </div>
@@ -183,11 +194,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -198,7 +217,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

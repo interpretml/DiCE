@@ -1,0 +1,3322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Estimating local and global feature importance scores using DiCE &mdash; DiCE 0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Estimating local and global feature importance scores using DiCE</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/DiCE_feature_importances.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Estimating-local-and-global-feature-importance-scores-using-DiCE">
+<h1>Estimating local and global feature importance scores using DiCE<a class="headerlink" href="#Estimating-local-and-global-feature-importance-scores-using-DiCE" title="Permalink to this headline">¶</a></h1>
+<p>Summaries of counterfactual examples can be used to estimate importance of features. Intuitively, a feature that is changed more often to generate a proximal counterfactual is an important feature. We use this intuition to build a feature importance score.</p>
+<p>This score can be interpreted as a measure of the <strong>necessity</strong> of a feature to cause a particular model output. That is, if the feature’s value changes, then it is likely that the model’s output class will also change (or the model’s output will significantly change in case of regression model).</p>
+<p>Below we show how counterfactuals can be used to provide local feature importance scores for any input, and how those scores can be combined to yield a global importance score for each feature.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Preliminaries:-Loading-the-data-and-ML-model">
+<h2>Preliminaries: Loading the data and ML model<a class="headerlink" href="#Preliminaries:-Loading-the-data-and-ML-model" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dice_ml.utils</span> <span class="kn">import</span> <span class="n">helpers</span> <span class="c1"># helper functions</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span> <span class="c1"># downsampling to reduce ML model fitting time</span>
+<span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_data_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;age&#39;: &#39;age&#39;,
+ &#39;workclass&#39;: &#39;type of industry (Government, Other/Unknown, Private, Self-Employed)&#39;,
+ &#39;education&#39;: &#39;education level (Assoc, Bachelors, Doctorate, HS-grad, Masters, Prof-school, School, Some-college)&#39;,
+ &#39;marital_status&#39;: &#39;marital status (Divorced, Married, Separated, Single, Widowed)&#39;,
+ &#39;occupation&#39;: &#39;occupation (Blue-Collar, Other/Unknown, Professional, Sales, Service, White-Collar)&#39;,
+ &#39;race&#39;: &#39;white or other race?&#39;,
+ &#39;gender&#39;: &#39;male or female?&#39;,
+ &#39;hours_per_week&#39;: &#39;total work hours per week&#39;,
+ &#39;income&#39;: &#39;0 (&lt;=50K) vs 1 (&gt;50K)&#39;}
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
+<span class="c1"># Split data into train and test</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
+                                                    <span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">numerical</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours_per_week&quot;</span><span class="p">]</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+
+<span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
+
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
+
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">numerical</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical</span><span class="p">)])</span>
+
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
+<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">Dice</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Local-feature-importance">
+<h2>Local feature importance<a class="headerlink" href="#Local-feature-importance" title="Permalink to this headline">¶</a></h2>
+<p>We first generate counterfactuals for a given input point.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">exp</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+<span class="n">query_instance</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">e1</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                                   <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">e1</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>49</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Divorced</td>
+      <td>White-Collar</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Diverse Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>48.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>97.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Widowed</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>These can now be used to calculate the feature importance scores.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">local_feature_importance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="n">e1</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">local_importance</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;education&#39;: 0.6, &#39;marital_status&#39;: 0.5, &#39;hours_per_week&#39;: 0.3, &#39;age&#39;: 0.2, &#39;workclass&#39;: 0.1, &#39;occupation&#39;: 0.1, &#39;race&#39;: 0.1, &#39;gender&#39;: 0.1}]
+</pre></div></div>
+</div>
+<p>Feature importance can also be estimated directly, by leaving the <code class="docutils literal notranslate"><span class="pre">cf_examples_list</span></code> argument blank.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">local_feature_importance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">local_importance</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;education&#39;: 0.6, &#39;marital_status&#39;: 0.6, &#39;gender&#39;: 0.2, &#39;age&#39;: 0.2, &#39;workclass&#39;: 0.1, &#39;occupation&#39;: 0.1, &#39;race&#39;: 0.1, &#39;hours_per_week&#39;: 0.1}]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Global-importance">
+<h2>Global importance<a class="headerlink" href="#Global-importance" title="Permalink to this headline">¶</a></h2>
+<p>For global importance, we need to generate counterfactuals for a representative sample of the dataset.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cobj</span><span class="o">=</span><span class="n">exp</span><span class="o">.</span><span class="n">global_feature_importance</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cobj</span><span class="o">.</span><span class="n">summary_importance</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;age&#39;: 0.57, &#39;marital_status&#39;: 0.4, &#39;education&#39;: 0.37, &#39;occupation&#39;: 0.27, &#39;hours_per_week&#39;: 0.23, &#39;race&#39;: 0.16, &#39;workclass&#39;: 0.13, &#39;gender&#39;: 0.13}
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Convert-the-counterfactual-output-to-json">
+<h2>Convert the counterfactual output to json<a class="headerlink" href="#Convert-the-counterfactual-output-to-json" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">json_str</span> <span class="o">=</span> <span class="n">cobj</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;cf_examples_list&#34;: [
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:35},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Blue-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:50.0,\\\&#34;1\\\&#34;:35,\\\&#34;2\\\&#34;:59.0,\\\&#34;3\\\&#34;:48.0,\\\&#34;4\\\&#34;:56.0,\\\&#34;5\\\&#34;:59.0,\\\&#34;6\\\&#34;:35,\\\&#34;7\\\&#34;:35,\\\&#34;8\\\&#34;:55.0,\\\&#34;9\\\&#34;:35},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Government\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Blue-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Other\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:40,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:40,\\\&#34;4\\\&#34;:40,\\\&#34;5\\\&#34;:40,\\\&#34;6\\\&#34;:40,\\\&#34;7\\\&#34;:40,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:49},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Divorced\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:41.0,\\\&#34;1\\\&#34;:49,\\\&#34;2\\\&#34;:49,\\\&#34;3\\\&#34;:49,\\\&#34;4\\\&#34;:49,\\\&#34;5\\\&#34;:49,\\\&#34;6\\\&#34;:49,\\\&#34;7\\\&#34;:49,\\\&#34;8\\\&#34;:86.0,\\\&#34;9\\\&#34;:49},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Doctorate\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Divorced\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Divorced\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Divorced\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:40,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:40,\\\&#34;4\\\&#34;:45.0,\\\&#34;5\\\&#34;:40,\\\&#34;6\\\&#34;:40,\\\&#34;7\\\&#34;:40,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:0,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:57},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Some-college\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Blue-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:45},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:57,\\\&#34;1\\\&#34;:57,\\\&#34;2\\\&#34;:47.0,\\\&#34;3\\\&#34;:72.0,\\\&#34;4\\\&#34;:57,\\\&#34;5\\\&#34;:63.0,\\\&#34;6\\\&#34;:46.0,\\\&#34;7\\\&#34;:57,\\\&#34;8\\\&#34;:57,\\\&#34;9\\\&#34;:57},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Self-Employed\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Doctorate\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Separated\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Separated\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Service\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:93.0,\\\&#34;1\\\&#34;:45,\\\&#34;2\\\&#34;:45,\\\&#34;3\\\&#34;:45,\\\&#34;4\\\&#34;:45,\\\&#34;5\\\&#34;:45,\\\&#34;6\\\&#34;:45,\\\&#34;7\\\&#34;:45,\\\&#34;8\\\&#34;:27.0,\\\&#34;9\\\&#34;:45},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:37},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:50},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:28.0,\\\&#34;1\\\&#34;:37,\\\&#34;2\\\&#34;:37,\\\&#34;3\\\&#34;:90.0,\\\&#34;4\\\&#34;:37,\\\&#34;5\\\&#34;:37,\\\&#34;6\\\&#34;:84.0,\\\&#34;7\\\&#34;:37,\\\&#34;8\\\&#34;:37,\\\&#34;9\\\&#34;:32.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:50,\\\&#34;1\\\&#34;:50,\\\&#34;2\\\&#34;:5.0,\\\&#34;3\\\&#34;:13.0,\\\&#34;4\\\&#34;:12.0,\\\&#34;5\\\&#34;:38.0,\\\&#34;6\\\&#34;:32.0,\\\&#34;7\\\&#34;:32.0,\\\&#34;8\\\&#34;:44.0,\\\&#34;9\\\&#34;:50},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0,\\\&#34;1\\\&#34;:0,\\\&#34;2\\\&#34;:0,\\\&#34;3\\\&#34;:0,\\\&#34;4\\\&#34;:0,\\\&#34;5\\\&#34;:0,\\\&#34;6\\\&#34;:0,\\\&#34;7\\\&#34;:0,\\\&#34;8\\\&#34;:0,\\\&#34;9\\\&#34;:0}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:48},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:20.0,\\\&#34;1\\\&#34;:48,\\\&#34;2\\\&#34;:18.0,\\\&#34;3\\\&#34;:48,\\\&#34;4\\\&#34;:51.0,\\\&#34;5\\\&#34;:48,\\\&#34;6\\\&#34;:48,\\\&#34;7\\\&#34;:83.0,\\\&#34;8\\\&#34;:25.0,\\\&#34;9\\\&#34;:68.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Masters\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:76.0,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:40,\\\&#34;4\\\&#34;:40,\\\&#34;5\\\&#34;:40,\\\&#34;6\\\&#34;:8.0,\\\&#34;7\\\&#34;:40,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0,\\\&#34;1\\\&#34;:0,\\\&#34;2\\\&#34;:0,\\\&#34;3\\\&#34;:0,\\\&#34;4\\\&#34;:0,\\\&#34;5\\\&#34;:0,\\\&#34;6\\\&#34;:0,\\\&#34;7\\\&#34;:0,\\\&#34;8\\\&#34;:0,\\\&#34;9\\\&#34;:0}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:50},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Government\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Masters\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Professional\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:38.0,\\\&#34;1\\\&#34;:50,\\\&#34;2\\\&#34;:50,\\\&#34;3\\\&#34;:65.0,\\\&#34;4\\\&#34;:83.0,\\\&#34;5\\\&#34;:50,\\\&#34;6\\\&#34;:43.0,\\\&#34;7\\\&#34;:50,\\\&#34;8\\\&#34;:50,\\\&#34;9\\\&#34;:30.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Self-Employed\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Government\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Masters\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Professional\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:40,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:40,\\\&#34;4\\\&#34;:40,\\\&#34;5\\\&#34;:45.0,\\\&#34;6\\\&#34;:40,\\\&#34;7\\\&#34;:95.0,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:34},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Government\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Doctorate\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Professional\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:45},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:30.0,\\\&#34;1\\\&#34;:34,\\\&#34;2\\\&#34;:34,\\\&#34;3\\\&#34;:34,\\\&#34;4\\\&#34;:34,\\\&#34;5\\\&#34;:34,\\\&#34;6\\\&#34;:34,\\\&#34;7\\\&#34;:34,\\\&#34;8\\\&#34;:34,\\\&#34;9\\\&#34;:34},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;School\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Doctorate\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Separated\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Divorced\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Widowed\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Married\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Service\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:45,\\\&#34;1\\\&#34;:1.0,\\\&#34;2\\\&#34;:45,\\\&#34;3\\\&#34;:45,\\\&#34;4\\\&#34;:84.0,\\\&#34;5\\\&#34;:34.0,\\\&#34;6\\\&#34;:45,\\\&#34;7\\\&#34;:15.0,\\\&#34;8\\\&#34;:45,\\\&#34;9\\\&#34;:45},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0,\\\&#34;1\\\&#34;:0,\\\&#34;2\\\&#34;:0,\\\&#34;3\\\&#34;:0,\\\&#34;4\\\&#34;:0,\\\&#34;5\\\&#34;:0,\\\&#34;6\\\&#34;:0,\\\&#34;7\\\&#34;:0,\\\&#34;8\\\&#34;:0,\\\&#34;9\\\&#34;:0}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:18},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;School\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Service\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:25},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:18,\\\&#34;1\\\&#34;:44.0,\\\&#34;2\\\&#34;:74.0,\\\&#34;3\\\&#34;:83.0,\\\&#34;4\\\&#34;:42.0,\\\&#34;5\\\&#34;:84.0,\\\&#34;6\\\&#34;:42.0,\\\&#34;7\\\&#34;:47.0,\\\&#34;8\\\&#34;:60.0,\\\&#34;9\\\&#34;:79.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Masters\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Bachelors\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Doctorate\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Separated\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Professional\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:52.0,\\\&#34;1\\\&#34;:25,\\\&#34;2\\\&#34;:70.0,\\\&#34;3\\\&#34;:25,\\\&#34;4\\\&#34;:25.0,\\\&#34;5\\\&#34;:25,\\\&#34;6\\\&#34;:25.0,\\\&#34;7\\\&#34;:25,\\\&#34;8\\\&#34;:25,\\\&#34;9\\\&#34;:25},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:0,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:21},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:48.0,\\\&#34;1\\\&#34;:31.0,\\\&#34;2\\\&#34;:48.0,\\\&#34;3\\\&#34;:36.0,\\\&#34;4\\\&#34;:54.0,\\\&#34;5\\\&#34;:31.0,\\\&#34;6\\\&#34;:31.0,\\\&#34;7\\\&#34;:71.0,\\\&#34;8\\\&#34;:55.0,\\\&#34;9\\\&#34;:46.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Some-college\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Assoc\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Prof-school\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White-Collar\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:40,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:40,\\\&#34;4\\\&#34;:40,\\\&#34;5\\\&#34;:40,\\\&#34;6\\\&#34;:72.0,\\\&#34;7\\\&#34;:40,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:1}}\&#34;}&#34;,
+    &#34;{\&#34;data_interface\&#34;: {\&#34;outcome_name\&#34;: \&#34;income\&#34;, \&#34;data_df\&#34;: \&#34;dummy_data\&#34;}, \&#34;model_type\&#34;: \&#34;classifier\&#34;, \&#34;desired_class\&#34;: \&#34;opposite\&#34;, \&#34;desired_range\&#34;: null, \&#34;test_instance_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:20},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Private\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Service\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:0}}\&#34;, \&#34;final_cfs_df\&#34;: \&#34;{\\\&#34;age\\\&#34;:{\\\&#34;0\\\&#34;:78.0,\\\&#34;1\\\&#34;:45.0,\\\&#34;2\\\&#34;:73.0,\\\&#34;3\\\&#34;:79.0,\\\&#34;4\\\&#34;:63.0,\\\&#34;5\\\&#34;:63.0,\\\&#34;6\\\&#34;:49.0,\\\&#34;7\\\&#34;:49.0,\\\&#34;8\\\&#34;:52.0,\\\&#34;9\\\&#34;:85.0},\\\&#34;workclass\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Self-Employed\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Government\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Private\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Government\\\&#34;},\\\&#34;education\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Doctorate\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Prof-school\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;HS-grad\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Prof-school\\\&#34;},\\\&#34;marital_status\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Single\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Married\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Single\\\&#34;},\\\&#34;occupation\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Blue-Collar\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White-Collar\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Other\\\\/Unknown\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Sales\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Service\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Service\\\&#34;},\\\&#34;race\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Other\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;White\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;White\\\&#34;},\\\&#34;gender\\\&#34;:{\\\&#34;0\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;1\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;2\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;3\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;4\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;5\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;6\\\&#34;:\\\&#34;Female\\\&#34;,\\\&#34;7\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;8\\\&#34;:\\\&#34;Male\\\&#34;,\\\&#34;9\\\&#34;:\\\&#34;Male\\\&#34;},\\\&#34;hours_per_week\\\&#34;:{\\\&#34;0\\\&#34;:40,\\\&#34;1\\\&#34;:36.0,\\\&#34;2\\\&#34;:40,\\\&#34;3\\\&#34;:60.0,\\\&#34;4\\\&#34;:40,\\\&#34;5\\\&#34;:40,\\\&#34;6\\\&#34;:40,\\\&#34;7\\\&#34;:40,\\\&#34;8\\\&#34;:40,\\\&#34;9\\\&#34;:40},\\\&#34;income\\\&#34;:{\\\&#34;0\\\&#34;:1,\\\&#34;1\\\&#34;:1,\\\&#34;2\\\&#34;:1,\\\&#34;3\\\&#34;:1,\\\&#34;4\\\&#34;:1,\\\&#34;5\\\&#34;:1,\\\&#34;6\\\&#34;:1,\\\&#34;7\\\&#34;:1,\\\&#34;8\\\&#34;:1,\\\&#34;9\\\&#34;:0}}\&#34;}&#34;
+  ],
+  &#34;local_importance&#34;: [
+    {
+      &#34;age&#34;: 0.6,
+      &#34;occupation&#34;: 0.5,
+      &#34;race&#34;: 0.3,
+      &#34;workclass&#34;: 0.1,
+      &#34;education&#34;: 0.1,
+      &#34;marital_status&#34;: 0.0,
+      &#34;gender&#34;: 0.0,
+      &#34;hours_per_week&#34;: 0.0
+    },
+    {
+      &#34;marital_status&#34;: 0.7,
+      &#34;education&#34;: 0.6,
+      &#34;gender&#34;: 0.2,
+      &#34;age&#34;: 0.2,
+      &#34;occupation&#34;: 0.1,
+      &#34;race&#34;: 0.1,
+      &#34;hours_per_week&#34;: 0.1,
+      &#34;workclass&#34;: 0.0
+    },
+    {
+      &#34;education&#34;: 0.4,
+      &#34;age&#34;: 0.4,
+      &#34;occupation&#34;: 0.3,
+      &#34;race&#34;: 0.3,
+      &#34;marital_status&#34;: 0.2,
+      &#34;hours_per_week&#34;: 0.2,
+      &#34;workclass&#34;: 0.1,
+      &#34;gender&#34;: 0.0
+    },
+    {
+      &#34;hours_per_week&#34;: 0.7,
+      &#34;age&#34;: 0.4,
+      &#34;marital_status&#34;: 0.2,
+      &#34;workclass&#34;: 0.1,
+      &#34;occupation&#34;: 0.1,
+      &#34;education&#34;: 0.0,
+      &#34;race&#34;: 0.0,
+      &#34;gender&#34;: 0.0
+    },
+    {
+      &#34;age&#34;: 0.6,
+      &#34;marital_status&#34;: 0.3,
+      &#34;education&#34;: 0.2,
+      &#34;occupation&#34;: 0.2,
+      &#34;hours_per_week&#34;: 0.2,
+      &#34;gender&#34;: 0.1,
+      &#34;workclass&#34;: 0.0,
+      &#34;race&#34;: 0.0
+    },
+    {
+      &#34;age&#34;: 0.5,
+      &#34;education&#34;: 0.3,
+      &#34;race&#34;: 0.3,
+      &#34;occupation&#34;: 0.2,
+      &#34;hours_per_week&#34;: 0.2,
+      &#34;workclass&#34;: 0.1,
+      &#34;gender&#34;: 0.1,
+      &#34;marital_status&#34;: 0.0
+    },
+    {
+      &#34;marital_status&#34;: 0.4,
+      &#34;occupation&#34;: 0.4,
+      &#34;hours_per_week&#34;: 0.4,
+      &#34;education&#34;: 0.3,
+      &#34;workclass&#34;: 0.1,
+      &#34;race&#34;: 0.1,
+      &#34;age&#34;: 0.1,
+      &#34;gender&#34;: 0.0
+    },
+    {
+      &#34;education&#34;: 1.0,
+      &#34;age&#34;: 0.9,
+      &#34;marital_status&#34;: 0.7,
+      &#34;occupation&#34;: 0.5,
+      &#34;workclass&#34;: 0.2,
+      &#34;hours_per_week&#34;: 0.2,
+      &#34;race&#34;: 0.1,
+      &#34;gender&#34;: 0.1
+    },
+    {
+      &#34;age&#34;: 1.0,
+      &#34;marital_status&#34;: 0.7,
+      &#34;education&#34;: 0.5,
+      &#34;gender&#34;: 0.3,
+      &#34;workclass&#34;: 0.1,
+      &#34;race&#34;: 0.1,
+      &#34;hours_per_week&#34;: 0.1,
+      &#34;occupation&#34;: 0.0
+    },
+    {
+      &#34;age&#34;: 1.0,
+      &#34;marital_status&#34;: 0.8,
+      &#34;workclass&#34;: 0.5,
+      &#34;gender&#34;: 0.5,
+      &#34;occupation&#34;: 0.4,
+      &#34;education&#34;: 0.3,
+      &#34;race&#34;: 0.3,
+      &#34;hours_per_week&#34;: 0.2
+    }
+  ],
+  &#34;summary_importance&#34;: {
+    &#34;age&#34;: 0.57,
+    &#34;marital_status&#34;: 0.4,
+    &#34;education&#34;: 0.37,
+    &#34;occupation&#34;: 0.27,
+    &#34;hours_per_week&#34;: 0.23,
+    &#34;race&#34;: 0.16,
+    &#34;workclass&#34;: 0.13,
+    &#34;gender&#34;: 0.13
+  },
+  &#34;metadata&#34;: {
+    &#34;version&#34;: &#34;1.0&#34;
+  }
+}
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Convert-the-json-output-to-a-counterfactual-object">
+<h2>Convert the json output to a counterfactual object<a class="headerlink" href="#Convert-the-json-output-to-a-counterfactual-object" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">imp_r</span><span class="o">=</span><span class="n">imp</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">o</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">imp_r</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp_r</span><span class="o">.</span><span class="n">local_importance</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp_r</span><span class="o">.</span><span class="n">summary_importance</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>35</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Married</td>
+      <td>Blue-Collar</td>
+      <td>White</td>
+      <td>Male</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>50</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Professional</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>59</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>48</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>56</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>59</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Professional</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>55</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>49</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Divorced</td>
+      <td>White-Collar</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>41</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>45</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Widowed</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>86</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>57</td>
+      <td>Private</td>
+      <td>Some-college</td>
+      <td>Married</td>
+      <td>Blue-Collar</td>
+      <td>White</td>
+      <td>Male</td>
+      <td>45</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Separated</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>93</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>Professional</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>47</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>72</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Separated</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>63</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>46</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>Self-Employed</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>27</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>Service</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 1)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>White</td>
+      <td>Male</td>
+      <td>50</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 0.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>28</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Widowed</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Widowed</td>
+      <td>Professional</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>5</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>90</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>13</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>12</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>38</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>84</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>32</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>32</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>44</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>32</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 1)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>48</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 0.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>76</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>18</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>Professional</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>51</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Widowed</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>8</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>83</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Single</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>25</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Widowed</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>68</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>50</td>
+      <td>Government</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>Professional</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>38</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>-</td>
+      <td>Service</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>Self-Employed</td>
+      <td>HS-grad</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>65</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>83</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>45</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>43</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>95</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Sales</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>30</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 1)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>34</td>
+      <td>Government</td>
+      <td>Doctorate</td>
+      <td>Married</td>
+      <td>Professional</td>
+      <td>White</td>
+      <td>Male</td>
+      <td>45</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 0.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>30</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Separated</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Service</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Divorced</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-</td>
+      <td>-</td>
+      <td>HS-grad</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>84</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Single</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>34</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-</td>
+      <td>-</td>
+      <td>School</td>
+      <td>-</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>15</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Widowed</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Service</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>18</td>
+      <td>Private</td>
+      <td>School</td>
+      <td>Single</td>
+      <td>Service</td>
+      <td>White</td>
+      <td>Male</td>
+      <td>25</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>52</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>44</td>
+      <td>-</td>
+      <td>Some-college</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>74</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>70</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>83</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>42</td>
+      <td>Other/Unknown</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>84</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>Female</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>42</td>
+      <td>Other/Unknown</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>47</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>60</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>Separated</td>
+      <td>Professional</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>79</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>21</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Single</td>
+      <td>White-Collar</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>48</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>31</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>48</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>36</td>
+      <td>-</td>
+      <td>Some-college</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>54</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>31</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>31</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>72</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>71</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>55</td>
+      <td>-</td>
+      <td>Assoc</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>46</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20</td>
+      <td>Private</td>
+      <td>HS-grad</td>
+      <td>Single</td>
+      <td>Service</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Counterfactual set (new outcome: 1.0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>workclass</th>
+      <th>education</th>
+      <th>marital_status</th>
+      <th>occupation</th>
+      <th>race</th>
+      <th>gender</th>
+      <th>hours_per_week</th>
+      <th>income</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>78</td>
+      <td>Self-Employed</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>45</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>Blue-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>36</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>73</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>-</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>79</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>60</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>63</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>63</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>49</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>49</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>Sales</td>
+      <td>Other</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>52</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>85</td>
+      <td>Government</td>
+      <td>Prof-school</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[None, None, None, None, None, None, None, None, None, None]
+[{&#39;age&#39;: 0.6, &#39;occupation&#39;: 0.5, &#39;race&#39;: 0.3, &#39;workclass&#39;: 0.1, &#39;education&#39;: 0.1, &#39;marital_status&#39;: 0.0, &#39;gender&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}, {&#39;marital_status&#39;: 0.7, &#39;education&#39;: 0.6, &#39;gender&#39;: 0.2, &#39;age&#39;: 0.2, &#39;occupation&#39;: 0.1, &#39;race&#39;: 0.1, &#39;hours_per_week&#39;: 0.1, &#39;workclass&#39;: 0.0}, {&#39;education&#39;: 0.4, &#39;age&#39;: 0.4, &#39;occupation&#39;: 0.3, &#39;race&#39;: 0.3, &#39;marital_status&#39;: 0.2, &#39;hours_per_week&#39;: 0.2, &#39;workclass&#39;: 0.1, &#39;gender&#39;: 0.0}, {&#39;hours_per_week&#39;: 0.7, &#39;age&#39;: 0.4, &#39;marital_status&#39;: 0.2, &#39;workclass&#39;: 0.1, &#39;occupation&#39;: 0.1, &#39;education&#39;: 0.0, &#39;race&#39;: 0.0, &#39;gender&#39;: 0.0}, {&#39;age&#39;: 0.6, &#39;marital_status&#39;: 0.3, &#39;education&#39;: 0.2, &#39;occupation&#39;: 0.2, &#39;hours_per_week&#39;: 0.2, &#39;gender&#39;: 0.1, &#39;workclass&#39;: 0.0, &#39;race&#39;: 0.0}, {&#39;age&#39;: 0.5, &#39;education&#39;: 0.3, &#39;race&#39;: 0.3, &#39;occupation&#39;: 0.2, &#39;hours_per_week&#39;: 0.2, &#39;workclass&#39;: 0.1, &#39;gender&#39;: 0.1, &#39;marital_status&#39;: 0.0}, {&#39;marital_status&#39;: 0.4, &#39;occupation&#39;: 0.4, &#39;hours_per_week&#39;: 0.4, &#39;education&#39;: 0.3, &#39;workclass&#39;: 0.1, &#39;race&#39;: 0.1, &#39;age&#39;: 0.1, &#39;gender&#39;: 0.0}, {&#39;education&#39;: 1.0, &#39;age&#39;: 0.9, &#39;marital_status&#39;: 0.7, &#39;occupation&#39;: 0.5, &#39;workclass&#39;: 0.2, &#39;hours_per_week&#39;: 0.2, &#39;race&#39;: 0.1, &#39;gender&#39;: 0.1}, {&#39;age&#39;: 1.0, &#39;marital_status&#39;: 0.7, &#39;education&#39;: 0.5, &#39;gender&#39;: 0.3, &#39;workclass&#39;: 0.1, &#39;race&#39;: 0.1, &#39;hours_per_week&#39;: 0.1, &#39;occupation&#39;: 0.0}, {&#39;age&#39;: 1.0, &#39;marital_status&#39;: 0.8, &#39;workclass&#39;: 0.5, &#39;gender&#39;: 0.5, &#39;occupation&#39;: 0.4, &#39;education&#39;: 0.3, &#39;race&#39;: 0.3, &#39;hours_per_week&#39;: 0.2}]
+{&#39;age&#39;: 0.57, &#39;marital_status&#39;: 0.4, &#39;education&#39;: 0.37, &#39;occupation&#39;: 0.27, &#39;hours_per_week&#39;: 0.23, &#39;race&#39;: 0.16, &#39;workclass&#39;: 0.13, &#39;gender&#39;: 0.13}
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

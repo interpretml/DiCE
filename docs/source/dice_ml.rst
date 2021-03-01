@@ -15,6 +15,14 @@ Subpackages
 Submodules
 ----------
 
+dice\_ml.counterfactual\_explanations module
+--------------------------------------------
+
+.. automodule:: dice_ml.counterfactual_explanations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.data module
 --------------------
 

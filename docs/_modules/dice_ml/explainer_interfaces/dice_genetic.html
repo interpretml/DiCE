@@ -1,0 +1,798 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.explainer_interfaces.dice_genetic &mdash; DiCE 0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>dice_ml.explainer_interfaces.dice_genetic</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dice_ml.explainer_interfaces.dice_genetic</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module to generate diverse counterfactual explanations based on genetic algorithm</span>
+<span class="sd">This code is similar to &#39;GeCo: Quality Counterfactual Explanations in Real Time&#39;: https://arxiv.org/pdf/2101.01292.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+
+<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
+
+
+<div class="viewcode-block" id="DiceGenetic"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic">[docs]</a><span class="k">class</span> <span class="nc">DiceGenetic</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init method</span>
+
+<span class="sd">        :param data_interface: an interface class to access data related params.</span>
+<span class="sd">        :param model_interface: an interface class to access trained ML model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">)</span>  <span class="c1"># initiating data related parameters</span>
+
+        <span class="c1"># number of output nodes of ML model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_num_output_nodes2</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
+
+        <span class="c1"># variables required to generate CFs - see generate_counterfactuals() for more info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf_init_weights</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># total_CFs, algorithm, features_to_vary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_weights</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># yloss_type, diversity_loss_type, feature_weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights_input</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># proximity_weight, diversity_weight, categorical_penalty</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span> <span class="o">=</span> <span class="mi">20</span>
+
+        <span class="c1"># Initializing a label encoder to obtain label-encoded values for categorical variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_encoded_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_encoded_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span>
+
+<div class="viewcode-block" id="DiceGenetic.update_hyperparameters"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.update_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">update_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update hyperparameters of the loss function&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proximity_weight</span> <span class="o">=</span> <span class="n">proximity_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diversity_weight</span> <span class="o">=</span> <span class="n">diversity_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_penalty</span> <span class="o">=</span> <span class="n">categorical_penalty</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.do_loss_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_loss_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_loss_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;one-hot&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Intializes variables related to main loss function&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">]</span>
+        <span class="c1"># define the loss parts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yloss_type</span> <span class="o">=</span> <span class="n">yloss_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss_type</span> <span class="o">=</span> <span class="n">diversity_loss_type</span>
+
+        <span class="c1"># define feature weights</span>
+        <span class="k">if</span> <span class="n">feature_weights</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights_input</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights_input</span> <span class="o">=</span> <span class="n">feature_weights</span>
+            <span class="k">if</span> <span class="n">feature_weights</span> <span class="o">==</span> <span class="s2">&quot;inverse_mad&quot;</span><span class="p">:</span>
+                <span class="n">normalized_mads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_valid_mads</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">feature_weights</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">normalized_mads</span><span class="p">:</span>
+                    <span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">normalized_mads</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">feature_weights_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;one-hot&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">feature_weights</span><span class="p">:</span>
+                        <span class="n">feature_weights_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">feature_weights_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span><span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">feature_weights</span><span class="p">:</span>
+                        <span class="n">feature_weights_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># TODO: why is the weight the max value of the encoded feature</span>
+                        <span class="n">feature_weights_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_encoded_data</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature_weights_list</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.do_random_init"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_random_init">[docs]</a>    <span class="k">def</span> <span class="nf">do_random_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">kx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="p">):</span>
+            <span class="n">temp_cfs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">ix</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">ix</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">:</span>
+                <span class="n">one_init</span> <span class="o">=</span> <span class="p">[[]]</span>
+                <span class="k">for</span> <span class="n">jx</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features_to_vary</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span> <span class="o">!=</span> <span class="n">desired_class</span><span class="p">:</span>
+                        <span class="n">ix</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">temp_cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;regressor&#39;</span><span class="p">:</span>
+                    <span class="n">predicted_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">predicted_value</span> <span class="o">&lt;=</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">ix</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">temp_cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+                <span class="n">ix</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_cfs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.do_KD_init"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_KD_init">[docs]</a>    <span class="k">def</span> <span class="nf">do_KD_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cfs</span><span class="p">):</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_encode</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">kx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="p">):</span>
+            <span class="n">temp_cfs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ix</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs</span><span class="p">):</span>
+                    <span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+                <span class="n">one_init</span> <span class="o">=</span> <span class="p">[[]]</span>
+                <span class="k">for</span> <span class="n">jx</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">features_to_vary</span><span class="p">:</span>
+                        <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                                <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">cfs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]:</span>
+                                <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]:</span>
+                                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]))</span>
+                <span class="n">temp_cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+                <span class="n">ix</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_cfs</span><span class="p">)</span>
+
+
+        <span class="k">for</span> <span class="n">kx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="p">)):</span>
+            <span class="n">temp_cfs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                <span class="n">one_init</span> <span class="o">=</span> <span class="p">[[]]</span>
+                <span class="k">for</span> <span class="n">jx</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">features_to_vary</span><span class="p">:</span>
+                        <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]))</span>
+                <span class="n">temp_cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_cfs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.do_cf_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_cf_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_cf_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">query_instance_df_dummies</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Intializes CFs and other related variables.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf_init_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;RandomInitCF&quot;</span><span class="p">:</span>
+            <span class="c1"># no. of times to run the experiment with random inits for diversity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_random_inits</span> <span class="o">=</span> <span class="n">total_CFs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># size of counterfactual set</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_random_inits</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="o">=</span> <span class="n">total_CFs</span>  <span class="c1"># size of counterfactual set</span>
+
+        <span class="c1"># freeze those columns that need to be fixed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span> <span class="o">=</span> <span class="n">features_to_vary</span>
+
+        <span class="c1"># CF initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_random_init</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s1">&#39;kdtree&#39;</span><span class="p">:</span>
+            <span class="c1"># Partitioned dataset and KD Tree for each class (binary) of the dataset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_with_predictions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KD_tree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_KD_tree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                                                                                               <span class="n">desired_range</span><span class="p">,</span>
+                                                                                               <span class="n">desired_class</span><span class="p">,</span>
+                                                                                               <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">KD_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_random_init</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">num_queries</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_with_predictions</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">)</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">KD_tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query_instance_df_dummies</span><span class="p">,</span> <span class="n">num_queries</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">KD_tree_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_with_predictions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_KD_init</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">KD_tree_output</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialization complete! Generating counterfactuals...&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.do_param_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_param_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_param_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">query_instance_df_dummies</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing initial parameters to the genetic algorithm...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_valid_feature_range</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_cf_initializations</span><span class="p">(</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">query_instance_df_dummies</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_loss_initializations</span><span class="p">(</span><span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_hyperparameters</span><span class="p">(</span><span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">initialization</span><span class="o">=</span><span class="s2">&quot;kdtree&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                 <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;DiverseCF&quot;</span><span class="p">,</span>
+                                 <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span>
+                                 <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span> <span class="n">feature_weights</span><span class="o">=</span><span class="s2">&quot;inverse_mad&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span>
+                                 <span class="n">maxiterations</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates diverse counterfactual explanations</span>
+
+<span class="sd">        :param query_instance: A dictionary of feature names and values. Test point of interest.</span>
+<span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
+<span class="sd">        :param initialization: Method to use to initialize the population of the genetic algorithm</span>
+<span class="sd">        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.</span>
+<span class="sd">        :param desired_class: For classification problems. Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the outcome class of query_instance for binary classification.</span>
+<span class="sd">        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the query_instance.</span>
+<span class="sd">        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.</span>
+<span class="sd">        :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</span>
+<span class="sd">        :param algorithm: Counterfactual generation algorithm. Either &quot;DiverseCF&quot; or &quot;RandomInitCF&quot;.</span>
+<span class="sd">        :param features_to_vary: Either a string &quot;all&quot; or a list of feature names to vary.</span>
+<span class="sd">        :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.</span>
+<span class="sd">        :param yloss_type: Metric for y-loss of the optimization function. Takes &quot;l2_loss&quot; or &quot;log_loss&quot; or &quot;hinge_loss&quot;.</span>
+<span class="sd">        :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes &quot;avg_dist&quot; or &quot;dpp_style:inverse_dist&quot;.</span>
+<span class="sd">        :param feature_weights: Either &quot;inverse_mad&quot; or a dictionary with feature names as keys and corresponding weights as values. Default option is &quot;inverse_mad&quot; where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature&#39;s values in the training set; the weight for a categorical feature is equal to 1 by default.</span>
+<span class="sd">        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.</span>
+<span class="sd">        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.</span>
+<span class="sd">        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes &quot;linear&quot; or &quot;binary&quot;. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</span>
+<span class="sd">        :param maxiterations: Maximum iterations to run the genetic algorithm for.</span>
+<span class="sd">        :param verbose: Parameter to determine whether to print &#39;Diverse Counterfactuals found!&#39;</span>
+
+<span class="sd">        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+
+        <span class="n">features_to_vary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">)</span>
+
+        <span class="c1"># Prepares user defined query_instance for DiCE.</span>
+        <span class="n">query_instance_orig</span> <span class="o">=</span> <span class="n">query_instance</span>
+        <span class="n">query_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span><span class="n">query_instance</span><span class="o">=</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">query_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_encode</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">query_instance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">query_instance</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x1</span> <span class="o">=</span> <span class="n">query_instance</span>
+
+        <span class="c1"># find the predicted value of query_instance</span>
+        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span> <span class="o">=</span> <span class="n">test_pred</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">infer_target_cfs_class</span><span class="p">(</span><span class="n">desired_class</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="p">)]],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;regressor&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_target_cfs_range</span><span class="p">(</span><span class="n">desired_range</span><span class="p">)</span>
+
+        <span class="n">query_instance_df_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">query_instance_orig</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">query_instance_df_dummies</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">query_instance_df_dummies</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_param_initializations</span><span class="p">(</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">query_instance_df_dummies</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">yloss_type</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="n">query_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span> <span class="n">maxiterations</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span><span class="n">data_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span>
+                                          <span class="n">test_instance_df</span><span class="o">=</span><span class="n">query_instance_df</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span>
+                                          <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                                          <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                                          <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DiceGenetic.predict_fn_scores"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn_scores">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns predictions&quot;&quot;&quot;</span>
+        <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.predict_fn"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+        <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
+        <span class="c1"># TODO this line needs to change---we should not call model.model directly here. That functionality should be in the model class</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_yloss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_yloss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_yloss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the first part (y-loss) of the loss function.&quot;&quot;&quot;</span>
+        <span class="n">yloss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yloss_type</span> <span class="o">==</span> <span class="s1">&#39;hinge_loss&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                    <span class="n">predicted_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_scores</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+                    <span class="n">maxvalue</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+                    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">desired_class</span><span class="p">:</span>
+                            <span class="n">maxvalue</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxvalue</span><span class="p">,</span> <span class="n">predicted_values</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+                    <span class="n">temp_loss</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxvalue</span> <span class="o">-</span> <span class="n">predicted_values</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">desired_class</span><span class="p">)])</span>
+                    <span class="n">yloss</span> <span class="o">+=</span> <span class="n">temp_loss</span>
+            <span class="k">return</span> <span class="n">yloss</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;regressor&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yloss_type</span> <span class="o">==</span> <span class="s1">&#39;hinge_loss&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                    <span class="n">predicted_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">predicted_value</span> <span class="o">&lt;=</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">temp_loss</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">temp_loss</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">predicted_value</span> <span class="o">-</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">predicted_value</span> <span class="o">-</span> <span class="n">desired_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">yloss</span> <span class="o">+=</span> <span class="n">temp_loss</span>
+            <span class="k">return</span> <span class="n">yloss</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_dist"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_dist">[docs]</a>    <span class="k">def</span> <span class="nf">compute_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute weighted distance between two vectors.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">x_hat</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights_list</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_proximity_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_proximity_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_proximity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the second part (distance from x1) of the loss function.&quot;&quot;&quot;</span>
+        <span class="n">proximity_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+            <span class="n">proximity_loss</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_dist</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">x1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">proximity_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.dpp_style"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.dpp_style">[docs]</a>    <span class="k">def</span> <span class="nf">dpp_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submethod</span><span class="p">,</span> <span class="n">cfs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the DPP of a matrix.&quot;&quot;&quot;</span>
+        <span class="n">det_entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">submethod</span> <span class="o">==</span> <span class="s2">&quot;inverse_dist&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                    <span class="n">det_temp_entry</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_dist</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cfs</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="n">det_temp_entry</span> <span class="o">=</span> <span class="n">det_temp_entry</span> <span class="o">+</span> <span class="mf">0.0001</span>
+                    <span class="n">det_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">det_temp_entry</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">submethod</span> <span class="o">==</span> <span class="s2">&quot;exponential_dist&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                    <span class="n">det_temp_entry</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compute_dist</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cfs</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+                    <span class="n">det_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">det_temp_entry</span><span class="p">)</span>
+
+        <span class="n">det_entries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">det_entries</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">])</span>
+        <span class="n">diversity_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">det_entries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diversity_loss</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_diversity_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_diversity_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_diversity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the third part (diversity) of the loss function.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;dpp&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss_type</span><span class="p">:</span>
+            <span class="n">submethod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dpp_style</span><span class="p">(</span><span class="n">submethod</span><span class="p">,</span> <span class="n">cfs</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss_type</span> <span class="o">==</span> <span class="s2">&quot;avg_dist&quot;</span><span class="p">:</span>
+            <span class="n">diversity_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="c1"># computing pairwise distance and transforming it to normalized similarity</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                    <span class="n">diversity_loss</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_dist</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cfs</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">diversity_loss</span><span class="o">/</span><span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_regularization_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_regularization_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_regularization_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one&quot;&quot;&quot;</span>
+        <span class="n">regularization_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_categorical_feature_indexes</span><span class="p">:</span>
+                <span class="n">regularization_loss</span> <span class="o">+=</span> <span class="nb">pow</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cfs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">regularization_loss</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.compute_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the overall loss&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yloss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_yloss</span><span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proximity_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_proximity_loss</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proximity_weight</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_diversity_loss</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_weight</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="c1"># TODO this is not needed for label encoding</span>
+        <span class="c1">#self.regularization_loss = self.compute_regularization_loss(cfs)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yloss</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proximity_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">proximity_loss</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">diversity_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.mate"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.mate">[docs]</a>    <span class="k">def</span> <span class="nf">mate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs mating and produces new offsprings&quot;&quot;&quot;</span>
+        <span class="c1"># chromosome for offspring</span>
+        <span class="n">child_chromosome</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
+            <span class="c1"># temp_child_chromosome = []</span>
+            <span class="n">one_init</span> <span class="o">=</span> <span class="p">[[]]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)):</span>
+            <span class="c1">#for jx, (gp1, gp2) in enumerate(zip(k1[i][0], k2[i][0])):</span>
+                <span class="n">gp1</span> <span class="o">=</span> <span class="n">k1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">gp2</span> <span class="o">=</span> <span class="n">k2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">feat_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+                <span class="c1"># random probability</span>
+                <span class="n">prob</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+                <span class="c1"># if prob is less than 0.45, insert gene from parent 1</span>
+                <span class="k">if</span> <span class="n">prob</span> <span class="o">&lt;</span> <span class="mf">0.45</span><span class="p">:</span>
+                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gp1</span><span class="p">)</span>
+
+                <span class="c1"># if prob is between 0.45 and 0.90, insert gene from parent 2</span>
+                <span class="k">elif</span> <span class="n">prob</span> <span class="o">&lt;</span> <span class="mf">0.90</span><span class="p">:</span>
+                    <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gp2</span><span class="p">)</span>
+
+                <span class="c1">#otherwise insert random gene(mutate) for maintaining diversity</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">feat_name</span> <span class="ow">in</span> <span class="n">features_to_vary</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">feat_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feat_name</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feat_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feat_name</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">one_init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+
+            <span class="n">child_chromosome</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">one_init</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">child_chromosome</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.find_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.find_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">find_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span> <span class="n">maxiterations</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds counterfactuals by generating cfs through the genetic algorithm&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="n">stopping_threshold</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">0.25</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">0.75</span>
+
+        <span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">previous_best_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">current_best_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">current_best_cf</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">stop_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cfs_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span>
+        <span class="k">while</span> <span class="n">iterations</span> <span class="o">&lt;</span> <span class="n">maxiterations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">previous_best_loss</span> <span class="o">-</span> <span class="n">current_best_loss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-2</span><span class="p">:</span> <span class="c1">#and (self.model.model_type == &#39;classifier&#39; and all(i == desired_class for i in cfs_preds) or (self.model.model_type == &#39;regressor&#39; and all(desired_range[0] &lt;= i &lt;= desired_range[1] for i in cfs_preds))):</span>
+                <span class="n">stop_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stop_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">stop_cnt</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">previous_best_loss</span> <span class="o">=</span> <span class="n">current_best_loss</span>
+            <span class="n">population_fitness</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">current_best_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">current_best_cf</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="p">):</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">population</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">)</span>
+                <span class="n">population_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">loss</span> <span class="o">&lt;</span> <span class="n">current_best_loss</span><span class="p">:</span>
+                    <span class="n">current_best_loss</span> <span class="o">=</span> <span class="n">loss</span>
+                    <span class="n">current_best_cf</span> <span class="o">=</span> <span class="n">population</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="n">cfs_preds</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span> <span class="k">for</span> <span class="n">cfs</span> <span class="ow">in</span> <span class="n">current_best_cf</span><span class="p">]</span>
+            <span class="c1"># 10% of the next generation is fittest members of current generation</span>
+            <span class="n">population_fitness</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population_fitness</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">new_generation</span> <span class="o">=</span> <span class="p">[</span><span class="n">population</span><span class="p">[</span><span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">population_fitness</span><span class="p">[:</span><span class="n">s</span><span class="p">]]</span>
+
+            <span class="c1"># 90% of the next generation obtained from top 50% of fittest members of current generation</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">90</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+                <span class="n">parent1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)])</span>
+                <span class="n">parent2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_size</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)])</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mate</span><span class="p">(</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">)</span>
+                <span class="n">new_generation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+            <span class="n">population</span> <span class="o">=</span> <span class="n">new_generation</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="o">=</span> <span class="n">current_best_cf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span> <span class="k">for</span> <span class="n">cfs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">]</span>
+
+        <span class="c1"># converting to dataframe</span>
+        <span class="n">query_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">query_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode_cfs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span>
+        <span class="c1"># post-hoc operation on continuous features to enhance sparsity - only for public data</span>
+        <span class="k">if</span> <span class="n">posthoc_sparsity_param</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posthoc_sparsity_param</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span> <span class="n">query_instance_df</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># to display the values with the same precision as the original data</span>
+        <span class="n">precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">precisions</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">precisions</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Diverse Counterfactuals found! total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span>
+                  <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query_instance_df</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.label_encode"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_encode">[docs]</a>    <span class="k">def</span> <span class="nf">label_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="n">input_instance</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_instance</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">input_instance</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.from_label"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.from_label">[docs]</a>    <span class="k">def</span> <span class="nf">from_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms label encoded data back to categorical values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># TODO: make sure that the indexes match the labelencoder and list</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_indexes</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">c</span><span class="p">]]</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">([</span><span class="nb">round</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">])])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.label_decode"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode">[docs]</a>    <span class="k">def</span> <span class="nf">label_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labelled_input</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms label encoded data back to categorical values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labelled_input</span> <span class="o">=</span> <span class="n">labelled_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">input_instance</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labelled_input</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+                <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">labelled_input</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">))</span>
+                <span class="n">input_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_instance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span><span class="n">labelled_input</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">input_instance_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_instance</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">input_instance_df</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.label_decode_cfs"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode_cfs">[docs]</a>    <span class="k">def</span> <span class="nf">label_decode_cfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfs_arr</span><span class="p">):</span>
+        <span class="n">ret_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cfs_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">cf</span> <span class="ow">in</span> <span class="n">cfs_arr</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ret_df</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret_df</span> <span class="o">=</span> <span class="n">ret_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret_df</span></div>
+
+<div class="viewcode-block" id="DiceGenetic.get_valid_feature_range"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.get_valid_feature_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_valid_feature_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_valid_feature_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="n">normalized</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">feat_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">feat_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="n">feat_name</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="n">feat_name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ret</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
