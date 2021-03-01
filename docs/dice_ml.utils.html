@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.utils package &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.utils package &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="dice_ml.utils.sample_architecture package" href="dice_ml.utils.sample_architecture.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiCE
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -88,7 +90,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -103,13 +107,16 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">dice_ml.utils package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.exception">dice_ml.utils.exception module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.serialize">dice_ml.utils.serialize module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
@@ -122,6 +129,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -160,7 +168,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
         
@@ -225,9 +233,52 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-dice_ml.utils.exception">
+<span id="dice-ml-utils-exception-module"></span><h2>dice_ml.utils.exception module<a class="headerlink" href="#module-dice_ml.utils.exception" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions for the package.</p>
+<dl class="py exception">
+<dt id="dice_ml.utils.exception.UserConfigValidationException">
+<em class="property">exception </em><code class="sig-prename descclassname">dice_ml.utils.exception.</code><code class="sig-name descname">UserConfigValidationException</code><a class="reference internal" href="_modules/dice_ml/utils/exception.html#UserConfigValidationException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.exception.UserConfigValidationException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>An exception indicating that some user configuration is not valid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>exception_message</strong> (<em>str</em>) – A message describing the error.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-dice_ml.utils.helpers">
 <span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this headline">¶</a></h2>
 <p>This module containts helper functions to load data and get meta deta.</p>
+<dl class="py class">
+<dt id="dice_ml.utils.helpers.DataTransfomer">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">DataTransfomer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#DataTransfomer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.DataTransfomer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to transform data based on user-defined function to get predicted outcomes. This class calls FunctionTransformer of scikit-learn internally (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html">https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html</a>).</p>
+<dl class="py method">
+<dt id="dice_ml.utils.helpers.DataTransfomer.feed_data_params">
+<code class="sig-name descname">feed_data_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#DataTransfomer.feed_data_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.DataTransfomer.feed_data_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.utils.helpers.DataTransfomer.initialize_transform_func">
+<code class="sig-name descname">initialize_transform_func</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#DataTransfomer.initialize_transform_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.DataTransfomer.initialize_transform_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.utils.helpers.DataTransfomer.inverse_transform">
+<code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#DataTransfomer.inverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.DataTransfomer.inverse_transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.utils.helpers.DataTransfomer.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#DataTransfomer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.DataTransfomer.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="dice_ml.utils.helpers.get_adult_data_info">
 <code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_adult_data_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_adult_data_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_adult_data_info" title="Permalink to this definition">¶</a></dt>
@@ -244,14 +295,69 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_custom_dataset_modelpath_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_custom_dataset_modelpath_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_binary">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_custom_dataset_modelpath_pipeline_binary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_custom_dataset_modelpath_pipeline_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_multiclass">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_custom_dataset_modelpath_pipeline_multiclass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_custom_dataset_modelpath_pipeline_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_multiclass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_regression">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">get_custom_dataset_modelpath_pipeline_regression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#get_custom_dataset_modelpath_pipeline_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_regression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="dice_ml.utils.helpers.load_adult_income_dataset">
-<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_adult_income_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_adult_income_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">only_train</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads adult income dataset from <a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Adult">https://archive.ics.uci.edu/ml/datasets/Adult</a> and prepares the data for data analysis based on <a class="reference external" href="https://rpubs.com/H_Zhu/235617">https://rpubs.com/H_Zhu/235617</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return adult_data</dt>
 <dd class="field-odd"><p>returns preprocessed adult income dataset.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.load_custom_testing_dataset">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_custom_testing_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.load_custom_testing_dataset_binary">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_custom_testing_dataset_binary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_custom_testing_dataset_multiclass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_multiclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.load_custom_testing_dataset_regression">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">load_custom_testing_dataset_regression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_regression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.utils.helpers.ohe_min_max_transformation">
+<code class="sig-prename descclassname">dice_ml.utils.helpers.</code><code class="sig-name descname">ohe_min_max_transformation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">data_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#ohe_min_max_transformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.helpers.ohe_min_max_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>the data is one-hot-encoded and min-max normalized and fed to the ML model</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.utils.serialize">
+<span id="dice-ml-utils-serialize-module"></span><h2>dice_ml.utils.serialize module<a class="headerlink" href="#module-dice_ml.utils.serialize" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dice_ml.utils.serialize.DummyDataInterface">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.utils.serialize.</code><code class="sig-name descname">DummyDataInterface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">outcome_name</span></em>, <em class="sig-param"><span class="n">data_df</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/serialize.html#DummyDataInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.utils.serialize.DummyDataInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -280,11 +386,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -295,7 +409,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

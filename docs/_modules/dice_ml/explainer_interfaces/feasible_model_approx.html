@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.explainer_interfaces.feasible_model_approx &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.explainer_interfaces.feasible_model_approx &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -72,6 +73,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -86,7 +88,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -99,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -137,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -186,15 +191,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param data_interface: an interface class to data related params</span>
 <span class="sd">        :param model_interface: an interface class to access trained ML model</span>
-<span class="sd">        &quot;&quot;&quot;</span>    
-        
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># initiating data related parameters</span>
-        <span class="n">ExplainerBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">)</span> 
-        
+        <span class="n">ExplainerBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">)</span>
+
         <span class="c1">#Black Box ML Model to be explained</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pred_model</span><span class="o">=</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">model</span>        
-        
-        <span class="c1">#Hyperparam </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pred_model</span><span class="o">=</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">model</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_categorical_feature_indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_data_params_for_gradient_dice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">one_hot_encoded_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">one_hot_encode_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">)</span>
+        <span class="c1">#Hyperparam</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoded_size</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;encoded_size&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span><span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
@@ -204,34 +211,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wm1</span><span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;wm1&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wm2</span><span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;wm2&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wm3</span><span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;wm3&#39;</span><span class="p">]</span>
-               
-        <span class="c1">#Initializing parameters for the DiceModelApproxGenCF  </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_test_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalise_weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae_optimizer</span><span class="o">=</span> <span class="n">get_base_gen_cf_initialization</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_reg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="p">)</span> 
-        
+
+        <span class="c1">#Initializing parameters for the DiceModelApproxGenCF</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_test_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalise_weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae_optimizer</span><span class="o">=</span> <span class="n">get_base_gen_cf_initialization</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_reg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wm3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="p">)</span>
+
         <span class="c1">#Data paths</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">base_model_dir</span><span class="o">=</span> <span class="s1">&#39;../../dice_ml/utils/sample_trained_models/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model_dir</span><span class="o">=</span> <span class="s1">&#39;../../../dice_ml/utils/sample_trained_models/&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model_dir</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_name</span> <span class="o">+</span><span class="s1">&#39;-margin-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-validity_reg-&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validity_reg</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-epoch-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;ae-gen&#39;</span> <span class="o">+</span> <span class="s1">&#39;.pth&#39;</span>
-    
-    
+
+
 <div class="viewcode-block" id="FeasibleModelApprox.train"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">constraint_type</span><span class="p">,</span> <span class="n">constraint_variables</span><span class="p">,</span> <span class="n">constraint_direction</span><span class="p">,</span> <span class="n">constraint_reg</span><span class="p">,</span> <span class="n">pre_trained</span><span class="o">=</span><span class="kc">False</span>  <span class="p">):</span>
-        
-        <span class="sd">&#39;&#39;&#39;        </span>
-<span class="sd">        </span>
-<span class="sd">        :param pre_trained: Bool Variable to check whether pre trained model exists to avoid training again        </span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        :param pre_trained: Bool Variable to check whether pre trained model exists to avoid training again</span>
 <span class="sd">        :param constraint_type: Binary Variable currently: (1) unary / (0) monotonic</span>
 <span class="sd">        :param constraint_variables: List of List: [[Effect, Cause1, Cause2, .... ]]</span>
 <span class="sd">        :param constraint_direction: -1: Negative, 1: Positive ( By default has to be one for monotonic constraints )</span>
 <span class="sd">        :param constraint_reg: Tunable Hyperparamter</span>
-<span class="sd">        </span>
+
 <span class="sd">        :return None</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="k">if</span> <span class="n">pre_trained</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-            <span class="k">return</span> 
-        
+            <span class="k">return</span>
+
         <span class="c1">##TODO: Handling such dataset specific constraints in a more general way</span>
         <span class="c1"># CF Generation for only low to high income data points</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">,:]</span>
@@ -239,25 +246,25 @@
 
         <span class="c1">#Removing the outcome variable from the datasets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_feat</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_train_dataset</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_feat</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_dataset</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>        
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_feat</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vae_val_dataset</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">):</span>
             <span class="n">batch_num</span><span class="o">=</span><span class="mi">0</span>
             <span class="n">train_loss</span><span class="o">=</span> <span class="mf">0.0</span>
             <span class="n">train_size</span><span class="o">=</span><span class="mi">0</span>
-            
+
             <span class="n">train_dataset</span><span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vae_train_feat</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
             <span class="n">train_dataset</span><span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">train_x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-                
+
                 <span class="n">train_x</span><span class="o">=</span> <span class="n">train_x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">train_y</span><span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_model</span><span class="p">(</span><span class="n">train_x</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span> <span class="p">)</span>
                 <span class="n">train_size</span><span class="o">+=</span> <span class="n">train_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                
+
                 <span class="n">out</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
                 <span class="n">loss</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span> <span class="n">out</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span> <span class="p">)</span>
-                
+
                 <span class="c1">#Unary Case</span>
                 <span class="k">if</span> <span class="n">constraint_type</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">const</span> <span class="ow">in</span> <span class="n">constraint_variables</span><span class="p">:</span>
@@ -267,13 +274,13 @@
                         <span class="n">dm</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;x_pred&#39;</span><span class="p">]</span>
                         <span class="n">mc_samples</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;mc_samples&#39;</span><span class="p">]</span>
                         <span class="n">x_pred</span> <span class="o">=</span> <span class="n">dm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                       
+
                         <span class="n">constraint_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">hinge_embedding_loss</span><span class="p">(</span> <span class="n">constraint_direction</span><span class="o">*</span><span class="p">(</span><span class="n">x_pred</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_x</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
 
                         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mc_samples</span><span class="p">):</span>
-                            <span class="n">x_pred</span> <span class="o">=</span> <span class="n">dm</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>            
-                            <span class="n">constraint_loss</span><span class="o">+=</span> <span class="n">F</span><span class="o">.</span><span class="n">hinge_embedding_loss</span><span class="p">(</span> <span class="n">constraint_direction</span><span class="o">*</span><span class="p">(</span><span class="n">x_pred</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_x</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>           
-                            
+                            <span class="n">x_pred</span> <span class="o">=</span> <span class="n">dm</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                            <span class="n">constraint_loss</span><span class="o">+=</span> <span class="n">F</span><span class="o">.</span><span class="n">hinge_embedding_loss</span><span class="p">(</span> <span class="n">constraint_direction</span><span class="o">*</span><span class="p">(</span><span class="n">x_pred</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_x</span><span class="p">[:,</span><span class="n">const_idx</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
                         <span class="n">constraint_loss</span><span class="o">=</span> <span class="n">constraint_loss</span><span class="o">/</span><span class="n">mc_samples</span>
                         <span class="n">constraint_loss</span><span class="o">=</span> <span class="n">constraint_reg</span><span class="o">*</span><span class="n">constraint_loss</span>
                         <span class="n">loss</span><span class="o">+=</span> <span class="n">constraint_loss</span>
@@ -281,16 +288,16 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1">#Train the regression model</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This has not been implemented yet. If you&#39;d like this to be implemented in the next version, please raise an issue at https://github.com/interpretml/DiCE/issues&quot;</span><span class="p">)</span>
-                    
+
                 <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
                 <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-                
+
                 <span class="n">batch_num</span><span class="o">+=</span><span class="mi">1</span>
-                
+
             <span class="n">ret</span><span class="o">=</span> <span class="n">loss</span><span class="o">/</span><span class="n">batch_num</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train Avg Loss: &#39;</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">train_size</span> <span class="p">)</span>
-            
+
             <span class="c1">#Save the model after training every 10 epochs and at the last epoch</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">epoch</span><span class="o">%</span><span class="mi">10</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">epoch</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span></div></div>
@@ -306,11 +313,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -321,7 +336,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

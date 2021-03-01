@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="dice_ml.model_interfaces package" href="dice_ml.model_interfaces.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiCE
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -88,7 +90,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -100,7 +104,10 @@
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.data_interfaces.html">dice_ml.data_interfaces package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">dice_ml.explainer_interfaces package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_KD">dice_ml.explainer_interfaces.dice_KD module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_genetic">dice_ml.explainer_interfaces.dice_genetic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_pytorch">dice_ml.explainer_interfaces.dice_pytorch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_random">dice_ml.explainer_interfaces.dice_random module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_tensorflow1">dice_ml.explainer_interfaces.dice_tensorflow1 module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.dice_tensorflow2">dice_ml.explainer_interfaces.dice_tensorflow2 module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.explainer_interfaces.explainer_base">dice_ml.explainer_interfaces.explainer_base module</a></li>
@@ -114,6 +121,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
@@ -126,6 +134,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -164,7 +173,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
         
@@ -215,6 +224,181 @@
 <h1>dice_ml.explainer_interfaces package<a class="headerlink" href="#dice-ml-explainer-interfaces-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dice_ml.explainer_interfaces.dice_KD">
+<span id="dice-ml-explainer-interfaces-dice-kd-module"></span><h2>dice_ml.explainer_interfaces.dice_KD module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.dice_KD" title="Permalink to this headline">¶</a></h2>
+<p>Module to generate counterfactual explanations from a KD-Tree
+This code is similar to ‘Interpretable Counterfactual Explanations Guided by Prototypes’: <a class="reference external" href="https://arxiv.org/pdf/1907.02584.pdf">https://arxiv.org/pdf/1907.02584.pdf</a></p>
+<dl class="py class">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.dice_KD.</code><code class="sig-name descname">DiceKD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD.do_sparsity_check">
+<code class="sig-name descname">do_sparsity_check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">sparsity_weight</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.do_sparsity_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.do_sparsity_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD.duplicates">
+<code class="sig-name descname">duplicates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em>, <em class="sig-param"><span class="n">final_indices</span></em>, <em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.duplicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.duplicates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD.find_counterfactuals">
+<code class="sig-name descname">find_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_df_copy</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">query_instance_orig</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">sparsity_weight</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.find_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.find_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn">
+<code class="sig-name descname">predict_fn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.predict_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns predictions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_KD.DiceKD.vary_valid">
+<code class="sig-name descname">vary_valid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">KD_query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">sparsity_weight</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.vary_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.vary_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function ensures that we only vary features_to_vary when generating counterfactuals</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.explainer_interfaces.dice_genetic">
+<span id="dice-ml-explainer-interfaces-dice-genetic-module"></span><h2>dice_ml.explainer_interfaces.dice_genetic module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.dice_genetic" title="Permalink to this headline">¶</a></h2>
+<p>Module to generate diverse counterfactual explanations based on genetic algorithm
+This code is similar to ‘GeCo: Quality Counterfactual Explanations in Real Time’: <a class="reference external" href="https://arxiv.org/pdf/2101.01292.pdf">https://arxiv.org/pdf/2101.01292.pdf</a></p>
+<dl class="py class">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.dice_genetic.</code><code class="sig-name descname">DiceGenetic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_dist">
+<code class="sig-name descname">compute_dist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_hat</span></em>, <em class="sig-param"><span class="n">x1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted distance between two vectors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_diversity_loss">
+<code class="sig-name descname">compute_diversity_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_diversity_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_diversity_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the third part (diversity) of the loss function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_loss">
+<code class="sig-name descname">compute_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the overall loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_proximity_loss">
+<code class="sig-name descname">compute_proximity_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_proximity_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_proximity_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the second part (distance from x1) of the loss function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_regularization_loss">
+<code class="sig-name descname">compute_regularization_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_regularization_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_regularization_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_yloss">
+<code class="sig-name descname">compute_yloss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.compute_yloss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.compute_yloss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the first part (y-loss) of the loss function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_KD_init">
+<code class="sig-name descname">do_KD_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">cfs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.do_KD_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_KD_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_cf_initializations">
+<code class="sig-name descname">do_cf_initializations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">initialization</span></em>, <em class="sig-param"><span class="n">algorithm</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">query_instance_df_dummies</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.do_cf_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_cf_initializations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes CFs and other related variables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_loss_initializations">
+<code class="sig-name descname">do_loss_initializations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yloss_type</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span></em>, <em class="sig-param"><span class="n">feature_weights</span></em>, <em class="sig-param"><span class="n">encoding</span><span class="o">=</span><span class="default_value">'one-hot'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.do_loss_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_loss_initializations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes variables related to main loss function</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_param_initializations">
+<code class="sig-name descname">do_param_initializations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">initialization</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">query_instance_df_dummies</span></em>, <em class="sig-param"><span class="n">algorithm</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">yloss_type</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span></em>, <em class="sig-param"><span class="n">feature_weights</span></em>, <em class="sig-param"><span class="n">proximity_weight</span></em>, <em class="sig-param"><span class="n">diversity_weight</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.do_param_initializations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_param_initializations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_random_init">
+<code class="sig-name descname">do_random_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">desired_range</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.do_random_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.do_random_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.dpp_style">
+<code class="sig-name descname">dpp_style</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">submethod</span></em>, <em class="sig-param"><span class="n">cfs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.dpp_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.dpp_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the DPP of a matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.find_counterfactuals">
+<code class="sig-name descname">find_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span></em>, <em class="sig-param"><span class="n">maxiterations</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.find_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.find_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds counterfactuals by generating cfs through the genetic algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.from_label">
+<code class="sig-name descname">from_label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.from_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.from_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms label encoded data back to categorical values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.get_valid_feature_range">
+<code class="sig-name descname">get_valid_feature_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalized</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.get_valid_feature_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.get_valid_feature_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode">
+<code class="sig-name descname">label_decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labelled_input</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.label_decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms label encoded data back to categorical values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode_cfs">
+<code class="sig-name descname">label_decode_cfs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfs_arr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.label_decode_cfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode_cfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_encode">
+<code class="sig-name descname">label_encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.label_encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.mate">
+<code class="sig-name descname">mate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k1</span></em>, <em class="sig-param"><span class="n">k2</span></em>, <em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">query_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.mate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.mate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs mating and produces new offsprings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn">
+<code class="sig-name descname">predict_fn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.predict_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn_scores">
+<code class="sig-name descname">predict_fn_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.predict_fn_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns predictions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.update_hyperparameters">
+<code class="sig-name descname">update_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proximity_weight</span></em>, <em class="sig-param"><span class="n">diversity_weight</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_genetic.html#DiceGenetic.update_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.update_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update hyperparameters of the loss function</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-dice_ml.explainer_interfaces.dice_pytorch">
 <span id="dice-ml-explainer-interfaces-dice-pytorch-module"></span><h2>dice_ml.explainer_interfaces.dice_pytorch module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.dice_pytorch" title="Permalink to this headline">¶</a></h2>
@@ -291,12 +475,12 @@
 
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.generate_counterfactuals">
-<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'pytorch:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_pytorch.html#DicePyTorch.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'pytorch:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_pytorch.html#DicePyTorch.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates diverse counterfactual explanations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query_instance</strong> – A dictionary of feature names and values. Test point of interest.</p></li>
+<li><p><strong>query_instance</strong> – Test point of interest. A dictionary of feature names and values or a single row dataframe</p></li>
 <li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
 <li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of query_instance for binary classification.</p></li>
 <li><p><strong>proximity_weight</strong> – A positive float. Larger this weight, more close the counterfactuals are to the query_instance.</p></li>
@@ -304,10 +488,17 @@
 <li><p><strong>categorical_penalty</strong> – A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p></li>
 <li><p><strong>algorithm</strong> – Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.</p></li>
 <li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
-<li><p><strong>yloss_type</strong> – Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.</p></li>
-<li><p><strong>diversity_loss_type</strong> – Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.</p></li>
-<li><p><strong>feature_weights</strong> – Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.</p></li>
-<li><p><strong>optimizer</strong> – PyTorch optimization algorithm. Currently tested only with “pytorch:adam”.</p></li>
+</ul>
+</dd>
+</dl>
+<p>param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+:param yloss_type: Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.
+:param diversity_loss_type: Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.
+:param feature_weights: Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.
+:param optimizer: PyTorch optimization algorithm. Currently tested only with “pytorch:adam”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>learning_rate</strong> – Learning rate for optimizer.</p></li>
 <li><p><strong>min_iter</strong> – Min iterations to run gradient descent for.</p></li>
 <li><p><strong>max_iter</strong> – Max iterations to run gradient descent for.</p></li>
@@ -347,6 +538,12 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.predict_fn_for_sparsity">
+<code class="sig-name descname">predict_fn_for_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_pytorch.html#DicePyTorch.predict_fn_for_sparsity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.predict_fn_for_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function for sparsity correction</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.round_off_cfs">
 <code class="sig-name descname">round_off_cfs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assign</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_pytorch.html#DicePyTorch.round_off_cfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.round_off_cfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>function for intermediate projection of CFs.</p>
@@ -362,6 +559,33 @@
 <dt id="dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.update_hyperparameters">
 <code class="sig-name descname">update_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proximity_weight</span></em>, <em class="sig-param"><span class="n">diversity_weight</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_pytorch.html#DicePyTorch.update_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.update_hyperparameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update hyperparameters of the loss function</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dice_ml.explainer_interfaces.dice_random">
+<span id="dice-ml-explainer-interfaces-dice-random-module"></span><h2>dice_ml.explainer_interfaces.dice_random module<a class="headerlink" href="#module-dice_ml.explainer_interfaces.dice_random" title="Permalink to this headline">¶</a></h2>
+<p>Module to generate diverse counterfactual explanations based on random sampling.
+A simple implementation.</p>
+<dl class="py class">
+<dt id="dice_ml.explainer_interfaces.dice_random.DiceRandom">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.dice_random.</code><code class="sig-name descname">DiceRandom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_random.html#DiceRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_random.DiceRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_random.DiceRandom.get_continuous_samples">
+<code class="sig-name descname">get_continuous_samples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">low</span></em>, <em class="sig-param"><span class="n">high</span></em>, <em class="sig-param"><span class="n">precision</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_random.html#DiceRandom.get_continuous_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_continuous_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_random.DiceRandom.get_samples">
+<code class="sig-name descname">get_samples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fixed_features_values</span></em>, <em class="sig-param"><span class="n">feature_range</span></em>, <em class="sig-param"><span class="n">sampling_random_seed</span></em>, <em class="sig-param"><span class="n">sampling_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_random.html#DiceRandom.get_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_random.DiceRandom.predict_fn">
+<code class="sig-name descname">predict_fn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_random.html#DiceRandom.predict_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_random.DiceRandom.predict_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function</p>
 </dd></dl>
 
 </dd></dl>
@@ -431,17 +655,17 @@
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">
 <code class="sig-name descname">find_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow1.html#DiceTensorFlow1.find_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finds counterfactuals by graident-descent.</p>
+<dd><p>Finds counterfactuals by gradient-descent.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals">
-<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'tensorflow:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow1.html#DiceTensorFlow1.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'tensorflow:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow1.html#DiceTensorFlow1.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates diverse counterfactual explanations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query_instance</strong> – A dictionary of feature names and values. Test point of interest.</p></li>
+<li><p><strong>query_instance</strong> – Test point of interest. A dictionary of feature names and values or a single row dataframe.</p></li>
 <li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
 <li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of query_instance for binary classification.</p></li>
 <li><p><strong>proximity_weight</strong> – A positive float. Larger this weight, more close the counterfactuals are to the query_instance.</p></li>
@@ -449,10 +673,17 @@
 <li><p><strong>categorical_penalty</strong> – A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p></li>
 <li><p><strong>algorithm</strong> – Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.</p></li>
 <li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
-<li><p><strong>yloss_type</strong> – Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.</p></li>
-<li><p><strong>diversity_loss_type</strong> – Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.</p></li>
-<li><p><strong>feature_weights</strong> – Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.</p></li>
-<li><p><strong>optimizer</strong> – Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p></li>
+</ul>
+</dd>
+</dl>
+<p>param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+:param yloss_type: Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.
+:param diversity_loss_type: Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.
+:param feature_weights: Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.
+:param optimizer: Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>learning_rate</strong> – Learning rate for optimizer.</p></li>
 <li><p><strong>min_iter</strong> – Min iterations to run gradient descent for.</p></li>
 <li><p><strong>max_iter</strong> – Max iterations to run gradient descent for.</p></li>
@@ -483,6 +714,12 @@
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn">
 <code class="sig-name descname">predict_fn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow1.html#DiceTensorFlow1.predict_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn" title="Permalink to this definition">¶</a></dt>
 <dd><p>prediction function</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity">
+<code class="sig-name descname">predict_fn_for_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow1.html#DiceTensorFlow1.predict_fn_for_sparsity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function for sparsity correction</p>
 </dd></dl>
 
 <dl class="py method">
@@ -587,17 +824,17 @@
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.find_counterfactuals">
 <code class="sig-name descname">find_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">learning_rate</span></em>, <em class="sig-param"><span class="n">min_iter</span></em>, <em class="sig-param"><span class="n">max_iter</span></em>, <em class="sig-param"><span class="n">project_iter</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span></em>, <em class="sig-param"><span class="n">verbose</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span></em>, <em class="sig-param"><span class="n">tie_random</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow2.html#DiceTensorFlow2.find_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.find_counterfactuals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finds counterfactuals by graident-descent.</p>
+<dd><p>Finds counterfactuals by gradient-descent.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.generate_counterfactuals">
-<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'tensorflow:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow2.html#DiceTensorFlow2.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">proximity_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">diversity_weight</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">categorical_penalty</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'DiverseCF'</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">yloss_type</span><span class="o">=</span><span class="default_value">'hinge_loss'</span></em>, <em class="sig-param"><span class="n">diversity_loss_type</span><span class="o">=</span><span class="default_value">'dpp_style:inverse_dist'</span></em>, <em class="sig-param"><span class="n">feature_weights</span><span class="o">=</span><span class="default_value">'inverse_mad'</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">'tensorflow:adam'</span></em>, <em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">project_iter</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loss_diff_thres</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">init_near_query_instance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tie_random</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow2.html#DiceTensorFlow2.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates diverse counterfactual explanations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query_instance</strong> – A dictionary of feature names and values. Test point of interest.</p></li>
+<li><p><strong>query_instance</strong> – Test point of interest. A dictionary of feature names and values or a single row dataframe</p></li>
 <li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
 <li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of query_instance for binary classification.</p></li>
 <li><p><strong>proximity_weight</strong> – A positive float. Larger this weight, more close the counterfactuals are to the query_instance.</p></li>
@@ -605,10 +842,17 @@
 <li><p><strong>categorical_penalty</strong> – A positive float. A weight to ensure that all levels of a categorical variable sums to 1.</p></li>
 <li><p><strong>algorithm</strong> – Counterfactual generation algorithm. Either “DiverseCF” or “RandomInitCF”.</p></li>
 <li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
-<li><p><strong>yloss_type</strong> – Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.</p></li>
-<li><p><strong>diversity_loss_type</strong> – Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.</p></li>
-<li><p><strong>feature_weights</strong> – Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.</p></li>
-<li><p><strong>optimizer</strong> – Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p></li>
+</ul>
+</dd>
+</dl>
+<p>param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+:param yloss_type: Metric for y-loss of the optimization function. Takes “l2_loss” or “log_loss” or “hinge_loss”.
+:param diversity_loss_type: Metric for diversity loss of the optimization function. Takes “avg_dist” or “dpp_style:inverse_dist”.
+:param feature_weights: Either “inverse_mad” or a dictionary with feature names as keys and corresponding weights as values. Default option is “inverse_mad” where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature’s values in the training set; the weight for a categorical feature is equal to 1 by default.
+:param optimizer: Tensorflow optimization algorithm. Currently tested only with “tensorflow:adam”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><strong>learning_rate</strong> – Learning rate for optimizer.</p></li>
 <li><p><strong>min_iter</strong> – Min iterations to run gradient descent for.</p></li>
 <li><p><strong>max_iter</strong> – Max iterations to run gradient descent for.</p></li>
@@ -642,6 +886,12 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.predict_fn_for_sparsity">
+<code class="sig-name descname">predict_fn_for_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow2.html#DiceTensorFlow2.predict_fn_for_sparsity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.predict_fn_for_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function for sparsity correction</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.round_off_cfs">
 <code class="sig-name descname">round_off_cfs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assign</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_tensorflow2.html#DiceTensorFlow2.round_off_cfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.round_off_cfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>function for intermediate projection of CFs.</p>
@@ -669,18 +919,56 @@ Subclasses implement interfaces for different ML frameworks such as TensorFlow o
 All methods are in dice_ml.explainer_interfaces</p>
 <dl class="py class">
 <dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.explainer_base.</code><code class="sig-name descname">ExplainerBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.explainer_interfaces.explainer_base.</code><code class="sig-name descname">ExplainerBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.build_KD_tree">
+<code class="sig-name descname">build_KD_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_df_copy</span></em>, <em class="sig-param"><span class="n">desired_range</span></em>, <em class="sig-param"><span class="n">desired_class</span></em>, <em class="sig-param"><span class="n">predicted_outcome_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.build_KD_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.build_KD_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_mad_validity">
+<code class="sig-name descname">check_mad_validity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_weights</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.check_mad_validity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_mad_validity" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks feature MAD validity and throw warnings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">
+<code class="sig-name descname">check_permitted_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">permitted_range</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.check_permitted_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks permitted range for continuous features</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity">
+<code class="sig-name descname">check_query_instance_validity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">feature_ranges_orig</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.check_query_instance_validity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity">
+<code class="sig-name descname">decide_cf_validity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_outputs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.decide_cf_validity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search">
+<code class="sig-name descname">do_binary_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diff</span></em>, <em class="sig-param"><span class="n">decimal_prec</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">cf_ix</span></em>, <em class="sig-param"><span class="n">feature</span></em>, <em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">current_pred</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.do_binary_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search">
+<code class="sig-name descname">do_linear_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diff</span></em>, <em class="sig-param"><span class="n">decimal_prec</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">cf_ix</span></em>, <em class="sig-param"><span class="n">feature</span></em>, <em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">current_pred_orig</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.do_linear_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement">
-<code class="sig-name descname">do_posthoc_sparsity_enhancement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">cfs_preds_sparse</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.do_posthoc_sparsity_enhancement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">do_posthoc_sparsity_enhancement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.do_posthoc_sparsity_enhancement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post-hoc method to encourage sparsity in a generated counterfactuals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>final_cfs_sparse</strong> – List of final CFs in numpy format.</p></li>
-<li><p><strong>cfs_preds_sparse</strong> – List of predicted outcomes of final CFs in numpy format.</p></li>
-<li><p><strong>query_instance</strong> – Query instance in numpy format.</p></li>
+<li><p><strong>final_cfs_sparse</strong> – Final CFs in original user-fed format, in a pandas dataframe.</p></li>
+<li><p><strong>query_instance</strong> – Query instance in original user-fed format, in a pandas dataframe.</p></li>
 <li><p><strong>posthoc_sparsity_param</strong> – Parameter for the post-hoc operation on continuous features to enhance sparsity.</p></li>
 <li><p><strong>posthoc_sparsity_algorithm</strong> – Perform either linear or binary search. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</p></li>
 </ul>
@@ -689,22 +977,155 @@ All methods are in dice_ml.explainer_interfaces</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.feature_importance">
+<code class="sig-name descname">feature_importance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instances</span></em>, <em class="sig-param"><span class="n">cf_examples_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">total_CFs</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">local_importance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">global_importance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">desired_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.feature_importance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.feature_importance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate feature importance scores for the given inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query_instances</strong> – A list of inputs for which to compute the</p>
+</dd>
+</dl>
+<p>feature importances. These can be provided as a dataframe.
+:param cf_examples_list: If precomputed, a list of counterfactual
+examples for every input point. If cf_examples_list is provided, then
+all the following parameters are ignored.
+:param total_CFs: The number of counterfactuals to generate per input
+(default is 10)
+:param other_parameters: These are the same as the
+generate_counterfactuals method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An object of class CounterfactualExplanations that includes</p>
+</dd>
+</dl>
+<p>the list of counterfactuals per input, local feature importances per
+input, and the global feature importance summarized over all inputs.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">
-<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instances</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">desired_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate counterfactuals by randomly sampling features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query_instances</strong> – Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.</p></li>
+<li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
+<li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of query_instance for binary classification.</p></li>
+<li><p><strong>desired_range</strong> – For regression problems. Contains the outcome range to generate counterfactuals in.</p></li>
+<li><p><strong>permitted_range</strong> – Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.</p></li>
+<li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
+<li><p><strong>stopping_threshold</strong> – Minimum threshold for counterfactuals target class probability.</p></li>
+<li><p><strong>posthoc_sparsity_param</strong> – Parameter for the post-hoc operation on continuous features to enhance sparsity.</p></li>
+<li><p><strong>posthoc_sparsity_algorithm</strong> – Perform either linear or binary search. Takes “linear” or “binary”. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</p></li>
+<li><p><strong>verbose</strong> – Whether to output detailed messages.</p></li>
+<li><p><strong>sample_size</strong> – Sampling size</p></li>
+<li><p><strong>random_seed</strong> – Random seed for reproducibility</p></li>
+<li><p><strong>kwargs</strong> – Other parameters accepted by specific explanation method</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A CounterfactualExplanations object that contains the list of</p>
+</dd>
+</dl>
+<p>counterfactual examples per query_instance as one of its attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores">
+<code class="sig-name descname">get_model_output_from_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_scores</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.get_model_output_from_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance">
+<code class="sig-name descname">global_feature_importance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instances</span></em>, <em class="sig-param"><span class="n">cf_examples_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">total_CFs</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">local_importance</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">desired_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.global_feature_importance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate global feature importance scores for the given inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query_instances</strong> – A list of inputs for which to compute the</p>
+</dd>
+</dl>
+<p>feature importances. These can be provided as a dataframe.
+:param cf_examples_list: If precomputed, a list of counterfactual
+examples for every input point. If cf_examples_list is provided, then
+all the following parameters are ignored.
+:param total_CFs: The number of counterfactuals to generate per input
+(default is 10)
+:param local_importance: Binary flag indicating whether local feature
+importance values should also be returned for each query instance.
+:param other_parameters: These are the same as the
+generate_counterfactuals method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An object of class CounterfactualExplanations that includes</p>
+</dd>
+</dl>
+<p>the list of counterfactuals per input, local feature importances per
+input, and the global feature importance summarized over all inputs.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt id="dice_ml.explainer_interfaces.explainer_base.do_binary_search">
-<code class="sig-prename descclassname">dice_ml.explainer_interfaces.explainer_base.</code><code class="sig-name descname">do_binary_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">diff</span></em>, <em class="sig-param"><span class="n">decimal_prec</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">cf_ix</span></em>, <em class="sig-param"><span class="n">feat_ix</span></em>, <em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">current_pred</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#do_binary_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.do_binary_search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes.</p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_class">
+<code class="sig-name descname">infer_target_cfs_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desired_class_input</span></em>, <em class="sig-param"><span class="n">original_pred</span></em>, <em class="sig-param"><span class="n">num_output_nodes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.infer_target_cfs_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infer the target class for generating CFs. Only called when
+model_type==”classifier”.
+TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
+whether it is allowed or not.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt id="dice_ml.explainer_interfaces.explainer_base.do_linear_search">
-<code class="sig-prename descclassname">dice_ml.explainer_interfaces.explainer_base.</code><code class="sig-name descname">do_linear_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">diff</span></em>, <em class="sig-param"><span class="n">decimal_prec</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">cf_ix</span></em>, <em class="sig-param"><span class="n">feat_ix</span></em>, <em class="sig-param"><span class="n">final_cfs_sparse</span></em>, <em class="sig-param"><span class="n">current_pred</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#do_linear_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.do_linear_search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes.</p>
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_range">
+<code class="sig-name descname">infer_target_cfs_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desired_range_input</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.infer_target_cfs_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.is_cf_valid">
+<code class="sig-name descname">is_cf_valid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_score</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.is_cf_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.is_cf_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a cf belongs to the target class or target range.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.local_feature_importance">
+<code class="sig-name descname">local_feature_importance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instances</span></em>, <em class="sig-param"><span class="n">cf_examples_list</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">total_CFs</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">desired_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">permitted_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features_to_vary</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">stopping_threshold</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="default_value">'linear'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.local_feature_importance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.local_feature_importance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate local feature importance scores for the given inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query_instances</strong> – A list of inputs for which to compute the</p>
+</dd>
+</dl>
+<p>feature importances. These can be provided as a dataframe.
+:param cf_examples_list: If precomputed, a list of counterfactual
+examples for every input point. If cf_examples_list is provided, then
+all the following parameters are ignored.
+:param total_CFs: The number of counterfactuals to generate per input
+(default is 10)
+:param other_parameters: These are the same as the
+generate_counterfactuals method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An object of class CounterfactualExplanations that includes</p>
+</dd>
+</dl>
+<p>the list of counterfactuals per input, local feature importances per
+input, and the global feature importance summarized over all inputs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn_for_sparsity">
+<code class="sig-name descname">predict_fn_for_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.predict_fn_for_sparsity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn_for_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>prediction function for sparsity correction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">
+<code class="sig-name descname">setup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_to_vary</span></em>, <em class="sig-param"><span class="n">permitted_range</span></em>, <em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">feature_weights</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid">
+<code class="sig-name descname">sigmoid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -722,7 +1143,31 @@ All methods are in dice_ml.explainer_interfaces</p>
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals">
 <code class="sig-name descname">generate_counterfactuals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em>, <em class="sig-param"><span class="n">total_CFs</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/feasible_base_vae.html#FeasibleBaseVAE.generate_counterfactuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generate counterfactuals by randomly sampling features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query_instances</strong> – Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.</p></li>
+<li><p><strong>total_CFs</strong> – Total number of counterfactuals required.</p></li>
+<li><p><strong>desired_class</strong> – Desired counterfactual class - can take 0 or 1. Default value is “opposite” to the outcome class of query_instance for binary classification.</p></li>
+<li><p><strong>desired_range</strong> – For regression problems. Contains the outcome range to generate counterfactuals in.</p></li>
+<li><p><strong>permitted_range</strong> – Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.</p></li>
+<li><p><strong>features_to_vary</strong> – Either a string “all” or a list of feature names to vary.</p></li>
+<li><p><strong>stopping_threshold</strong> – Minimum threshold for counterfactuals target class probability.</p></li>
+<li><p><strong>posthoc_sparsity_param</strong> – Parameter for the post-hoc operation on continuous features to enhance sparsity.</p></li>
+<li><p><strong>posthoc_sparsity_algorithm</strong> – Perform either linear or binary search. Takes “linear” or “binary”. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</p></li>
+<li><p><strong>verbose</strong> – Whether to output detailed messages.</p></li>
+<li><p><strong>sample_size</strong> – Sampling size</p></li>
+<li><p><strong>random_seed</strong> – Random seed for reproducibility</p></li>
+<li><p><strong>kwargs</strong> – Other parameters accepted by specific explanation method</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A CounterfactualExplanations object that contains the list of</p>
+</dd>
+</dl>
+<p>counterfactual examples per query_instance as one of its attributes.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train">
@@ -784,11 +1229,19 @@ All methods are in dice_ml.explainer_interfaces</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -799,7 +1252,6 @@ All methods are in dice_ml.explainer_interfaces</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

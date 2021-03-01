@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.counterfactual_explanations &mdash; DiCE 0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>dice_ml.counterfactual_explanations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dice_ml.counterfactual_explanations</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">dice_ml.diverse_counterfactuals</span> <span class="k">as</span> <span class="nn">exp</span>
+<span class="kn">from</span> <span class="nn">dice_ml.utils.serialize</span> <span class="kn">import</span> <span class="n">DummyDataInterface</span>
+
+
+<div class="viewcode-block" id="json_converter"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.json_converter">[docs]</a><span class="k">def</span> <span class="nf">json_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function to convert CounterfactualExplanations object to json.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">CounterfactualExplanations</span><span class="p">):</span>
+        <span class="n">rdict</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">return</span> <span class="n">rdict</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span></div>
+
+
+<div class="viewcode-block" id="as_counterfactual_explanations"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.as_counterfactual_explanations">[docs]</a><span class="k">def</span> <span class="nf">as_counterfactual_explanations</span><span class="p">(</span><span class="n">json_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function to convert json string to a CounterfactualExplanations</span>
+<span class="sd">    object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;metadata&#39;</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">:</span>
+        <span class="n">cf_examples_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cf_examples_str</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;cf_examples_list&quot;</span><span class="p">]:</span>
+            <span class="n">cf_examples_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cf_examples_str</span><span class="p">)</span>
+            <span class="n">test_instance_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;test_instance_df&quot;</span><span class="p">])</span>
+            <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;final_cfs_df&quot;</span><span class="p">])</span>
+            <span class="c1"># Creating the object for dummy_data_interface</span>
+            <span class="n">dummy_data_interface</span> <span class="o">=</span> <span class="n">DummyDataInterface</span><span class="p">(</span><span class="o">**</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;data_interface&quot;</span><span class="p">])</span>
+            <span class="n">cf_examples_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span><span class="n">data_interface</span><span class="o">=</span><span class="n">dummy_data_interface</span><span class="p">,</span>
+                                          <span class="n">test_instance_df</span><span class="o">=</span><span class="n">test_instance_df</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df</span><span class="o">=</span><span class="n">cfs_df</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="n">cfs_df</span><span class="p">,</span>
+                                          <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;desired_class&quot;</span><span class="p">],</span>
+                                          <span class="n">desired_range</span><span class="o">=</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;desired_range&quot;</span><span class="p">],</span>
+                                          <span class="n">model_type</span><span class="o">=</span><span class="n">cf_examples_dict</span><span class="p">[</span><span class="s2">&quot;model_type&quot;</span><span class="p">])</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">CounterfactualExplanations</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="p">,</span>
+                <span class="n">local_importance</span><span class="o">=</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;local_importance&quot;</span><span class="p">],</span>
+                <span class="n">summary_importance</span><span class="o">=</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;summary_importance&quot;</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json_dict</span></div>
+
+
+<div class="viewcode-block" id="CounterfactualExplanations"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations">[docs]</a><span class="k">class</span> <span class="nc">CounterfactualExplanations</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class to store counterfactual examples for one or more inputs</span>
+<span class="sd">    and feature importance scores.</span>
+
+<span class="sd">    :param cf_examples_list: A list of CounterfactualExamples instances</span>
+<span class="sd">    :param local_importance: List of estimated local importance scores. The</span>
+<span class="sd">    size of the list is the number of input instances, each containing feature</span>
+<span class="sd">    importance scores for that input.</span>
+<span class="sd">    :param summary_importance: Estimated global feature importance scores</span>
+<span class="sd">    based on the input set of CounterfactualExamples instances</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="p">,</span>
+                 <span class="n">local_importance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">summary_importance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cf_examples_list</span> <span class="o">=</span> <span class="n">cf_examples_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_importance</span> <span class="o">=</span> <span class="n">local_importance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_summary_importance</span> <span class="o">=</span> <span class="n">summary_importance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_cf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other_cf</span><span class="p">,</span> <span class="n">CounterfactualExplanations</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_examples_list</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">cf_examples_list</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">local_importance</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">local_importance</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">summary_importance</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">summary_importance</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;cf_examples_list&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">,</span>
+                 <span class="s1">&#39;local_importance&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_importance</span><span class="p">,</span>
+                 <span class="s1">&#39;summary_importance&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary_importance</span><span class="p">,</span>
+                 <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cf_examples_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cf_examples_list</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_importance</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">sorted_local_importance</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">local_importance_instance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_importance</span><span class="p">:</span>
+                <span class="n">local_importance_instance</span> <span class="o">=</span> \
+                    <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">local_importance_instance</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+                                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="n">sorted_local_importance</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_importance_instance</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_importance</span> <span class="o">=</span> <span class="n">sorted_local_importance</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_importance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">summary_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_summary_importance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_summary_importance</span> <span class="o">=</span> \
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_summary_importance</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+                            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_summary_importance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_cf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other_cf</span><span class="p">,</span> <span class="n">CounterfactualExplanations</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_examples_list</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">cf_examples_list</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">local_importance</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">local_importance</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">summary_importance</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">summary_importance</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">==</span> <span class="n">other_cf</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="CounterfactualExplanations.visualize_as_dataframe"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cf_examples</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">:</span>
+            <span class="n">cf_examples</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span>
+                    <span class="n">display_sparse_df</span><span class="o">=</span><span class="n">display_sparse_df</span><span class="p">,</span>
+                    <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CounterfactualExplanations.visualize_as_list"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cf_examples</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">:</span>
+            <span class="n">cf_examples</span><span class="o">.</span><span class="n">visualize_as_list</span><span class="p">(</span>
+                    <span class="n">display_sparse_df</span><span class="o">=</span><span class="n">display_sparse_df</span><span class="p">,</span>
+                    <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CounterfactualExplanations.to_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Serialize Explanations object to json.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">json_converter</span><span class="p">,</span>
+                          <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CounterfactualExplanations.from_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Deserialize json string to a CounterfactualExplanations object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">as_counterfactual_explanations</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.dice &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.dice &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> DiCE
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -72,6 +73,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -86,7 +88,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -99,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -137,7 +142,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -157,36 +162,45 @@
            <div itemprop="articleBody">
             
   <h1>Source code for dice_ml.dice</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch.&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-
+<span></span><span class="sd">&quot;&quot;&quot;Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Dice"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice">[docs]</a><span class="k">class</span> <span class="nc">Dice</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;An interface class to different DiCE implementations.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param data_interface: an interface to access data related params.</span>
 <span class="sd">        :param model_interface: an interface to access the output or gradients of a trained ML model.</span>
+<span class="sd">        :param method: Name of the method to use for generating counterfactuals</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Dice.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Dice.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.&quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>  <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>  <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 <span class="c1"># To add new implementations of DiCE, add the class in explainer_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.</span>
 
-<div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
+<div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.&quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF1&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 1.x backend</span>
+    <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sklearn&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span> <span class="c1"># random sampling of CFs</span>
+            <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_random</span> <span class="kn">import</span> <span class="n">DiceRandom</span>
+            <span class="k">return</span> <span class="n">DiceRandom</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;genetic&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_genetic</span> <span class="kn">import</span> <span class="n">DiceGenetic</span>
+            <span class="k">return</span> <span class="n">DiceGenetic</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kdtree&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_KD</span> <span class="kn">import</span> <span class="n">DiceKD</span>
+            <span class="k">return</span> <span class="n">DiceKD</span>
+
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF1&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 1.x backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_tensorflow1</span> <span class="kn">import</span> <span class="n">DiceTensorFlow1</span>
         <span class="k">return</span> <span class="n">DiceTensorFlow1</span>
 
@@ -215,11 +229,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -230,7 +252,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

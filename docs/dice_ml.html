@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml package &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml package &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="dice_ml.data_interfaces package" href="dice_ml.data_interfaces.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiCE
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -88,7 +90,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -104,6 +108,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.dice">dice_ml.dice module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
@@ -116,6 +121,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -154,7 +160,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>dice_ml package</li>
     
@@ -214,7 +220,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.explainer_interfaces.html">dice_ml.explainer_interfaces package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_KD">dice_ml.explainer_interfaces.dice_KD module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_genetic">dice_ml.explainer_interfaces.dice_genetic module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_pytorch">dice_ml.explainer_interfaces.dice_pytorch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_random">dice_ml.explainer_interfaces.dice_random module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_tensorflow1">dice_ml.explainer_interfaces.dice_tensorflow1 module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.dice_tensorflow2">dice_ml.explainer_interfaces.dice_tensorflow2 module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.explainer_interfaces.html#module-dice_ml.explainer_interfaces.explainer_base">dice_ml.explainer_interfaces.explainer_base module</a></li>
@@ -242,7 +251,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.exception">dice_ml.utils.exception module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.serialize">dice_ml.utils.serialize module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils">Module contents</a></li>
 </ul>
 </li>
@@ -251,6 +262,84 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-dice_ml.counterfactual_explanations">
+<span id="dice-ml-counterfactual-explanations-module"></span><h2>dice_ml.counterfactual_explanations module<a class="headerlink" href="#module-dice_ml.counterfactual_explanations" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">CounterfactualExplanations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cf_examples_list</span></em>, <em class="sig-param"><span class="n">local_importance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">summary_importance</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to store counterfactual examples for one or more inputs
+and feature importance scores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cf_examples_list</strong> – A list of CounterfactualExamples instances</p></li>
+<li><p><strong>local_importance</strong> – List of estimated local importance scores. The</p></li>
+</ul>
+</dd>
+</dl>
+<p>size of the list is the number of input instances, each containing feature
+importance scores for that input.
+:param summary_importance: Estimated global feature importance scores
+based on the input set of CounterfactualExamples instances</p>
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.cf_examples_list">
+<em class="property">property </em><code class="sig-name descname">cf_examples_list</code><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.cf_examples_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.from_json">
+<em class="property">static </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize json string to a CounterfactualExplanations object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.local_importance">
+<em class="property">property </em><code class="sig-name descname">local_importance</code><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.local_importance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.metadata">
+<em class="property">property </em><code class="sig-name descname">metadata</code><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.summary_importance">
+<em class="property">property </em><code class="sig-name descname">summary_importance</code><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.summary_importance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize Explanations object to json.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_dataframe">
+<code class="sig-name descname">visualize_as_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">display_sparse_df</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_only_changes</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations.visualize_as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_list">
+<code class="sig-name descname">visualize_as_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">display_sparse_df</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_only_changes</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations.visualize_as_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.visualize_as_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.counterfactual_explanations.as_counterfactual_explanations">
+<code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">as_counterfactual_explanations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#as_counterfactual_explanations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.as_counterfactual_explanations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to convert json string to a CounterfactualExplanations
+object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dice_ml.counterfactual_explanations.json_converter">
+<code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">json_converter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#json_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.json_converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to convert CounterfactualExplanations object to json.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dice_ml.data">
 <span id="dice-ml-data-module"></span><h2>dice_ml.data module<a class="headerlink" href="#module-dice_ml.data" title="Permalink to this headline">¶</a></h2>
@@ -278,15 +367,15 @@
 </div>
 <div class="section" id="module-dice_ml.dice">
 <span id="dice-ml-dice-module"></span><h2>dice_ml.dice module<a class="headerlink" href="#module-dice_ml.dice" title="Permalink to this headline">¶</a></h2>
-<p>Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch.</p>
+<p>Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic</p>
 <dl class="py class">
 <dt id="dice_ml.dice.Dice">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'random'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An interface class to different DiCE implementations.</p>
 <dl class="py method">
 <dt id="dice_ml.dice.Dice.decide_implementation_type">
-<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides DiCE implementation type.</p>
 </dd></dl>
 
@@ -294,7 +383,7 @@
 
 <dl class="py function">
 <dt id="dice_ml.dice.decide">
-<code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">decide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#decide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.decide" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">decide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#decide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.decide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides DiCE implementation type.</p>
 </dd></dl>
 
@@ -303,19 +392,9 @@
 <span id="dice-ml-diverse-counterfactuals-module"></span><h2>dice_ml.diverse_counterfactuals module<a class="headerlink" href="#module-dice_ml.diverse_counterfactuals" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.diverse_counterfactuals.</code><code class="sig-name descname">CounterfactualExamples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">test_instance</span></em>, <em class="sig-param"><span class="n">test_pred</span></em>, <em class="sig-param"><span class="n">final_cfs</span></em>, <em class="sig-param"><span class="n">final_cfs_preds</span></em>, <em class="sig-param"><span class="n">final_cfs_sparse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cfs_preds_sparse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.diverse_counterfactuals.</code><code class="sig-name descname">CounterfactualExamples</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_cfs_df</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">test_instance_df</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">desired_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">desired_class</span><span class="o">=</span><span class="default_value">'opposite'</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'classifier'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to store and visualize the resulting counterfactual explanations.</p>
-<dl class="py method">
-<dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe">
-<code class="sig-name descname">convert_to_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.convert_to_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe_sparse">
-<code class="sig-name descname">convert_to_dataframe_sparse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.convert_to_dataframe_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.convert_to_dataframe_sparse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.display_df">
 <code class="sig-name descname">display_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">show_only_changes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.display_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.display_df" title="Permalink to this definition">¶</a></dt>
@@ -324,6 +403,11 @@
 <dl class="py method">
 <dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list">
 <code class="sig-name descname">print_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">li</span></em>, <em class="sig-param"><span class="n">show_only_changes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.print_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json">
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -338,6 +422,12 @@
 
 </dd></dl>
 
+<dl class="py function">
+<dt id="dice_ml.diverse_counterfactuals.json_converter">
+<code class="sig-prename descclassname">dice_ml.diverse_counterfactuals.</code><code class="sig-name descname">json_converter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#json_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.json_converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to convert object to json.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-dice_ml.model">
 <span id="dice-ml-model-module"></span><h2>dice_ml.model module<a class="headerlink" href="#module-dice_ml.model" title="Permalink to this headline">¶</a></h2>
@@ -345,12 +435,12 @@
 <p>The implementations contain methods to access the output or gradients of ML models trained based on different frameworks such as Tensorflow or PyTorch.</p>
 <dl class="py class">
 <dt id="dice_ml.model.Model">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.Model" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'classifier'</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An interface class to different ML Model implementations.</p>
 <dl class="py method">
 <dt id="dice_ml.model.Model.decide_implementation_type">
-<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">model_path</span></em>, <em class="sig-param"><span class="n">backend</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.Model.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">model_path</span></em>, <em class="sig-param"><span class="n">backend</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">kw_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.Model.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides the Model implementation type.</p>
 </dd></dl>
 
@@ -388,11 +478,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -403,7 +501,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

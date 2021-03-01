@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dice_ml.explainer_interfaces.dice_random &mdash; DiCE 0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DiCE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>dice_ml.explainer_interfaces.dice_random</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dice_ml.explainer_interfaces.dice_random</h1><div class="highlight"><pre>
+<span></span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module to generate diverse counterfactual explanations based on random sampling.</span>
+<span class="sd">A simple implementation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+
+<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
+
+
+<div class="viewcode-block" id="DiceRandom"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom">[docs]</a><span class="k">class</span> <span class="nc">DiceRandom</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init method</span>
+
+<span class="sd">        :param data_interface: an interface class to access data related params.</span>
+<span class="sd">        :param model_interface: an interface class to access trained ML model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>  <span class="c1"># initiating data related parameters</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">create_ohe_params</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_interface</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>  <span class="c1"># loading pickled trained model if applicable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">feed_data_params</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">initialize_transform_func</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;dict&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">precisions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outcome_precision</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">precisions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outcome_precision</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span>  <span class="n">desired_class</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate counterfactuals by randomly sampling features.</span>
+
+<span class="sd">        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.</span>
+<span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
+<span class="sd">        :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.</span>
+<span class="sd">        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the outcome class of query_instance for binary classification.</span>
+<span class="sd">        :param permitted_range: Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.</span>
+<span class="sd">        :param features_to_vary: Either a string &quot;all&quot; or a list of feature names to vary.</span>
+<span class="sd">        :param stopping_threshold: Minimum threshold for counterfactuals target class probability.</span>
+<span class="sd">        :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.</span>
+<span class="sd">        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes &quot;linear&quot; or &quot;binary&quot;. Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.</span>
+<span class="sd">        :param sample_size: Sampling size</span>
+<span class="sd">        :param random_seed: Random seed for reproducibility</span>
+
+<span class="sd">        :returns: A CounterfactualExamples object that contains the dataframe</span>
+<span class="sd">        of generated counterfactuals as an attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">permitted_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># use the precomputed default</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># compute the new ranges based on user input</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">,</span> <span class="n">feature_ranges_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_features_range</span><span class="p">(</span><span class="n">permitted_range</span><span class="p">)</span>
+
+        <span class="c1"># number of output nodes of ML model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># query_instance need no transformation for generating CFs using random sampling.</span>
+        <span class="c1"># find the predicted value of query_instance</span>
+        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;classifier&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_target_cfs_class</span><span class="p">(</span><span class="n">desired_class</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;regressor&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_target_cfs_range</span><span class="p">(</span><span class="n">desired_range</span><span class="p">)</span>
+        <span class="c1"># fixing features that are to be fixed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="o">=</span> <span class="n">total_CFs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span>
+        <span class="k">if</span> <span class="n">features_to_vary</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_features_values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_features_values</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">features_to_vary</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fixed_features_values</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="n">stopping_threshold</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
+            <span class="c1"># TODO Generalize this for multi-class</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">0.25</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="mf">0.75</span>
+
+        <span class="c1"># get random samples for each feature independently</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+        <span class="n">random_instances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_features_values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">,</span> <span class="n">sampling_random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span> <span class="n">sampling_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">)</span>
+        <span class="c1"># Generate copies of the query instance that will be changed one feature</span>
+        <span class="c1"># at a time to encourage sparsity.</span>
+        <span class="n">cfs_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">candidate_cfs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">query_instance</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">columns</span><span class="o">=</span><span class="n">query_instance</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="c1"># Loop to change one feature at a time, then two features, and so on.</span>
+        <span class="k">for</span> <span class="n">num_features_to_vary</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">selected_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_to_vary</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_size</span><span class="p">):</span>
+                <span class="n">candidate_cfs</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">selected_features</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">random_instances</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">selected_features</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">candidate_cfs</span><span class="p">)</span>
+            <span class="n">validity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decide_cf_validity</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">validity</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rows_to_add</span> <span class="o">=</span> <span class="n">candidate_cfs</span><span class="p">[</span><span class="n">validity</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">cfs_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">rows_to_add</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">cfs_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rows_to_add</span><span class="p">)</span>
+                <span class="n">cfs_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Always change at least 2 features before stopping</span>
+                <span class="k">if</span> <span class="n">num_features_to_vary</span> <span class="o">&gt;=</span><span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">total_CFs</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_cfs_found</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_cfs_found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">total_CFs</span><span class="p">:</span>
+                <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">cfs_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">total_CFs</span><span class="p">)</span>
+            <span class="n">cfs_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs_pred_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span>
+            <span class="n">cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_pred_scores</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_cfs_found</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_cfs_found</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_cfs_found</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="k">else</span> <span class="kc">False</span>
+
+            <span class="n">final_cfs_df</span> <span class="o">=</span> <span class="n">cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span>
+            <span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome_precision</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">final_cfs_df</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfs_pred_scores</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">test_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_output_from_scores</span><span class="p">((</span><span class="n">test_pred</span><span class="p">,)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome_precision</span><span class="p">))</span>
+        <span class="c1"># post-hoc operation on continuous features to enhance sparsity - only for public data</span>
+        <span class="k">if</span> <span class="n">posthoc_sparsity_param</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posthoc_sparsity_param</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_cfs_found</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Diverse Counterfactuals found! total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span>
+                      <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_cfs_found</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No Counterfactuals found for the given configuation, perhaps try with different parameters...&#39;</span><span class="p">,</span> <span class="s1">&#39;; total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only </span><span class="si">%d</span><span class="s1"> (required </span><span class="si">%d</span><span class="s1">) Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_cfs_found</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">),</span> <span class="s1">&#39;; total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span><span class="n">data_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df</span><span class="o">=</span><span class="n">final_cfs_df</span><span class="p">,</span>
+                                          <span class="n">test_instance_df</span><span class="o">=</span><span class="n">test_instance_df</span><span class="p">,</span>
+                                          <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df_sparse</span><span class="p">,</span>
+                                          <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DiceRandom.get_samples"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_samples">[docs]</a>    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_features_values</span><span class="p">,</span> <span class="n">feature_range</span><span class="p">,</span> <span class="n">sampling_random_seed</span><span class="p">,</span> <span class="n">sampling_size</span><span class="p">):</span>
+
+        <span class="c1"># first get required parameters</span>
+        <span class="n">precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;dict&quot;</span><span class="p">)</span>
+
+        <span class="n">categorical_features_frequencies</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="n">categorical_features_frequencies</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">sampling_random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">sampling_random_seed</span><span class="p">)</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">fixed_features_values</span><span class="p">:</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="p">[</span><span class="n">fixed_features_values</span><span class="p">[</span><span class="n">feature</span><span class="p">]]</span><span class="o">*</span><span class="n">sampling_size</span>
+            <span class="k">elif</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
+                <span class="n">low</span> <span class="o">=</span> <span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">high</span> <span class="o">=</span> <span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_continuous_samples</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">precisions</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">sampling_size</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">sampling_random_seed</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sampling_random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">sampling_random_seed</span><span class="p">)</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="n">sampling_size</span><span class="p">)</span>
+
+            <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">samples</span><span class="p">)))</span> <span class="c1">#to_dict(orient=&#39;records&#39;)#.values</span>
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+<div class="viewcode-block" id="DiceRandom.get_continuous_samples"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_continuous_samples">[docs]</a>    <span class="k">def</span> <span class="nf">get_continuous_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">precision</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">+</span><span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">precision</span><span class="p">),</span> <span class="n">size</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="DiceRandom.predict_fn"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom.predict_fn">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;prediction function&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

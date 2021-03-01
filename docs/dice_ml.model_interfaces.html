@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.model_interfaces package &mdash; DiCE 0.4 documentation</title>
+  <title>dice_ml.model_interfaces package &mdash; DiCE 0.5 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,10 +35,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="dice_ml.utils package" href="dice_ml.utils.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> DiCE
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> DiCE
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -88,7 +90,9 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Diverse Counterfactual Explanations without accessing training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -111,6 +115,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.diverse_counterfactuals">dice_ml.diverse_counterfactuals module</a></li>
@@ -123,6 +128,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -161,7 +167,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
         
@@ -216,11 +222,11 @@
 <div class="section" id="module-dice_ml.model_interfaces.base_model">
 <span id="dice-ml-model-interfaces-base-model-module"></span><h2>dice_ml.model_interfaces.base_model module<a class="headerlink" href="#module-dice_ml.model_interfaces.base_model" title="Permalink to this headline">¶</a></h2>
 <p>Module containing a template class as an interface to ML model.
-Subclasses implement model interfaces for different ML frameworks such as TensorFlow or PyTorch.
+Subclasses implement model interfaces for different ML frameworks such as TensorFlow, PyTorch OR Sklearn.
 All model interface methods are in dice_ml.model_interfaces</p>
 <dl class="py class">
 <dt id="dice_ml.model_interfaces.base_model.BaseModel">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.base_model.</code><code class="sig-name descname">BaseModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.base_model.</code><code class="sig-name descname">BaseModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.base_model.BaseModel.get_gradient">
@@ -228,9 +234,27 @@ All model interface methods are in dice_ml.model_interfaces</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="dice_ml.model_interfaces.base_model.BaseModel.get_output">
-<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dt id="dice_ml.model_interfaces.base_model.BaseModel.get_num_output_nodes">
+<code class="sig-name descname">get_num_output_nodes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel.get_num_output_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel.get_num_output_nodes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.model_interfaces.base_model.BaseModel.get_num_output_nodes2">
+<code class="sig-name descname">get_num_output_nodes2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel.get_num_output_nodes2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel.get_num_output_nodes2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.model_interfaces.base_model.BaseModel.get_output">
+<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/base_model.html#BaseModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.base_model.BaseModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns prediction probabilities for a classifier and the
+predicted output for a regressor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an array of output scores for a classifier, and a singleton</p>
+</dd>
+</dl>
+<p>array of predicted value for a regressor.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.base_model.BaseModel.load_model">
@@ -245,7 +269,7 @@ All model interface methods are in dice_ml.model_interfaces</p>
 <p>Module containing an interface to trained Keras Tensorflow model.</p>
 <dl class="py class">
 <dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.keras_tensorflow_model.</code><code class="sig-name descname">KerasTensorFlowModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/keras_tensorflow_model.html#KerasTensorFlowModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.keras_tensorflow_model.</code><code class="sig-name descname">KerasTensorFlowModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/keras_tensorflow_model.html#KerasTensorFlowModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dice_ml.model_interfaces.base_model.BaseModel" title="dice_ml.model_interfaces.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.model_interfaces.base_model.BaseModel</span></code></a></p>
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_gradient">
@@ -253,9 +277,24 @@ All model interface methods are in dice_ml.model_interfaces</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">
-<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_tensor</span></em>, <em class="sig-param"><span class="n">training</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/keras_tensorflow_model.html#KerasTensorFlowModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_num_output_nodes">
+<code class="sig-name descname">get_num_output_nodes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/keras_tensorflow_model.html#KerasTensorFlowModel.get_num_output_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_num_output_nodes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output">
+<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_tensor</span></em>, <em class="sig-param"><span class="n">training</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">transform_data</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/keras_tensorflow_model.html#KerasTensorFlowModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns prediction probabilities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_tensor</strong> – test input.</p></li>
+<li><p><strong>training</strong> – to determine training mode in TF2.</p></li>
+<li><p><strong>transform_data</strong> – boolean to indicate if data transformation is required.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel.load_model">
@@ -270,7 +309,7 @@ All model interface methods are in dice_ml.model_interfaces</p>
 <p>Module containing an interface to trained PyTorch model.</p>
 <dl class="py class">
 <dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.pytorch_model.</code><code class="sig-name descname">PyTorchModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'PYT'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/pytorch_model.html#PyTorchModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.pytorch_model.PyTorchModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.model_interfaces.pytorch_model.</code><code class="sig-name descname">PyTorchModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'PYT'</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/pytorch_model.html#PyTorchModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.pytorch_model.PyTorchModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dice_ml.model_interfaces.base_model.BaseModel" title="dice_ml.model_interfaces.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.model_interfaces.base_model.BaseModel</span></code></a></p>
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_gradient">
@@ -278,9 +317,23 @@ All model interface methods are in dice_ml.model_interfaces</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output">
-<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_tensor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/pytorch_model.html#PyTorchModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_num_output_nodes">
+<code class="sig-name descname">get_num_output_nodes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/pytorch_model.html#PyTorchModel.get_num_output_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_num_output_nodes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output">
+<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_tensor</span></em>, <em class="sig-param"><span class="n">transform_data</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model_interfaces/pytorch_model.html#PyTorchModel.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns prediction probabilities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_tensor</strong> – test input.</p></li>
+<li><p><strong>transform_data</strong> – boolean to indicate if data transformation is required.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.model_interfaces.pytorch_model.PyTorchModel.load_model">
@@ -320,11 +373,19 @@ All model interface methods are in dice_ml.model_interfaces</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Ramaravind, Amit, Chenhao
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -335,7 +396,6 @@ All model interface methods are in dice_ml.model_interfaces</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

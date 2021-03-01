@@ -4,10 +4,34 @@ dice\_ml.explainer\_interfaces package
 Submodules
 ----------
 
+dice\_ml.explainer\_interfaces.dice\_KD module
+----------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.dice_KD
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dice\_ml.explainer\_interfaces.dice\_genetic module
+---------------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.dice_genetic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.explainer\_interfaces.dice\_pytorch module
 ---------------------------------------------------
 
 .. automodule:: dice_ml.explainer_interfaces.dice_pytorch
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dice\_ml.explainer\_interfaces.dice\_random module
+--------------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.dice_random
    :members:
    :undoc-members:
    :show-inheritance:
