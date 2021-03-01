@@ -531,13 +531,13 @@ class ExplainerBase:
         #         raise ValueError(
         #             "permitted range of features should be within their original range")
         #     else:
-                self.data_interface.permitted_range = permitted_range
-                self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-                self.cont_minx = []
-                self.cont_maxx = []
-                for feature in self.data_interface.continuous_feature_names:
-                    self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                    self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+            self.data_interface.permitted_range = permitted_range
+            self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
+            self.cont_minx = []
+            self.cont_maxx = []
+            for feature in self.data_interface.continuous_feature_names:
+                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
+                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
     def check_mad_validity(self, feature_weights): # TODO: add comments as to where this is used if this function is necessary, else remove.
         """checks feature MAD validity and throw warnings"""
