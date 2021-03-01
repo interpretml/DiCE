@@ -151,7 +151,7 @@ class TestDiceGeneticBinaryClassificationMethods:
 #     def _initiate_exp_object(self, genetic_regression_exp_object):
 #         self.exp = genetic_regression_exp_object  # explainer object
 #
-#     # Testing that the counterfactuals are in the desired range
+#     # features_range
 #     @pytest.mark.parametrize("desired_range, total_CFs, initialization", [([1, 2.8], 2, "kdtree"), ([1, 2.8], 2, "random")])
 #     def test_desired_range(self, desired_range, sample_custom_query_2, total_CFs, initialization):
 #         features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")

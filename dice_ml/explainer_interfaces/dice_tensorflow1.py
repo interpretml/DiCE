@@ -95,10 +95,10 @@ class DiceTensorFlow1(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            if not self.data_interface.check_features_range(permitted_range):
-                raise ValueError(
-                    "permitted range of features should be within their original range")
-            else:
+            # if not self.data_interface.check_features_range(permitted_range):
+            #     raise ValueError(
+            #         "permitted range of features should be within their original range")
+            # else:
                 self.data_interface.permitted_range = permitted_range
                 self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
                 self.cont_minx = []
