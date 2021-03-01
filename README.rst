@@ -230,7 +230,7 @@ list of features to vary.
 
 It also supports simple constraints on
 features that reflect practical constraints (e.g., working hours per week
-should be between 10 and 50 using the `permitted_range` parameter).
+should be between 10 and 50 using the ``permitted_range`` parameter).
 
 For more details, check out `this <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb>`_ notebook.
 
@@ -257,7 +257,8 @@ Ideally, counterfactual explanations should balance between a wide range of sugg
 We are working on adding the following features to DiCE:
 
 * Support for using DiCE for debugging machine learning models
-* Constructed English phrases (e.g., `desired outcome if feature1 was changed`) and other ways to output the counterfactual examples
+* Constructed English phrases (e.g., ``desired outcome if feature was changed``) and other ways to output the counterfactual examples
+* Evaluating feature attribution methods like LIME and SHAP on necessity and sufficiency metrics using counterfactuals (see `this paper <https://arxiv.org/abs/2011.04917>`_)
 * Support for Bayesian optimization and other algorithms for generating counterfactual explanations
 * Better feasibility constraints for counterfactual generation 
 
