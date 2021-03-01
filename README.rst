@@ -166,7 +166,7 @@ DiCE does not need access to the full dataset. It only requires metadata propert
 
 **Model**
 
-We support pre-trained models as well as training a model using Tensorflow. Here's a simple example.
+We support pre-trained models as well as training a model. Here's a simple example using Tensorflow. 
 
 .. code:: python
 
@@ -185,7 +185,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-Check out the last two sections in `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with Tensorflow and PyTorch.
+Check out the `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to see code examples on using DiCE with sklearn and PyTorch models.
 
 **Explanations**
 
