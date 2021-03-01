@@ -90,7 +90,7 @@ class TestDiceGeneticBinaryClassificationMethods:
                 assert all(ans.final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
                            range(total_CFs))
 
-    # Testing that the features_to_vary argument actually varies only the features that you wish to vary
+    # Testing that the permitted_range argument actually varies the features only within the permitted_range
     @pytest.mark.parametrize("desired_class, total_CFs, permitted_range, initialization",
                              [(1, 2, {'Numerical': [10, 15]}, "kdtree"), (1, 2, {'Numerical': [10, 15]}, "random")])
     def test_permitted_range(self, desired_class, sample_custom_query_2, total_CFs, permitted_range, initialization):
