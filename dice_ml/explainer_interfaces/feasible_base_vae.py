@@ -246,8 +246,3 @@ class FeasibleBaseVAE(ExplainerBase):
                                           final_cfs_df_sparse = None,
                                           posthoc_sparsity_param=None,
                                           desired_class=desired_class)
-                                          #test_instance=result['query-instance'],
-                                          #test_pred=result['test-pred'],
-                                          #final_cfs=result['CF'],
-                                          #final_cfs_preds=result['CF-Pred'],
-                                          #posthoc_sparsity_param=None)
