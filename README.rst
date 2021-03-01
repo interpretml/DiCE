@@ -16,7 +16,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 
 `Ramaravind K. Mothilal <https://raam93.github.io/>`_, `Amit Sharma <http://www.amitsharma.in/>`_, `Chenhao Tan <https://chenhaot.com/>`_
   
-`FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://interpretml.github.io/DiCE/>`_ | Live Jupyter notebook |Binder|_
+`FAT* '20 paper <https://arxiv.org/abs/1905.07697>`_ | `Docs <https://interpretml.github.io/DiCE/>`_ | `Example Notebooks <https://github.com/interpretml/DiCE/tree/master/docs/source/notebooks>`_ | Live Jupyter notebook |Binder|_
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
 .. _Binder:  https://mybinder.org/v2/gh/interpretML/DiCE/master?filepath=docs/source/notebooks
@@ -42,7 +42,13 @@ Barring simple linear models, however, it is difficult to generate CF examples t
 
 Installing DICE
 -----------------
-DiCE supports Python 3+. To install the latest version of DiCE and its dependencies, run this from the top-most folder of the repo:
+DiCE supports Python 3+. The stable version of DiCE is available on `PyPI <https://pypi.org/project/dice-ml/>`_.
+
+.. code:: bash
+
+    pip install dice-ml
+
+To install the latest (dev) version of DiCE and its dependencies, clone this repo and run `pip install` from the top-most folder of the repo:
 
 .. code:: bash
 
@@ -53,6 +59,8 @@ If you face any problems, try installing dependencies manually.
 .. code:: bash
 
     pip install -r requirements.txt
+    # Additional dependendies for deep learning models
+    pip install -r requirements-deeplearning.txt
 
 DiCE requires the following packages:
 
@@ -60,13 +68,8 @@ DiCE requires the following packages:
 * scikit-learn
 * pandas
 * h5py
-* tensorflow/pytorch (We use DiCE with `TensorFlow 1.13.0-rc1 <https://github.com/tensorflow/tensorflow/releases/tag/v1.13.0-rc1>`_ in the notebooks, however, it works with Tensorflow>=1.13 and PyTorch as well.)
+* [optional] tensorflow/pytorch (works with Tensorflow>=1.13)
 
-The stable version of DiCE is now available on `PyPI <https://pypi.org/project/dice-ml/>`_.
-
-.. code:: bash
-
-    pip install dice-ml
 
 Getting started with DiCE
 -------------------------
@@ -113,16 +116,31 @@ Using DiCE, we can now generate examples that would have been classified as clas
   :width: 400
   :alt: List of counterfactual examples
 
-For more details, check out the `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook.
+For more details, check out the `docs/source/notebooks <https://github.com/interpretml/DiCE/tree/master/docs/source/notebooks>`_ folder. Here are some example notebooks:
+
+* `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_: Generate CF examples for a `sklearn`, `tensorflow` or `pytorch` binary classifier and compute feature importance scores.
+* `Explaining Multi-class Classifiers and Regressors
+  <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_multiclass_classification_and_regression.ipynb>`_: Generate CF explanations for a multi-class classifier or regressor.
+* `Local and Global Feature Importance`_: Estimate local and global feature importance scores using generated counterfactuals.
+* `Providing Constraints on Counterfactual Generation
+  <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb>`_: Specifying which features to vary and their permissible ranges for valid counterfactual examples.
 
 Supported methods for generating counterfactuals
 ------------------------------------------------
 DiCE can generate counterfactual examples using the following methods.
 
-* An explicit loss-based method described in `Mothilal et al. (2020) <https://arxiv.org/abs/1905.07697>`_ (Default).
+**Model-agnostic methods**
+
+* Randomized sampling 
+* KD-Tree (for counterfactuals within the training data)
+* Genetic algorithm 
+
+**Gradient-based methods**
+
+* An explicit loss-based method described in `Mothilal et al. (2020) <https://arxiv.org/abs/1905.07697>`_ (Default for deep learning models).
 * A Variational AutoEncoder (VAE)-based method described in `Mahajan et al. (2019) <https://arxiv.org/abs/1912.03277>`_ (see the BaseVAE `notebook <https://github.com/interpretml/DiCE/blob/master/docs/notebooks/DiCE_getting_started_feasible.ipynb>`_).
 
-Both these methods require a differentiable model, such as a neural network. We plan to add support for tree-based ML models in the future. If you are interested in a specific method, do raise an issue `here <https://github.com/interpretml/DiCE/issues>`_.
+The last two methods require a differentiable model, such as a neural network. If you are interested in a specific method, do raise an issue `here <https://github.com/interpretml/DiCE/issues>`_.
 
 Supported use-cases
 -------------------
@@ -164,7 +182,7 @@ We support pre-trained models as well as training a model using Tensorflow. Here
     # Generate the DiCE model for explanation
     m = model.Model(model=ann_model)
 
-Check out the last section in `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with PyTorch.
+Check out the last two sections in `Getting Started <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started.ipynb>`_ notebook to use DiCE with Tensorflow and PyTorch.
 
 **Explanations**
 
@@ -235,10 +253,10 @@ Ideally, counterfactual explanations should balance between a wide range of sugg
 
 We are working on adding the following features to DiCE:
 
-* Explaining model's decision for multi-class (alpha version on master) and regression problems. 
-* Support for scikit-learn and other libraries where models are not necessarily differentiable
 * Support for using DiCE for debugging machine learning models
-* Support for other algorithms for generating counterfactual explanations
+* Constructed English phrases (e.g., `desired outcome if feature1 was changed`) and other ways to output the counterfactual examples
+* Support for Bayesian optimization and other algorithms for generating counterfactual explanations
+* Better feasibility constraints for counterfactual generation 
 
 Citing
 -------
