@@ -3,6 +3,9 @@
 The implementations contain methods to access the output or gradients of ML models trained based on different frameworks such as Tensorflow or PyTorch.
 """
 
+from dice_ml.constants import BackEndTypes
+
+
 class Model:
     """An interface class to different ML Model implementations."""
     def __init__(self, model=None, model_path='', backend='TF1', model_type='classifier', func=None, kw_args=None):
@@ -31,15 +34,15 @@ class Model:
 def decide(backend):
     """Decides the Model implementation type."""
 
-    if backend == 'sklearn': # random sampling of CFs
+    if backend == BackEndTypes.Sklearn: # random sampling of CFs
         from dice_ml.model_interfaces.base_model import BaseModel
         return BaseModel
 
-    elif 'TF' in backend: # Tensorflow 1 or 2 backend
+    elif backend == BackEndTypes.Tensorflow1 or backend == BackEndTypes.Tensorflow2: # Tensorflow 1 or 2 backend
         from dice_ml.model_interfaces.keras_tensorflow_model import KerasTensorFlowModel
         return KerasTensorFlowModel
 
-    elif backend == 'PYT': # PyTorch backend
+    elif backend == BackEndTypes.Pytorch: # PyTorch backend
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel
         return PyTorchModel
 

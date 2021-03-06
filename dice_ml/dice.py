@@ -1,5 +1,8 @@
 """Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
+from dice_ml.constants import BackEndTypes, SamplingStrategy
+
+
 class Dice:
     """An interface class to different DiCE implementations."""
 
@@ -25,26 +28,26 @@ class Dice:
 def decide(model_interface, method):
     """Decides DiCE implementation type."""
 
-    if model_interface.backend == 'sklearn':
-        if method == "random": # random sampling of CFs
+    if model_interface.backend == BackEndTypes.Sklearn:
+        if method == SamplingStrategy.Random: # random sampling of CFs
             from dice_ml.explainer_interfaces.dice_random import DiceRandom
             return DiceRandom
-        elif method == "genetic":
+        elif method == SamplingStrategy.Genetic:
             from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
             return DiceGenetic
-        elif method == "kdtree":
+        elif method == SamplingStrategy.KdTree:
             from dice_ml.explainer_interfaces.dice_KD import DiceKD
             return DiceKD
 
-    elif model_interface.backend == 'TF1': # pretrained Keras Sequential model with Tensorflow 1.x backend
+    elif model_interface.backend == BackEndTypes.Tensorflow1: # pretrained Keras Sequential model with Tensorflow 1.x backend
         from dice_ml.explainer_interfaces.dice_tensorflow1 import DiceTensorFlow1
         return DiceTensorFlow1
 
-    elif model_interface.backend == 'TF2': # pretrained Keras Sequential model with Tensorflow 2.x backend
+    elif model_interface.backend == BackEndTypes.Tensorflow2: # pretrained Keras Sequential model with Tensorflow 2.x backend
         from dice_ml.explainer_interfaces.dice_tensorflow2 import DiceTensorFlow2
         return DiceTensorFlow2
 
-    elif model_interface.backend == 'PYT': # PyTorch backend
+    elif model_interface.backend == BackEndTypes.Pytorch: # PyTorch backend
         from dice_ml.explainer_interfaces.dice_pytorch import DicePyTorch
         return DicePyTorch
 
