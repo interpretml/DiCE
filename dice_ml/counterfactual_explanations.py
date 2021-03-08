@@ -110,14 +110,6 @@ class CounterfactualExplanations:
     def metadata(self):
         return self._metadata
 
-    def __eq__(self, other_cf):
-        if (isinstance(other_cf, CounterfactualExplanations)):
-            return self.cf_examples_list == other_cf.cf_examples_list and \
-                    self.local_importance == other_cf.local_importance and \
-                    self.summary_importance == other_cf.summary_importance and \
-                    self.metadata == other_cf.metadata
-        return False
-
     def visualize_as_dataframe(self, display_sparse_df=True,
                                show_only_changes=False):
         for cf_examples in self.cf_examples_list:
