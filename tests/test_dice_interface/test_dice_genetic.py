@@ -1,7 +1,5 @@
 import pytest
 import dice_ml
-import numpy as np
-import pandas as pd
 from dice_ml.utils import helpers
 
 
@@ -65,15 +63,15 @@ class TestDiceGeneticBinaryClassificationMethods:
             assert True
 
     # # Testing that the counterfactuals are in the desired class
-    # @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
-    #                          [(1, 2, "all", "kdtree"), (1, 2, "all", "random")])
-    # def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
-    #     features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-    #     ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-    #                                              features_to_vary=features_to_vary,
-    #                                              total_CFs=total_CFs, desired_class=desired_class,
-    #                                              initialization=initialization)
-    #     assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
+    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
+                             [(1, 2, "all", "kdtree"), (1, 2, "all", "random")])
+    def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
+        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 features_to_vary=features_to_vary,
+                                                 total_CFs=total_CFs, desired_class=desired_class,
+                                                 initialization=initialization)
+        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
 
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
@@ -131,31 +129,68 @@ class TestDiceGeneticBinaryClassificationMethods:
         except ValueError:
             assert True
 
+    # Testing if only valid cfs are found after maxiterations
+    @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
+                             [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
+    def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 total_CFs=total_CFs, desired_class=desired_class,
+                                                 initialization=initialization, maxiterations=maxiterations)
+        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
+            assert i == desired_class
 
-# class TestDiceGeneticMultiClassificationMethods:
-#     @pytest.fixture(autouse=True)
-#     def _initiate_exp_object(self, genetic_multi_classification_exp_object):
-#         self.exp = genetic_multi_classification_exp_object  # explainer object
-#
-#     # Testing that the counterfactuals are in the desired class
-#     @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (1, 2, "random")])
-#     def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-#         features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-#         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-#                                                  total_CFs=total_CFs, desired_class=desired_class,
-#                                                  initialization=initialization)
-#         assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-#
-# class TestDiceGeneticRegressionMethods:
-#     @pytest.fixture(autouse=True)
-#     def _initiate_exp_object(self, genetic_regression_exp_object):
-#         self.exp = genetic_regression_exp_object  # explainer object
-#
-#     # features_range
-#     @pytest.mark.parametrize("desired_range, total_CFs, initialization", [([1, 2.8], 2, "kdtree"), ([1, 2.8], 2, "random")])
-#     def test_desired_range(self, desired_range, sample_custom_query_2, total_CFs, initialization):
-#         features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-#         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-#                                                  total_CFs=total_CFs, desired_range=desired_range,
-#                                                  initialization=initialization)
-#         assert all([desired_range[0]] * total_CFs <= ans.final_cfs_df[self.exp.data_interface.outcome_name].values) and all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values <= [desired_range[1]] * total_CFs)
+
+class TestDiceGeneticMultiClassificationMethods:
+    @pytest.fixture(autouse=True)
+    def _initiate_exp_object(self, genetic_multi_classification_exp_object):
+        self.exp = genetic_multi_classification_exp_object  # explainer object
+
+    # Testing that the counterfactuals are in the desired class
+    @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
+    def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
+        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 total_CFs=total_CFs, desired_class=desired_class,
+                                                 initialization=initialization)
+        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
+
+    # Testing if only valid cfs are found after maxiterations
+    @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
+                             [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
+    def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 total_CFs=total_CFs, desired_class=desired_class,
+                                                 initialization=initialization, maxiterations=maxiterations)
+        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
+            assert i == desired_class
+
+
+class TestDiceGeneticRegressionMethods:
+    @pytest.fixture(autouse=True)
+    def _initiate_exp_object(self, genetic_regression_exp_object):
+        self.exp = genetic_regression_exp_object  # explainer object
+
+    # features_range
+    @pytest.mark.parametrize("desired_range, total_CFs, initialization",
+                             [([1, 2.8], 2, "kdtree"), ([1, 2.8], 2, "random")])
+    def test_desired_range(self, desired_range, sample_custom_query_2, total_CFs, initialization):
+        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 total_CFs=total_CFs, desired_range=desired_range,
+                                                 initialization=initialization)
+        assert all(
+            [desired_range[0]] * total_CFs <= ans.final_cfs_df[self.exp.data_interface.outcome_name].values) and all(
+            ans.final_cfs_df[self.exp.data_interface.outcome_name].values <= [desired_range[1]] * total_CFs)
+
+    # Testing if only valid cfs are found after maxiterations
+    @pytest.mark.parametrize("desired_range, total_CFs, initialization, maxiterations",
+                             [([1, 2.8], 7, "kdtree", 0), ([1, 2.8], 7, "random", 0)])
+    def test_maxiter(self, desired_range, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                                 total_CFs=total_CFs, desired_range=desired_range,
+                                                 initialization=initialization, maxiterations=maxiterations)
+        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
+            assert desired_range[0] <= i <= desired_range[1]

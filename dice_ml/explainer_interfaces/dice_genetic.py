@@ -40,7 +40,7 @@ class DiceGenetic(ExplainerBase):
         self.feature_weights_input = ''
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
 
-        self.population_size = 20
+        self.population_size = 25
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
@@ -94,94 +94,75 @@ class DiceGenetic(ExplainerBase):
                         feature_weights_list.append(self.label_encoded_data[feature].max())
             self.feature_weights_list = [feature_weights_list]
 
-    def do_random_init(self, features_to_vary, query_instance, desired_class, desired_range):
-        for kx in range(self.population_size):
-            temp_cfs = []
-            ix = 0
-            while ix < self.total_CFs:
-                one_init = [[]]
-                for jx, feature in enumerate(self.data_interface.feature_names):
-                    if feature in features_to_vary:
-                        if feature in self.data_interface.continuous_feature_names:
-                            one_init[0].append(
-                                np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]))
-                        else:
-                            one_init[0].append(np.random.choice(self.feature_range[feature]))
+    def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
+        remaining_cfs = np.zeros((num_inits, self.data_interface.number_of_features))
+        kx = 0
+        precisions = self.data_interface.get_decimal_precisions()
+        while kx < num_inits:
+            one_init = np.zeros(self.data_interface.number_of_features)
+            for jx, feature in enumerate(self.data_interface.feature_names):
+                if feature in features_to_vary:
+                    if feature in self.data_interface.continuous_feature_names:
+                        one_init[jx] = np.round(np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]), precisions[jx])
                     else:
-                        one_init[0].append(query_instance[0][jx])
-                if self.model.model_type == 'classifier':
-                    if self.predict_fn(np.array(one_init)) != desired_class:
-                        ix -= 1
-                    else:
-                        temp_cfs.append(np.array(one_init))
-                elif self.model.model_type == 'regressor':
-                    predicted_value = self.predict_fn(np.array(one_init))
-                    if not desired_range[0] <= predicted_value <= desired_range[1]:
-                        ix -= 1
-                    else:
-                        temp_cfs.append(np.array(one_init))
-                ix += 1
-            self.cfs.append(temp_cfs)
+                        one_init[jx] = np.random.choice(self.feature_range[feature])
+                else:
+                    one_init[jx] = query_instance[jx]
+            if self.model.model_type == 'classifier':
+                if self.predict_fn(np.array(one_init)) != desired_class:
+                    kx -= 1
+                else:
+                    remaining_cfs[kx] = one_init
+            elif self.model.model_type == 'regressor':
+                predicted_value = self.predict_fn(np.array(one_init))
+                if not desired_range[0] <= predicted_value <= desired_range[1]:
+                    kx -= 1
+                else:
+                    remaining_cfs[kx] = one_init
+            kx += 1
+        return remaining_cfs
 
-    def do_KD_init(self, features_to_vary, query_instance, cfs):
+    def do_KD_init(self, features_to_vary, query_instance, cfs, desired_class, desired_range):
         cfs = self.label_encode(cfs)
         cfs = cfs.reset_index(drop=True)
-        ix = 0
-        done = False
+
+        self.cfs = np.zeros((self.population_size, self.data_interface.number_of_features))
         for kx in range(self.population_size):
-            temp_cfs = []
-            for _ in range(self.total_CFs):
-                if ix >= len(cfs):
-                    done = True
-                    break
-                one_init = [[]]
-                for jx, feature in enumerate(self.data_interface.feature_names):
-                    if feature not in features_to_vary:
-                        one_init[0].append(query_instance[0][jx])
-                    else:
-                        if feature in self.data_interface.continuous_feature_names:
-                            if self.feature_range[feature][0] <= cfs.iloc[ix][jx] <= self.feature_range[feature][1]:
-                                one_init[0].append(cfs.iloc[ix][jx])
-                            else:
-                                if self.feature_range[feature][0] <= query_instance[0][jx] <= self.feature_range[feature][1]:
-                                    one_init[0].append(query_instance[0][jx])
-                                else:
-                                    one_init[0].append(
-                                        np.random.uniform(self.feature_range[feature][0],
-                                                          self.feature_range[feature][1]))
-                        else:
-                            if cfs.iloc[ix][jx] in self.feature_range[feature]:
-                                one_init[0].append(cfs.iloc[ix][jx])
-                            else:
-                                if query_instance[0][jx] in self.feature_range[feature]:
-                                    one_init[0].append(query_instance[0][jx])
-                                else:
-                                    one_init[0].append(np.random.choice(self.feature_range[feature]))
-                temp_cfs.append(np.array(one_init))
-                ix += 1
-            if done:
+            if kx >= len(cfs):
                 break
-            self.cfs.append(temp_cfs)
-
-
-        for kx in range(self.population_size - len(self.cfs)):
-            temp_cfs = []
-            for _ in range(self.total_CFs):
-                one_init = [[]]
-                for jx, feature in enumerate(self.data_interface.feature_names):
-                    if feature not in features_to_vary:
-                        one_init[0].append(query_instance[0][jx])
-                    else:
-                        if feature in self.data_interface.continuous_feature_names:
-                            one_init[0].append(np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]))
+            one_init = np.zeros(self.data_interface.number_of_features)
+            for jx, feature in enumerate(self.data_interface.feature_names):
+                if feature not in features_to_vary:
+                    one_init[jx] = (query_instance[jx])
+                else:
+                    if feature in self.data_interface.continuous_feature_names:
+                        if self.feature_range[feature][0] <= cfs.iloc[kx][jx] <= self.feature_range[feature][1]:
+                            one_init[jx] = cfs.iloc[kx][jx]
                         else:
-                            one_init[0].append(np.random.choice(self.feature_range[feature]))
-                temp_cfs.append(np.array(one_init))
-            self.cfs.append(temp_cfs)
+                            if self.feature_range[feature][0] <= query_instance[jx] <= self.feature_range[feature][1]:
+                                one_init[jx] = query_instance[jx]
+                            else:
+                                one_init[jx] = np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1])
+                    else:
+                        if cfs.iloc[kx][jx] in self.feature_range[feature]:
+                            one_init[jx] = cfs.iloc[kx][jx]
+                        else:
+                            if query_instance[jx] in self.feature_range[feature]:
+                                one_init[jx] = query_instance[jx]
+                            else:
+                                one_init[jx] = np.random.choice(self.feature_range[feature])
+            self.cfs[kx] = one_init
+            kx += 1
+
+        new_array = [tuple(row) for row in self.cfs]
+        uniques = np.unique(new_array, axis=0)
+
+        if len(uniques) != self.population_size:
+            remaining_cfs = self.do_random_init(self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
+            self.cfs = np.concatenate([uniques, remaining_cfs])
 
     def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose):
         """Intializes CFs and other related variables."""
-
         self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
 
         if algorithm == "RandomInitCF":
@@ -198,7 +179,7 @@ class DiceGenetic(ExplainerBase):
         # CF initialization
         self.cfs = []
         if initialization == 'random':
-            self.do_random_init(features_to_vary, query_instance, desired_class, desired_range)
+            self.cfs = self.do_random_init(self.population_size, features_to_vary, query_instance, desired_class, desired_range)
 
         elif initialization == 'kdtree':
             # Partitioned dataset and KD Tree for each class (binary) of the dataset
@@ -207,13 +188,13 @@ class DiceGenetic(ExplainerBase):
                                                                                                desired_class,
                                                                                                self.predicted_outcome_name)
             if self.KD_tree is None:
-                self.do_random_init(features_to_vary, query_instance, desired_class, desired_range)
+                self.cfs = self.do_random_init(self.population_size, features_to_vary, query_instance, desired_class, desired_range)
 
             else:
                 num_queries = min(len(self.dataset_with_predictions), self.population_size*self.total_CFs)
                 indices = self.KD_tree.query(query_instance_df_dummies, num_queries)[1][0]
                 KD_tree_output = self.dataset_with_predictions.iloc[indices].copy()
-                self.do_KD_init(features_to_vary, query_instance, KD_tree_output)
+                self.do_KD_init(features_to_vary, query_instance, KD_tree_output, desired_class, desired_range)
 
         if verbose:
             print("Initialization complete! Generating counterfactuals...")
@@ -227,11 +208,11 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None, desired_class="opposite", proximity_weight=0.5,
+    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None, desired_class="opposite", proximity_weight=0.1,
                                  diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary",
-                                 maxiterations=10000, verbose=False):
+                                 maxiterations=500, thresh=1e-2, verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -252,6 +233,7 @@ class DiceGenetic(ExplainerBase):
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
         :param maxiterations: Maximum iterations to run the genetic algorithm for.
+        :param thresh: The genetic algorithm stops when the difference between the previous best loss and current best loss is less than thresh
         :param verbose: Parameter to determine whether to print 'Diverse Counterfactuals found!'
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
@@ -265,7 +247,7 @@ class DiceGenetic(ExplainerBase):
         query_instance_orig = query_instance
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
         query_instance = self.label_encode(query_instance)
-        query_instance = np.array([query_instance.iloc[0].values])
+        query_instance = np.array(query_instance.values[0])
         self.x1 = query_instance
 
         # find the predicted value of query_instance
@@ -276,6 +258,7 @@ class DiceGenetic(ExplainerBase):
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
+            desired_class = self.target_cf_class[0][0]
         elif self.model.model_type == 'regressor':
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
 
@@ -286,7 +269,7 @@ class DiceGenetic(ExplainerBase):
 
         self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
 
-        query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, verbose)
+        query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose)
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
@@ -305,151 +288,78 @@ class DiceGenetic(ExplainerBase):
     def predict_fn(self, input_instance):
         input_instance = self.label_decode(input_instance)
         # TODO this line needs to change---we should not call model.model directly here. That functionality should be in the model class
-        output = self.model.model.predict(input_instance)[0]
+        output = self.model.model.predict(input_instance)
         return output
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
         if self.model.model_type == 'classifier':
+            predicted_value = np.array(self.predict_fn_scores(cfs))
             if self.yloss_type == 'hinge_loss':
-                for i in range(self.total_CFs):
-                    predicted_values = self.predict_fn_scores(cfs[i])[0]
-
-                    maxvalue = -np.inf
-                    for c in range(self.num_output_nodes):
-                        if c != desired_class:
-                            maxvalue = max(maxvalue, predicted_values[c])
-                    temp_loss = max(0, maxvalue - predicted_values[int(desired_class)])
-                    yloss += temp_loss
-            return yloss/self.total_CFs
+                maxvalue = np.full((len(predicted_value)), -np.inf)
+                for c in range(self.num_output_nodes):
+                    if c != desired_class:
+                        maxvalue = np.maximum(maxvalue, predicted_value[:, c])
+                yloss = np.maximum(0, maxvalue - predicted_value[:, int(desired_class)])
+            return yloss
 
         elif self.model.model_type == 'regressor':
+            predicted_value = self.predict_fn(cfs)
             if self.yloss_type == 'hinge_loss':
-                for i in range(self.total_CFs):
-                    predicted_value = self.predict_fn(cfs[i])
-                    if desired_range[0] <= predicted_value <= desired_range[1]:
-                        temp_loss = 0
-                    else:
-                        temp_loss = min(abs(predicted_value - desired_range[0]), abs(predicted_value - desired_range[1]))
-                    yloss += temp_loss
-            return yloss / self.total_CFs
+                yloss = np.zeros(len(predicted_value))
+                for i in range(len(predicted_value)):
+                    if not desired_range[0] <= predicted_value[i] <= desired_range[1]:
+                        yloss[i] = min(abs(predicted_value[i] - desired_range[0]), abs(predicted_value[i] - desired_range[1]))
+            return yloss
 
-    def compute_dist(self, x_hat, x1):
+    def compute_proximity_loss(self, x_hat):
         """Compute weighted distance between two vectors."""
-        return np.sum(np.multiply((abs(x_hat - x1)), self.feature_weights_list))
-
-    def compute_proximity_loss(self, cfs):
-        """Compute the second part (distance from x1) of the loss function."""
-        proximity_loss = 0.0
-        for i in range(self.total_CFs):
-            proximity_loss += self.compute_dist(cfs[i], self.x1)
-        return proximity_loss / len(self.data_interface.feature_names)
-
-    def dpp_style(self, submethod, cfs):
-        """Computes the DPP of a matrix."""
-        det_entries = []
-        if submethod == "inverse_dist":
-            for i in range(self.total_CFs):
-                for j in range(self.total_CFs):
-                    det_temp_entry = 1.0 / (1.0 + self.compute_dist(cfs[i], cfs[j]))
-                    if i == j:
-                        det_temp_entry = det_temp_entry + 0.0001
-                    det_entries.append(det_temp_entry)
-
-        elif submethod == "exponential_dist":
-            for i in range(self.total_CFs):
-                for j in range(self.total_CFs):
-                    det_temp_entry = 1.0 / np.exp(
-                        self.compute_dist(cfs[i], cfs[j]))
-                    det_entries.append(det_temp_entry)
-
-        det_entries = np.reshape(det_entries, [self.total_CFs, self.total_CFs])
-        diversity_loss = np.linalg.det(det_entries)
-        return diversity_loss
-
-    def compute_diversity_loss(self, cfs):
-        """Computes the third part (diversity) of the loss function."""
-        if self.total_CFs == 1:
-            return 0.0
-
-        if "dpp" in self.diversity_loss_type:
-            submethod = self.diversity_loss_type.split(':')[1]
-            return np.sum(self.dpp_style(submethod, cfs))
-        elif self.diversity_loss_type == "avg_dist":
-            diversity_loss = 0.0
-            count = 0.0
-            # computing pairwise distance and transforming it to normalized similarity
-            for i in range(self.total_CFs):
-                for j in range(i+1, self.total_CFs):
-                    count += 1.0
-                    diversity_loss += 1.0/(1.0 + self.compute_dist(cfs[i], cfs[j]))
-
-            return 1.0 - (diversity_loss/count)
-
-    def compute_regularization_loss(self, cfs):
-        """Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one"""
-        regularization_loss = 0.0
-        for i in range(self.total_CFs):
-            for v in self.encoded_categorical_feature_indexes:
-                regularization_loss += pow((np.sum(cfs[i][0, v[0]:v[-1] + 1]) - 1.0), 2)
-
-        return regularization_loss
+        proximity_loss = np.sum(np.multiply((abs(x_hat - self.x1)), self.feature_weights_list), axis=1)
+        return proximity_loss
 
     def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
         self.proximity_loss = self.compute_proximity_loss(cfs) if self.proximity_weight > 0 else 0.0
-        self.diversity_loss = self.compute_diversity_loss(cfs) if self.diversity_weight > 0 else 0.0
-        # TODO this is not needed for label encoding
-        #self.regularization_loss = self.compute_regularization_loss(cfs)
-
-
-        self.loss = self.yloss + (self.proximity_weight * self.proximity_loss) + (
-                    self.diversity_weight * self.diversity_loss)
-
+        self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss)), (-1, 1))
+        index = np.reshape(np.arange(len(cfs)), (-1, 1))
+        self.loss = np.concatenate([index, self.loss], axis=1)
         return self.loss
 
     def mate(self, k1, k2, features_to_vary, query_instance):
         """Performs mating and produces new offsprings"""
         # chromosome for offspring
-        child_chromosome = []
-        for i in range(self.total_CFs):
-            # temp_child_chromosome = []
-            one_init = [[]]
-            for j in range(len(self.data_interface.feature_names)):
-            #for jx, (gp1, gp2) in enumerate(zip(k1[i][0], k2[i][0])):
-                gp1 = k1[i][0][j]
-                gp2 = k2[i][0][j]
-                feat_name = self.data_interface.feature_names[j]
+        one_init = np.zeros(self.data_interface.number_of_features)
+        for j in range(self.data_interface.number_of_features):
+            gp1 = k1[j]
+            gp2 = k2[j]
+            feat_name = self.data_interface.feature_names[j]
 
-                # random probability
-                prob = random.random()
+            # random probability
+            prob = random.random()
 
-                # if prob is less than 0.45, insert gene from parent 1
-                if prob < 0.45:
-                    one_init[0].append(gp1)
+            # if prob is less than 0.40, insert gene from parent 1
+            if prob < 0.40:
+                one_init[j] = gp1
 
-                # if prob is between 0.45 and 0.90, insert gene from parent 2
-                elif prob < 0.90:
-                    one_init[0].append(gp2)
+            # if prob is between 0.40 and 0.80, insert gene from parent 2
+            elif prob < 0.80:
+                one_init[j] = gp2
 
-                #otherwise insert random gene(mutate) for maintaining diversity
-                else:
-                    if feat_name in features_to_vary:
-                        if feat_name in self.data_interface.continuous_feature_names:
-                            one_init[0].append(np.random.uniform(self.feature_range[feat_name][0], self.feature_range[feat_name][0]))
-                        else:
-                            one_init[0].append(np.random.choice(self.feature_range[feat_name]))
+            #otherwise insert random gene(mutate) for maintaining diversity
+            else:
+                if feat_name in features_to_vary:
+                    if feat_name in self.data_interface.continuous_feature_names:
+                        one_init[j] = np.random.uniform(self.feature_range[feat_name][0], self.feature_range[feat_name][0])
                     else:
-                        one_init[0].append(query_instance[0][j])
+                        one_init[j] = np.random.choice(self.feature_range[feat_name])
+                else:
+                    one_init[j] = query_instance[j]
+        return one_init
 
-            child_chromosome.append(np.array(one_init))
-        return child_chromosome
-
-    def find_counterfactuals(self, query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, verbose):
+    def find_counterfactuals(self, query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
-
         self.stopping_threshold = stopping_threshold
         if self.model.model_type == 'classifier':
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
@@ -461,47 +371,64 @@ class DiceGenetic(ExplainerBase):
         iterations = 0
         previous_best_loss = -np.inf
         current_best_loss = np.inf
-        current_best_cf = []
         stop_cnt = 0
         cfs_preds = [np.inf]*self.total_CFs
-        while iterations < maxiterations:
-            if abs(previous_best_loss - current_best_loss) <= 1e-2: #and (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
+        to_pred = None
+
+        while iterations < maxiterations or len(population) == self.total_CFs:
+            start = timeit.default_timer()
+            if abs(previous_best_loss - current_best_loss) <= thresh and (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:
                 stop_cnt = 0
             if stop_cnt >= 5:
                 break
             previous_best_loss = current_best_loss
-            population_fitness = []
-            current_best_loss = np.inf
-            current_best_cf = []
-            for k in range(self.population_size):
-                loss = self.compute_loss(population[k], desired_range, desired_class)
-                population_fitness.append((k, loss))
 
-                if loss < current_best_loss:
-                    current_best_loss = loss
-                    current_best_cf = population[k]
+            new_array = [tuple(row) for row in population]
+            population = np.unique(new_array, axis=0)
 
-            cfs_preds = [self.predict_fn(cfs) for cfs in current_best_cf]
-            # 10% of the next generation is fittest members of current generation
-            population_fitness = sorted(population_fitness, key=lambda x: x[1])
-            s = int((10 * self.population_size) / 100)
-            new_generation = [population[tup[0]] for tup in population_fitness[:s]]
+            population_fitness = self.compute_loss(population, desired_range, desired_class)
+            population_fitness = population_fitness[population_fitness[:, 1].argsort()]
 
-            # 90% of the next generation obtained from top 50% of fittest members of current generation
-            s = int((90 * self.population_size) / 100)
+            current_best_loss = population_fitness[0][1]
+            to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
+            cfs_preds = self.predict_fn(to_pred)
+
+            # self.total_CFS of the next generation obtained from the fittest members of current generation
+            s = self.total_CFs
+            new_generation_1 = np.array([population[int(tup[0])] for tup in population_fitness[:s]])
+
+            # rest of the next generation obtained from top 50% of fittest members of current generation
+            s = self.population_size - s
+            new_generation_2 = np.zeros((s, self.data_interface.number_of_features))
             for _ in range(s):
-                parent1 = random.choice(population[:int(50 * self.population_size / 100)])
-                parent2 = random.choice(population[:int(50 * self.population_size / 100)])
+                parent1 = random.choice(population[:int(len(population) / 2)])
+                parent2 = random.choice(population[:int(len(population) / 2)])
                 child = self.mate(parent1, parent2, features_to_vary, query_instance)
-                new_generation.append(child)
+                new_generation_2[_] = child
 
-            population = new_generation.copy()
+            population = np.concatenate([new_generation_1, new_generation_2])
             iterations += 1
 
-        self.final_cfs = current_best_cf
-        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
+        self.cfs_preds = []
+        self.final_cfs = []
+        if self.model.model_type == 'classifier':
+            i = 0
+            while i < self.total_CFs:
+                prediction = self.predict_fn(population[i])[0]
+                if prediction == desired_class:
+                    self.final_cfs.append(population[i])
+                    self.cfs_preds.append(prediction)
+                i += 1
+        elif self.model.model_type == 'regressor':
+            i = 0
+            while i < self.total_CFs:
+                prediction = self.predict_fn(population[i])[0]
+                if desired_range[0] <= prediction <= desired_range[1]:
+                    self.final_cfs.append(population[i])
+                    self.cfs_preds.append(prediction)
+                i += 1
 
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
@@ -517,18 +444,25 @@ class DiceGenetic(ExplainerBase):
         else:
             self.final_cfs_df_sparse = None
 
-        # to display the values with the same precision as the original data
-        precisions = self.data_interface.get_decimal_precisions()
-        for ix, feature in enumerate(self.data_interface.continuous_feature_names):
-            self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
-            self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+        if self.final_cfs_df is not None:
+            # to display the values with the same precision as the original data
+            precisions = self.data_interface.get_decimal_precisions()
+            for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+                self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
+                if self.final_cfs_df_sparse is not None:
+                    self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
 
         self.elapsed = timeit.default_timer() - self.start_time
         m, s = divmod(self.elapsed, 60)
 
         if verbose:
-            print('Diverse Counterfactuals found! total time taken: %02d' %
+            if len(self.final_cfs) == self.total_CFs:
+                print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
+            else:
+                print(
+                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps change the query instance or the features to vary...' % (
+                        len(self.final_cfs), self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return query_instance_df
 
@@ -553,17 +487,25 @@ class DiceGenetic(ExplainerBase):
     def label_decode(self, labelled_input):
         """Transforms label encoded data back to categorical values
         """
-        labelled_input = labelled_input[0]
-        input_instance = {}
-        for i in range(len(labelled_input)):
-            if self.data_interface.feature_names[i] in self.data_interface.categorical_feature_names:
-                enc = self.labelencoder[self.data_interface.feature_names[i]]
-                val = enc.inverse_transform(np.array([labelled_input[i]], dtype=np.int32))
-                input_instance[self.data_interface.feature_names[i]] = val
-            else:
-                input_instance[self.data_interface.feature_names[i]] =labelled_input[i]
+        num_to_decode = 1
+        if len(labelled_input.shape) > 1:
+            num_to_decode = len(labelled_input)
+        else:
+            labelled_input = [labelled_input]
 
-        input_instance_df = pd.DataFrame(input_instance, columns=self.data_interface.feature_names, index=[0])
+        input_instance = []
+
+        for j in range(num_to_decode):
+            temp = {}
+            for i in range(len(labelled_input[j])):
+                if self.data_interface.feature_names[i] in self.data_interface.categorical_feature_names:
+                    enc = self.labelencoder[self.data_interface.feature_names[i]]
+                    val = enc.inverse_transform(np.array([labelled_input[j][i]], dtype=np.int32))
+                    temp[self.data_interface.feature_names[i]] = val[0]
+                else:
+                    temp[self.data_interface.feature_names[i]] = labelled_input[j][i]
+            input_instance.append(temp)
+        input_instance_df = pd.DataFrame(input_instance, columns=self.data_interface.feature_names)
         return input_instance_df
 
     def label_decode_cfs(self, cfs_arr):
