@@ -331,6 +331,9 @@ class TestDiceKDBinaryClassificationMethods:
 
         query_instance[self.exp.data_interface.outcome_name] = test_pred
 
+        # find the predicted value of query_instance
+        self.exp.misc_init(stopping_threshold=0.5, desired_class=desired_class, desired_range=desired_range, test_pred=test_pred)
+
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 

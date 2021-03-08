@@ -96,6 +96,7 @@ class DiceGenetic(ExplainerBase):
 
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
         remaining_cfs = np.zeros((num_inits, self.data_interface.number_of_features))
+        # kx is the number of valid inits found so far
         kx = 0
         precisions = self.data_interface.get_decimal_precisions()
         while kx < num_inits:
@@ -108,18 +109,9 @@ class DiceGenetic(ExplainerBase):
                         one_init[jx] = np.random.choice(self.feature_range[feature])
                 else:
                     one_init[jx] = query_instance[jx]
-            if self.model.model_type == 'classifier':
-                if self.predict_fn(np.array(one_init)) != desired_class:
-                    kx -= 1
-                else:
-                    remaining_cfs[kx] = one_init
-            elif self.model.model_type == 'regressor':
-                predicted_value = self.predict_fn(np.array(one_init))
-                if not desired_range[0] <= predicted_value <= desired_range[1]:
-                    kx -= 1
-                else:
-                    remaining_cfs[kx] = one_init
-            kx += 1
+            if(self.is_cf_valid(self.predict_fn_scores(one_init))):
+                remaining_cfs[kx] = one_init
+                kx += 1
         return remaining_cfs
 
     def do_KD_init(self, features_to_vary, query_instance, cfs, desired_class, desired_range):
@@ -136,16 +128,16 @@ class DiceGenetic(ExplainerBase):
                     one_init[jx] = (query_instance[jx])
                 else:
                     if feature in self.data_interface.continuous_feature_names:
-                        if self.feature_range[feature][0] <= cfs.iloc[kx][jx] <= self.feature_range[feature][1]:
-                            one_init[jx] = cfs.iloc[kx][jx]
+                        if self.feature_range[feature][0] <= cfs.iat[kx, jx] <= self.feature_range[feature][1]:
+                            one_init[jx] = cfs.iat[kx, jx]
                         else:
                             if self.feature_range[feature][0] <= query_instance[jx] <= self.feature_range[feature][1]:
                                 one_init[jx] = query_instance[jx]
                             else:
                                 one_init[jx] = np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1])
                     else:
-                        if cfs.iloc[kx][jx] in self.feature_range[feature]:
-                            one_init[jx] = cfs.iloc[kx][jx]
+                        if cfs.iat[kx, jx] in self.feature_range[feature]:
+                            one_init[jx] = cfs.iat[kx, jx]
                         else:
                             if query_instance[jx] in self.feature_range[feature]:
                                 one_init[jx] = query_instance[jx]
@@ -204,7 +196,8 @@ class DiceGenetic(ExplainerBase):
             print("Initializing initial parameters to the genetic algorithm...")
 
         self.feature_range = self.get_valid_feature_range(normalized=False)
-        self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
+        if len(self.cfs) != total_CFs:
+            self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
@@ -254,13 +247,7 @@ class DiceGenetic(ExplainerBase):
         test_pred = self.predict_fn(query_instance)
         self.test_pred = test_pred
 
-        if self.model.model_type == 'classifier':
-            self.target_cf_class = np.array(
-                [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
-                dtype=np.float32)
-            desired_class = self.target_cf_class[0][0]
-        elif self.model.model_type == 'regressor':
-            self.target_cf_range = self.infer_target_cfs_range(desired_range)
+        self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
 
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
         for col in pd.get_dummies(self.data_interface.data_df[self.data_interface.feature_names]).columns:
@@ -360,13 +347,6 @@ class DiceGenetic(ExplainerBase):
 
     def find_counterfactuals(self, query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
-        self.stopping_threshold = stopping_threshold
-        if self.model.model_type == 'classifier':
-            if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
-                self.stopping_threshold = 0.25
-            elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
-                self.stopping_threshold = 0.75
-
         population = self.cfs.copy()
         iterations = 0
         previous_best_loss = -np.inf
@@ -376,7 +356,6 @@ class DiceGenetic(ExplainerBase):
         to_pred = None
 
         while iterations < maxiterations or len(population) == self.total_CFs:
-            start = timeit.default_timer()
             if abs(previous_best_loss - current_best_loss) <= thresh and (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:
@@ -384,9 +363,7 @@ class DiceGenetic(ExplainerBase):
             if stop_cnt >= 5:
                 break
             previous_best_loss = current_best_loss
-
-            new_array = [tuple(row) for row in population]
-            population = np.unique(new_array, axis=0)
+            population = np.unique(tuple(map(tuple, population)), axis=0)
 
             population_fitness = self.compute_loss(population, desired_range, desired_class)
             population_fitness = population_fitness[population_fitness[:, 1].argsort()]
@@ -402,33 +379,27 @@ class DiceGenetic(ExplainerBase):
             # rest of the next generation obtained from top 50% of fittest members of current generation
             s = self.population_size - s
             new_generation_2 = np.zeros((s, self.data_interface.number_of_features))
-            for _ in range(s):
+            for i in range(s):
                 parent1 = random.choice(population[:int(len(population) / 2)])
                 parent2 = random.choice(population[:int(len(population) / 2)])
                 child = self.mate(parent1, parent2, features_to_vary, query_instance)
-                new_generation_2[_] = child
+                new_generation_2[i] = child
 
             population = np.concatenate([new_generation_1, new_generation_2])
             iterations += 1
 
         self.cfs_preds = []
         self.final_cfs = []
-        if self.model.model_type == 'classifier':
-            i = 0
-            while i < self.total_CFs:
-                prediction = self.predict_fn(population[i])[0]
-                if prediction == desired_class:
-                    self.final_cfs.append(population[i])
-                    self.cfs_preds.append(prediction)
-                i += 1
-        elif self.model.model_type == 'regressor':
-            i = 0
-            while i < self.total_CFs:
-                prediction = self.predict_fn(population[i])[0]
-                if desired_range[0] <= prediction <= desired_range[1]:
-                    self.final_cfs.append(population[i])
-                    self.cfs_preds.append(prediction)
-                i += 1
+        i = 0
+        while i < self.total_CFs:
+            predictions = self.predict_fn_scores(population[i])[0]
+            if self.is_cf_valid(predictions):
+                self.final_cfs.append(population[i])
+                if not isinstance(predictions, float) and len(predictions) > 1:
+                    self.cfs_preds.append(np.argmax(predictions))
+                else:
+                    self.cfs_preds.append(predictions)
+            i += 1
 
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
@@ -445,12 +416,7 @@ class DiceGenetic(ExplainerBase):
             self.final_cfs_df_sparse = None
 
         if self.final_cfs_df is not None:
-            # to display the values with the same precision as the original data
-            precisions = self.data_interface.get_decimal_precisions()
-            for ix, feature in enumerate(self.data_interface.continuous_feature_names):
-                self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
-                if self.final_cfs_df_sparse is not None:
-                    self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+            self.round_to_precision()
 
         self.elapsed = timeit.default_timer() - self.start_time
         m, s = divmod(self.elapsed, 60)

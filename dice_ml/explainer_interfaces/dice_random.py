@@ -85,7 +85,7 @@ class DiceRandom(ExplainerBase):
             self.fixed_features_values = {}
             for feature in self.data_interface.feature_names:
                 if feature not in features_to_vary:
-                    self.fixed_features_values[feature] = query_instance[feature].iloc[0]
+                    self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         self.stopping_threshold = stopping_threshold
         if self.model.model_type == "classifier":
