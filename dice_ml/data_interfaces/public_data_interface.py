@@ -44,6 +44,8 @@ class PublicData:
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
 
+        self.number_of_features = len(self.feature_names)
+
         self.continuous_feature_indexes = [self.data_df.columns.get_loc(
             name) for name in self.continuous_feature_names if name in self.data_df]
 

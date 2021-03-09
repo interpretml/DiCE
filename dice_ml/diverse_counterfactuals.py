@@ -30,7 +30,7 @@ class CounterfactualExamples:
         self.final_cfs_list = None
         self.posthoc_sparsity_param = posthoc_sparsity_param # might be useful for future additions
 
-        self.test_pred = self.test_instance_df[self.data_interface.outcome_name].iloc[0]
+        self.test_pred = self.test_instance_df[self.data_interface.outcome_name].iat[0]
         if model_type == 'classifier':
             if desired_class == "opposite":
                 self.new_outcome = 1.0 - round(self.test_pred)

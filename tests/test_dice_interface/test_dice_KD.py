@@ -62,7 +62,7 @@ class TestDiceKDBinaryClassificationMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_1,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -121,7 +121,7 @@ class TestDiceKDBinaryClassificationMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_1,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -133,11 +133,11 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_param=0.1,
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
-        final_cfs.Numerical = final_cfs.Numerical.astype(int)
+        self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
-        assert all(final_cfs.Numerical == expected_output.Numerical[0]) and \
-               all(final_cfs.Categorical == expected_output.Categorical[0])
+        assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[0]) and \
+               all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -167,7 +167,7 @@ class TestDiceKDBinaryClassificationMethods:
 
         query_instance[self.exp.data_interface.outcome_name] = test_pred
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_2,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -179,11 +179,11 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_param=0.1,
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
-        final_cfs.Numerical = final_cfs.Numerical.astype(int)
+        self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
-        assert all(final_cfs.Numerical == expected_output.Numerical[1]) and \
-               all(final_cfs.Categorical == expected_output.Categorical[1])
+        assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[1]) and \
+               all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[1])
 
     # Testing that the permitted_range argument actually varies the features only within the permitted_range
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -216,7 +216,7 @@ class TestDiceKDBinaryClassificationMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_2,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -228,11 +228,11 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_param=0.1,
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
-        final_cfs.Numerical = final_cfs.Numerical.astype(int)
+        self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
-        assert all(final_cfs.Numerical == expected_output.Numerical[1]) and \
-               all(final_cfs.Categorical == expected_output.Categorical[1])
+        assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[1]) and \
+               all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[1])
 
     # Testing if you can provide permitted_range for categorical variables
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -267,7 +267,7 @@ class TestDiceKDBinaryClassificationMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_2,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -279,7 +279,7 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_param=0.1,
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
-        assert all(i in permitted_range["Categorical"] for i in final_cfs.Categorical.values)
+        assert all(i in permitted_range["Categorical"] for i in self.exp.final_cfs_df.Categorical.values)
 
     # Testing if an error is thrown when the query instance has an unknown categorical variable
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -331,10 +331,13 @@ class TestDiceKDBinaryClassificationMethods:
 
         query_instance[self.exp.data_interface.outcome_name] = test_pred
 
+        # find the predicted value of query_instance
+        self.exp.misc_init(stopping_threshold=0.5, desired_class=desired_class, desired_range=desired_range, test_pred=test_pred)
+
         if features_to_vary == 'all':
             features_to_vary = self.exp.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp.find_counterfactuals(self.data_df_copy,
                                                                              sample_custom_query_4,
                                                                              sample_custom_query_orig,
                                                                              desired_range,
@@ -347,13 +350,13 @@ class TestDiceKDBinaryClassificationMethods:
                                                                              posthoc_sparsity_algorithm='binary',
                                                                              verbose=False)
 
-        final_cfs.Numerical = final_cfs.Numerical.astype(int)
-        final_cfs = final_cfs.reset_index(drop=True)
+        self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
+        self.exp.final_cfs_df = self.exp.final_cfs_df.reset_index(drop=True)
 
         expected_output = self.exp.data_interface.data_df.iloc[np.r_[2, 0]][self.exp.data_interface.feature_names]
         expected_output = expected_output.reset_index(drop=True)
 
-        assert all(final_cfs == expected_output)
+        assert all(self.exp.final_cfs_df == expected_output)
 
 
 class TestDiceKDMultiClassificationMethods:
@@ -412,7 +415,7 @@ class TestDiceKDMultiClassificationMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp_multi.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp_multi.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp_multi.find_counterfactuals(self.data_df_copy,
                                                                                    sample_custom_query_2,
                                                                                    sample_custom_query_orig,
                                                                                    desired_range,
@@ -488,7 +491,7 @@ class TestDiceKDRegressionMethods:
         if features_to_vary == 'all':
             features_to_vary = self.exp_regr.data_interface.feature_names
 
-        query_instance, final_cfs, cfs_preds = self.exp_regr.find_counterfactuals(self.data_df_copy,
+        query_instance, cfs_preds = self.exp_regr.find_counterfactuals(self.data_df_copy,
                                                                                    sample_custom_query_2,
                                                                                    sample_custom_query_orig,
                                                                                    desired_range,
