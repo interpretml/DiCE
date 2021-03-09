@@ -373,17 +373,17 @@ class DiceGenetic(ExplainerBase):
             cfs_preds = self.predict_fn(to_pred)
 
             # self.total_CFS of the next generation obtained from the fittest members of current generation
-            s = self.total_CFs
-            new_generation_1 = np.array([population[int(tup[0])] for tup in population_fitness[:s]])
+            top_members = self.total_CFs
+            new_generation_1 = np.array([population[int(tup[0])] for tup in population_fitness[:top_members]])
 
             # rest of the next generation obtained from top 50% of fittest members of current generation
-            s = self.population_size - s
-            new_generation_2 = np.zeros((s, self.data_interface.number_of_features))
-            for i in range(s):
+            rest_members = self.population_size - top_members
+            new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
+            for new_gen_idx in range(rest_members):
                 parent1 = random.choice(population[:int(len(population) / 2)])
                 parent2 = random.choice(population[:int(len(population) / 2)])
                 child = self.mate(parent1, parent2, features_to_vary, query_instance)
-                new_generation_2[i] = child
+                new_generation_2[new_gen_idx] = child
 
             population = np.concatenate([new_generation_1, new_generation_2])
             iterations += 1
