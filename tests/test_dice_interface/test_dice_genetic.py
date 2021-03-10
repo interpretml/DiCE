@@ -194,3 +194,5 @@ class TestDiceGeneticRegressionMethods:
                                                  initialization=initialization, maxiterations=maxiterations)
         for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
             assert desired_range[0] <= i <= desired_range[1]
+
+    # TODO: Test for number of cfs = 0

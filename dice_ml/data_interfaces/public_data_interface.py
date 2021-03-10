@@ -133,17 +133,22 @@ class PublicData:
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
-        for feature_name in self.continuous_feature_names:
-            max_value = self.data_df[feature_name].max()
-            min_value = self.data_df[feature_name].min()
-            result[feature_name] = (
-                                           df[feature_name] - min_value) / (max_value - min_value)
-        #if encoding == 'label':
-        #    for ix in self.categorical_feature_indexes:
-        #        feature_name = self.feature_names[ix]
-        #        max_value = len(self.train_df[feature_name].unique())-1
-        #        min_value = 0
-        #        result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        if isinstance(df, pd.DataFrame) or isinstance(df, dict):
+            for feature_name in self.continuous_feature_names:
+                max_value = self.data_df[feature_name].max()
+                min_value = self.data_df[feature_name].min()
+                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        else:
+            result = result.astype('float')
+            for feature_index in self.continuous_feature_indexes:
+                feature_name = self.feature_names[feature_index]
+                max_value = self.data_df[feature_name].max()
+                min_value = self.data_df[feature_name].min()
+                if len(df.shape) == 1:
+                    value = (df[feature_index] - min_value) / (max_value - min_value)
+                    result[feature_index] = value
+                else:
+                    result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):

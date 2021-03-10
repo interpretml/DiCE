@@ -38,8 +38,6 @@ class DiceGenetic(ExplainerBase):
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.feature_weights_input = ''
-        self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
-
         self.population_size = 25
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
@@ -53,11 +51,11 @@ class DiceGenetic(ExplainerBase):
 
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
-    def update_hyperparameters(self, proximity_weight, diversity_weight, categorical_penalty):
+    def update_hyperparameters(self, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty):
         """Update hyperparameters of the loss function"""
 
-        self.hyperparameters = [proximity_weight, diversity_weight, categorical_penalty]
         self.proximity_weight = proximity_weight
+        self.sparsity_weight = sparsity_weight
         self.diversity_weight = diversity_weight
         self.categorical_penalty = categorical_penalty
 
@@ -191,7 +189,7 @@ class DiceGenetic(ExplainerBase):
         if verbose:
             print("Initialization complete! Generating counterfactuals...")
 
-    def do_param_initializations(self, total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose):
+    def do_param_initializations(self, total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, verbose):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
@@ -199,9 +197,10 @@ class DiceGenetic(ExplainerBase):
         if len(self.cfs) != total_CFs:
             self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
-        self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
+        self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None, desired_class="opposite", proximity_weight=0.1,
+    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None, desired_class="opposite",
+                                  proximity_weight=0.2, sparsity_weight=0.2,
                                  diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary",
@@ -214,6 +213,7 @@ class DiceGenetic(ExplainerBase):
         :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
         :param desired_class: For classification problems. Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
         :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the query_instance.
+        :param sparsity_weight: A positive float. Larger this weight, less features are changed from the query_instance.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
         :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
@@ -254,7 +254,7 @@ class DiceGenetic(ExplainerBase):
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
 
-        self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, diversity_weight, categorical_penalty, verbose)
+        self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, verbose)
 
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose)
 
@@ -300,16 +300,28 @@ class DiceGenetic(ExplainerBase):
                         yloss[i] = min(abs(predicted_value[i] - desired_range[0]), abs(predicted_value[i] - desired_range[1]))
             return yloss
 
-    def compute_proximity_loss(self, x_hat):
+    def compute_proximity_loss(self, x_hat_unnormalized, query_instance_normalized):
         """Compute weighted distance between two vectors."""
-        proximity_loss = np.sum(np.multiply((abs(x_hat - self.x1)), self.feature_weights_list), axis=1)
+        x_hat = self.data_interface.normalize_data(x_hat_unnormalized)
+        feature_weights = np.array([self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
+        product = np.multiply((abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]), feature_weights)
+        product = product.reshape(-1, product.shape[-1])
+        proximity_loss = np.sum(product, axis=1)
         return proximity_loss
+
+    def compute_sparsity_loss(self, cfs):
+        """Compute weighted distance between two vectors."""
+        sparsity_loss = np.count_nonzero(cfs - self.x1, axis=1)
+        return sparsity_loss
 
     def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
-        self.proximity_loss = self.compute_proximity_loss(cfs) if self.proximity_weight > 0 else 0.0
-        self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss)), (-1, 1))
+        query_instance_normalized = self.data_interface.normalize_data(self.x1)
+        query_instance_normalized = query_instance_normalized.astype('float')
+        self.proximity_loss = self.compute_proximity_loss(cfs, query_instance_normalized) if self.proximity_weight > 0 else 0.0
+        self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
+        self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss) + self.sparsity_weight * self.sparsity_loss), (-1, 1))
         index = np.reshape(np.arange(len(cfs)), (-1, 1))
         self.loss = np.concatenate([index, self.loss], axis=1)
         return self.loss
@@ -370,7 +382,8 @@ class DiceGenetic(ExplainerBase):
 
             current_best_loss = population_fitness[0][1]
             to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
-            cfs_preds = self.predict_fn(to_pred)
+            if self.total_CFs > 0:
+                cfs_preds = self.predict_fn(to_pred)
 
             # self.total_CFS of the next generation obtained from the fittest members of current generation
             top_members = self.total_CFs
@@ -385,7 +398,10 @@ class DiceGenetic(ExplainerBase):
                 child = self.mate(parent1, parent2, features_to_vary, query_instance)
                 new_generation_2[new_gen_idx] = child
 
-            population = np.concatenate([new_generation_1, new_generation_2])
+            if self.total_CFs > 0:
+                population = np.concatenate([new_generation_1, new_generation_2])
+            else:
+                population = new_generation_2
             iterations += 1
 
         self.cfs_preds = []
@@ -405,17 +421,11 @@ class DiceGenetic(ExplainerBase):
         query_instance_df = self.label_decode(query_instance)
         query_instance_df[self.data_interface.outcome_name] = self.test_pred
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+        self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-        # post-hoc operation on continuous features to enhance sparsity - only for public data
-        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
-            final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
-            self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, query_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
-        else:
-            self.final_cfs_df_sparse = None
-
-        if self.final_cfs_df is not None:
+            self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.cfs_preds
             self.round_to_precision()
 
         self.elapsed = timeit.default_timer() - self.start_time
@@ -436,19 +446,6 @@ class DiceGenetic(ExplainerBase):
         for column in self.data_interface.categorical_feature_names:
             input_instance[column] = self.labelencoder[column].transform(input_instance[column])
         return input_instance
-
-    def from_label(self, data):
-        """Transforms label encoded data back to categorical values
-        """
-        out = data.copy()
-        if isinstance(data, pd.DataFrame) or isinstance(data, dict):
-            for column in self.categorical_feature_names:
-                out[column] = self.labelencoder[column].inverse_transform(out[column].round().astype(int).tolist())
-        elif isinstance(data, list):
-            # TODO: make sure that the indexes match the labelencoder and list
-            for c in self.categorical_feature_indexes:
-                out[c] = self.labelencoder[self.feature_names[c]].inverse_transform([round(out[c])])[0]
-        return out
 
     def label_decode(self, labelled_input):
         """Transforms label encoded data back to categorical values
