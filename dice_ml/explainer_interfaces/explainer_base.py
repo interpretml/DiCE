@@ -4,6 +4,8 @@
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+
 from collections.abc import Iterable
 from sklearn.neighbors import KDTree
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
@@ -75,7 +77,7 @@ class ExplainerBase:
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
             #query_instances = query_instances.to_dict("records")
-        for query_instance in query_instances_list:
+        for query_instance in tqdm(query_instances_list):
             res = self._generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
                     desired_range=desired_range,
