@@ -4,7 +4,6 @@ This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time'
 """
 
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-import math
 import numpy as np
 import pandas as pd
 import random
@@ -151,7 +150,7 @@ class DiceGenetic(ExplainerBase):
             remaining_cfs = self.do_random_init(self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
             self.cfs = np.concatenate([uniques, remaining_cfs])
 
-    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose):
+    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose):
         """Intializes CFs and other related variables."""
         self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
 
@@ -195,7 +194,9 @@ class DiceGenetic(ExplainerBase):
 
         self.feature_range = self.get_valid_feature_range(normalized=False)
         if len(self.cfs) != total_CFs:
-            self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, permitted_range, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
+            self.do_cf_initializations(total_CFs, initialization, algorithm, features_to_vary, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose)
+        else:
+            self.total_CFs = total_CFs
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
@@ -247,7 +248,7 @@ class DiceGenetic(ExplainerBase):
         test_pred = self.predict_fn(query_instance)
         self.test_pred = test_pred
 
-        self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
+        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
 
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
         for col in pd.get_dummies(self.data_interface.data_df[self.data_interface.feature_names]).columns:
@@ -256,7 +257,7 @@ class DiceGenetic(ExplainerBase):
 
         self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance, query_instance_df_dummies, algorithm, features_to_vary, permitted_range, yloss_type, diversity_loss_type, feature_weights, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, verbose)
 
-        query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose)
+        query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary, maxiterations, thresh, verbose)
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
@@ -357,7 +358,7 @@ class DiceGenetic(ExplainerBase):
                     one_init[j] = query_instance[j]
         return one_init
 
-    def find_counterfactuals(self, query_instance, desired_range, desired_class, features_to_vary, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, maxiterations, thresh, verbose):
+    def find_counterfactuals(self, query_instance, desired_range, desired_class, features_to_vary, maxiterations, thresh, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
         population = self.cfs.copy()
         iterations = 0
@@ -367,7 +368,7 @@ class DiceGenetic(ExplainerBase):
         cfs_preds = [np.inf]*self.total_CFs
         to_pred = None
 
-        while iterations < maxiterations or len(population) == self.total_CFs:
+        while iterations < maxiterations and self.total_CFs > 0:
             if abs(previous_best_loss - current_best_loss) <= thresh and (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:

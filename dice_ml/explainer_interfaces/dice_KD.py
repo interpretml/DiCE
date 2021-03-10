@@ -77,7 +77,7 @@ class DiceKD(ExplainerBase):
         test_pred = self.predict_fn(query_instance)[0]
 
         query_instance[self.data_interface.outcome_name] = test_pred
-        self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
+        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
         if desired_range != None:
             if desired_range[0] > desired_range[1]:
                 raise ValueError("Invalid Range!")
@@ -106,6 +106,7 @@ class DiceKD(ExplainerBase):
                                                                          stopping_threshold,
                                                                          posthoc_sparsity_param,
                                                                          posthoc_sparsity_algorithm, verbose)
+        self.cfs_preds = cfs_preds
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=self.final_cfs_df,
