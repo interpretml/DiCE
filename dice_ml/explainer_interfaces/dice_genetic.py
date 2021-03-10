@@ -303,8 +303,6 @@ class DiceGenetic(ExplainerBase):
     def compute_proximity_loss(self, x_hat_unnormalized, query_instance_normalized):
         """Compute weighted distance between two vectors."""
         x_hat = self.data_interface.normalize_data(x_hat_unnormalized)
-        print('x_hat', x_hat)
-        print('q inst norm', query_instance_normalized)
         feature_weights = np.array([self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
         product = np.multiply((abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]), feature_weights)
         product = product.reshape(-1, product.shape[-1])
