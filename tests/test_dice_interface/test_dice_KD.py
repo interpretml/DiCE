@@ -504,3 +504,5 @@ class TestDiceKDRegressionMethods:
                                                                                    posthoc_sparsity_algorithm='binary',
                                                                                    verbose=False)
         assert all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds)
+
+        # TODO: Test for number of cfs = 0

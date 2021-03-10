@@ -149,7 +149,7 @@ class DiceKD(ExplainerBase):
         num_queries = min(len(self.dataset_with_predictions), total_CFs * 10)
         cfs = []
 
-        if self.KD_tree is not None:
+        if self.KD_tree is not None and num_queries > 0:
             KD_tree_output = self.KD_tree.query(KD_query_instance, num_queries)
             distances = KD_tree_output[0][0]
             indices = KD_tree_output[1][0]
@@ -165,7 +165,7 @@ class DiceKD(ExplainerBase):
         total_cfs_found = 0
 
         # Iterating through the closest points from the KD tree and checking if any of these are valid
-        if self.KD_tree is not None:
+        if self.KD_tree is not None and total_CFs > 0:
             cfs = cfs.reset_index(drop=True)
             for i in range(len(cfs)):
                 if total_cfs_found == total_CFs:
