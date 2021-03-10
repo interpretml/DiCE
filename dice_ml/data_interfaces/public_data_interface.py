@@ -133,13 +133,13 @@ class PublicData:
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
-        result = result.astype('float')
         if isinstance(df, pd.DataFrame) or isinstance(df, dict):
             for feature_name in self.continuous_feature_names:
                 max_value = self.data_df[feature_name].max()
                 min_value = self.data_df[feature_name].min()
                 result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         else:
+            result = result.astype('float')
             for feature_index in self.continuous_feature_indexes:
                 feature_name = self.feature_names[feature_index]
                 max_value = self.data_df[feature_name].max()

@@ -303,6 +303,8 @@ class DiceGenetic(ExplainerBase):
     def compute_proximity_loss(self, x_hat_unnormalized, query_instance_normalized):
         """Compute weighted distance between two vectors."""
         x_hat = self.data_interface.normalize_data(x_hat_unnormalized)
+        print('x_hat', x_hat)
+        print('q inst norm', query_instance_normalized)
         feature_weights = np.array([self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
         product = np.multiply((abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]), feature_weights)
         product = product.reshape(-1, product.shape[-1])
@@ -318,6 +320,7 @@ class DiceGenetic(ExplainerBase):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
         query_instance_normalized = self.data_interface.normalize_data(self.x1)
+        query_instance_normalized = query_instance_normalized.astype('float')
         self.proximity_loss = self.compute_proximity_loss(cfs, query_instance_normalized) if self.proximity_weight > 0 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
         self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss) + self.sparsity_weight * self.sparsity_loss), (-1, 1))
