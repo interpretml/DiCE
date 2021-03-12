@@ -31,12 +31,12 @@ class PublicData:
             self.continuous_feature_names = params['continuous_features']
         else:
             raise ValueError(
-                "should provide the name(s) of continuous features in the data")
+                "should provide the name(s) of continuous features in the data as a list")
 
         if type(params['outcome_name']) is str:
             self.outcome_name = params['outcome_name']
         else:
-            raise ValueError("should provide the name of outcome feature")
+            raise ValueError("should provide the name of outcome feature as a string")
 
         self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
         ) if name not in self.continuous_feature_names + [self.outcome_name]]
