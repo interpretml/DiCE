@@ -450,21 +450,22 @@ class ExplainerBase:
         TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
         whether it is allowed or not.
         """
-        target_class = None
         if desired_class_input == "opposite":
             if num_output_nodes == 2:
                 original_pred_1 = np.argmax(original_pred)
                 target_class = int(1 - original_pred_1)
-
+                return target_class
             elif num_output_nodes > 2:
-                raise ValueError("Desired class cannot be opposite if the number of classes is more than 2.")
-
-        if isinstance(desired_class_input, int):
+                raise UserConfigValidationException("Desired class cannot be opposite if the number of classes is more than 2.")
+        elif isinstance(desired_class_input, int):
             if desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
+                return target_class
             else:
-                raise ValueError("Desired class not present in training data!")
-        return target_class
+                raise UserConfigValidationException("Desired class not present in training data!")
+        else:
+            raise UserConfigValidationException("The target class for {0} could not be identified".format(
+                                                desired_class_input))
 
     def infer_target_cfs_range(self, desired_range_input):
         target_range = None

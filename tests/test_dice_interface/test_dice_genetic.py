@@ -1,6 +1,7 @@
 import pytest
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.fixture
@@ -44,23 +45,16 @@ class TestDiceGeneticBinaryClassificationMethods:
     # When invalid desired_class is given
     @pytest.mark.parametrize("desired_class, total_CFs", [(7, 3)])
     def test_no_cfs(self, desired_class, sample_custom_query_1, total_CFs):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_1, "inverse_mad")
-        try:
+        with pytest.raises(UserConfigValidationException):
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
                                                desired_class=desired_class)
-            assert False
-        except ValueError:
-            assert True
 
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("features_to_vary, permitted_range, feature_weights",
                              [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
     def test_invalid_query_instance(self, sample_custom_query_1, features_to_vary, permitted_range, feature_weights):
-        try:
+        with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
-            assert False
-        except ValueError:
-            assert True
 
     # # Testing that the counterfactuals are in the desired class
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
@@ -123,11 +117,8 @@ class TestDiceGeneticBinaryClassificationMethods:
     # Testing if an error is thrown when the query instance has an unknown categorical variable
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs):
-        try:
+        with pytest.raises(ValueError):
             self.exp.setup("all", None, sample_custom_query_3, "inverse_mad")
-            assert False
-        except ValueError:
-            assert True
 
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
