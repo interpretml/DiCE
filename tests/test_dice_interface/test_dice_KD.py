@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.fixture
@@ -43,14 +44,15 @@ class TestDiceKDBinaryClassificationMethods:
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
     # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(1, 3)])
-    def test_empty_KD(self, desired_class, sample_custom_query_1, total_CFs):
-        try:
+    @pytest.mark.parametrize("desired_class, total_CFs", [(1, 3), ('a', 3)])
+    def test_unsupported_binary_class(self, desired_class, sample_custom_query_1, total_CFs):
+        with pytest.raises(UserConfigValidationException) as ucve:
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
                                                desired_class=desired_class)
-            assert False
-        except ValueError:
-            assert True
+        if desired_class == 1:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
 
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -60,12 +62,9 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
 
-        try:
+        with pytest.raises(ValueError):
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
                                                features_to_vary=features_to_vary, permitted_range=permitted_range)
-            assert False
-        except ValueError:
-            assert True
 
     # Verifying the output of the KD tree
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
@@ -109,12 +108,9 @@ class TestDiceKDBinaryClassificationMethods:
     # Testing if an error is thrown when the query instance has an unknown categorical variable
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs):
-        try:
+        with pytest.raises(ValueError):
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_3, total_CFs=total_CFs,
                                                desired_class=desired_class)
-            assert False
-        except ValueError:
-            assert True
 
     # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
@@ -155,6 +151,18 @@ class TestDiceKDMultiClassificationMethods:
     def test_zero_cfs(self, desired_class, sample_custom_query_4, total_CFs):
         self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
                                                  desired_class=desired_class)
+
+    # When no elements in the desired_class are present in the training data
+    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
+    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
+        with pytest.raises(UserConfigValidationException) as ucve:
+            self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
+                                                     desired_class=desired_class)
+        if desired_class == 100:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
+
 
 
 class TestDiceKDRegressionMethods:
