@@ -3,6 +3,8 @@ import numpy as np
 import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 
 @pytest.fixture
@@ -77,6 +79,15 @@ class TestDiceKDBinaryClassificationMethods:
         assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[0]) and \
                all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 
+    # Verifying the output of the KD tree
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1, desired_class=desired_class,
+            total_CFs=total_CFs)
+
+        assert counterfactual_explanations is not None
+
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary", [(0, 1, ["Numerical"])])
     def test_features_to_vary(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary):
@@ -146,6 +157,16 @@ class TestDiceKDMultiClassificationMethods:
                                                  desired_class=desired_class)
         assert all(i == desired_class for i in self.exp_multi.cfs_preds)
 
+    # Testing that the output of multiclass classification lies in the desired_class
+    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
+    def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
+        counterfactual_explanations = self.exp_multi.generate_counterfactuals(
+                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
+                                        desired_class=desired_class)
+        assert all(i == desired_class for i in self.exp_multi.cfs_preds)
+
+        assert counterfactual_explanations is not None
+
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 0)])
     def test_zero_cfs(self, desired_class, sample_custom_query_4, total_CFs):
@@ -174,9 +195,31 @@ class TestDiceKDRegressionMethods:
     # Testing that the output of regression lies in the desired_range
     @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
     def test_KD_tree_output(self, desired_range, sample_custom_query_2, total_CFs):
-        self.exp_regr._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
-                                                desired_range=desired_range)
+        cf_examples = self.exp_regr._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
+                                                              desired_range=desired_range)
         assert all(desired_range[0] <= i <= desired_range[1] for i in self.exp_regr.cfs_preds)
+
+        assert cf_examples is not None
+        json_str = cf_examples.to_json()
+        assert json_str is not None
+
+        recovered_cf_examples = CounterfactualExamples.from_json(json_str)
+        assert recovered_cf_examples is not None
+        assert cf_examples == recovered_cf_examples
+
+    @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
+    def test_KD_tree_counterfactual_explanations_output(self, desired_range, sample_custom_query_2, total_CFs):
+        counterfactual_explanations = self.exp_regr.generate_counterfactuals(
+                                            query_instances=sample_custom_query_2, total_CFs=total_CFs,
+                                            desired_range=desired_range)
+
+        assert counterfactual_explanations is not None
+        json_str = counterfactual_explanations.to_json()
+        assert json_str is not None
+
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(json_str)
+        assert recovered_counterfactual_explanations is not None
+        assert counterfactual_explanations == recovered_counterfactual_explanations
 
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs", [(0, [1, 2.8], 0)])
