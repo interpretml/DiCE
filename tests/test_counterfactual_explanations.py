@@ -1,6 +1,8 @@
+import json
 import pytest
 
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class TestCounterfactualExplanations:
@@ -119,3 +121,17 @@ class TestCounterfactualExplanations:
         for index in range(0, len(unsorted_local_importance)):
             assert list(unsorted_local_importance[index].keys()) != list(counterfactual_explanations.local_importance[index].keys())
             assert list(sorted_local_importance[index].keys()) == list(counterfactual_explanations.local_importance[index].keys())
+
+    @pytest.mark.parametrize('version', ['2.0', ''])
+    def test_unsupported_versions_json_input(self, version):
+        json_str = json.dumps({'metadata': {'version': version}})
+        with pytest.raises(UserConfigValidationException) as ucve:
+            CounterfactualExplanations.from_json(json_str)
+
+        assert "Incompatible version {} found in json input".format(version) in str(ucve)
+
+        json_str = json.dumps({'metadata': {'versio': version}})
+        with pytest.raises(UserConfigValidationException) as ucve:
+            CounterfactualExplanations.from_json(json_str)
+
+        assert "No version field in the json input" in str(ucve)

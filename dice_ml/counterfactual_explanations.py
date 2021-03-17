@@ -3,6 +3,15 @@ import pandas as pd
 
 import dice_ml.diverse_counterfactuals as exp
 from dice_ml.utils.serialize import DummyDataInterface
+from dice_ml.utils.exception import UserConfigValidationException
+
+
+_CurrentVersion = '1.0'
+_AllVersions = [_CurrentVersion]
+
+
+def _check_supported_json_output_versions(version):
+    return version in _AllVersions
 
 
 def json_converter(obj):
@@ -22,6 +31,12 @@ def as_counterfactual_explanations(json_dict):
     object.
     """
     if 'metadata' in json_dict:
+        version = json_dict['metadata'].get('version')
+        if version is None:
+            raise UserConfigValidationException("No version field in the json input")
+        elif not _check_supported_json_output_versions(version):
+            raise UserConfigValidationException("Incompatible version {} found in json input".format(version))
+
         cf_examples_list = []
         for cf_examples_str in json_dict["cf_examples_list"]:
             cf_examples_dict = json.loads(cf_examples_str)
@@ -65,7 +80,7 @@ class CounterfactualExplanations:
         self._cf_examples_list = cf_examples_list
         self._local_importance = local_importance
         self._summary_importance = summary_importance
-        self._metadata = {'version': '1.0'}
+        self._metadata = {'version': _CurrentVersion}
 
     def __eq__(self, other_cf):
         if (isinstance(other_cf, CounterfactualExplanations)):
