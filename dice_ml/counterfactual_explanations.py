@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 import dice_ml.diverse_counterfactuals as exp
-from dice_ml.utils.serialize import DummyDataInterface
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils.exception import UserConfigValidationException
 
 
@@ -12,7 +12,6 @@ _AllVersions = [_CurrentVersion]
 
 def _check_supported_json_output_versions(version):
     return version in _AllVersions
-
 
 def json_converter(obj):
     """ Helper function to convert CounterfactualExplanations object to json.
@@ -39,25 +38,11 @@ def as_counterfactual_explanations(json_dict):
 
         cf_examples_list = []
         for cf_examples_str in json_dict["cf_examples_list"]:
-            cf_examples_dict = json.loads(cf_examples_str)
-            test_instance_df = pd.read_json(cf_examples_dict["test_instance_df"])
-            cfs_df = pd.read_json(cf_examples_dict["final_cfs_df"])
-            # Creating the object for dummy_data_interface
-            dummy_data_interface = DummyDataInterface(**cf_examples_dict["data_interface"])
-            cf_examples_list.append(
-                    exp.CounterfactualExamples(data_interface=dummy_data_interface,
-                                          test_instance_df=test_instance_df,
-                                          final_cfs_df=cfs_df,
-                                          final_cfs_df_sparse=cfs_df,
-                                          posthoc_sparsity_param=None,
-                                          desired_class=cf_examples_dict["desired_class"],
-                                          desired_range=cf_examples_dict["desired_range"],
-                                          model_type=cf_examples_dict["model_type"])
-                    )
+            cf_examples_list.append(CounterfactualExamples.from_json(cf_examples_str))
+
         return CounterfactualExplanations(cf_examples_list,
                 local_importance=json_dict["local_importance"],
                 summary_importance=json_dict["summary_importance"])
-
     else:
         return json_dict
 
@@ -93,9 +78,9 @@ class CounterfactualExplanations:
     @property
     def __dict__(self):
         return {'cf_examples_list': self.cf_examples_list,
-                 'local_importance': self.local_importance,
-                 'summary_importance': self.summary_importance,
-                 'metadata': self.metadata}
+                'local_importance': self.local_importance,
+                'summary_importance': self.summary_importance,
+                'metadata': self.metadata}
 
     @property
     def cf_examples_list(self):
