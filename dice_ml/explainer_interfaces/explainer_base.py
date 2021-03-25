@@ -48,7 +48,7 @@ class ExplainerBase:
             permitted_range=None, features_to_vary="all",
             stopping_threshold=0.5, posthoc_sparsity_param=0.1,
             posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
-        """Generate counterfactuals by randomly sampling features.
+        """General method for generating counterfactuals.
 
         :param query_instances: Input point(s) for which counterfactuals are to be generated. This can be a dataframe with one or more rows.
         :param total_CFs: Total number of counterfactuals required.
@@ -76,7 +76,6 @@ class ExplainerBase:
                 query_instances_list.append(query_instances[ix:(ix+1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
-            #query_instances = query_instances.to_dict("records")
         for query_instance in tqdm(query_instances_list):
             res = self._generate_counterfactuals(query_instance, total_CFs,
                     desired_class=desired_class,
