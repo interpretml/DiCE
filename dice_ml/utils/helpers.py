@@ -3,6 +3,7 @@ This module containts helper functions to load data and get meta deta.
 """
 import numpy as np
 import pandas as pd
+import shutil
 import os
 
 import dice_ml
@@ -63,6 +64,11 @@ def load_adult_income_dataset(only_train=True):
     if only_train:
         train, _ = train_test_split(adult_data, test_size=0.2, random_state=17)
         adult_data = train.reset_index(drop=True)
+
+    # Remove the downloaded dataset
+    if os.path.isdir('archive.ics.uci.edu'):
+        entire_path = os.path.abspath('archive.ics.uci.edu')
+        shutil.rmtree(entire_path)
 
     return adult_data
 
