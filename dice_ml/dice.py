@@ -1,6 +1,7 @@
 """Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic"""
 
 from dice_ml.constants import BackEndTypes, SamplingStrategy
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class Dice:
@@ -38,6 +39,13 @@ def decide(model_interface, method):
         elif method == SamplingStrategy.KdTree:
             from dice_ml.explainer_interfaces.dice_KD import DiceKD
             return DiceKD
+        else:
+            raise UserConfigValidationException("Unsupported sample strategy {0} provided. "
+                                                "Please choose one of {0}, {1} or {2}".format(
+                                                    method, SamplingStrategy.Random,
+                                                    SamplingStrategy.Genetic,
+                                                    SamplingStrategy.KdTree
+                                                ))
 
     elif model_interface.backend == BackEndTypes.Tensorflow1: # pretrained Keras Sequential model with Tensorflow 1.x backend
         from dice_ml.explainer_interfaces.dice_tensorflow1 import DiceTensorFlow1
