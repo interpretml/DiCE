@@ -40,7 +40,13 @@ class DiceRandom(ExplainerBase):
         else:
             self.outcome_precision = 0
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range,  desired_class, permitted_range, features_to_vary, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=None, verbose=False):
+    def _generate_counterfactuals(self, query_instance, total_CFs,
+                                  desired_range=None,  desired_class="opposite",
+                                  permitted_range=None,
+                                  features_to_vary="all",
+                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                  posthoc_sparsity_algorithm="linear", sample_size=1000, 
+                                  random_seed=None, verbose=False):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
