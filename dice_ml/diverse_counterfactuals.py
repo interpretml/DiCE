@@ -1,7 +1,5 @@
-import numpy as np
 import pandas as pd
 import copy
-from IPython.display import display
 import json
 from dice_ml.utils.serialize import DummyDataInterface
 
@@ -46,6 +44,7 @@ class CounterfactualExamples:
         return False
 
     def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
+        from IPython.display import display
         # original instance
         print('Query instance (original outcome : %i)' %round(self.test_pred))
         display(self.test_instance_df) #  works only in Jupyter notebook
@@ -76,6 +75,7 @@ class CounterfactualExamples:
             print('\nNo counterfactuals found!')
 
     def display_df(self, df, show_only_changes):
+        from IPython.display import display
         if show_only_changes is False:
             display(df)  # works only in Jupyter notebook
         else:
