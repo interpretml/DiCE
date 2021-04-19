@@ -6,12 +6,13 @@ from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils.exception import UserConfigValidationException
 
 
-_CurrentVersion = '1.0'
-_AllVersions = [_CurrentVersion]
+_CurrentVersion = '2.0'
+_AllVersions = [_CurrentVersion, '1.0']
 
 
 def _check_supported_json_output_versions(version):
     return version in _AllVersions
+
 
 def json_converter(obj):
     """ Helper function to convert CounterfactualExplanations object to json.
@@ -36,13 +37,30 @@ def as_counterfactual_explanations(json_dict):
         elif not _check_supported_json_output_versions(version):
             raise UserConfigValidationException("Incompatible version {} found in json input".format(version))
 
-        cf_examples_list = []
-        for cf_examples_str in json_dict["cf_examples_list"]:
-            cf_examples_list.append(CounterfactualExamples.from_json(cf_examples_str))
+        if version == '1.0':
+            cf_examples_list = []
+            for cf_examples_str in json_dict["cf_examples_list"]:
+                cf_examples_list.append(CounterfactualExamples.from_json(cf_examples_str))
 
-        return CounterfactualExplanations(cf_examples_list,
-                local_importance=json_dict["local_importance"],
-                summary_importance=json_dict["summary_importance"])
+            return CounterfactualExplanations(
+                    cf_examples_list=cf_examples_list,
+                    local_importance=json_dict["local_importance"],
+                    summary_importance=json_dict["summary_importance"])
+        elif version == '2.0':
+            #raise NotImplementedError("Not implemented as yet")
+            cf_examples_list = []
+            for index in range(0, len(json_dict['cfs_list'])):
+                cf_examples_list.append(
+                    CounterfactualExamples.from_json_v2(
+                        json_dict['cfs_list'][index],
+                        json_dict['test_data'][index],
+                        json_dict['metadata']
+                    )
+                )
+            return CounterfactualExplanations(
+                    cf_examples_list=cf_examples_list,
+                    local_importance=json_dict["local_importance"],
+                    summary_importance=json_dict["summary_importance"])
     else:
         return json_dict
 
@@ -127,8 +145,35 @@ class CounterfactualExplanations:
     def to_json(self):
         """ Serialize Explanations object to json.
         """
-        return json.dumps(self, default=json_converter,
-                          indent=2)
+        if len(self.cf_examples_list) > 0:
+            serialization_version = self.cf_examples_list[0]._get_serialiation_version()
+            if serialization_version == '1.0':
+                return json.dumps(self, default=json_converter,
+                                  indent=2)
+            elif serialization_version == '2.0':
+                combined_test_instance_list = []
+                combined_final_dfs_list = []
+                metadata = None
+                for cf_examples in self.cf_examples_list:
+                    cf_examples_str = cf_examples.to_json()
+                    serialized_cf_examples = json.loads(cf_examples_str)
+                    combined_test_instance_list.append(serialized_cf_examples['test_instance_list'])
+                    combined_final_dfs_list.append(serialized_cf_examples['final_dfs_list'])
+                    metadata = serialized_cf_examples['metadata']
+
+                if metadata is None:
+                    raise Exception("No counterfactual examples found")
+                entire_dict = {
+                    'test_data': combined_test_instance_list,
+                    'cfs_list': combined_final_dfs_list,
+                    'local_importance': self.local_importance,
+                    'summary_importance': self.summary_importance,
+                    'metadata': metadata
+                }
+                return json.dumps(entire_dict)
+            else:
+                raise Exception("Unsupported serialization version {}".format(
+                    serialization_version))
 
     @staticmethod
     def from_json(json_str):

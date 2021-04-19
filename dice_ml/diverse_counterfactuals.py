@@ -132,6 +132,9 @@ class CounterfactualExamples:
                         newli[ix][jx] = '-'
                 print(newli[ix])
 
+    def _get_serialiation_version(self):
+        return '2.0'
+
     def to_json(self):
         if self.final_cfs_df_sparse is not None:
             df = self.final_cfs_df_sparse
@@ -146,13 +149,41 @@ class CounterfactualExamples:
         else:
             dummy_data_interface = DummyDataInterface(
                     self.data_interface.outcome_name)
-        obj = {'data_interface': dummy_data_interface,
-               'model_type': self.model_type,
-               'desired_class': self.desired_class,
-               'desired_range': self.desired_range,
-               'test_instance_df': self.test_instance_df,
-               'final_cfs_df': df}
-        return json.dumps(obj, default=json_converter)
+
+        serialization_version = self._get_serialiation_version()
+        if serialization_version == '1.0':
+            obj = {
+                'data_interface': dummy_data_interface,
+                'model_type': self.model_type,
+                'desired_class': self.desired_class,
+                'desired_range': self.desired_range,
+                'test_instance_df': self.test_instance_df,
+                'final_cfs_df': df,
+                'metadata': {'version': '1.0'}
+            }
+            return json.dumps(obj, default=json_converter)
+        elif serialization_version == '2.0':
+            dummy_data_interface_dict = dummy_data_interface.to_json()
+            feature_names_including_target = self.test_instance_df.columns.tolist()
+            feature_names = self.test_instance_df.columns.tolist().copy()
+            feature_names.remove(dummy_data_interface.outcome_name)
+            test_instance_df_as_list = self.test_instance_df.values.tolist()
+            final_cfs_df_as_as_list = df.values.tolist()
+
+            alternate_obj = {
+                'test_instance_list': test_instance_df_as_list,
+                'final_dfs_list': final_cfs_df_as_as_list,
+                'metadata': {
+                    'data_interface': dummy_data_interface_dict,
+                    'feature_names': feature_names,
+                    'feature_names_including_target': feature_names_including_target,
+                    'model_type': self.model_type,
+                    'desired_class': self.desired_class,
+                    'desired_range': self.desired_range,
+                    'version': '2.0'
+                }
+            }
+            return json.dumps(alternate_obj)
 
     @staticmethod
     def from_json(cf_example_json_str):
@@ -170,3 +201,20 @@ class CounterfactualExamples:
                                       desired_class=cf_example_dict["desired_class"],
                                       desired_range=cf_example_dict["desired_range"],
                                       model_type=cf_example_dict["model_type"])
+
+    @staticmethod
+    def from_json_v2(final_dfs_list, test_instance_list, metadata):
+        test_instance_df = pd.DataFrame(data=test_instance_list,
+                                        columns=metadata['feature_names_including_target'])
+        cfs_df = pd.DataFrame(data=final_dfs_list,
+                              columns=metadata['feature_names_including_target'])
+        # Creating the object for dummy_data_interface
+        dummy_data_interface = DummyDataInterface(**metadata["data_interface"])
+        return CounterfactualExamples(data_interface=dummy_data_interface,
+                                      test_instance_df=test_instance_df,
+                                      final_cfs_df=cfs_df,
+                                      final_cfs_df_sparse=cfs_df,
+                                      posthoc_sparsity_param=None,
+                                      desired_class=metadata["desired_class"],
+                                      desired_range=metadata["desired_range"],
+                                      model_type=metadata["model_type"])
