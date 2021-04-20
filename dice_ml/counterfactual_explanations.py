@@ -47,7 +47,6 @@ def as_counterfactual_explanations(json_dict):
                     local_importance=json_dict["local_importance"],
                     summary_importance=json_dict["summary_importance"])
         elif version == '2.0':
-            #raise NotImplementedError("Not implemented as yet")
             cf_examples_list = []
             for index in range(0, len(json_dict['cfs_list'])):
                 cf_examples_list.append(
@@ -57,10 +56,27 @@ def as_counterfactual_explanations(json_dict):
                         json_dict['metadata']
                     )
                 )
+            local_importance_list = None
+            if json_dict['local_importance'] is not None:
+                local_importance_list = []
+                for local_importance_instance in json_dict['local_importance']:
+                    local_importance_dict = {}
+                    feature_names = json_dict['metadata']['feature_names']
+                    for index in range(0, len(local_importance_instance)):
+                        local_importance_dict[feature_names[index]] = local_importance_instance[index]
+                    local_importance_list.append(local_importance_dict)
+
+            summary_importance_dict = None
+            if json_dict['summary_importance'] is not None:
+                summary_importance_dict = {}
+                feature_names = json_dict['metadata']['feature_names']
+                for index in range(0, len(json_dict['summary_importance'])):
+                    summary_importance_dict[feature_names[index]] = json_dict['summary_importance'][index]
+
             return CounterfactualExplanations(
                     cf_examples_list=cf_examples_list,
-                    local_importance=json_dict["local_importance"],
-                    summary_importance=json_dict["summary_importance"])
+                    local_importance=local_importance_list,
+                    summary_importance=summary_importance_dict)
     else:
         return json_dict
 
@@ -163,11 +179,27 @@ class CounterfactualExplanations:
 
                 if metadata is None:
                     raise Exception("No counterfactual examples found")
+
+                local_importance_matrix = None
+                if self.local_importance is not None:
+                    local_importance_matrix = []
+                    for local_importance_dict in self.local_importance:
+                        local_importance_list = []
+                        for feature_name in metadata['feature_names']:
+                            local_importance_list.append(local_importance_dict.get(feature_name))
+                        local_importance_matrix.append(local_importance_list)
+
+                summary_importance_list = None
+                if self.summary_importance is not None:
+                    summary_importance_list = []
+                    for feature_name in metadata['feature_names']:
+                        summary_importance_list.append(self.summary_importance.get(feature_name))
+
                 entire_dict = {
                     'test_data': combined_test_instance_list,
                     'cfs_list': combined_final_dfs_list,
-                    'local_importance': self.local_importance,
-                    'summary_importance': self.summary_importance,
+                    'local_importance': local_importance_matrix,
+                    'summary_importance': summary_importance_list,
                     'metadata': metadata
                 }
                 return json.dumps(entire_dict)
