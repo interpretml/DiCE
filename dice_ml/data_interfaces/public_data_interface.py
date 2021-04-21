@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 import logging
 from collections import defaultdict
 
+from dice_ml.utils.exception import UserConfigValidationException
+
 
 class PublicData:
     """A data interface for public data. This class is an interface to DiCE explainers and contains methods to transform user-fed raw data into the format a DiCE explainer requires, and vice versa."""
@@ -38,13 +40,25 @@ class PublicData:
         else:
             raise ValueError("should provide the name of outcome feature as a string")
 
-        self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
-        ) if name not in self.continuous_feature_names + [self.outcome_name]]
+        if params['outcome_name'] not in self.data_df.columns.tolist():
+            raise UserConfigValidationException(
+                "outcome_name {0} not found in {1}".format(
+                    params['outcome_name'], ','.join(self.data_df.columns.tolist())
+                )
+            )
 
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
 
         self.number_of_features = len(self.feature_names)
+
+        if len(set(self.continuous_feature_names) - set(self.feature_names)) != 0:
+            raise UserConfigValidationException(
+                "continuous_features contains some feature names which are not part of columns in dataframe"
+            )
+
+        self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
+        ) if name not in self.continuous_feature_names + [self.outcome_name]]
 
         self.continuous_feature_indexes = [self.data_df.columns.get_loc(
             name) for name in self.continuous_feature_names if name in self.data_df]
@@ -54,6 +68,11 @@ class PublicData:
 
         if 'continuous_features_precision' in params:
             self.continuous_features_precision = params['continuous_features_precision']
+            for continuous_features_precision_feature_name in self.continuous_features_precision:
+                if continuous_features_precision_feature_name not in self.feature_names:
+                    raise UserConfigValidationException(
+                        "continuous_features_precision contains some feature names which are not part of columns in dataframe"
+                    )
         else:
             self.continuous_features_precision = None
 
@@ -89,7 +108,12 @@ class PublicData:
 
         input_permitted_range = None
         if 'permitted_range' in params:
-           input_permitted_range = params['permitted_range']
+            input_permitted_range = params['permitted_range']
+            for input_permitted_range_feature_name in input_permitted_range:
+                if input_permitted_range_feature_name not in self.feature_names:
+                    raise UserConfigValidationException(
+                        "permitted_range contains some feature names which are not part of columns in dataframe"
+                    )
         self.permitted_range, feature_ranges_orig = self.get_features_range(input_permitted_range)
 
         # should move the below snippet to model agnostic dice interfaces
