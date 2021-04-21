@@ -1,15 +1,41 @@
 import json
+import os
 
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.diverse_counterfactuals import _DiverseCFV2SchemaConstants
+from dice_ml.constants import _SchemaVersions
 
 
-_CurrentVersion = '2.0'
-_AllVersions = [_CurrentVersion, '1.0']
+class _CommonSchemaConstants:
+    LOCAL_IMPORTANCE = 'local_importance'
+    SUMMARY_IMPORTANCE = 'summary_importance'
+    METADATA = 'metadata'
+
+
+class _CounterfactualExpV1SchemaConstants:
+    CF_EXAMPLES_LIST = 'cf_examples_list'
+    LOCAL_IMPORTANCE = _CommonSchemaConstants.LOCAL_IMPORTANCE
+    SUMMARY_IMPORTANCE = _CommonSchemaConstants.SUMMARY_IMPORTANCE
+    METADATA = _CommonSchemaConstants.METADATA
+
+
+class _CounterfactualExpV2SchemaConstants:
+    TEST_DATA = 'test_data'
+    CFS_LIST = 'cfs_list'
+    LOCAL_IMPORTANCE = _CommonSchemaConstants.LOCAL_IMPORTANCE
+    SUMMARY_IMPORTANCE = _CommonSchemaConstants.SUMMARY_IMPORTANCE
+    METADATA = _CommonSchemaConstants.METADATA
+    MODEL_TYPE = 'model_type'
+    DATA_INTERFACE = 'data_interface'
+    FEATURE_NAMES = 'feature_names'
+    DESIRED_CLASS = 'desired_class'
+    DESIRED_RANGE = 'desired_range'
+    FEATURE_NAMES_INCLUDING_TARGET = 'feature_names_including_target'
 
 
 def _check_supported_json_output_versions(version):
-    return version in _AllVersions
+    return version in _SchemaVersions.ALL_VERSIONS
 
 
 class CounterfactualExplanations:
@@ -26,11 +52,12 @@ class CounterfactualExplanations:
     """
     def __init__(self, cf_examples_list,
                  local_importance=None,
-                 summary_importance=None):
+                 summary_importance=None,
+                 version=None):
         self._cf_examples_list = cf_examples_list
         self._local_importance = local_importance
         self._summary_importance = summary_importance
-        self._metadata = {'version': _CurrentVersion}
+        self._metadata = {'version': version if version is not None else _SchemaVersions.CURRENT_VERSION}
 
     def __eq__(self, other_cf):
         if (isinstance(other_cf, CounterfactualExplanations)):
@@ -89,24 +116,47 @@ class CounterfactualExplanations:
                     display_sparse_df=display_sparse_df,
                     show_only_changes=show_only_changes)
 
+    @staticmethod
+    def _check_cf_exp_output_against_json_schema(
+            cf_dict, version):
+        """
+        Validate the dictionary version of the counterfactual explanations.
+
+        :param cf_dict: Serialized version of the counterfactual explanations.
+        :type cf_dict: Dict
+        """
+        schema_file_name = 'counterfactual_explanations_v{0}.json'.format(version)
+        schema_path = os.path.join(os.path.dirname(__file__),
+                                   'schema', schema_file_name)
+        with open(schema_path, 'r') as schema_file:
+            schema_json = json.load(schema_file)
+
+        try:
+            import jsonschema
+            jsonschema.validate(cf_dict, schema_json)
+        except ImportError:
+            pass
+
     def to_json(self):
         """ Serialize Explanations object to json.
         """
-        serialization_version = _CurrentVersion
-        if serialization_version == '1.0':
+        serialization_version = self.metadata['version']
+        if serialization_version == _SchemaVersions.V1:
             cf_examples_str_list = []
             for cf_examples in self.cf_examples_list:
                 cf_examples_str = cf_examples.to_json(
                     serialization_version=serialization_version)
                 cf_examples_str_list.append(cf_examples_str)
             entire_dict = {
-                'cf_examples_list': cf_examples_str_list,
-                'local_importance': self.local_importance,
-                'summary_importance': self.summary_importance,
-                'metadata': self.metadata
+                _CounterfactualExpV1SchemaConstants.CF_EXAMPLES_LIST: cf_examples_str_list,
+                _CounterfactualExpV1SchemaConstants.LOCAL_IMPORTANCE: self.local_importance,
+                _CounterfactualExpV1SchemaConstants.SUMMARY_IMPORTANCE: self.summary_importance,
+                _CounterfactualExpV1SchemaConstants.METADATA: self.metadata
             }
+            CounterfactualExplanations._check_cf_exp_output_against_json_schema(
+                entire_dict, version=serialization_version)
             return json.dumps(entire_dict)
-        elif serialization_version == '2.0':
+        elif serialization_version == _SchemaVersions.V2:
             combined_test_instance_list = []
             combined_final_cfs_list = []
             data_interface = None
@@ -119,14 +169,22 @@ class CounterfactualExplanations:
                 cf_examples_str = cf_examples.to_json(
                     serialization_version=serialization_version)
                 serialized_cf_examples = json.loads(cf_examples_str)
-                combined_test_instance_list.append(serialized_cf_examples['test_instance_list'])
-                combined_final_cfs_list.append(serialized_cf_examples['final_cfs_list'])
-                data_interface = serialized_cf_examples['data_interface']
-                feature_names = serialized_cf_examples['feature_names']
-                feature_names_including_target = serialized_cf_examples['feature_names_including_target']
-                model_type = serialized_cf_examples['model_type']
-                desired_class = serialized_cf_examples['desired_class']
-                desired_range = serialized_cf_examples['desired_range']
+                combined_test_instance_list.append(serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST])
+                combined_final_cfs_list.append(serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.FIANL_CFS_LIST])
+                data_interface = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.DATA_INTERFACE]
+                feature_names = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.FEATURE_NAMES]
+                feature_names_including_target = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET]
+                model_type = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.MODEL_TYPE]
+                desired_class = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.DESIRED_CLASS]
+                desired_range = serialized_cf_examples[
+                    _DiverseCFV2SchemaConstants.DESIRED_RANGE]
 
             local_importance_matrix = None
             if self.local_importance is not None:
@@ -144,18 +202,20 @@ class CounterfactualExplanations:
                     summary_importance_list.append(self.summary_importance.get(feature_name))
 
             entire_dict = {
-                'test_data': combined_test_instance_list,
-                'cfs_list': combined_final_cfs_list,
-                'local_importance': local_importance_matrix,
-                'summary_importance': summary_importance_list,
-                'data_interface': data_interface,
-                'feature_names': feature_names,
-                'feature_names_including_target': feature_names_including_target,
-                'model_type': model_type,
-                'desired_class': desired_class,
-                'desired_range': desired_range,
-                'metadata': self.metadata
+                _CounterfactualExpV2SchemaConstants.TEST_DATA: combined_test_instance_list,
+                _CounterfactualExpV2SchemaConstants.CFS_LIST: combined_final_cfs_list,
+                _CounterfactualExpV2SchemaConstants.LOCAL_IMPORTANCE: local_importance_matrix,
+                _CounterfactualExpV2SchemaConstants.SUMMARY_IMPORTANCE: summary_importance_list,
+                _CounterfactualExpV2SchemaConstants.DATA_INTERFACE: data_interface,
+                _CounterfactualExpV2SchemaConstants.FEATURE_NAMES: feature_names,
+                _CounterfactualExpV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET: feature_names_including_target,
+                _CounterfactualExpV2SchemaConstants.MODEL_TYPE: model_type,
+                _CounterfactualExpV2SchemaConstants.DESIRED_CLASS: desired_class,
+                _CounterfactualExpV2SchemaConstants.DESIRED_RANGE: desired_range,
+                _CounterfactualExpV1SchemaConstants.METADATA: self.metadata
             }
+            CounterfactualExplanations._check_cf_exp_output_against_json_schema(
+                entire_dict, version=serialization_version)
             return json.dumps(entire_dict)
         else:
             raise Exception("Unsupported serialization version {}".format(
@@ -166,34 +226,46 @@ class CounterfactualExplanations:
         """ Deserialize json string to a CounterfactualExplanations object.
         """
         json_dict = json.loads(json_str)
-        if 'metadata' in json_dict:
-            version = json_dict['metadata'].get('version')
+        if _CommonSchemaConstants.METADATA in json_dict:
+            version = json_dict[_CommonSchemaConstants.METADATA].get('version')
             if version is None:
                 raise UserConfigValidationException("No version field in the json input")
             elif not _check_supported_json_output_versions(version):
                 raise UserConfigValidationException("Incompatible version {} found in json input".format(version))
 
-            if version == '1.0':
+            if version == _SchemaVersions.V1:
+                CounterfactualExplanations._check_cf_exp_output_against_json_schema(
+                    json_dict, version=version)
                 cf_examples_list = []
-                for cf_examples_str in json_dict["cf_examples_list"]:
+                for cf_examples_str in json_dict[_CounterfactualExpV1SchemaConstants.CF_EXAMPLES_LIST]:
                     cf_examples_list.append(CounterfactualExamples.from_json(cf_examples_str))
 
                 return CounterfactualExplanations(
                         cf_examples_list=cf_examples_list,
-                        local_importance=json_dict["local_importance"],
-                        summary_importance=json_dict["summary_importance"])
-            elif version == '2.0':
+                        local_importance=json_dict[_CounterfactualExpV1SchemaConstants.LOCAL_IMPORTANCE],
+                        summary_importance=json_dict[_CounterfactualExpV1SchemaConstants.SUMMARY_IMPORTANCE],
+                        version=version)
+            elif version == _SchemaVersions.V2:
+                CounterfactualExplanations._check_cf_exp_output_against_json_schema(
+                    json_dict, version=version)
                 cf_examples_list = []
-                for index in range(0, len(json_dict['cfs_list'])):
+                for index in range(0, len(json_dict[_CounterfactualExpV2SchemaConstants.CFS_LIST])):
                     cf_examples_str = json.dumps(
                         {
-                            'final_cfs_list': json_dict['cfs_list'][index],
-                            'test_instance_list': json_dict['test_data'][index],
-                            'data_interface': json_dict['data_interface'],
-                            'desired_class': json_dict['desired_class'],
-                            'desired_range': json_dict['desired_range'],
-                            'model_type': json_dict['model_type'],
-                            'feature_names_including_target': json_dict['feature_names_including_target']
+                            _DiverseCFV2SchemaConstants.FIANL_CFS_LIST: json_dict[
+                                _CounterfactualExpV2SchemaConstants.CFS_LIST][index],
+                            _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST: json_dict[
+                                _CounterfactualExpV2SchemaConstants.TEST_DATA][index],
+                            _DiverseCFV2SchemaConstants.DATA_INTERFACE: json_dict[
+                                _CounterfactualExpV2SchemaConstants.DATA_INTERFACE],
+                            _DiverseCFV2SchemaConstants.DESIRED_CLASS: json_dict[
+                                _CounterfactualExpV2SchemaConstants.DESIRED_CLASS],
+                            _DiverseCFV2SchemaConstants.DESIRED_RANGE: json_dict[
+                                _CounterfactualExpV2SchemaConstants.DESIRED_RANGE],
+                            _DiverseCFV2SchemaConstants.MODEL_TYPE: json_dict[
+                                _CounterfactualExpV2SchemaConstants.MODEL_TYPE],
+                            _DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET: json_dict[
+                                _CounterfactualExpV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET]
                         }
                     )
                     cf_examples_list.append(
@@ -201,25 +273,30 @@ class CounterfactualExplanations:
                     )
 
                 local_importance_list = None
-                if json_dict['local_importance'] is not None:
+                if json_dict[_CounterfactualExpV2SchemaConstants.LOCAL_IMPORTANCE] is not None:
                     local_importance_list = []
-                    for local_importance_instance in json_dict['local_importance']:
+                    for local_importance_instance in json_dict[
+                            _CounterfactualExpV2SchemaConstants.LOCAL_IMPORTANCE]:
                         local_importance_dict = {}
-                        feature_names = json_dict['feature_names']
+                        feature_names = json_dict[_CounterfactualExpV2SchemaConstants.FEATURE_NAMES]
                         for index in range(0, len(local_importance_instance)):
                             local_importance_dict[feature_names[index]] = local_importance_instance[index]
                         local_importance_list.append(local_importance_dict)
 
                 summary_importance_dict = None
-                if json_dict['summary_importance'] is not None:
+                if json_dict[_CounterfactualExpV2SchemaConstants.SUMMARY_IMPORTANCE] is not None:
                     summary_importance_dict = {}
-                    feature_names = json_dict['feature_names']
-                    for index in range(0, len(json_dict['summary_importance'])):
-                        summary_importance_dict[feature_names[index]] = json_dict['summary_importance'][index]
+                    feature_names = json_dict[
+                        _CounterfactualExpV2SchemaConstants.FEATURE_NAMES]
+                    for index in range(0, len(json_dict[
+                            _CounterfactualExpV2SchemaConstants.SUMMARY_IMPORTANCE])):
+                        summary_importance_dict[feature_names[index]] = json_dict[
+                            _CounterfactualExpV2SchemaConstants.SUMMARY_IMPORTANCE][index]
 
                 return CounterfactualExplanations(
                         cf_examples_list=cf_examples_list,
                         local_importance=local_importance_list,
-                        summary_importance=summary_importance_dict)
+                        summary_importance=summary_importance_dict,
+                        version=version)
         else:
             return json_dict

@@ -39,6 +39,8 @@ setuptools.setup(
     include_package_data=True,
     package_data={
         # If any package contains *.h5 files, include them:
-        '': ['*.h5']
+        '': ['*.h5',
+             'counterfactual_explanations_v1.0.json',
+             'counterfactual_explanations_v2.0.json']
     }
 )
