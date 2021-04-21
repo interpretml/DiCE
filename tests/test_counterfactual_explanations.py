@@ -19,11 +19,16 @@ class TestCounterfactualExplanations:
         assert counterfactual_explanations.local_importance is None
         assert counterfactual_explanations.metadata is not None
         assert counterfactual_explanations.metadata['version'] is not None
-        assert counterfactual_explanations.metadata['version'] == '1.0'
+        assert counterfactual_explanations.metadata['version'] == '1.0' or \
+            counterfactual_explanations.metadata['version'] == '2.0'
 
         counterfactual_explanations_as_json = counterfactual_explanations.to_json()
+        assert counterfactual_explanations_as_json is not None
+
         recovered_counterfactual_explanations = CounterfactualExplanations.from_json(
             counterfactual_explanations_as_json)
+
+        assert recovered_counterfactual_explanations is not None
         assert counterfactual_explanations == recovered_counterfactual_explanations
 
     def test_sorted_summary_importance_counterfactual_explanations(self):
@@ -122,7 +127,7 @@ class TestCounterfactualExplanations:
             assert list(unsorted_local_importance[index].keys()) != list(counterfactual_explanations.local_importance[index].keys())
             assert list(sorted_local_importance[index].keys()) == list(counterfactual_explanations.local_importance[index].keys())
 
-    @pytest.mark.parametrize('version', ['2.0', ''])
+    @pytest.mark.parametrize('version', ['3.0', ''])
     def test_unsupported_versions_json_input(self, version):
         json_str = json.dumps({'metadata': {'version': version}})
         with pytest.raises(UserConfigValidationException) as ucve:

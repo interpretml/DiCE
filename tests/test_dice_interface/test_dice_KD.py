@@ -194,13 +194,14 @@ class TestDiceKDRegressionMethods:
 
     # Testing that the output of regression lies in the desired_range
     @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
-    def test_KD_tree_output(self, desired_range, sample_custom_query_2, total_CFs):
+    @pytest.mark.parametrize("version", ['2.0', '1.0'])
+    def test_KD_tree_output(self, desired_range, sample_custom_query_2, total_CFs, version):
         cf_examples = self.exp_regr._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
                                                               desired_range=desired_range)
         assert all(desired_range[0] <= i <= desired_range[1] for i in self.exp_regr.cfs_preds)
 
         assert cf_examples is not None
-        json_str = cf_examples.to_json()
+        json_str = cf_examples.to_json(version)
         assert json_str is not None
 
         recovered_cf_examples = CounterfactualExamples.from_json(json_str)
@@ -208,7 +209,8 @@ class TestDiceKDRegressionMethods:
         assert cf_examples == recovered_cf_examples
 
     @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
-    def test_KD_tree_counterfactual_explanations_output(self, desired_range, sample_custom_query_2, total_CFs):
+    def test_KD_tree_counterfactual_explanations_output(self, desired_range, sample_custom_query_2,
+                                                        total_CFs):
         counterfactual_explanations = self.exp_regr.generate_counterfactuals(
                                             query_instances=sample_custom_query_2, total_CFs=total_CFs,
                                             desired_range=desired_range)
