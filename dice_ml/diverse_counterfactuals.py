@@ -33,6 +33,7 @@ def json_converter(obj):
     except AttributeError:
         return obj.__dict__
 
+
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 

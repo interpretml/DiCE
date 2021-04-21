@@ -168,6 +168,8 @@ class CounterfactualExplanations:
             for cf_examples in self.cf_examples_list:
                 cf_examples_str = cf_examples.to_json(
                     serialization_version=serialization_version)
+                # We need to load the json again since we need to decompose the
+                # counterfactual example into different schema fields
                 serialized_cf_examples = json.loads(cf_examples_str)
                 combined_test_instance_list.append(serialized_cf_examples[
                     _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST])
@@ -250,6 +252,8 @@ class CounterfactualExplanations:
                     json_dict, version=version)
                 cf_examples_list = []
                 for index in range(0, len(json_dict[_CounterfactualExpV2SchemaConstants.CFS_LIST])):
+                    # We need to save the json again since we need to recompose the
+                    # counterfactual example.
                     cf_examples_str = json.dumps(
                         {
                             _DiverseCFV2SchemaConstants.FIANL_CFS_LIST: json_dict[

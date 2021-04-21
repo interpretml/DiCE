@@ -172,7 +172,9 @@ class DiceRandom(ExplainerBase):
                                           test_instance_df=test_instance_df,
                                           final_cfs_df_sparse = final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
-                                          desired_class=desired_class)
+                                          desired_class=desired_class,
+                                          desired_range=desired_range,
+                                          model_type=self.model.model_type)
 
 
     def get_samples(self, fixed_features_values, feature_range, sampling_random_seed, sampling_size):
