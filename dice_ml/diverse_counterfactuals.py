@@ -2,6 +2,27 @@ import pandas as pd
 import copy
 import json
 from dice_ml.utils.serialize import DummyDataInterface
+from dice_ml.constants import _SchemaVersions
+
+
+class _DiverseCFV1SchemaConstants:
+    DATA_INTERFACE = 'data_interface'
+    MODEL_TYPE = 'model_type'
+    DESIRED_CLASS = 'desired_class'
+    DESIRED_RANGE = 'desired_range'
+    TEST_INSTANCE_DF = 'test_instance_df'
+    FINAL_CFS_DF = 'final_cfs_df'
+
+
+class _DiverseCFV2SchemaConstants:
+    DATA_INTERFACE = 'data_interface'
+    MODEL_TYPE = 'model_type'
+    DESIRED_CLASS = 'desired_class'
+    DESIRED_RANGE = 'desired_range'
+    FEATURE_NAMES_INCLUDING_TARGET = 'feature_names_including_target'
+    FEATURE_NAMES = 'feature_names'
+    TEST_INSTANCE_LIST = 'test_instance_list'
+    FIANL_CFS_LIST = 'final_cfs_list'
 
 
 def json_converter(obj):
@@ -11,6 +32,7 @@ def json_converter(obj):
         return obj.to_json()
     except AttributeError:
         return obj.__dict__
+
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
@@ -132,7 +154,7 @@ class CounterfactualExamples:
                         newli[ix][jx] = '-'
                 print(newli[ix])
 
-    def to_json(self):
+    def to_json(self, serialization_version):
         if self.final_cfs_df_sparse is not None:
             df = self.final_cfs_df_sparse
         else:
@@ -146,27 +168,76 @@ class CounterfactualExamples:
         else:
             dummy_data_interface = DummyDataInterface(
                     self.data_interface.outcome_name)
-        obj = {'data_interface': dummy_data_interface,
-               'model_type': self.model_type,
-               'desired_class': self.desired_class,
-               'desired_range': self.desired_range,
-               'test_instance_df': self.test_instance_df,
-               'final_cfs_df': df}
-        return json.dumps(obj, default=json_converter)
+
+        if serialization_version == _SchemaVersions.V1:
+            obj = {
+                _DiverseCFV1SchemaConstants.DATA_INTERFACE: dummy_data_interface,
+                _DiverseCFV1SchemaConstants.MODEL_TYPE: self.model_type,
+                _DiverseCFV1SchemaConstants.DESIRED_CLASS: self.desired_class,
+                _DiverseCFV1SchemaConstants.DESIRED_RANGE: self.desired_range,
+                _DiverseCFV1SchemaConstants.TEST_INSTANCE_DF: self.test_instance_df,
+                _DiverseCFV1SchemaConstants.FINAL_CFS_DF: df
+            }
+            return json.dumps(obj, default=json_converter)
+        elif serialization_version == _SchemaVersions.V2:
+            dummy_data_interface_dict = dummy_data_interface.to_json()
+            feature_names_including_target = self.test_instance_df.columns.tolist()
+            feature_names = self.test_instance_df.columns.tolist().copy()
+            feature_names.remove(dummy_data_interface.outcome_name)
+            test_instance_df_as_list = self.test_instance_df.values.tolist()
+            final_cfs_df_as_as_list = df.values.tolist()
+
+            alternate_obj = {
+                _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST: test_instance_df_as_list,
+                _DiverseCFV2SchemaConstants.FIANL_CFS_LIST: final_cfs_df_as_as_list,
+                _DiverseCFV2SchemaConstants.DATA_INTERFACE: dummy_data_interface_dict,
+                _DiverseCFV2SchemaConstants.FEATURE_NAMES: feature_names,
+                _DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET: feature_names_including_target,
+                _DiverseCFV2SchemaConstants.MODEL_TYPE: self.model_type,
+                _DiverseCFV2SchemaConstants.DESIRED_CLASS: self.desired_class,
+                _DiverseCFV2SchemaConstants.DESIRED_RANGE: self.desired_range
+            }
+            return json.dumps(alternate_obj)
 
     @staticmethod
     def from_json(cf_example_json_str):
         cf_example_dict = json.loads(cf_example_json_str)
-        test_instance_df = pd.read_json(cf_example_dict["test_instance_df"])
-        cfs_df = pd.read_json(cf_example_dict["final_cfs_df"])
+        if cf_example_dict.get(_DiverseCFV1SchemaConstants.TEST_INSTANCE_DF) is not None:
+            test_instance_df = pd.read_json(cf_example_dict[
+                _DiverseCFV1SchemaConstants.TEST_INSTANCE_DF])
+            cfs_df = pd.read_json(cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF])
 
-        # Creating the object for dummy_data_interface
-        dummy_data_interface = DummyDataInterface(**cf_example_dict["data_interface"])
-        return CounterfactualExamples(data_interface=dummy_data_interface,
-                                      test_instance_df=test_instance_df,
-                                      final_cfs_df=cfs_df,
-                                      final_cfs_df_sparse=cfs_df,
-                                      posthoc_sparsity_param=None,
-                                      desired_class=cf_example_dict["desired_class"],
-                                      desired_range=cf_example_dict["desired_range"],
-                                      model_type=cf_example_dict["model_type"])
+            # Creating the object for dummy_data_interface
+            dummy_data_interface = DummyDataInterface(**cf_example_dict[_DiverseCFV1SchemaConstants.DATA_INTERFACE])
+            return CounterfactualExamples(data_interface=dummy_data_interface,
+                                          test_instance_df=test_instance_df,
+                                          final_cfs_df=cfs_df,
+                                          final_cfs_df_sparse=cfs_df,
+                                          posthoc_sparsity_param=None,
+                                          desired_class=cf_example_dict[_DiverseCFV1SchemaConstants.DESIRED_CLASS],
+                                          desired_range=cf_example_dict[_DiverseCFV1SchemaConstants.DESIRED_RANGE],
+                                          model_type=cf_example_dict[_DiverseCFV1SchemaConstants.MODEL_TYPE])
+        else:
+            final_cfs_list = cf_example_dict[_DiverseCFV2SchemaConstants.FIANL_CFS_LIST]
+            test_instance_list = cf_example_dict[_DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST]
+            feature_names_including_target = cf_example_dict[_DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET]
+
+            data_interface = cf_example_dict[_DiverseCFV2SchemaConstants.DATA_INTERFACE]
+            desired_class = cf_example_dict[_DiverseCFV2SchemaConstants.DESIRED_CLASS]
+            desired_range = cf_example_dict[_DiverseCFV2SchemaConstants.DESIRED_RANGE]
+            model_type = cf_example_dict[_DiverseCFV2SchemaConstants.MODEL_TYPE]
+
+            test_instance_df = pd.DataFrame(data=test_instance_list,
+                                            columns=feature_names_including_target)
+            cfs_df = pd.DataFrame(data=final_cfs_list,
+                                  columns=feature_names_including_target)
+            # Creating the object for dummy_data_interface
+            dummy_data_interface = DummyDataInterface(**data_interface)
+            return CounterfactualExamples(data_interface=dummy_data_interface,
+                                          test_instance_df=test_instance_df,
+                                          final_cfs_df=cfs_df,
+                                          final_cfs_df_sparse=cfs_df,
+                                          posthoc_sparsity_param=None,
+                                          desired_class=desired_class,
+                                          desired_range=desired_range,
+                                          model_type=model_type)
