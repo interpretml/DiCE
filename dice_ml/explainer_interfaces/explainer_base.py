@@ -68,7 +68,8 @@ class ExplainerBase:
         :returns: A CounterfactualExplanations object that contains the list of
         counterfactual examples per query_instance as one of its attributes.
         """
-
+        if total_CFs <= 0:
+            raise UserConfigValidationException("The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
