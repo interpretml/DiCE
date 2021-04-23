@@ -5,6 +5,40 @@ import dice_ml
 from dice_ml.utils import helpers
 
 @pytest.fixture
+def binary_classification_exp_object(method="random"):
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_binary()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    exp = dice_ml.Dice(d, m, method=method)
+    return exp
+
+
+@pytest.fixture
+def multi_classification_exp_object(method="random"):
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_multiclass()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
+    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    exp = dice_ml.Dice(d, m, method=method)
+    return exp
+
+
+@pytest.fixture
+def regression_exp_object(method="random"):
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_regression()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
+    exp = dice_ml.Dice(d, m, method=method)
+    return exp
+
+
+
+@pytest.fixture
 def public_data_object():
     """
     Returns a public data object for the adult income dataset
