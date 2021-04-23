@@ -68,13 +68,6 @@ class CounterfactualExplanations:
         return False
 
     @property
-    def __dict__(self):
-        return {'cf_examples_list': self.cf_examples_list,
-                'local_importance': self.local_importance,
-                'summary_importance': self.summary_importance,
-                'metadata': self.metadata}
-
-    @property
     def cf_examples_list(self):
         return self._cf_examples_list
 
@@ -220,8 +213,8 @@ class CounterfactualExplanations:
                 entire_dict, version=serialization_version)
             return json.dumps(entire_dict)
         else:
-            raise Exception("Unsupported serialization version {}".format(
-                serialization_version))
+            raise UserConfigValidationException(
+                "Unsupported serialization version {}".format(serialization_version))
 
     @staticmethod
     def from_json(json_str):
