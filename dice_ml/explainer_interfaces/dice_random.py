@@ -63,6 +63,8 @@ class DiceRandom(ExplainerBase):
         else: # compute the new ranges based on user input
             self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
 
+        # Do predictions once on the query_instance and reuse across to reduce the number
+        # inferences.
         modlel_predictions = self.predict_fn(query_instance)
 
         # number of output nodes of ML model
