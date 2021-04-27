@@ -65,16 +65,16 @@ class DiceRandom(ExplainerBase):
 
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
-        modlel_predictions = self.predict_fn(query_instance)
+        model_predictions = self.predict_fn(query_instance)
 
         # number of output nodes of ML model
         self.num_output_nodes = None
         if self.model.model_type == "classifier":
-            self.num_output_nodes = modlel_predictions.shape[1]
+            self.num_output_nodes = model_predictions.shape[1]
 
         # query_instance need no transformation for generating CFs using random sampling.
         # find the predicted value of query_instance
-        test_pred = modlel_predictions[0]
+        test_pred = model_predictions[0]
         if self.model.model_type == 'classifier':
             self.target_cf_class = self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)
         elif self.model.model_type == 'regressor':
