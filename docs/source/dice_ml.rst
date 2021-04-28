@@ -15,6 +15,14 @@ Subpackages
 Submodules
 ----------
 
+dice\_ml.constants module
+-------------------------
+
+.. automodule:: dice_ml.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.counterfactual\_explanations module
 --------------------------------------------
 

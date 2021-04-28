@@ -22,7 +22,7 @@ copyright = '2020, Ramaravind, Amit, Chenhao'
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5'
+release = '0.6'
 
 
 # -- General configuration ---------------------------------------------------

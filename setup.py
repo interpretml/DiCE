@@ -17,7 +17,7 @@ for e in extras:
 
 setuptools.setup(
     name="dice_ml",
-    version="0.5",
+    version="0.6",
     license="MIT",
     author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
@@ -25,8 +25,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/interpretml/DiCE",
-    download_url="https://github.com/interpretml/DiCE/archive/v0.5.tar.gz",
-    python_requires='>=3.4',
+    download_url="https://github.com/interpretml/DiCE/archive/v0.6.tar.gz",
+    python_requires='>=3.5',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
