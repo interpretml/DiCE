@@ -91,7 +91,7 @@ class TestCounterfactualExplanations:
                 "workclass": 0.65,
                 "race": 0.41
             }
-        ]         
+        ]
 
         counterfactual_explanations = CounterfactualExplanations(
             cf_examples_list=[],
@@ -103,8 +103,10 @@ class TestCounterfactualExplanations:
             assert sorted_local_importance[index] == counterfactual_explanations.local_importance[index]
 
         for index in range(0, len(unsorted_local_importance)):
-            assert list(unsorted_local_importance[index].keys()) != list(counterfactual_explanations.local_importance[index].keys())
-            assert list(sorted_local_importance[index].keys()) == list(counterfactual_explanations.local_importance[index].keys())
+            assert list(unsorted_local_importance[index].keys()) != \
+                list(counterfactual_explanations.local_importance[index].keys())
+            assert list(sorted_local_importance[index].keys()) == \
+                list(counterfactual_explanations.local_importance[index].keys())
 
 
 @pytest.fixture

@@ -4,6 +4,7 @@ import pandas as pd
 import dice_ml
 from dice_ml.utils import helpers
 
+
 @pytest.fixture
 def binary_classification_exp_object(method="random"):
     backend = 'sklearn'
@@ -37,7 +38,6 @@ def regression_exp_object(method="random"):
     return exp
 
 
-
 @pytest.fixture
 def public_data_object():
     """
@@ -50,25 +50,31 @@ def public_data_object():
 @pytest.fixture
 def private_data_object():
     """
-    Returns a private data object containing meta information about the adult income dataset
+    Returns a private data object containing meta information about the adult income dataset.
+
+    Providing an OrderedDict to make it work for Python<=3.6
     """
-    features_dict = OrderedDict([('age', [17, 90]),
-                            ('workclass', ['Government', 'Other/Unknown', 'Private', 'Self-Employed']),
-                            ('education', ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college']),
-                            ('marital_status', ['Divorced', 'Married', 'Separated', 'Single', 'Widowed']),
-                            ('occupation', ['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar']),
-                            ('race', ['Other', 'White']),
-                            ('gender', ['Female', 'Male']),
-                            ('hours_per_week', [1, 99])]) # providing an OrderedDict to make it work for Python<=3.6
+    features_dict = OrderedDict(
+        [('age', [17, 90]),
+         ('workclass', ['Government', 'Other/Unknown', 'Private', 'Self-Employed']),
+         ('education', ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college']),
+         ('marital_status', ['Divorced', 'Married', 'Separated', 'Single', 'Widowed']),
+         ('occupation', ['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar']),
+         ('race', ['Other', 'White']),
+         ('gender', ['Female', 'Male']),
+         ('hours_per_week', [1, 99])]
+    )
     return dice_ml.Data(features=features_dict, outcome_name='income')
+
 
 @pytest.fixture
 def sample_adultincome_query():
     """
     Returns a sample query instance for adult income dataset
     """
-    return {'age':22, 'workclass':'Private', 'education':'HS-grad', 'marital_status':'Single', 'occupation':'Service',
-    'race': 'White', 'gender':'Female', 'hours_per_week': 45}
+    return {'age': 22, 'workclass': 'Private', 'education': 'HS-grad', 'marital_status': 'Single', 'occupation': 'Service',
+            'race': 'White', 'gender': 'Female', 'hours_per_week': 45}
+
 
 @pytest.fixture
 def sample_custom_query_1():
@@ -77,6 +83,7 @@ def sample_custom_query_1():
     """
     return pd.DataFrame({'Categorical': ['a'], 'Numerical': [25]})
 
+
 @pytest.fixture
 def sample_custom_query_2():
     """
@@ -84,12 +91,14 @@ def sample_custom_query_2():
     """
     return pd.DataFrame({'Categorical': ['b'], 'Numerical': [25]})
 
+
 @pytest.fixture
 def sample_custom_query_3():
     """
     Returns a sample query instance for the custom dataset
     """
     return pd.DataFrame({'Categorical': ['d'], 'Numerical': [1000000]})
+
 
 @pytest.fixture
 def sample_custom_query_4():

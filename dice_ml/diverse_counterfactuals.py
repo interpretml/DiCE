@@ -37,7 +37,9 @@ def json_converter(obj):
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
 
-    def __init__(self, data_interface=None, final_cfs_df=None, test_instance_df=None, final_cfs_df_sparse=None, posthoc_sparsity_param=0, desired_range=None, desired_class="opposite", model_type='classifier'):
+    def __init__(self, data_interface=None, final_cfs_df=None, test_instance_df=None,
+                 final_cfs_df_sparse=None, posthoc_sparsity_param=0,
+                 desired_range=None, desired_class="opposite", model_type='classifier'):
 
         self.data_interface = data_interface
         self.final_cfs_df = final_cfs_df
@@ -48,7 +50,7 @@ class CounterfactualExamples:
         self.desired_range = desired_range
 
         self.final_cfs_list = None
-        self.posthoc_sparsity_param = posthoc_sparsity_param # might be useful for future additions
+        self.posthoc_sparsity_param = posthoc_sparsity_param  # might be useful for future additions
 
         self.test_pred = self.test_instance_df[self.data_interface.outcome_name].iat[0]
         if model_type == 'classifier':
@@ -79,7 +81,6 @@ class CounterfactualExamples:
                 # CFs
                 print('\nDiverse Counterfactual set (new outcome: {0})'.format(self.new_outcome))
                 self.display_df(self.final_cfs_df_sparse, show_only_changes)
-
 
             elif hasattr(self.data_interface, 'data_df') and display_sparse_df==True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %(self.new_outcome))

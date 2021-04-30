@@ -58,6 +58,7 @@ for nb in notebooks_list:
         param = pytest.param(nb, id=nb)
     parameter_list.append(param)
 
+
 @pytest.mark.parametrize("notebook_filename", parameter_list)
 def test_notebook(notebook_filename):
     nb, errors = _notebook_run(NOTEBOOKS_PATH + notebook_filename)
