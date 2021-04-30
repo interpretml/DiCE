@@ -2,7 +2,6 @@
 
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 import logging
 from collections import defaultdict
 
@@ -10,7 +9,9 @@ from dice_ml.utils.exception import UserConfigValidationException
 
 
 class PublicData:
-    """A data interface for public data. This class is an interface to DiCE explainers and contains methods to transform user-fed raw data into the format a DiCE explainer requires, and vice versa."""
+    """A data interface for public data. This class is an interface to DiCE explainers
+       and contains methods to transform user-fed raw data into the format a DiCE explainer
+       requires, and vice versa."""
 
     def __init__(self, params):
         """Init method
@@ -18,7 +19,8 @@ class PublicData:
         :param dataframe: The train dataframe used by explainer method.
         :param continuous_features: List of names of continuous features. The remaining features are categorical features.
         :param outcome_name: Outcome feature name.
-        :param permitted_range (optional): Dictionary with feature names as keys and permitted range in list as values. Defaults to the range inferred from training data.
+        :param permitted_range (optional): Dictionary with feature names as keys and permitted range in list as values.
+                                           Defaults to the range inferred from training data.
         :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
         :param data_name (optional): Dataset name
 
@@ -92,19 +94,19 @@ class PublicData:
                         np.int32)
 
         # should move the below snippet to gradient based dice interfaces
-                                # self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
-                                # self.ohe_encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
-                                #     ) if x not in np.array([self.outcome_name])]
+        # self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
+        # self.ohe_encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
+        #     ) if x not in np.array([self.outcome_name])]
 
         # should move the below snippet to model agnostic dice interfaces
-                                # # Initializing a label encoder to obtain label-encoded values for categorical variables
-                                # self.labelencoder = {}
-                                #
-                                # self.label_encoded_data = self.data_df.copy()
-                                #
-                                # for column in self.categorical_feature_names:
-                                #     self.labelencoder[column] = LabelEncoder()
-                                #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
+        # # Initializing a label encoder to obtain label-encoded values for categorical variables
+        # self.labelencoder = {}
+        #
+        # self.label_encoded_data = self.data_df.copy()
+        #
+        # for column in self.categorical_feature_names:
+        #     self.labelencoder[column] = LabelEncoder()
+        #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
         input_permitted_range = None
         if 'permitted_range' in params:
@@ -117,9 +119,9 @@ class PublicData:
         self.permitted_range, feature_ranges_orig = self.get_features_range(input_permitted_range)
 
         # should move the below snippet to model agnostic dice interfaces
-                                # self.max_range = -np.inf
-                                # for feature in self.continuous_feature_names:
-                                #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
+        # self.max_range = -np.inf
+        # for feature in self.continuous_feature_names:
+        #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
 
         if 'data_name' in params:
             self.data_name = params['data_name']
@@ -205,9 +207,9 @@ class PublicData:
 
                 if normalized:
                     minx = (feature_range_input[feature_name]
-                                    [0] - min_value) / (max_value - min_value)
+                            [0] - min_value) / (max_value - min_value)
                     maxx = (feature_range_input[feature_name]
-                                    [1] - min_value) / (max_value - min_value)
+                            [1] - min_value) / (max_value - min_value)
                 else:
                     minx = feature_range_input[feature_name][0]
                     maxx = feature_range_input[feature_name][1]
@@ -236,7 +238,7 @@ class PublicData:
                 minx[0][idx] = self.permitted_range[feature_name][0]
                 maxx[0][idx] = self.permitted_range[feature_name][1]
         return minx, maxx
-        #if encoding=='one-hot':
+        # if encoding=='one-hot':
         #    minx = np.array([[0.0] * len(self.ohe_encoded_feature_names)])
         #    maxx = np.array([[1.0] * len(self.ohe_encoded_feature_names)])
 
@@ -252,7 +254,7 @@ class PublicData:
         #        else:
         #            minx[0][idx] = self.permitted_range[feature_name][0]
         #            maxx[0][idx] = self.permitted_range[feature_name][1]
-        #else:
+        # else:
         #    minx = np.array([[0.0] * len(self.feature_names)])
         #    maxx = np.array([[1.0] * len(self.feature_names)])
 
@@ -308,8 +310,10 @@ class PublicData:
             # one-hot-encoded data is same as original data if there is no categorical features.
             self.ohe_encoded_feature_names = [feat for feat in self.feature_names]
 
-        self.ohe_base_df = self.prepare_df_for_ohe_encoding() # base dataframe for doing one-hot-encoding
-        # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters) when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
+        # base dataframe for doing one-hot-encoding
+        # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters)
+        # when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
+        self.ohe_base_df = self.prepare_df_for_ohe_encoding()
 
     def get_data_params_for_gradient_dice(self):
         """Gets all data related params for DiCE."""
@@ -500,7 +504,8 @@ class PublicData:
         temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
-        return self.normalize_data(temp) # returns a pandas dataframe
+        # returns a pandas dataframe
+        return self.normalize_data(temp)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array"""
@@ -510,4 +515,5 @@ class PublicData:
         for ix, feature in enumerate(self.continuous_feature_names):
             raw_data[feature] = raw_data[feature].astype(float).round(precisions[ix])
         raw_data = raw_data[self.feature_names]
-        return raw_data # returns a pandas dataframe
+        # returns a pandas dataframe
+        return raw_data

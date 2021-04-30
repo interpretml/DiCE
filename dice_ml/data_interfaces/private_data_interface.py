@@ -3,12 +3,12 @@
 import sys
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 import collections
-from collections import OrderedDict
 import logging
+
+
 logging.basicConfig(level=logging.NOTSET)
-from sklearn.preprocessing import LabelEncoder
+
 
 class PrivateData:
     """A data interface for private data with meta information."""
@@ -16,21 +16,29 @@ class PrivateData:
     def __init__(self, params):
         """Init method
 
-        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float (for continuous features) or categories in string (for categorical features) as values. For python version <=3.6, should provide only an OrderedDict.
+        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float (for continuous features) or
+                         categories in string (for categorical features) as values. For python version <=3.6, should provide only an
+                         OrderedDict.
         :param outcome_name: Outcome feature name.
-        :param type_and_precision (optional): Dictionary with continuous feature names as keys. If the feature is of type int, just string 'int' should be provided, if the feature is of type float, a list of type and precision should be provided. For instance, type_and_precision: {cont_f1: 'int', cont_f2: ['float', 2]} for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2 decimal places) respectively. Default value is None and all features are treated as int.
-        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values. Default MAD value is 1 for all features.
+        :param type_and_precision (optional): Dictionary with continuous feature names as keys.
+                                              If the feature is of type int, just string 'int' should be provided,
+                                              if the feature is of type float, a list of type and precision should be
+                                              provided. For instance, type_and_precision: {cont_f1: 'int', cont_f2: ['float', 2]}
+                                              for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2
+                                              decimal places) respectively. Default value is None and all features are treated as int.
+        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values.
+                               Default MAD value is 1 for all features.
         :param data_name (optional): Dataset name
-
         """
-
-        if sys.version_info > (3,6,0) and type(params['features']) in [dict, collections.OrderedDict]:
+        if sys.version_info > (3, 6, 0) and type(params['features']) in [dict, collections.OrderedDict]:
             features_dict = params['features']
-        elif sys.version_info <= (3,6,0) and type(params['features']) is collections.OrderedDict:
+        elif sys.version_info <= (3, 6, 0) and type(params['features']) is collections.OrderedDict:
             features_dict = params['features']
         else:
             raise ValueError(
-                "should provide dictionary with feature names as keys and range (for continuous features) or categories (for categorical features) as values. For python version <3.6, should provide an OrderedDict")
+                "should provide dictionary with feature names as keys and range"
+                "(for continuous features) or categories (for categorical features) as values. "
+                "For python version <3.6, should provide an OrderedDict")
 
         if type(params['outcome_name']) is str:
             self.outcome_name = params['outcome_name']
@@ -178,8 +186,10 @@ class PrivateData:
             # one-hot-encoded data is same as original data if there is no categorical features.
             self.ohe_encoded_feature_names = [feat for feat in self.feature_names]
 
-        self.ohe_base_df = self.prepare_df_for_ohe_encoding() # base dataframe for doing one-hot-encoding
-        # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters) when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
+        # base dataframe for doing one-hot-encoding
+        # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters)
+        # when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
+        self.ohe_base_df = self.prepare_df_for_ohe_encoding()
 
     def get_data_params_for_gradient_dice(self):
         """Gets all data related params for DiCE."""
@@ -201,7 +211,6 @@ class PrivateData:
         cont_precisions = [self.get_decimal_precisions()[ix] for ix in range(len(self.continuous_feature_names))]
 
         return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, cont_minx, cont_maxx, cont_precisions
-
 
     def get_encoded_categorical_feature_indexes(self):
         """Gets the column indexes categorical features after one-hot-encoding."""
@@ -243,10 +252,10 @@ class PrivateData:
     def from_dummies(self, data, prefix_sep='_'):
         """Gets the original data from dummy encoded data with k levels."""
         out = data.copy()
-        for l in self.categorical_feature_names:
+        for feature_name in self.categorical_feature_names:
             cols, labs = [[c.replace(
-                x, "") for c in data.columns if l+prefix_sep in c] for x in ["", l+prefix_sep]]
-            out[l] = pd.Categorical(
+                x, "") for c in data.columns if feature_name+prefix_sep in c] for x in ["", feature_name+prefix_sep]]
+            out[feature_name] = pd.Categorical(
                 np.array(labs)[np.argmax(data[cols].values, axis=1)])
             out.drop(cols, axis=1, inplace=True)
         return out
@@ -335,7 +344,8 @@ class PrivateData:
         temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
-        return self.normalize_data(temp) # returns a pandas dataframe
+        # returns a pandas dataframe
+        return self.normalize_data(temp)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array"""
@@ -345,4 +355,5 @@ class PrivateData:
         for ix, feature in enumerate(self.continuous_feature_names):
             raw_data[feature] = raw_data[feature].astype(float).round(precisions[ix])
         raw_data = raw_data[self.feature_names]
-        return raw_data # returns a pandas dataframe
+        # returns a pandas dataframe
+        return raw_data
