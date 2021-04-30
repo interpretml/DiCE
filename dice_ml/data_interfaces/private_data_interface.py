@@ -16,17 +16,19 @@ class PrivateData:
     def __init__(self, params):
         """Init method
 
-        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float (for continuous features) or
-                         categories in string (for categorical features) as values. For python version <=3.6, should provide only an
-                         OrderedDict.
+        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float
+                         (for continuous features) or categories in string (for categorical features)
+                         as values. For python version <=3.6, should provide only an OrderedDict.
         :param outcome_name: Outcome feature name.
         :param type_and_precision (optional): Dictionary with continuous feature names as keys.
                                               If the feature is of type int, just string 'int' should be provided,
                                               if the feature is of type float, a list of type and precision should be
-                                              provided. For instance, type_and_precision: {cont_f1: 'int', cont_f2: ['float', 2]}
-                                              for continuous features cont_f1 and cont_f2 of type int and float (and precision up to 2
-                                              decimal places) respectively. Default value is None and all features are treated as int.
-        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD) as values.
+                                              provided. For instance, type_and_precision: {cont_f1: 'int',
+                                              cont_f2: ['float', 2]} for continuous features cont_f1 and cont_f2 of
+                                              type int and float (and precision up to 2 decimal places) respectively.
+                                              Default value is None and all features are treated as int.
+        :param mad (optional): Dictionary with feature names as keys and corresponding Median Absolute Deviations (MAD)
+                               as values.
                                Default MAD value is 1 for all features.
         :param data_name (optional): Dataset name
         """
@@ -88,7 +90,8 @@ class PrivateData:
                 #
                 # for column in self.categorical_feature_names:
                 #     self.labelencoder[column] = LabelEncoder()
-                #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.categorical_levels[column])
+                #     self.label_encoded_data[column] = \
+                #           self.labelencoder[column].fit_transform(self.categorical_levels[column])
 
                 # self.max_range = -np.inf
                 # for feature in self.continuous_feature_names:
@@ -210,7 +213,8 @@ class PrivateData:
         # decimal precisions for continuous features
         cont_precisions = [self.get_decimal_precisions()[ix] for ix in range(len(self.continuous_feature_names))]
 
-        return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, cont_minx, cont_maxx, cont_precisions
+        return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, \
+            cont_minx, cont_maxx, cont_precisions
 
     def get_encoded_categorical_feature_indexes(self):
         """Gets the column indexes categorical features after one-hot-encoding."""
@@ -339,7 +343,8 @@ class PrivateData:
         return test
 
     def get_ohe_min_max_normalized_data(self, query_instance):
-        """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict, a dataframe, a list, or a list of dicts"""
+        """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
+           a dataframe, a list, or a list of dicts"""
         query_instance = self.prepare_query_instance(query_instance)
         temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
@@ -348,7 +353,8 @@ class PrivateData:
         return self.normalize_data(temp)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
-        """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array"""
+        """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
+           should be a dataframe or an array"""
         raw_data = self.get_decoded_data(transformed_data, encoding='one-hot')
         raw_data = self.de_normalize_data(raw_data)
         precisions = self.get_decimal_precisions()

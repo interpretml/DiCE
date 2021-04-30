@@ -1,4 +1,5 @@
-"""Module containing all required information about the interface between raw (or transformed) public data and DiCE explainers."""
+"""Module containing all required information about the interface between raw (or transformed)
+public data and DiCE explainers."""
 
 import pandas as pd
 import numpy as np
@@ -334,7 +335,8 @@ class PublicData:
         # decimal precisions for continuous features
         cont_precisions = [self.get_decimal_precisions()[ix] for ix in range(len(self.continuous_feature_names))]
 
-        return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, cont_minx, cont_maxx, cont_precisions
+        return minx, maxx, encoded_categorical_feature_indexes, encoded_continuous_feature_indexes, cont_minx, \
+            cont_maxx, cont_precisions
 
     def get_encoded_categorical_feature_indexes(self):
         """Gets the column indexes categorical features after one-hot-encoding."""
@@ -386,7 +388,8 @@ class PublicData:
             match_cols = [c for c in data.columns if
                           c in cat_col_values]  # check for the above matching columns in the encoded data
 
-            # then, recreate original data by removing the suffixes - based on the GitHub issue comment: https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271
+            # then, recreate original data by removing the suffixes - based on the GitHub issue comment:
+            # https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271
             cols, labs = [[c.replace(
                 x, "") for c in match_cols] for x in ["", feat + prefix_sep]]
             out[feat] = pd.Categorical(
@@ -396,7 +399,8 @@ class PublicData:
 
     def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
-        # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the precision of majority of values in the column.
+        # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the
+        # precision of majority of values in the column.
         precisions_dict = defaultdict(int)
         precisions = [0] * len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
@@ -484,7 +488,8 @@ class PublicData:
         test = test.reset_index(drop=True)
         return test
 
-        # TODO: create a new method, get_LE_min_max_normalized_data() to get label-encoded and normalized data. Keep this method only for converting query_instance to pd.DataFrame
+        # TODO: create a new method, get_LE_min_max_normalized_data() to get label-encoded and normalized data. Keep this
+        #       method only for converting query_instance to pd.DataFrame
         # if encoding == 'label':
         #     for column in self.categorical_feature_names:
         #         test[column] = self.labelencoder[column].transform(test[column])
@@ -499,7 +504,8 @@ class PublicData:
         #     return temp.tail(test.shape[0]).reset_index(drop=True)
 
     def get_ohe_min_max_normalized_data(self, query_instance):
-        """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict, a dataframe, a list, or a list of dicts"""
+        """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
+           a dataframe, a list, or a list of dicts"""
         query_instance = self.prepare_query_instance(query_instance)
         temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
@@ -508,7 +514,8 @@ class PublicData:
         return self.normalize_data(temp)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
-        """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array"""
+        """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
+           should be a dataframe or an array"""
         raw_data = self.get_decoded_data(transformed_data, encoding='one-hot')
         raw_data = self.de_normalize_data(raw_data)
         precisions = self.get_decimal_precisions()
