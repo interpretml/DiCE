@@ -18,14 +18,14 @@ class TestBaseModelLoader:
         assert isinstance(m, dice_ml.model_interfaces.keras_tensorflow_model.KerasTensorFlowModel)
 
     def test_pyt(self):
-        pyt = pytest.importorskip("torch")
+        pytest.importorskip("torch")
         backend = 'PYT'
         m = self._get_model(backend)
         assert issubclass(type(m), dice_ml.model_interfaces.base_model.BaseModel)
         assert isinstance(m, dice_ml.model_interfaces.pytorch_model.PyTorchModel)
 
     def test_sklearn(self):
-        pyt = pytest.importorskip("sklearn")
+        pytest.importorskip("sklearn")
         backend = 'sklearn'
         m = self._get_model(backend)
         assert isinstance(m, dice_ml.model_interfaces.base_model.BaseModel)

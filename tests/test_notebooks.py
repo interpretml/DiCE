@@ -10,11 +10,11 @@ import nbformat
 import pytest
 
 NOTEBOOKS_PATH = "docs/source/notebooks/"
-notebooks_list = [ f.name for f in os.scandir(NOTEBOOKS_PATH) if f.name.endswith(".ipynb")]
+notebooks_list = [f.name for f in os.scandir(NOTEBOOKS_PATH) if f.name.endswith(".ipynb")]
 # notebooks that should not be run
 advanced_notebooks = [
-        "DiCE_with_advanced_options.ipynb", # requires tensorflow 1.x
-        "DiCE_getting_started_feasible.ipynb", # needs changes after latest refactor
+        "DiCE_with_advanced_options.ipynb",  # requires tensorflow 1.x
+        "DiCE_getting_started_feasible.ipynb",  # needs changes after latest refactor
         "Benchmarking_different_CF_explanation_methods.ipynb"
         ]
 
@@ -63,4 +63,3 @@ for nb in notebooks_list:
 def test_notebook(notebook_filename):
     nb, errors = _notebook_run(NOTEBOOKS_PATH + notebook_filename)
     assert errors == []
-

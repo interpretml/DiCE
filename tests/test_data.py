@@ -1,12 +1,15 @@
 import pytest
 
 import dice_ml
-from dice_ml.utils import helpers
+
 
 def test_data_initiation(public_data_object, private_data_object):
-    assert isinstance(public_data_object, dice_ml.data_interfaces.public_data_interface.PublicData), "the given parameters should instantiate PublicData class"
+    assert isinstance(public_data_object, dice_ml.data_interfaces.public_data_interface.PublicData), \
+        "the given parameters should instantiate PublicData class"
 
-    assert isinstance(private_data_object, dice_ml.data_interfaces.private_data_interface.PrivateData), "the given parameters should instantiate PrivateData class"
+    assert isinstance(private_data_object, dice_ml.data_interfaces.private_data_interface.PrivateData), \
+        "the given parameters should instantiate PrivateData class"
+
 
 class TestCommonDataMethods:
     """
@@ -20,7 +23,8 @@ class TestCommonDataMethods:
         # public data
         for normalized in [True, False]:
             mads = self.d[0].get_valid_mads(normalized=normalized, display_warnings=False, return_mads=True)
-            assert all(mads[feature] > 0 for feature in mads) # mads denotes variability in features and should be positive for DiCE.
+            # mads denotes variability in features and should be positive for DiCE.
+            assert all(mads[feature] > 0 for feature in mads)
 
             if normalized:
                 min_value = 0
@@ -34,12 +38,14 @@ class TestCommonDataMethods:
 
                 if mads[feature] > max_value - min_value:
                     errors += 1
-            assert errors==0 # mads can't be larger than the feature range
+            assert errors == 0  # mads can't be larger than the feature range
 
         # private data
         for normalized in [True, False]:
             mads = self.d[1].get_valid_mads(normalized=normalized, display_warnings=False, return_mads=True)
-            assert all(mads[feature] == 1 for feature in mads) # no mad is provided for private data by default, so a practical alternative is keeping all value at 1. Check get_valid_mads() in data interface classes for more info.
+            # no mad is provided for private data by default, so a practical alternative is keeping all value at 1.
+            # Check get_valid_mads() in data interface classes for more info.
+            assert all(mads[feature] == 1 for feature in mads)
 
     # @pytest.mark.parametrize(
     # "encode_categorical, output_query",
