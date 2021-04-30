@@ -195,23 +195,23 @@ class AutoEncoder(nn.Module):
          )
 
         self.decoder_mean = nn.Sequential(
-            nn.Linear( self.encoded_size, 12 ),
+            nn.Linear(self.encoded_size, 12),
             nn.BatchNorm1d(12),
             nn.Dropout(0.1),
             nn.ReLU(),
-            nn.Linear( 12, 14 ),
+            nn.Linear(12, 14),
             nn.BatchNorm1d(14),
             nn.Dropout(0.1),
             nn.ReLU(),
-            nn.Linear( 14, 16 ),
+            nn.Linear(14, 16),
             nn.BatchNorm1d(16),
             nn.Dropout(0.1),
             nn.ReLU(),
-            nn.Linear( 16, 20 ),
+            nn.Linear(16, 20),
             nn.BatchNorm1d(20),
             nn.Dropout(0.1),
             nn.ReLU(),
-            nn.Linear( 20, self.data_size),
+            nn.Linear(20, self.data_size),
             nn.Sigmoid()
             )
 
