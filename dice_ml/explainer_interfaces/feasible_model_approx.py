@@ -1,15 +1,6 @@
-#Common Imports
-import numpy as np
-import random
-import collections
-import timeit
-import copy
-
 #Dice Imports
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.explainer_interfaces.feasible_base_vae import FeasibleBaseVAE
-from dice_ml import diverse_counterfactuals as exp
-from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 from dice_ml.utils.helpers import get_base_gen_cf_initialization
 
 #Pytorch
@@ -20,6 +11,7 @@ from torch.nn import functional as F
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
+
 
 class FeasibleModelApprox(FeasibleBaseVAE, ExplainerBase):
 
@@ -33,7 +25,7 @@ class FeasibleModelApprox(FeasibleBaseVAE, ExplainerBase):
         ExplainerBase.__init__(self, data_interface)
 
         #Black Box ML Model to be explained
-        self.pred_model= model_interface.model
+        self.pred_model = model_interface.model
 
         self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
         self.data_interface.one_hot_encoded_data = self.data_interface.one_hot_encode_data(self.data_interface.data_df)
@@ -117,10 +109,10 @@ class FeasibleModelApprox(FeasibleBaseVAE, ExplainerBase):
                             x_pred = dm[j]
                             constraint_loss+= F.hinge_embedding_loss( constraint_direction*(x_pred[:,const_idx] - train_x[:,const_idx]), torch.tensor(-1), 0)
 
-                        constraint_loss= constraint_loss/mc_samples
-                        constraint_loss= constraint_reg*constraint_loss
+                        constraint_loss = constraint_loss/mc_samples
+                        constraint_loss = constraint_reg*constraint_loss
                         loss+= constraint_loss
-                        print('Constraint: ', constraint_loss, torch.mean(constraint_loss) )
+                        print('Constraint: ', constraint_loss, torch.mean(constraint_loss))
                 else:
                     #Train the regression model
                     raise NotImplementedError("This has not been implemented yet. If you'd like this to be implemented in the next version, please raise an issue at https://github.com/interpretml/DiCE/issues")
@@ -129,11 +121,11 @@ class FeasibleModelApprox(FeasibleBaseVAE, ExplainerBase):
                 train_loss += loss.item()
                 self.cf_vae_optimizer.step()
 
-                batch_num+=1
+                batch_num += 1
 
-            ret= loss/batch_num
-            print('Train Avg Loss: ', ret, train_size )
+            ret = loss/batch_num
+            print('Train Avg Loss: ', ret, train_size)
 
-            #Save the model after training every 10 epochs and at the last epoch
-            if (epoch!=0 and epoch%10==0) or epoch==self.epochs-1:
+            # Save the model after training every 10 epochs and at the last epoch
+            if (epoch != 0 and (epoch % 10) == 0) or epoch == self.epochs-1:
                 torch.save(self.cf_vae.state_dict(), self.save_path)

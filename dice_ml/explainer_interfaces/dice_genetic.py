@@ -2,7 +2,6 @@
 Module to generate diverse counterfactual explanations based on genetic algorithm
 This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time': https://arxiv.org/pdf/2101.01292.pdf
 """
-
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import numpy as np
 import pandas as pd
@@ -21,9 +20,7 @@ class DiceGenetic(ExplainerBase):
 
         :param data_interface: an interface class to access data related params.
         :param model_interface: an interface class to access trained ML model.
-
         """
-
         super().__init__(data_interface, model_interface)  # initiating data related parameters
 
         # number of output nodes of ML model
@@ -50,7 +47,8 @@ class DiceGenetic(ExplainerBase):
 
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
-    def update_hyperparameters(self, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty):
+    def update_hyperparameters(self, proximity_weight, sparsity_weight,
+                               diversity_weight, categorical_penalty):
         """Update hyperparameters of the loss function"""
 
         self.proximity_weight = proximity_weight
@@ -58,7 +56,8 @@ class DiceGenetic(ExplainerBase):
         self.diversity_weight = diversity_weight
         self.categorical_penalty = categorical_penalty
 
-    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights, encoding = 'one-hot'):
+    def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights,
+                                encoding='one-hot'):
         """Intializes variables related to main loss function"""
 
         self.loss_weights = [yloss_type, diversity_loss_type, feature_weights]
@@ -101,7 +100,8 @@ class DiceGenetic(ExplainerBase):
             for jx, feature in enumerate(self.data_interface.feature_names):
                 if feature in features_to_vary:
                     if feature in self.data_interface.continuous_feature_names:
-                        one_init[jx] = np.round(np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1]), precisions[jx])
+                        one_init[jx] = np.round(np.random.uniform(
+                            self.feature_range[feature][0], self.feature_range[feature][1]), precisions[jx])
                     else:
                         one_init[jx] = np.random.choice(self.feature_range[feature])
                 else:
@@ -131,7 +131,8 @@ class DiceGenetic(ExplainerBase):
                             if self.feature_range[feature][0] <= query_instance[jx] <= self.feature_range[feature][1]:
                                 one_init[jx] = query_instance[jx]
                             else:
-                                one_init[jx] = np.random.uniform(self.feature_range[feature][0], self.feature_range[feature][1])
+                                one_init[jx] = np.random.uniform(
+                                    self.feature_range[feature][0], self.feature_range[feature][1])
                     else:
                         if cfs.iat[kx, jx] in self.feature_range[feature]:
                             one_init[jx] = cfs.iat[kx, jx]
@@ -147,10 +148,12 @@ class DiceGenetic(ExplainerBase):
         uniques = np.unique(new_array, axis=0)
 
         if len(uniques) != self.population_size:
-            remaining_cfs = self.do_random_init(self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
+            remaining_cfs = self.do_random_init(
+                self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
             self.cfs = np.concatenate([uniques, remaining_cfs])
 
-    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range, desired_class, query_instance, query_instance_df_dummies, verbose):
+    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range, desired_class,
+                              query_instance, query_instance_df_dummies, verbose):
         """Intializes CFs and other related variables."""
         self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
 
