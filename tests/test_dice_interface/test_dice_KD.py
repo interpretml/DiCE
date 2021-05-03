@@ -28,6 +28,7 @@ def KD_multi_classification_exp_object():
     exp = dice_ml.Dice(d, m, method='kdtree')
     return exp
 
+
 @pytest.fixture
 def KD_regression_exp_object():
     backend = 'sklearn'
@@ -183,7 +184,6 @@ class TestDiceKDMultiClassificationMethods:
             assert "Desired class not present in training data!" in str(ucve)
         else:
             assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
-
 
 
 class TestDiceKDRegressionMethods:
