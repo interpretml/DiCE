@@ -677,9 +677,14 @@ class DiceTensorFlow1(ExplainerBase):
                     valid_ix.append(cf_ix)
 
             if self.total_CFs_found == 0:
-                print('No Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('No Counterfactuals found for the given configuation, perhaps try with different '
+                      'values of proximity (or diversity) weights or learning rate...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
-                print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d)' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)),
+                      ' Diverse Counterfactuals found for the given configuation, perhaps try with different'
+                      'values of proximity (or diversity) weights or learning rate...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         if final_cfs_df_sparse is not None:
             final_cfs_df_sparse = final_cfs_df_sparse.iloc[valid_ix].reset_index(drop=True)

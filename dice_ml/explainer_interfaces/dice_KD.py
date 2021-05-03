@@ -102,8 +102,8 @@ class DiceKD(ExplainerBase):
             raise ValueError("Desired class should be within 0 and num_classes-1.")
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
-        self.dataset_with_predictions, self.KD_tree, self.predictions = self.build_KD_tree(data_df_copy, desired_range,
-                                                                                           desired_class, self.predicted_outcome_name)
+        self.dataset_with_predictions, self.KD_tree, self.predictions = \
+            self.build_KD_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
 
         query_instance, cfs_preds = self.find_counterfactuals(data_df_copy,
                                                               query_instance, query_instance_orig,
@@ -259,9 +259,10 @@ class DiceKD(ExplainerBase):
             if total_cfs_found < total_CFs:
                 self.elapsed = timeit.default_timer() - start_time
                 m, s = divmod(self.elapsed, 60)
-                print(
-                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps change the query instance or the features to vary...' % (
-                        total_cfs_found, total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d) ' % (total_cfs_found, self.total_CFs),
+                      'Diverse Counterfactuals found for the given configuation, perhaps ',
+                      'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
+                      'min %02d' % s, 'sec')
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
 

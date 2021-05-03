@@ -400,7 +400,8 @@ class DiceGenetic(ExplainerBase):
         while iterations < maxiterations and self.total_CFs > 0:
             if abs(previous_best_loss - current_best_loss) <= thresh and \
                 (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or
-                    (self.model.model_type == 'regressor' and all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
+                    (self.model.model_type == 'regressor' and
+                     all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:
                 stop_cnt = 0
@@ -468,9 +469,10 @@ class DiceGenetic(ExplainerBase):
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')
             else:
-                print(
-                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps change the query instance or the features to vary...' % (
-                        len(self.final_cfs), self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d) ' % (len(self.final_cfs), self.total_CFs),
+                      'Diverse Counterfactuals found for the given configuation, perhaps ',
+                      'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
+                      'min %02d' % s, 'sec')
 
         return query_instance_df
 

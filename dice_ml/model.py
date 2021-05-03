@@ -55,7 +55,7 @@ def decide(backend):
     elif backend == BackEndTypes.Tensorflow1 or backend == BackEndTypes.Tensorflow2:
         # Tensorflow 1 or 2 backend
         try:
-            import tensorflow
+            import tensorflow  # noqa: F401
         except ImportError:
             raise UserConfigValidationException("Unable to import tensorflow. Please install tensorflow")
         from dice_ml.model_interfaces.keras_tensorflow_model import KerasTensorFlowModel
@@ -64,7 +64,7 @@ def decide(backend):
     elif backend == BackEndTypes.Pytorch:
         # PyTorch backend
         try:
-            import torch
+            import torch  # noqa: F401
         except ImportError:
             raise UserConfigValidationException("Unable to import torch. Please install torch")
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel

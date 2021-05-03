@@ -158,7 +158,7 @@ class DiceRandom(ExplainerBase):
         test_instance_df[self.data_interface.outcome_name] = \
             np.array(np.round(self.get_model_output_from_scores((test_pred,)), self.outcome_precision))
         # post-hoc operation on continuous features to enhance sparsity - only for public data
-        if posthoc_sparsity_param is None and posthoc_sparsity_param > 0 and \
+        if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and \
                 self.final_cfs is not None and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
             final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(
@@ -174,10 +174,12 @@ class DiceRandom(ExplainerBase):
                       m, 'min %02d' % s, 'sec')
         else:
             if self.total_cfs_found == 0:
-                print('No Counterfactuals found for the given configuration, perhaps try with different parameters...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('No Counterfactuals found for the given configuration, perhaps try with different parameters...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
-                print('Only %d (required %d) Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...' % (
-                    self.total_cfs_found, self.total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d) ' % (self.total_cfs_found, self.total_CFs),
+                      'Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
