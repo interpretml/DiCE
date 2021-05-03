@@ -351,31 +351,34 @@ class ExplainerBase:
             current_pred = self.predict_fn_for_sparsity(
                 final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
             for feature in features_sorted:
-                #current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
-                #feat_ix = self.data_interface.continuous_feature_names.index(feature)
+                # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
+                # feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iat[0] - final_cfs_sparse[feature].iat[cf_ix]
                 if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
-                        final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
+                        final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
+                                                                 feature, final_cfs_sparse, current_pred)
 
                     elif posthoc_sparsity_algorithm == "binary":
-                        final_cfs_sparse = self.do_binary_search(diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
+                        final_cfs_sparse = self.do_binary_search(
+                            diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
 
             temp_preds = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
             cfs_preds_sparse.append(temp_preds)
 
         final_cfs_sparse[self.data_interface.outcome_name] = self.get_model_output_from_scores(cfs_preds_sparse)
-        #final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
+        # final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
         return final_cfs_sparse
 
     def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred_orig):
-        """Performs a greedy linear search - moves the continuous features in CFs towards original values in query_instance greedily until the prediction class changes."""
+        """Performs a greedy linear search - moves the continuous features in CFs towards original values in
+           query_instance greedily until the prediction class changes."""
 
         old_diff = diff
-        change = (10**-decimal_prec[feature]) # the minimal possible change for a feature
+        change = (10**-decimal_prec[feature])  # the minimal possible change for a feature
         current_pred = current_pred_orig
         if self.model.model_type == 'classifier':
-            while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
+            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
                 old_val = final_cfs_sparse[feature].iat[cf_ix]
                 final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
@@ -391,7 +394,8 @@ class ExplainerBase:
         return final_cfs_sparse
 
     def do_binary_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred):
-        """Performs a binary search between continuous features of a CF and corresponding values in query_instance until the prediction class changes."""
+        """Performs a binary search between continuous features of a CF and corresponding values
+           in query_instance until the prediction class changes."""
 
         old_val = final_cfs_sparse[feature].iat[cf_ix]
         final_cfs_sparse.loc[cf_ix, feature] = query_instance[feature].iat[0]
@@ -461,12 +465,11 @@ class ExplainerBase:
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         return desired_class
 
-    def infer_target_cfs_class(self, desired_class_input, original_pred,
-            num_output_nodes):
+    def infer_target_cfs_class(self, desired_class_input, original_pred, num_output_nodes):
         """ Infer the target class for generating CFs. Only called when
-        model_type=="classifier".
-        TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
-        whether it is allowed or not.
+            model_type=="classifier".
+            TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
+                  whether it is allowed or not.
         """
         if desired_class_input == "opposite":
             if num_output_nodes == 2:
@@ -474,7 +477,8 @@ class ExplainerBase:
                 target_class = int(1 - original_pred_1)
                 return target_class
             elif num_output_nodes > 2:
-                raise UserConfigValidationException("Desired class cannot be opposite if the number of classes is more than 2.")
+                raise UserConfigValidationException(
+                    "Desired class cannot be opposite if the number of classes is more than 2.")
         elif isinstance(desired_class_input, int):
             if desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
@@ -501,10 +505,12 @@ class ExplainerBase:
         for i in range(len(model_outputs)):
             pred = model_outputs[i]
             if self.model.model_type == "classifier":
-                if self.num_output_nodes == 2: # binary
+                if self.num_output_nodes == 2:  # binary
                     pred_1 = pred[self.num_output_nodes-1]
-                    validity[i] = 1 if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else 0
-                else: # multiclass
+                    validity[i] = 1 if \
+                        ((self.target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
+                         (self.target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else 0
+                else:  # multiclass
                     if np.argmax(pred) == self.target_cf_class:
                         validity[i] = 1
             elif self.model.model_type == "regressor":
@@ -532,11 +538,15 @@ class ExplainerBase:
 
             if self.num_output_nodes == 1:  # for tensorflow/pytorch models
                 pred_1 = model_score[0]
-                validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
+                validity = True if \
+                    ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
+                     (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
                 return validity
             if self.num_output_nodes == 2:  # binary
                 pred_1 = model_score[self.num_output_nodes-1]
-                validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
+                validity = True if \
+                    ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
+                     (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
                 return validity
             else:  # multiclass
                 if np.argmax(model_score) == target_cf_class:
@@ -560,13 +570,15 @@ class ExplainerBase:
                 model_output[i] = model_scores[i]
         return model_output
 
-    def check_permitted_range(self, permitted_range): # TODO: add comments as to where this is used if this function is necessary, else remove.
-        """checks permitted range for continuous features"""
+    def check_permitted_range(self, permitted_range):
+        """checks permitted range for continuous features
+           TODO: add comments as to where this is used if this function is necessary, else remove.
+        """
         if permitted_range is not None:
-        #     if not self.data_interface.check_features_range(permitted_range):
-        #         raise ValueError(
-        #             "permitted range of features should be within their original range")
-        #     else:
+            # if not self.data_interface.check_features_range(permitted_range):
+            #   raise ValueError(
+            #       "permitted range of features should be within their original range")
+            # else:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
             self.cont_minx = []
@@ -575,8 +587,10 @@ class ExplainerBase:
                 self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                 self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
-    def check_mad_validity(self, feature_weights): # TODO: add comments as to where this is used if this function is necessary, else remove.
-        """checks feature MAD validity and throw warnings"""
+    def check_mad_validity(self, feature_weights):
+        """checks feature MAD validity and throw warnings.
+           TODO: add comments as to where this is used if this function is necessary, else remove.
+        """
         if feature_weights == "inverse_mad":
             self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
