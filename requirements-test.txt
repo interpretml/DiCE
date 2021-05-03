@@ -1,0 +1,5 @@
+flake8
+pytest
+twine
+ipython
+jsonschema
