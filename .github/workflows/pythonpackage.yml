@@ -38,7 +38,16 @@ jobs:
         flake8 . --count --max-complexity=30 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        # pytest
+        pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
+        cat coverage.xml
+    - name: Upload code coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-results
+        path: htmlcov
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
     - name: Check package consistency with twine
       run: |
         python setup.py check sdist bdist_wheel
