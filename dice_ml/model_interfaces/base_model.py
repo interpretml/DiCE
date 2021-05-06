@@ -8,7 +8,6 @@ from dice_ml.utils.helpers import DataTransfomer
 from dice_ml.constants import ModelTypes
 
 
-
 class BaseModel:
 
     def __init__(self, model=None, model_path='', backend='', func=None, kw_args=None):

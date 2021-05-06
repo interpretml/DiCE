@@ -10,7 +10,8 @@ from dice_ml.utils.exception import UserConfigValidationException
 
 class Model:
     """An interface class to different ML Model implementations."""
-    def __init__(self, model=None, model_path='', backend=BackEndTypes.Tensorflow1, model_type=ModelTypes.Classifier, func=None, kw_args=None):
+    def __init__(self, model=None, model_path='', backend=BackEndTypes.Tensorflow1, model_type=ModelTypes.Classifier,
+                 func=None, kw_args=None):
         """Init method
 
         :param model: trained ML model.
