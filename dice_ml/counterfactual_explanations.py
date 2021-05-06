@@ -217,16 +217,20 @@ class CounterfactualExplanations:
                 "Unsupported serialization version {}".format(serialization_version))
 
     @staticmethod
+    def _validate_serialization_version(version):
+        if version is None:
+            raise UserConfigValidationException("No version field in the json input")
+        elif not _check_supported_json_output_versions(version):
+            raise UserConfigValidationException("Incompatible version {} found in json input".format(version))
+
+    @staticmethod
     def from_json(json_str):
         """ Deserialize json string to a CounterfactualExplanations object.
         """
         json_dict = json.loads(json_str)
         if _CommonSchemaConstants.METADATA in json_dict:
             version = json_dict[_CommonSchemaConstants.METADATA].get('version')
-            if version is None:
-                raise UserConfigValidationException("No version field in the json input")
-            elif not _check_supported_json_output_versions(version):
-                raise UserConfigValidationException("Incompatible version {} found in json input".format(version))
+            CounterfactualExplanations._validate_serialization_version(version)
 
             if version == _SchemaVersions.V1:
                 CounterfactualExplanations._check_cf_exp_output_against_json_schema(
@@ -240,7 +244,7 @@ class CounterfactualExplanations:
                         local_importance=json_dict[_CounterfactualExpV1SchemaConstants.LOCAL_IMPORTANCE],
                         summary_importance=json_dict[_CounterfactualExpV1SchemaConstants.SUMMARY_IMPORTANCE],
                         version=version)
-            elif version == _SchemaVersions.V2:
+            else:
                 CounterfactualExplanations._check_cf_exp_output_against_json_schema(
                     json_dict, version=version)
                 cf_examples_list = []

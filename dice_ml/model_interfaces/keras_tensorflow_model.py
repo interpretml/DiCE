@@ -4,6 +4,7 @@ from dice_ml.model_interfaces.base_model import BaseModel
 import tensorflow as tf
 from tensorflow import keras
 
+
 class KerasTensorFlowModel(BaseModel):
 
     def __init__(self, model=None, model_path='', backend='TF1', func=None, kw_args=None):
@@ -13,7 +14,8 @@ class KerasTensorFlowModel(BaseModel):
         :param model_path: path to trained model.
         :param backend: "TF1" for TensorFlow 1 and "TF2" for TensorFlow 2.
         :param func: function transformation required for ML model. If func is None, then func will be the identity function.
-        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the dictionary of kw_args, by default.
+        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the
+                        dictionary of kw_args, by default.
         """
 
         super().__init__(model, model_path, backend)

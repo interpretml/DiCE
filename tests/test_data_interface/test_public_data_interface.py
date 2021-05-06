@@ -114,4 +114,5 @@ class TestErrorCasesPublicDataInterface:
                          outcome_name='target',
                          continuous_features_precision=continuous_features_precision)
 
-        assert "continuous_features_precision contains some feature names which are not part of columns in dataframe" in str(ucve)
+        assert "continuous_features_precision contains some feature names which" + \
+            " are not part of columns in dataframe" in str(ucve)

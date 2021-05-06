@@ -124,7 +124,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
     def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
                                                  initialization=initialization, maxiterations=maxiterations)
@@ -135,10 +135,10 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
                              [(0, 0, "kdtree"), (0, 0, "random")])
     def test_zero_cfs(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 initialization=initialization)
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                           total_CFs=total_CFs, desired_class=desired_class,
+                                           initialization=initialization)
 
 
 class TestDiceGeneticMultiClassificationMethods:
@@ -149,7 +149,7 @@ class TestDiceGeneticMultiClassificationMethods:
     # Testing that the counterfactuals are in the desired class
     @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
     def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
                                                  initialization=initialization)
@@ -159,7 +159,7 @@ class TestDiceGeneticMultiClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(2, 7, "kdtree", 0), (2, 7, "random", 0)])
     def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
                                                  initialization=initialization, maxiterations=maxiterations)
@@ -170,10 +170,10 @@ class TestDiceGeneticMultiClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
                              [(2, 0, "kdtree"), (2, 0, "random")])
     def test_zero_cfs(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 initialization=initialization)
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                           total_CFs=total_CFs, desired_class=desired_class,
+                                           initialization=initialization)
 
 
 class TestDiceGeneticRegressionMethods:
@@ -185,7 +185,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",
                              [([1, 2.8], 2, "kdtree"), ([1, 2.8], 2, "random")])
     def test_desired_range(self, desired_range, sample_custom_query_2, total_CFs, initialization):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_range=desired_range,
                                                  initialization=initialization)
@@ -197,7 +197,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization, maxiterations",
                              [([1, 2.8], 7, "kdtree", 0), ([1, 2.8], 7, "random", 0)])
     def test_maxiter(self, desired_range, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_range=desired_range,
                                                  initialization=initialization, maxiterations=maxiterations)
@@ -208,7 +208,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",
                              [([1, 2.8], 0, "kdtree"), ([1, 2.8], 0, "random")])
     def test_zero_cfs(self, desired_range, sample_custom_query_2, total_CFs, initialization):
-        features_to_vary = self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_range=desired_range,
-                                                 initialization=initialization)
+        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
+        self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
+                                           total_CFs=total_CFs, desired_range=desired_range,
+                                           initialization=initialization)
