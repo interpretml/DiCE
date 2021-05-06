@@ -5,6 +5,8 @@
 import pickle
 import numpy as np
 from dice_ml.utils.helpers import DataTransfomer
+from dice_ml.constants import ModelTypes
+
 
 class BaseModel:
 
@@ -36,7 +38,7 @@ class BaseModel:
         array of predicted value for a regressor.
         """
         input_instance = self.transformer.transform(input_instance)
-        if self.model_type == "classifier":
+        if self.model_type == ModelTypes.Classifier:
             return self.model.predict_proba(input_instance)
         else:
             return self.model.predict(input_instance)

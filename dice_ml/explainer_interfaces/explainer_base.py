@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from sklearn.neighbors import KDTree
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.constants import ModelTypes
 
 
 class ExplainerBase:
@@ -356,7 +357,7 @@ class ExplainerBase:
         old_diff = diff
         change = (10**-decimal_prec[feature]) # the minimal possible change for a feature
         current_pred = current_pred_orig
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             while((abs(diff)>10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
                 old_val = final_cfs_sparse[feature].iat[cf_ix]
                 final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
@@ -429,7 +430,7 @@ class ExplainerBase:
 
     def misc_init(self, stopping_threshold, desired_class, desired_range, test_pred):
         self.stopping_threshold = stopping_threshold
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
@@ -439,7 +440,7 @@ class ExplainerBase:
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
                 self.stopping_threshold = 0.75
 
-        elif self.model.model_type == 'regressor':
+        elif self.model.model_type == ModelTypes.Regressor:
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         return desired_class
 
@@ -482,14 +483,14 @@ class ExplainerBase:
         validity = np.zeros(len(model_outputs), dtype=np.int32)
         for i in range(len(model_outputs)):
             pred = model_outputs[i]
-            if self.model.model_type == "classifier":
+            if self.model.model_type == ModelTypes.Classifier:
                 if self.num_output_nodes == 2: # binary
                     pred_1 = pred[self.num_output_nodes-1]
                     validity[i] = 1 if ((self.target_cf_class == 0 and pred_1<= self.stopping_threshold) or (self.target_cf_class == 1 and pred_1>= self.stopping_threshold)) else 0
                 else: # multiclass
                     if np.argmax(pred) == self.target_cf_class:
                         validity[i] = 1
-            elif self.model.model_type == "regressor":
+            elif self.model.model_type == ModelTypes.Regressor:
                 if self.target_cf_range[0] <= pred <= self.target_cf_range[1]:
                     validity[i] = 1
         return validity
@@ -499,11 +500,11 @@ class ExplainerBase:
         """
         # Converting to single prediction if the prediction is provided as a
         # singleton array
-        correct_dim = 1 if self.model.model_type == "classifier" else 0
+        correct_dim = 1 if self.model.model_type == ModelTypes.Classifier else 0
         if hasattr(model_score, "shape") and len(model_score.shape) > correct_dim:
             model_score = model_score[0]
         # Converting target_cf_class to a scalar (tf/torch have it as (1,1) shape)
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             target_cf_class = self.target_cf_class
             if hasattr(self.target_cf_class, "shape"):
                 if len(self.target_cf_class.shape) == 1:
@@ -521,24 +522,20 @@ class ExplainerBase:
                 validity = True if ((target_cf_class == 0 and pred_1<= self.stopping_threshold) or (target_cf_class == 1 and pred_1>= self.stopping_threshold)) else False
                 return validity
             else:  # multiclass
-                if np.argmax(model_score) == target_cf_class:
-                    return True
-        elif self.model.model_type == "regressor":
-            if self.target_cf_range[0] <= model_score <= self.target_cf_range[1]:
-                return True
-            else:
-                return False
+                return np.argmax(model_score) == target_cf_class
+        else:
+            return self.target_cf_range[0] <= model_score and model_score <= self.target_cf_range[1]
 
     def get_model_output_from_scores(self, model_scores):
-        if self.model.model_type == "classifier":
+        if self.model.model_type == ModelTypes.Classifier:
             output_type = np.int32
         else:
             output_type = np.float32
         model_output = np.zeros(len(model_scores), dtype=output_type)
         for i in range(len(model_scores)):
-            if self.model.model_type == "classifier":
+            if self.model.model_type == ModelTypes.Classifier:
                 model_output[i] = np.argmax(model_scores[i])
-            elif self.model.model_type == "regressor":
+            elif self.model.model_type == ModelTypes.Regressor:
                 model_output[i] = model_scores[i]
         return model_output
 
@@ -576,10 +573,10 @@ class ExplainerBase:
 
         # segmenting the dataset according to outcome
         dataset_with_predictions = None
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             dataset_with_predictions = data_df_copy.loc[[i == desired_class for i in predictions]].copy()
 
-        elif self.model.model_type == 'regressor':
+        elif self.model.model_type == ModelTypes.Regressor:
             dataset_with_predictions = data_df_copy.loc[
                 [desired_range[0] <= pred <= desired_range[1] for pred in predictions]].copy()
 
