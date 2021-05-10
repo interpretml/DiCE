@@ -40,7 +40,7 @@ jobs:
     - name: Test with pytest
       run: |
         # pytest
-        pytest tests/ -n 3 --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
+        pytest tests/ -n auto --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
     - name: Upload code coverage results
       uses: actions/upload-artifact@v2
       with:
