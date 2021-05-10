@@ -297,15 +297,11 @@ class DiceGenetic(ExplainerBase):
 
     def predict_fn_scores(self, input_instance):
         """returns predictions"""
-        input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance)
+        return self.predict_fn(input_instance)
 
     def predict_fn(self, input_instance):
         input_instance = self.label_decode(input_instance)
-        # TODO this line needs to change---we should not call model.model directly here.
-        # That functionality should be in the model class
-        output = self.model.model.predict(input_instance)
-        return output
+        return self.model.get_output(input_instance)
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""

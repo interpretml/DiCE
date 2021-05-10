@@ -307,9 +307,13 @@ class ExplainerBase:
             local_importance=local_importances,
             summary_importance=summary_importance)
 
+    def predict_fn(self, input_instance):
+        """prediction function"""
+        return self.model.get_output(input_instance)
+
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        return self.model.get_output(input_instance)
+        return self.predict_fn(input_instance)
 
     def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, query_instance, posthoc_sparsity_param,
                                         posthoc_sparsity_algorithm):
