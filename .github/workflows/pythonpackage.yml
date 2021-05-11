@@ -26,7 +26,6 @@ jobs:
             python-version: 3.8
           - os: windows-latest
             python-version: 3.8
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.os }}
@@ -36,9 +35,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [ -f requirements-deeplearning.txt ]; then pip install -r requirements-deeplearning.txt; fi
+        pip install -r requirements-test.txt
+        pip install -r requirements.txt
+        pip install -r requirements-deeplearning.txt
         pip install nbformat jupyter
     - name: Lint with flake8
       run: |
