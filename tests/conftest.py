@@ -38,7 +38,7 @@ def regression_exp_object(method="random"):
     return exp
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def public_data_object():
     """
     Returns a public data object for the adult income dataset
