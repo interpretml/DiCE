@@ -1,6 +1,8 @@
 import pytest
 from collections import OrderedDict
 import pandas as pd
+from sklearn.datasets import load_iris, load_boston
+from sklearn.model_selection import train_test_split
 import dice_ml
 from dice_ml.utils import helpers
 
@@ -119,3 +121,22 @@ def sample_custom_query_10():
             'Numerical': [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
         }
     )
+
+
+@pytest.fixture
+def create_iris_data():
+    iris = load_iris()
+    x_train, x_test, y_train, y_test = train_test_split(
+        iris.data, iris.target, test_size=0.2, random_state=0)
+    feature_names = iris.feature_names
+    classes = iris.target_names
+    return x_train, x_test, y_train, y_test, feature_names, classes
+
+
+@pytest.fixture
+def create_boston_data():
+    boston = load_boston()
+    x_train, x_test, y_train, y_test = train_test_split(
+        boston.data, boston.target,
+        test_size=0.2, random_state=7)
+    return x_train, x_test, y_train, y_test, boston.feature_names
