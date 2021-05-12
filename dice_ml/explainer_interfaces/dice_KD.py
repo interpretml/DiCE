@@ -128,7 +128,7 @@ class DiceKD(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """returns predictions"""
-        return self.model.get_output(input_instance, model_score=True)
+        return self.model.get_output(input_instance, model_score=False)
 
     def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
         cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)

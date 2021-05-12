@@ -28,7 +28,7 @@ class TestModelClassification:
         assert prediction_probabilities.shape[0] == x_test.shape[0]
         assert prediction_probabilities.shape[1] == len(classes)
 
-        predictions = diceml_model.get_output(x_test, model_score=True).reshape(-1, 1)
+        predictions = diceml_model.get_output(x_test, model_score=False).reshape(-1, 1)
         assert predictions.shape[0] == x_test.shape[0]
         assert predictions.shape[1] == 1
         assert np.all(np.unique(predictions) == np.unique(y_test))
@@ -61,7 +61,7 @@ class TestModelRegression:
         assert prediction_probabilities.shape[0] == x_test.shape[0]
         assert prediction_probabilities.shape[1] == 1
 
-        predictions = diceml_model.get_output(x_test, model_score=True).reshape(-1, 1)
+        predictions = diceml_model.get_output(x_test, model_score=False).reshape(-1, 1)
         assert predictions.shape[0] == x_test.shape[0]
         assert predictions.shape[1] == 1
 

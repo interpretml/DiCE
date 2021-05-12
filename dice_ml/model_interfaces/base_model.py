@@ -38,14 +38,14 @@ class BaseModel:
             with open(self.model_path, 'rb') as filehandle:
                 self.model = pickle.load(filehandle)
 
-    def get_output(self, input_instance, model_score=False):
+    def get_output(self, input_instance, model_score=True):
         """returns prediction probabilities for a classifier and the predicted output for a regressor.
 
         :returns: an array of output scores for a classifier, and a singleton
         array of predicted value for a regressor.
         """
         input_instance = self.transformer.transform(input_instance)
-        if not model_score:
+        if model_score:
             if self.model_type == "classifier":
                 return self.model.predict_proba(input_instance)
             else:

@@ -303,7 +303,7 @@ class DiceGenetic(ExplainerBase):
     def predict_fn(self, input_instance):
         """Returns actual prediction."""
         input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance, model_score=True)
+        return self.model.get_output(input_instance, model_score=False)
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
