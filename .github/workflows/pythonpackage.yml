@@ -33,7 +33,6 @@ jobs:
         pip install -r requirements-test.txt
         pip install -r requirements.txt
         pip install -r requirements-deeplearning.txt
-        pip install nbformat jupyter
     - name: Lint code with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -43,7 +42,7 @@ jobs:
     - name: Lint notebooks with flake8_nb
       run: |
         # stop the build if there are flake8 errors in notebooks
-        flake8_nb docs/source/notebooks/
+        flake8_nb docs/source/notebooks/ --statistics --max-line-length=127
     - name: Test with pytest
       run: |
         # pytest
