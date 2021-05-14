@@ -4,9 +4,10 @@
 
 from dice_ml.constants import BackEndTypes, SamplingStrategy
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
-class Dice:
+class Dice(ExplainerBase):
     """An interface class to different DiCE implementations."""
 
     def __init__(self, data_interface, model_interface, method="random",  **kwargs):
@@ -22,6 +23,13 @@ class Dice:
         """Decides DiCE implementation type."""
         self.__class__ = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
+
+    def _generate_counterfactuals(self, query_instance, total_CFs,
+                                  desired_class="opposite", desired_range=None,
+                                  permitted_range=None, features_to_vary="all",
+                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                  posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+        pass
 
 
 def decide(model_interface, method):
