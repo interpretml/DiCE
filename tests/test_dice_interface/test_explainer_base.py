@@ -1,5 +1,6 @@
 import pytest
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class TestExplainerBaseBinaryClassification:
@@ -42,3 +43,10 @@ class TestExplainerBaseRegression:
                     query_instances=[sample_custom_query_1],
                     total_CFs=0,
                     desired_class=desired_class)
+
+
+class TestExplainerBase:
+
+    def test_instantiating_explainer_base(self, public_data_object):
+        with pytest.raises(TypeError):
+            ExplainerBase(data_interface=public_data_object)
