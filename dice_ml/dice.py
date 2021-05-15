@@ -29,7 +29,8 @@ class Dice(ExplainerBase):
                                   permitted_range=None, features_to_vary="all",
                                   stopping_threshold=0.5, posthoc_sparsity_param=0.1,
                                   posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
-        pass
+        raise NotImplementedError("This method should be implemented by the concrete classes "
+                                  "that inherit from ExplainerBase")
 
 
 def decide(model_interface, method):
