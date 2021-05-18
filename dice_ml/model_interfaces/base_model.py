@@ -62,6 +62,6 @@ class BaseModel:
         return self.get_output(temp_input).shape[1]
 
     def get_num_output_nodes2(self, input):
-        if self.model_type == 'regressor':
+        if self.model_type == ModelTypes.Regressor:
             raise SystemException('Number of output nodes not supported for regression')
         return self.get_output(input).shape[1]

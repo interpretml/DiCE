@@ -3,7 +3,7 @@
 The implementations contain methods to access the output or gradients of ML models trained based on different
 frameworks such as Tensorflow or PyTorch.
 """
-
+import warnings
 from dice_ml.constants import BackEndTypes, ModelTypes
 from dice_ml.utils.exception import UserConfigValidationException
 
@@ -30,7 +30,7 @@ class Model:
                         to the dictionary of kw_args, by default.
         """
         if backend not in BackEndTypes.ALL:
-            raise UserConfigValidationException('{0} backend not in supported backends {1}'.format(
+            warnings.warn('{0} backend not in supported backends {1}'.format(
                 backend, ','.join(BackEndTypes.ALL))
             )
 
