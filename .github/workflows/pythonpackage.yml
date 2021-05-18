@@ -45,6 +45,11 @@ jobs:
         # pytest
         pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
         cat coverage.xml
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: junit/test-results.xml
     - name: Upload code coverage results
       uses: actions/upload-artifact@v2
       with:
