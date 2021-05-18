@@ -233,7 +233,3 @@ class DiceRandom(ExplainerBase):
             result = np.random.uniform(low, high+(10**-precision), size)
             result = [round(r, precision) for r in result]
         return result
-
-    def predict_fn(self, input_instance):
-        """prediction function"""
-        return self.model.get_output(input_instance)

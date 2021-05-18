@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 from dice_ml.utils.helpers import DataTransfomer
 from dice_ml.constants import ModelTypes
+from dice_ml.utils.exception import SystemException
 
 
 class BaseModel:
@@ -38,16 +39,18 @@ class BaseModel:
             with open(self.model_path, 'rb') as filehandle:
                 self.model = pickle.load(filehandle)
 
-    def get_output(self, input_instance):
-        """returns prediction probabilities for a classifier and the
-        predicted output for a regressor.
+    def get_output(self, input_instance, model_score=True):
+        """returns prediction probabilities for a classifier and the predicted output for a regressor.
 
         :returns: an array of output scores for a classifier, and a singleton
         array of predicted value for a regressor.
         """
         input_instance = self.transformer.transform(input_instance)
-        if self.model_type == ModelTypes.Classifier:
-            return self.model.predict_proba(input_instance)
+        if model_score:
+            if self.model_type == ModelTypes.Classifier:
+                return self.model.predict_proba(input_instance)
+            else:
+                return self.model.predict(input_instance)
         else:
             return self.model.predict(input_instance)
 
@@ -59,4 +62,6 @@ class BaseModel:
         return self.get_output(temp_input).shape[1]
 
     def get_num_output_nodes2(self, input):
+        if self.model_type == 'regressor':
+            raise SystemException('Number of output nodes not supported for regression')
         return self.get_output(input).shape[1]
