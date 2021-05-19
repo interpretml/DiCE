@@ -84,12 +84,12 @@ class TestErrorCasesPublicDataInterface:
                 dice_ml.Data(dataframe=dataset, continuous_features=None,
                              outcome_name='target')
 
-            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)  
+            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         else:
             with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, outcome_name='target')
 
-            assert 'continuous_features should be provided' in str(ve) 
+            assert 'continuous_features should be provided' in str(ve)
 
     @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
                                            DataTypeCombinations.AsNone,
@@ -110,7 +110,7 @@ class TestErrorCasesPublicDataInterface:
                 dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                              outcome_name=None)
 
-            assert "should provide the name of outcome feature as a string" in str(ve)       
+            assert "should provide the name of outcome feature as a string" in str(ve)
         else:
             with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, continuous_features=feature_names)
