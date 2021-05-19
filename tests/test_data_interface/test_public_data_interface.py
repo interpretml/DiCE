@@ -1,3 +1,4 @@
+from enum import Enum
 import numpy as np
 import pytest
 from sklearn.datasets import load_iris
@@ -34,39 +35,87 @@ class TestPublicDataMethods:
         assert self.d.get_decimal_precisions()[1] == 2
 
 
+class DataTypeCombinations(Enum):
+    Incorrect = 1
+    AsNone = 2
+    Omitted = 2
+
+
 class TestErrorCasesPublicDataInterface:
-    def test_invalid_dataframe(self):
+    @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
+                                           DataTypeCombinations.AsNone,
+                                           DataTypeCombinations.Omitted])
+    def test_invalid_dataframe(self, data_type):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
         dataset = iris.frame
 
-        with pytest.raises(ValueError) as ve:
-            dice_ml.Data(dataframe=dataset.values, continuous_features=feature_names,
-                         outcome_name='target')
+        if data_type == DataTypeCombinations.Incorrect:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset.values, continuous_features=feature_names,
+                             outcome_name='target')
+            assert "should provide a pandas dataframe" in str(ve)
+        elif data_type == DataTypeCombinations.AsNone:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=None, continuous_features=feature_names,
+                             outcome_name='target')
+            assert "should provide a pandas dataframe" in str(ve)
+        else:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(continuous_features=feature_names,
+                             outcome_name='target')
+            assert "dataframe not found in params" in str(ve)
 
-        assert "should provide a pandas dataframe" in str(ve)
-
-    def test_invalid_continuous_features(self):
+    @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
+                                           DataTypeCombinations.AsNone,
+                                           DataTypeCombinations.Omitted])
+    def test_invalid_continuous_features(self, data_type):
         iris = load_iris(as_frame=True)
-        feature_names = np.array(iris.feature_names)
         dataset = iris.frame
 
-        with pytest.raises(ValueError) as ve:
-            dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
-                         outcome_name='target')
+        if data_type == DataTypeCombinations.Incorrect:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, continuous_features=np.array(iris.feature_names),
+                             outcome_name='target')
 
-        assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
+            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
+        elif data_type == DataTypeCombinations.AsNone:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, continuous_features=None,
+                             outcome_name='target')
 
-    def test_invalid_outcome_name(self):
+            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)  
+        else:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, outcome_name='target')
+
+            assert 'continuous_features should be provided' in str(ve) 
+
+    @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
+                                           DataTypeCombinations.AsNone,
+                                           DataTypeCombinations.Omitted])
+    def test_invalid_outcome_name(self, data_type):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
         dataset = iris.frame
 
-        with pytest.raises(ValueError) as ve:
-            dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
-                         outcome_name=1)
+        if data_type == DataTypeCombinations.Incorrect:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                             outcome_name=1)
 
-        assert "should provide the name of outcome feature as a string" in str(ve)
+            assert "should provide the name of outcome feature as a string" in str(ve)
+        elif data_type == DataTypeCombinations.AsNone:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                             outcome_name=None)
+
+            assert "should provide the name of outcome feature as a string" in str(ve)       
+        else:
+            with pytest.raises(ValueError) as ve:
+                dice_ml.Data(dataframe=dataset, continuous_features=feature_names)
+
+            assert "should provide the name of outcome feature" in str(ve)
 
     def test_not_found_outcome_name(self):
         iris = load_iris(as_frame=True)

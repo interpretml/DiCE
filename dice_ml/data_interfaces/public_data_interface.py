@@ -6,10 +6,11 @@ import numpy as np
 import logging
 from collections import defaultdict
 
-from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.data_interfaces.base_data_interface import _BaseData
+from dice_ml.utils.exception import SystemException, UserConfigValidationException
 
 
-class PublicData:
+class PublicData(_BaseData):
     """A data interface for public data. This class is an interface to DiCE explainers
        and contains methods to transform user-fed raw data into the format a DiCE explainer
        requires, and vice versa."""
@@ -24,31 +25,10 @@ class PublicData:
                                            Defaults to the range inferred from training data.
         :param continuous_features_precision (optional): Dictionary with feature names as keys and precisions as values.
         :param data_name (optional): Dataset name
-
         """
-
-        if isinstance(params['dataframe'], pd.DataFrame):
-            self.data_df = params['dataframe']
-        else:
-            raise ValueError("should provide a pandas dataframe")
-
-        if type(params['continuous_features']) is list:
-            self.continuous_feature_names = params['continuous_features']
-        else:
-            raise ValueError(
-                "should provide the name(s) of continuous features in the data as a list")
-
-        if type(params['outcome_name']) is str:
-            self.outcome_name = params['outcome_name']
-        else:
-            raise ValueError("should provide the name of outcome feature as a string")
-
-        if params['outcome_name'] not in self.data_df.columns.tolist():
-            raise UserConfigValidationException(
-                "outcome_name {0} not found in {1}".format(
-                    params['outcome_name'], ','.join(self.data_df.columns.tolist())
-                )
-            )
+        self._validate_and_set_outcome_name(params=params)
+        self._validate_and_set_dataframe(params=params)
+        self._validate_and_set_continuous_features(params=params)
 
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
@@ -69,15 +49,7 @@ class PublicData:
         self.categorical_feature_indexes = [self.data_df.columns.get_loc(
             name) for name in self.categorical_feature_names if name in self.data_df]
 
-        if 'continuous_features_precision' in params:
-            self.continuous_features_precision = params['continuous_features_precision']
-            for continuous_features_precision_feature_name in self.continuous_features_precision:
-                if continuous_features_precision_feature_name not in self.feature_names:
-                    raise UserConfigValidationException(
-                        "continuous_features_precision contains some feature names which are not part of columns in dataframe"
-                    )
-        else:
-            self.continuous_features_precision = None
+        self._validate_and_set_continuous_features_precision(params=params)
 
         if len(self.categorical_feature_names) > 0:
             for feature in self.categorical_feature_names:
@@ -109,25 +81,74 @@ class PublicData:
         #     self.labelencoder[column] = LabelEncoder()
         #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
 
-        input_permitted_range = None
-        if 'permitted_range' in params:
-            input_permitted_range = params['permitted_range']
-            for input_permitted_range_feature_name in input_permitted_range:
-                if input_permitted_range_feature_name not in self.feature_names:
-                    raise UserConfigValidationException(
-                        "permitted_range contains some feature names which are not part of columns in dataframe"
-                    )
-        self.permitted_range, feature_ranges_orig = self.get_features_range(input_permitted_range)
+        self._validate_and_set_permitted_range(params=params)
 
         # should move the below snippet to model agnostic dice interfaces
         # self.max_range = -np.inf
         # for feature in self.continuous_feature_names:
         #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
 
-        if 'data_name' in params:
-            self.data_name = params['data_name']
+        self._validate_and_set_data_name(params=params)
+
+    def _validate_and_set_dataframe(self, params):
+        """Validate and set the dataframe."""
+        if 'dataframe' not in params:
+            raise ValueError("dataframe not found in params")
+
+        if isinstance(params['dataframe'], pd.DataFrame):
+            self.data_df = params['dataframe']
         else:
-            self.data_name = 'mydata'
+            raise ValueError("should provide a pandas dataframe")
+
+        if 'outcome_name' in params and params['outcome_name'] not in self.data_df.columns.tolist():
+            raise UserConfigValidationException(
+                "outcome_name {0} not found in {1}".format(
+                    params['outcome_name'], ','.join(self.data_df.columns.tolist())
+                )
+            )
+
+    def _validate_and_set_continuous_features(self, params):
+        """Validate and set the list of continuous features."""
+        if 'continuous_features' not in params:
+            raise ValueError('continuous_features should be provided')
+
+        if type(params['continuous_features']) is list:
+            self.continuous_feature_names = params['continuous_features']
+        else:
+            raise ValueError(
+                "should provide the name(s) of continuous features in the data as a list")
+
+    def _validate_and_set_continuous_features_precision(self, params):
+        """Validate and set the dictionary of precision for continuous features."""
+        if 'continuous_features_precision' in params:
+            self.continuous_features_precision = params['continuous_features_precision']
+
+            if not hasattr(self, 'feature_names'):
+                raise SystemException('Feature names not correctly set in public data interface')
+
+            for continuous_features_precision_feature_name in self.continuous_features_precision:
+                if continuous_features_precision_feature_name not in self.feature_names:
+                    raise UserConfigValidationException(
+                        "continuous_features_precision contains some feature names which are not part of columns in dataframe"
+                    )
+        else:
+            self.continuous_features_precision = None
+
+    def _validate_and_set_permitted_range(self, params):
+        """Validate and set the dictionary of permitted ranges for continuous features."""
+        input_permitted_range = None
+        if 'permitted_range' in params:
+            input_permitted_range = params['permitted_range']
+
+            if not hasattr(self, 'feature_names'):
+                raise SystemException('Feature names not correctly set in public data interface')
+
+            for input_permitted_range_feature_name in input_permitted_range:
+                if input_permitted_range_feature_name not in self.feature_names:
+                    raise UserConfigValidationException(
+                        "permitted_range contains some feature names which are not part of columns in dataframe"
+                    )
+        self.permitted_range, _ = self.get_features_range(input_permitted_range)
 
     def get_features_range(self, permitted_range_input=None):
         ranges = {}

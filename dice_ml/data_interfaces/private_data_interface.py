@@ -6,11 +6,13 @@ import numpy as np
 import collections
 import logging
 
+from dice_ml.data_interfaces.base_data_interface import _BaseData
+
 
 logging.basicConfig(level=logging.NOTSET)
 
 
-class PrivateData:
+class PrivateData(_BaseData):
     """A data interface for private data with meta information."""
 
     def __init__(self, params):
@@ -42,15 +44,8 @@ class PrivateData:
                 "(for continuous features) or categories (for categorical features) as values. "
                 "For python version <3.6, should provide an OrderedDict")
 
-        if type(params['outcome_name']) is str:
-            self.outcome_name = params['outcome_name']
-        else:
-            raise ValueError("should provide the name of outcome feature")
-
-        if 'type_and_precision' in params:
-            self.type_and_precision = params['type_and_precision']
-        else:
-            self.type_and_precision = {}
+        self._validate_and_set_outcome_name(params=params)
+        self._validate_and_set_type_and_precision(params=params)
 
         self.continuous_feature_names = []
         self.permitted_range = {}
@@ -65,10 +60,7 @@ class PrivateData:
                 self.categorical_feature_names.append(feature)
                 self.categorical_levels[feature] = features_dict[feature]
 
-        if 'mad' in params:
-            self.mad = params['mad']
-        else:
-            self.mad = {}
+        self._validate_and_set_mad(params=params)
 
         # self.continuous_feature_names + self.categorical_feature_names
         self.feature_names = list(features_dict.keys())
@@ -97,10 +89,21 @@ class PrivateData:
                 # for feature in self.continuous_feature_names:
                 #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
 
-        if 'data_name' in params:
-            self.data_name = params['data_name']
+        self._validate_and_set_data_name(params=params)
+
+    def _validate_and_set_type_and_precision(self, params):
+        """Validate and set the type and precision."""
+        if 'type_and_precision' in params:
+            self.type_and_precision = params['type_and_precision']
         else:
-            self.data_name = 'mydata'
+            self.type_and_precision = {}
+
+    def _validate_and_set_mad(self, params):
+        """Validate and set the MAD."""
+        if 'mad' in params:
+            self.mad = params['mad']
+        else:
+            self.mad = {}
 
     def one_hot_encode_data(self, data):
         """One-hot-encodes the data."""
