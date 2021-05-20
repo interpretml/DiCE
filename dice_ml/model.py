@@ -3,14 +3,15 @@
 The implementations contain methods to access the output or gradients of ML models trained based on different
 frameworks such as Tensorflow or PyTorch.
 """
-
-from dice_ml.constants import BackEndTypes
+import warnings
+from dice_ml.constants import BackEndTypes, ModelTypes
 from dice_ml.utils.exception import UserConfigValidationException
 
 
 class Model:
     """An interface class to different ML Model implementations."""
-    def __init__(self, model=None, model_path='', backend='TF1', model_type='classifier', func=None, kw_args=None):
+    def __init__(self, model=None, model_path='', backend=BackEndTypes.Tensorflow1, model_type=ModelTypes.Classifier,
+                 func=None, kw_args=None):
         """Init method
 
         :param model: trained ML model.
@@ -28,6 +29,16 @@ class Model:
         :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended
                         to the dictionary of kw_args, by default.
         """
+        if backend not in BackEndTypes.ALL:
+            warnings.warn('{0} backend not in supported backends {1}'.format(
+                backend, ','.join(BackEndTypes.ALL))
+            )
+
+        if model_type not in ModelTypes.ALL:
+            raise UserConfigValidationException('{0} model type not in supported model types {1}'.format(
+                model_type, ','.join(ModelTypes.ALL))
+            )
+
         self.model_type = model_type
         if((model is None) & (model_path == '')):
             raise ValueError("should provide either a trained model or the path to a model")
@@ -66,7 +77,7 @@ def decide(backend):
         try:
             import torch  # noqa: F401
         except ImportError:
-            raise UserConfigValidationException("Unable to import torch. Please install torch")
+            raise UserConfigValidationException("Unable to import torch. Please install torch from https://pytorch.org/")
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel
         return PyTorchModel
 

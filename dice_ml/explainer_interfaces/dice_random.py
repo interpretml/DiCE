@@ -10,6 +10,7 @@ import random
 import timeit
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.constants import ModelTypes
 
 
 class DiceRandom(ExplainerBase):
@@ -72,15 +73,15 @@ class DiceRandom(ExplainerBase):
 
         # number of output nodes of ML model
         self.num_output_nodes = None
-        if self.model.model_type == "classifier":
+        if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = model_predictions.shape[1]
 
         # query_instance need no transformation for generating CFs using random sampling.
         # find the predicted value of query_instance
         test_pred = model_predictions[0]
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             self.target_cf_class = self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)
-        elif self.model.model_type == 'regressor':
+        elif self.model.model_type == ModelTypes.Regressor:
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
@@ -95,7 +96,7 @@ class DiceRandom(ExplainerBase):
                     self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         self.stopping_threshold = stopping_threshold
-        if self.model.model_type == "classifier":
+        if self.model.model_type == ModelTypes.Classifier:
             # TODO Generalize this for multi-class
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
                 self.stopping_threshold = 0.25
