@@ -66,7 +66,7 @@ def decide(backend):
         try:
             import torch  # noqa: F401
         except ImportError:
-            raise UserConfigValidationException("Unable to import torch. Please install torch")
+            raise UserConfigValidationException("Unable to import torch. Please install torch from https://pytorch.org/")
         from dice_ml.model_interfaces.pytorch_model import PyTorchModel
         return PyTorchModel
 
