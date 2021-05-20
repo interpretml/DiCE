@@ -11,6 +11,7 @@ import copy
 from sklearn.preprocessing import LabelEncoder
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.constants import ModelTypes
 
 
 class DiceGenetic(ExplainerBase):
@@ -24,7 +25,7 @@ class DiceGenetic(ExplainerBase):
         super().__init__(data_interface, model_interface)  # initiating data related parameters
 
         # number of output nodes of ML model
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(
                 self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
@@ -308,7 +309,7 @@ class DiceGenetic(ExplainerBase):
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             predicted_value = np.array(self.predict_fn_scores(cfs))
             if self.yloss_type == 'hinge_loss':
                 maxvalue = np.full((len(predicted_value)), -np.inf)
@@ -318,7 +319,7 @@ class DiceGenetic(ExplainerBase):
                 yloss = np.maximum(0, maxvalue - predicted_value[:, int(desired_class)])
             return yloss
 
-        elif self.model.model_type == 'regressor':
+        elif self.model.model_type == ModelTypes.Regressor:
             predicted_value = self.predict_fn(cfs)
             if self.yloss_type == 'hinge_loss':
                 yloss = np.zeros(len(predicted_value))
@@ -397,8 +398,8 @@ class DiceGenetic(ExplainerBase):
 
         while iterations < maxiterations and self.total_CFs > 0:
             if abs(previous_best_loss - current_best_loss) <= thresh and \
-                (self.model.model_type == 'classifier' and all(i == desired_class for i in cfs_preds) or
-                    (self.model.model_type == 'regressor' and
+                (self.model.model_type == ModelTypes.Classifier and all(i == desired_class for i in cfs_preds) or
+                    (self.model.model_type == ModelTypes.Regressor and
                      all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:

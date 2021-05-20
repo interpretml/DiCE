@@ -9,6 +9,7 @@ import pandas as pd
 import copy
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.constants import ModelTypes
 
 
 class DiceKD(ExplainerBase):
@@ -36,7 +37,7 @@ class DiceKD(ExplainerBase):
         self.model.load_model()
 
         # number of output nodes of ML model
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(
                 self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
@@ -91,7 +92,7 @@ class DiceKD(ExplainerBase):
             if desired_range[0] > desired_range[1]:
                 raise ValueError("Invalid Range!")
 
-        if desired_class == "opposite" and self.model.model_type == 'classifier':
+        if desired_class == "opposite" and self.model.model_type == ModelTypes.Classifier:
             if self.num_output_nodes == 2:
                 desired_class = 1.0 - test_pred
 

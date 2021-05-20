@@ -2,7 +2,7 @@ import pandas as pd
 import copy
 import json
 from dice_ml.utils.serialize import DummyDataInterface
-from dice_ml.constants import _SchemaVersions
+from dice_ml.constants import _SchemaVersions, ModelTypes
 
 
 class _DiverseCFV1SchemaConstants:
@@ -36,10 +36,10 @@ def json_converter(obj):
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
-
     def __init__(self, data_interface=None, final_cfs_df=None, test_instance_df=None,
                  final_cfs_df_sparse=None, posthoc_sparsity_param=0,
-                 desired_range=None, desired_class="opposite", model_type='classifier'):
+                 desired_range=None, desired_class="opposite",
+                 model_type=ModelTypes.Classifier):
 
         self.data_interface = data_interface
         self.final_cfs_df = final_cfs_df
@@ -53,12 +53,12 @@ class CounterfactualExamples:
         self.posthoc_sparsity_param = posthoc_sparsity_param  # might be useful for future additions
 
         self.test_pred = self.test_instance_df[self.data_interface.outcome_name].iat[0]
-        if model_type == 'classifier':
+        if model_type == ModelTypes.Classifier:
             if desired_class == "opposite":
                 self.new_outcome = 1.0 - round(self.test_pred)
             else:
                 self.new_outcome = desired_class
-        elif model_type == 'regressor':
+        elif model_type == ModelTypes.Regressor:
             self.new_outcome = desired_range
 
     def __eq__(self, other_counterfactual_example):

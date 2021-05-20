@@ -7,11 +7,20 @@ class BackEndTypes:
     Tensorflow2 = 'TF2'
     Pytorch = 'PYT'
 
+    ALL = [Sklearn, Tensorflow1, Tensorflow2, Pytorch]
+
 
 class SamplingStrategy:
     Random = 'random'
     Genetic = 'genetic'
     KdTree = 'kdtree'
+
+
+class ModelTypes:
+    Classifier = 'classifier'
+    Regressor = 'regressor'
+
+    ALL = [Classifier, Regressor]
 
 
 class _SchemaVersions:
