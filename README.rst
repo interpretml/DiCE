@@ -61,6 +61,8 @@ If you face any problems, try installing dependencies manually.
     pip install -r requirements.txt
     # Additional dependendies for deep learning models
     pip install -r requirements-deeplearning.txt
+    # For running unit tests
+    pip install -r requirements-test.txt
 
 DiCE requires the following packages:
 
@@ -68,6 +70,7 @@ DiCE requires the following packages:
 * scikit-learn
 * pandas
 * h5py
+* tqdm
 * [optional] tensorflow/pytorch (works with Tensorflow>=1.13)
 
 
