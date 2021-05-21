@@ -6,8 +6,10 @@ private data whose meta data are only available (such as the feature names and
 range/levels of different features) by specifying appropriate parameters.
 """
 
+from dice_ml.data_interfaces.base_data_interface import _BaseData
 
-class Data:
+
+class Data(_BaseData):
     """Class containing all required information about the data for DiCE."""
 
     def __init__(self, **params):
