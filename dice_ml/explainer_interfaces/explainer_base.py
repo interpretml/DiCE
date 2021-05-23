@@ -45,6 +45,24 @@ class ExplainerBase(ABC):
         # self.cont_precisions = \
         #   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
+    def _validate_counterfactual_configuration(
+        self, query_instances, total_CFs,
+        desired_class="opposite", desired_range=None,
+        permitted_range=None, features_to_vary="all",
+        stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+        posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+
+        if total_CFs <= 0:
+            raise UserConfigValidationException(
+                "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")  
+
+        from dice_ml.constants import _PostHocSparsityTypes
+        if posthoc_sparsity_algorithm not in _PostHocSparsityTypes.ALL:
+            raise UserConfigValidationException(
+                'The posthoc_sparsity_algorithm should be {0} and not {1}'.format(
+                    ','.join(_PostHocSparsityTypes.ALL),posthoc_sparsity_algorithm)
+                )
+        
     def generate_counterfactuals(self, query_instances, total_CFs,
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
