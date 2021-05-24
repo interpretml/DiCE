@@ -26,6 +26,10 @@ elif os.getcwd() not in os.environ['PYTHONPATH'].split(os.pathsep):
 
 
 def _check_notebook_cell_outputs(filepath):
+    """Convert notebook via nbconvert, collect output and assert if any output cells are not empty.
+
+    :param filepath: file path for the notebook
+    """
     with tempfile.NamedTemporaryFile(suffix=".ipynb") as fout:
         args = ["jupyter", "nbconvert", "--to", "notebook",
                 "-y", "--no-prompt",
@@ -41,11 +45,12 @@ def _check_notebook_cell_outputs(filepath):
 
 
 def _notebook_run(filepath):
-    """ Execute a notebook via nbconvert and collect output.
-        :param filepath: file path for the notebook
-        :returns (parsed nb object, execution errors)
+    """Execute a notebook via nbconvert and collect output.
 
-       Source of this function: http://www.christianmoscardi.com/blog/2016/01/20/jupyter-testing.html
+    Source of this function: http://www.christianmoscardi.com/blog/2016/01/20/jupyter-testing.html
+
+    :param filepath: file path for the notebook
+    :returns (parsed nb object, execution errors)
     """
     with tempfile.NamedTemporaryFile(suffix=".ipynb") as fout:
         args = ["jupyter", "nbconvert", "--to", "notebook", "--execute",
