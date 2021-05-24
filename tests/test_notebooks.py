@@ -25,12 +25,32 @@ elif os.getcwd() not in os.environ['PYTHONPATH'].split(os.pathsep):
     os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + os.pathsep + os.getcwd()
 
 
-def _notebook_run(filepath):
-    """ Execute a notebook via nbconvert and collect output.
-        :param filepath: file path for the notebook
-        :returns (parsed nb object, execution errors)
+def _check_notebook_cell_outputs(filepath):
+    """Convert notebook via nbconvert, collect output and assert if any output cells are not empty.
 
-       Source of this function: http://www.christianmoscardi.com/blog/2016/01/20/jupyter-testing.html
+    :param filepath: file path for the notebook
+    """
+    with tempfile.NamedTemporaryFile(suffix=".ipynb") as fout:
+        args = ["jupyter", "nbconvert", "--to", "notebook",
+                "-y", "--no-prompt",
+                "--output", fout.name, filepath]
+        subprocess.check_call(args)
+        fout.seek(0)
+        nb = nbformat.read(fout, nbformat.current_nbformat)
+
+    for cell in nb.cells:
+        if "outputs" in cell:
+            if len(cell['outputs']) > 0:
+                assert False, "Output cell found in notebook. Please clean your notebook"
+
+
+def _notebook_run(filepath):
+    """Execute a notebook via nbconvert and collect output.
+
+    Source of this function: http://www.christianmoscardi.com/blog/2016/01/20/jupyter-testing.html
+
+    :param filepath: file path for the notebook
+    :returns (parsed nb object, execution errors)
     """
     with tempfile.NamedTemporaryFile(suffix=".ipynb") as fout:
         args = ["jupyter", "nbconvert", "--to", "notebook", "--execute",
@@ -64,5 +84,6 @@ for nb in notebooks_list:
 
 @pytest.mark.parametrize("notebook_filename", parameter_list)
 def test_notebook(notebook_filename):
+    _check_notebook_cell_outputs(NOTEBOOKS_PATH + notebook_filename)
     nb, errors = _notebook_run(NOTEBOOKS_PATH + notebook_filename)
     assert errors == []
