@@ -356,7 +356,7 @@ class DiceGenetic(ExplainerBase):
             feature_weights)
         product = product.reshape(-1, product.shape[-1])
         proximity_loss = np.sum(product,
-                                axis=1)  # Dividing by the sum of feature weights as that is the upper bound for proximity weight
+                                axis=1)  # Dividing by the sum of feature weights to normalize proximity loss
         return proximity_loss / sum(feature_weights)
 
     def compute_sparsity_loss(self, cfs):
