@@ -306,6 +306,21 @@ class DiceGenetic(ExplainerBase):
         input_instance = self.label_decode(input_instance)
         return self.model.get_output(input_instance, model_score=False)
 
+    def predict_fn_custom(self, input_instance, desired_class):
+        """Checks that the maximum predicted score lies in the desired class"""
+        input_instance = self.label_decode(input_instance)
+        output = self.model.get_output(input_instance, model_score=True)
+        desired_class = int(desired_class)
+        maxvalues = np.max(output, 1)
+        predicted_values = np.argmax(output, 1)
+
+        for i in range(len(output)):
+            if output[i][desired_class] == maxvalues[i]:
+                predicted_values[i] = desired_class
+
+        return predicted_values
+
+
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
@@ -335,13 +350,13 @@ class DiceGenetic(ExplainerBase):
         product = np.multiply((abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]),
                               feature_weights)
         product = product.reshape(-1, product.shape[-1])
-        proximity_loss = np.sum(product, axis=1)
-        return proximity_loss
+        proximity_loss = np.sum(product, axis=1) # Dividing by the sum of feature weights as that is the upper bound for proximity weight
+        return proximity_loss / sum(feature_weights)
 
     def compute_sparsity_loss(self, cfs):
         """Compute weighted distance between two vectors."""
         sparsity_loss = np.count_nonzero(cfs - self.x1, axis=1)
-        return sparsity_loss
+        return sparsity_loss/len(self.data_interface.feature_names) # Dividing by the number of features to normalize sparsity loss
 
     def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
@@ -414,8 +429,12 @@ class DiceGenetic(ExplainerBase):
 
             current_best_loss = population_fitness[0][1]
             to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
+
             if self.total_CFs > 0:
-                cfs_preds = self.predict_fn(to_pred)
+                if self.model.model_type == ModelTypes.Classifier:
+                    cfs_preds = self.predict_fn_custom(to_pred, desired_class)
+                else:
+                    cfs_preds = self.predict_fn(to_pred)
 
             # self.total_CFS of the next generation obtained from the fittest members of current generation
             top_members = self.total_CFs
