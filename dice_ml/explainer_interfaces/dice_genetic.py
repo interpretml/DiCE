@@ -369,7 +369,7 @@ class DiceGenetic(ExplainerBase):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
         self.proximity_loss = self.compute_proximity_loss(cfs,
-                                                          self.query_instance_normalized) if self.proximity_weight > 0 else 0.0
+                                                self.query_instance_normalized) if self.proximity_weight > 0 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
         self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss) +
                                         self.sparsity_weight * self.sparsity_loss), (-1, 1))
