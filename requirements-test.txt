@@ -7,3 +7,4 @@ ipython
 jsonschema
 nbformat
 jupyter
+pytest-mock
