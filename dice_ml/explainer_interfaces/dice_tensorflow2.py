@@ -120,9 +120,9 @@ class DiceTensorFlow2(ExplainerBase):
 
         # if([total_CFs, algorithm, features_to_vary] != self.cf_init_weights):
         self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
-        if([yloss_type, diversity_loss_type, feature_weights] != self.loss_weights):
+        if [yloss_type, diversity_loss_type, feature_weights] != self.loss_weights:
             self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights)
-        if([proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters):
+        if [proximity_weight, diversity_weight, categorical_penalty] != self.hyperparameters:
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
         final_cfs_df, test_instance_df, final_cfs_df_sparse = \
@@ -352,7 +352,7 @@ class DiceTensorFlow2(ExplainerBase):
             for v in self.encoded_categorical_feature_indexes:
                 maxs = np.argwhere(
                     cf[0, v[0]:v[-1]+1] == np.amax(cf[0, v[0]:v[-1]+1])).flatten().tolist()
-                if(len(maxs) > 1):
+                if len(maxs) > 1:
                     if self.tie_random:
                         ix = random.choice(maxs)
                     else:
@@ -378,8 +378,8 @@ class DiceTensorFlow2(ExplainerBase):
         """Determines the stopping condition for gradient descent."""
 
         # intermediate projections
-        if((self.project_iter > 0) & (itr > 0)):
-            if((itr % self.project_iter) == 0):
+        if self.project_iter > 0 and itr > 0:
+            if (itr % self.project_iter) == 0:
                 self.round_off_cfs(assign=True)
 
         # do GD for min iterations
@@ -500,7 +500,7 @@ class DiceTensorFlow2(ExplainerBase):
                     self.cfs[j].assign(clip_cf)
 
                 if verbose:
-                    if (iterations) % 50 == 0:
+                    if iterations % 50 == 0:
                         print('step %d,  loss=%g' % (iterations+1, loss_value))
 
                 loss_diff = abs(loss_value-prev_loss)
