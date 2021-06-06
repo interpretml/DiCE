@@ -312,9 +312,9 @@ class DiceGenetic(ExplainerBase):
     def _predict_fn_custom(self, input_instance, desired_class):
         """Checks that the maximum predicted score lies in the desired class."""
         """The reason we do so can be illustrated by
-        this example: If the predict probabilities are [0, 0.5, 0,5], the computed yloss is 0 as class 2 has the same 
-        value as the maximum score. sklearn's usual predict function, which implements argmax, returns class 1 instead 
-        of 2. This is why we need a custom predict function that returns the desired class if the maximum predict 
+        this example: If the predict probabilities are [0, 0.5, 0,5], the computed yloss is 0 as class 2 has the same
+        value as the maximum score. sklearn's usual predict function, which implements argmax, returns class 1 instead
+        of 2. This is why we need a custom predict function that returns the desired class if the maximum predict
         probability is the same as the probability of the desired class."""
 
         input_instance = self.label_decode(input_instance)
