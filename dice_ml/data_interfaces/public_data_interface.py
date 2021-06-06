@@ -146,9 +146,9 @@ class PublicData:
 
     def get_data_type(self, col):
         """Infers data type of a continuous feature from the training data."""
-        if (self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32):
+        if ((self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32)):
             return 'int'
-        elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32):
+        elif ((self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32)):
             return 'float'
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
@@ -404,10 +404,10 @@ class PublicData:
         precisions_dict = defaultdict(int)
         precisions = [0] * len(self.feature_names)
         for ix, col in enumerate(self.continuous_feature_names):
-            if (self.continuous_features_precision is not None) and (col in self.continuous_features_precision):
+            if ((self.continuous_features_precision is not None) and (col in self.continuous_features_precision)):
                 precisions[ix] = self.continuous_features_precision[col]
                 precisions_dict[col] = self.continuous_features_precision[col]
-            elif (self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64):
+            elif ((self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64)):
                 modes = self.data_df[col].mode()
                 maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
                 for mx in range(len(modes)):

@@ -452,7 +452,7 @@ class DiceTensorFlow1(ExplainerBase):
             for v in self.encoded_categorical_feature_indexes:
                 maxs = np.argwhere(
                     cf[0, v[0]:v[-1]+1] == np.amax(cf[0, v[0]:v[-1]+1])).flatten().tolist()
-                if len(maxs) > 1:
+                if(len(maxs) > 1):
                     if self.tie_random:
                         ix = random.choice(maxs)
                     else:
@@ -477,8 +477,8 @@ class DiceTensorFlow1(ExplainerBase):
         """Determines the stopping condition for gradient descent."""
 
         # intermediate projections
-        if self.project_iter > 0 and itr > 0:
-            if (itr % self.project_iter) == 0:
+        if((self.project_iter > 0) & (itr > 0)):
+            if((itr % self.project_iter) == 0):
                 self.round_off_cfs(assign=True)
 
         # do GD for min iterations

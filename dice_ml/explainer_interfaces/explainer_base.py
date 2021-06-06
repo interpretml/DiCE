@@ -395,7 +395,7 @@ class ExplainerBase(ABC):
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iat[0] - final_cfs_sparse[feature].iat[cf_ix]
-                if abs(diff) <= quantiles[feature]:
+                if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
                                                                  feature, final_cfs_sparse, current_pred)

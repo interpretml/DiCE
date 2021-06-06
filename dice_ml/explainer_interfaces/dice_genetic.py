@@ -310,13 +310,20 @@ class DiceGenetic(ExplainerBase):
         return self.model.get_output(input_instance, model_score=False)
 
     def _predict_fn_custom(self, input_instance, desired_class):
-        """Checks that the maximum predicted score lies in the desired class"""
+        """Checks that the maximum predicted score lies in the desired class."""
+        """The reason we do so can be illustrated by
+        this example: If the predict probabilities are [0, 0.5, 0,5], the computed yloss is 0 as class 2 has the same 
+        value as the maximum score. sklearn's usual predict function, which implements argmax, returns class 1 instead 
+        of 2. This is why we need a custom predict function that returns the desired class if the maximum predict 
+        probability is the same as the probability of the desired class."""
+
         input_instance = self.label_decode(input_instance)
         output = self.model.get_output(input_instance, model_score=True)
         desired_class = int(desired_class)
         maxvalues = np.max(output, 1)
         predicted_values = np.argmax(output, 1)
 
+        # We iterate through output as we often call _predict_fn_custom for multiple inputs at once
         for i in range(len(output)):
             if output[i][desired_class] == maxvalues[i]:
                 predicted_values[i] = desired_class
@@ -355,8 +362,9 @@ class DiceGenetic(ExplainerBase):
             (abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]),
             feature_weights)
         product = product.reshape(-1, product.shape[-1])
-        proximity_loss = np.sum(product,
-                                axis=1)  # Dividing by the sum of feature weights to normalize proximity loss
+        proximity_loss = np.sum(product, axis=1)
+
+        # Dividing by the sum of feature weights to normalize proximity loss
         return proximity_loss / sum(feature_weights)
 
     def compute_sparsity_loss(self, cfs):

@@ -500,7 +500,7 @@ class DiceTensorFlow2(ExplainerBase):
                     self.cfs[j].assign(clip_cf)
 
                 if verbose:
-                    if iterations % 50 == 0:
+                    if (iterations) % 50 == 0:
                         print('step %d,  loss=%g' % (iterations+1, loss_value))
 
                 loss_diff = abs(loss_value-prev_loss)

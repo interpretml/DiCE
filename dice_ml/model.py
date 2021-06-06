@@ -40,7 +40,7 @@ class Model:
             )
 
         self.model_type = model_type
-        if (model is None) and (model_path == ''):
+        if((model is None) & (model_path == '')):
             raise ValueError("should provide either a trained model or the path to a model")
         else:
             self.decide_implementation_type(model, model_path, backend, func, kw_args)
