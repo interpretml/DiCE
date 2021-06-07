@@ -3,6 +3,8 @@ import pytest
 
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
+
 
 tf = pytest.importorskip("tensorflow")
 
@@ -90,7 +92,9 @@ class TestDiceTensorFlowMethods:
         """
         Tets correctness of final CFs and their predictions for sample query instance.
         """
-        self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            sample_adultincome_query, total_CFs=4, desired_class="opposite")
+        assert isinstance(counterfactual_explanations, CounterfactualExplanations)
         # test_cfs = [[70.0, 'Private', 'Masters', 'Single', 'White-Collar', 'White', 'Female', 51.0, 0.534],
         #             [22.0, 'Self-Employed', 'Doctorate', 'Married', 'Service', 'White', 'Female', 45.0, 0.861],
         #             [47.0, 'Private', 'HS-grad', 'Married', 'Service', 'White', 'Female', 45.0, 0.589],

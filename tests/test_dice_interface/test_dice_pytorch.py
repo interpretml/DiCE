@@ -3,6 +3,8 @@ import pytest
 
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
+
 
 torch = pytest.importorskip("torch")
 
@@ -66,7 +68,9 @@ class TestDiceTorchMethods:
         """
         Tets correctness of final CFs and their predictions for sample query instance.
         """
-        self.exp.generate_counterfactuals(sample_adultincome_query, total_CFs=4, desired_class="opposite")
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            sample_adultincome_query, total_CFs=4, desired_class="opposite")
+        assert isinstance(counterfactual_explanations, CounterfactualExplanations)
         # test_cfs = [[72.0, 'Private', 'HS-grad', 'Married', 'White-Collar', 'White', 'Female', 45.0, 0.691],
         #             [29.0, 'Private', 'Prof-school', 'Married', 'Service', 'White', 'Male', 45.0, 0.954],
         #             [52.0, 'Private', 'Doctorate', 'Married', 'Service', 'White', 'Female', 45.0, 0.971],
