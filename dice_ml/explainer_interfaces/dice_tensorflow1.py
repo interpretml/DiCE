@@ -11,6 +11,7 @@ import timeit
 import copy
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 
 class DiceTensorFlow1(ExplainerBase):
@@ -159,12 +160,15 @@ class DiceTensorFlow1(ExplainerBase):
             loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random,
             stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
-        return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          final_cfs_df=final_cfs_df,
-                                          test_instance_df=test_instance_df,
-                                          final_cfs_df_sparse=final_cfs_df_sparse,
-                                          posthoc_sparsity_param=posthoc_sparsity_param,
-                                          desired_class=desired_class)
+        counterfactual_explanations = exp.CounterfactualExamples(
+            data_interface=self.data_interface,
+            final_cfs_df=final_cfs_df,
+            test_instance_df=test_instance_df,
+            final_cfs_df_sparse=final_cfs_df_sparse,
+            posthoc_sparsity_param=posthoc_sparsity_param,
+            desired_class=desired_class)
+
+        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes TF variables required for CF generation."""
