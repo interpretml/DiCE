@@ -1,9 +1,8 @@
 flake8
 flake8-nb
+ipython
+jupyter
+nbformat
 pytest
 pytest-cov
 twine
-ipython
-jsonschema
-nbformat
-jupyter
