@@ -168,6 +168,10 @@ class DiceRandom(ExplainerBase):
         else:
             final_cfs_df_sparse = None
 
+        if final_cfs_df_sparse is None:
+            self.final_cfs_df = final_cfs_df
+        else:
+            self.final_cfs_df = final_cfs_df_sparse
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
         if self.valid_cfs_found:
