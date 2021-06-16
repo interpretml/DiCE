@@ -2,7 +2,7 @@
 
 from dice_ml.model_interfaces.base_model import BaseModel
 import torch
-import numpy as np
+
 
 class PyTorchModel(BaseModel):
 
@@ -13,7 +13,8 @@ class PyTorchModel(BaseModel):
         :param model_path: path to trained model.
         :param backend: "PYT" for PyTorch framework.
         :param func: function transformation required for ML model. If func is None, then func will be the identity function.
-        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the dictionary of kw_args, by default.
+        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the
+                        dictionary of kw_args, by default.
         """
 
         super().__init__(model, model_path, backend)
@@ -41,5 +42,5 @@ class PyTorchModel(BaseModel):
         raise NotImplementedError("Future Support")
 
     def get_num_output_nodes(self, inp_size):
-        temp_input = torch.rand(1,inp_size).float() #torch.tensor([np.random.uniform([inp_size])]).float()
+        temp_input = torch.rand(1, inp_size).float()
         return self.get_output(temp_input).data

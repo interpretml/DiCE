@@ -7,4 +7,13 @@ class UserConfigValidationException(Exception):
     :param exception_message: A message describing the error.
     :type exception_message: str
     """
-    _error_code = "Invalid config"
+    _error_code = "Invalid Configuration"
+
+
+class SystemException(Exception):
+    """An exception indicating that some system exception happened during execution.
+
+    :param exception_message: A message describing the error.
+    :type exception_message: str
+    """
+    _error_code = "System Error"

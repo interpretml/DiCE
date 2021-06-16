@@ -7,9 +7,9 @@ import numpy as np
 import timeit
 import pandas as pd
 import copy
-import random
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.constants import ModelTypes
 
 
 class DiceKD(ExplainerBase):
@@ -37,7 +37,7 @@ class DiceKD(ExplainerBase):
         self.model.load_model()
 
         # number of output nodes of ML model
-        if self.model.model_type == 'classifier':
+        if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(
                 self.data_interface.data_df[0:1][self.data_interface.feature_names])
 
@@ -53,17 +53,27 @@ class DiceKD(ExplainerBase):
         :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
         :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
-        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
+        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the
+                              outcome class of query_instance for binary classification.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
-        :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+        :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in
+                                list as values. Defaults to the range inferred from training data.
+                                If None, uses the parameters initialized in data_interface.
         :param sparsity_weight: Parameter to determine how much importance to give to sparsity
-        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
+        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding
+                                weights as values. Default option is "inverse_mad" where the weight for a continuous
+                                feature is the inverse of the Median Absolute Devidation (MAD) of the feature's
+                                values in the training set; the weight for a categorical feature is equal to 1 by default.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
-        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary".
+                                           Prefer binary search when a feature range is large (for instance, income
+                                           varying from 10k to 1000k) and only if the features share a monotonic
+                                           relationship with predicted outcome in the model.
         :param verbose: Parameter to determine whether to print 'Diverse Counterfactuals found!'
 
-        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
+        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
+                 (see diverse_counterfactuals.py).
         """
         data_df_copy = self.data_interface.data_df.copy()
 
@@ -78,11 +88,11 @@ class DiceKD(ExplainerBase):
 
         query_instance[self.data_interface.outcome_name] = test_pred
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
-        if desired_range != None:
+        if desired_range is not None:
             if desired_range[0] > desired_range[1]:
                 raise ValueError("Invalid Range!")
 
-        if desired_class == "opposite" and self.model.model_type == 'classifier':
+        if desired_class == "opposite" and self.model.model_type == ModelTypes.Classifier:
             if self.num_output_nodes == 2:
                 desired_class = 1.0 - test_pred
 
@@ -93,19 +103,19 @@ class DiceKD(ExplainerBase):
             raise ValueError("Desired class should be within 0 and num_classes-1.")
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
-        self.dataset_with_predictions, self.KD_tree, self.predictions = self.build_KD_tree(data_df_copy, desired_range,
-                                                                                           desired_class, self.predicted_outcome_name)
+        self.dataset_with_predictions, self.KD_tree, self.predictions = \
+            self.build_KD_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
 
         query_instance, cfs_preds = self.find_counterfactuals(data_df_copy,
-                                                                         query_instance, query_instance_orig,
-                                                                         desired_range,
-                                                                         desired_class,
-                                                                         total_CFs, features_to_vary,
-                                                                         permitted_range,
-                                                                         sparsity_weight,
-                                                                         stopping_threshold,
-                                                                         posthoc_sparsity_param,
-                                                                         posthoc_sparsity_algorithm, verbose)
+                                                              query_instance, query_instance_orig,
+                                                              desired_range,
+                                                              desired_class,
+                                                              total_CFs, features_to_vary,
+                                                              permitted_range,
+                                                              sparsity_weight,
+                                                              stopping_threshold,
+                                                              posthoc_sparsity_param,
+                                                              posthoc_sparsity_algorithm, verbose)
         self.cfs_preds = cfs_preds
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
@@ -119,7 +129,7 @@ class DiceKD(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """returns predictions"""
-        return self.model.model.predict(input_instance)
+        return self.model.get_output(input_instance, model_score=False)
 
     def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
         cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)
@@ -219,20 +229,20 @@ class DiceKD(ExplainerBase):
                 query_instance_df_dummies[col] = 0
 
         self.final_cfs, cfs_preds = self.vary_valid(query_instance_df_dummies,
-                                               total_CFs,
-                                               features_to_vary,
-                                               permitted_range,
-                                               query_instance_orig,
-                                               sparsity_weight)
+                                                    total_CFs,
+                                                    features_to_vary,
+                                                    permitted_range,
+                                                    query_instance_orig,
+                                                    sparsity_weight)
 
         total_cfs_found = len(self.final_cfs)
         if total_cfs_found > 0:
             # post-hoc operation on continuous features to enhance sparsity - only for public data
-            if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+            if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
                 self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs)
                 self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.final_cfs_df_sparse, query_instance,
-                                                                             posthoc_sparsity_param,
-                                                                             posthoc_sparsity_algorithm)
+                                                                                posthoc_sparsity_param,
+                                                                                posthoc_sparsity_algorithm)
             else:
                 self.final_cfs_df_sparse = None
         else:
@@ -250,9 +260,10 @@ class DiceKD(ExplainerBase):
             if total_cfs_found < total_CFs:
                 self.elapsed = timeit.default_timer() - start_time
                 m, s = divmod(self.elapsed, 60)
-                print(
-                    'Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps change the query instance or the features to vary...' % (
-                        total_cfs_found, total_CFs), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d) ' % (total_cfs_found, self.total_CFs),
+                      'Diverse Counterfactuals found for the given configuation, perhaps ',
+                      'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
+                      'min %02d' % s, 'sec')
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
 

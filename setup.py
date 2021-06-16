@@ -1,5 +1,7 @@
 import setuptools
 
+VERSION_STR = "0.6.1"
+
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
@@ -17,7 +19,7 @@ for e in extras:
 
 setuptools.setup(
     name="dice_ml",
-    version="0.5",
+    version=VERSION_STR,
     license="MIT",
     author="Ramaravind Mothilal, Amit Sharma, Chenhao Tan",
     author_email="raam.arvind93@gmail.com",
@@ -25,8 +27,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/interpretml/DiCE",
-    download_url="https://github.com/interpretml/DiCE/archive/v0.5.tar.gz",
-    python_requires='>=3.4',
+    download_url="https://github.com/interpretml/DiCE/archive/v"+VERSION_STR+".tar.gz",
+    python_requires='>=3.5',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -39,6 +41,8 @@ setuptools.setup(
     include_package_data=True,
     package_data={
         # If any package contains *.h5 files, include them:
-        '': ['*.h5']
+        '': ['*.h5',
+             'counterfactual_explanations_v1.0.json',
+             'counterfactual_explanations_v2.0.json']
     }
 )

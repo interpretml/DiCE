@@ -11,6 +11,8 @@ import timeit
 import copy
 
 from dice_ml import diverse_counterfactuals as exp
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
+
 
 class DiceTensorFlow1(ExplainerBase):
 
@@ -19,12 +21,12 @@ class DiceTensorFlow1(ExplainerBase):
 
         :param data_interface: an interface class to access data related params.
         :param model_interface: an interface class to access trained ML model.
-
         """
-
         # initiating data related parameters
         super().__init__(data_interface)
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, \
+            self.encoded_continuous_feature_indexes, self.cont_minx, \
+            self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
 
         # create TensorFLow session if one is not already created
         if tf.get_default_session() is not None:
@@ -34,12 +36,19 @@ class DiceTensorFlow1(ExplainerBase):
 
         # initializing model related variables
         self.model = model_interface
-        self.model.load_model() # loading trained model
-        self.input_tensor = tf.Variable(self.minx, dtype=tf.float32) # placeholder variables for model predictions
+        self.model.load_model()  # loading trained model
+        self.input_tensor = tf.Variable(self.minx, dtype=tf.float32)  # placeholder variables for model predictions
         self.output_tensor = self.model.get_output(self.input_tensor)
-        if self.model.transformer.func is not None: # TODO: this error is probably too big - need to change it.
-            raise ValueError("Gradient-based DiCE currently (1) accepts the data only in raw categorical and continuous formats, (2) does one-hot-encoding and min-max-normalization internally, (3) expects the ML model the accept the data in this same format. If your problem supports this, please initialize model class again with no custom transformation function.")
-        self.num_output_nodes = self.dice_sess.run(self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names))).shape[1] # number of output nodes of ML model
+        if self.model.transformer.func is not None:  # TODO: this error is probably too big - need to change it.
+            raise ValueError("Gradient-based DiCE currently "
+                             "(1) accepts the data only in raw categorical and continuous formats, "
+                             "(2) does one-hot-encoding and min-max-normalization internally, "
+                             "(3) expects the ML model the accept the data in this same format. "
+                             "If your problem supports this, please initialize model class again "
+                             "with no custom transformation function.")
+        # number of output nodes of ML model
+        self.num_output_nodes = self.dice_sess.run(
+            self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names))).shape[1]
 
         # hyperparameter initializations
         self.weights = []
@@ -53,23 +62,38 @@ class DiceTensorFlow1(ExplainerBase):
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.optimizer_weights = []  # optimizer
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5, diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all", permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad", optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=True, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
+    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
+                                 diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF",
+                                 features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
+                                 diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad",
+                                 optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000,
+                                 project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
+                                 init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
+                                 posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
         """Generates diverse counterfactual explanations
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
         :param total_CFs: Total number of counterfactuals required.
-
-        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class of query_instance for binary classification.
-        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the query_instance.
+        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the
+                              outcome class of query_instance for binary classification.
+        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
+                                 query_instance.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
         :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
 
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
-        param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values. Defaults to the range inferred from training data. If None, uses the parameters initialized in data_interface.
+        param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values.
+                               Defaults to the range inferred from training data. If None, uses the parameters initialized in
+                               data_interface.
         :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
-        :param diversity_loss_type: Metric for diversity loss of the optimization function. Takes "avg_dist" or "dpp_style:inverse_dist".
-        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and corresponding weights as values. Default option is "inverse_mad" where the weight for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of the feature's values in the training set; the weight for a categorical feature is equal to 1 by default.
+        :param diversity_loss_type: Metric for diversity loss of the optimization function.
+                                    Takes "avg_dist" or "dpp_style:inverse_dist".
+        :param feature_weights: Either "inverse_mad" or a dictionary with feature names as keys and
+                                corresponding weights as values. Default option is "inverse_mad" where the weight
+                                for a continuous feature is the inverse of the Median Absolute Devidation (MAD) of
+                                the feature's values in the training set; the weight for a categorical feature is
+                                equal to 1 by default.
         :param optimizer: Tensorflow optimization algorithm. Currently tested only with "tensorflow:adam".
 
         :param learning_rate: Learning rate for optimizer.
@@ -77,16 +101,19 @@ class DiceTensorFlow1(ExplainerBase):
         :param max_iter: Max iterations to run gradient descent for.
         :param project_iter: Project the gradients at an interval of these many iterations.
         :param loss_diff_thres: Minimum difference between successive loss values to check convergence.
-        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence. Defaults to 1, but we assigned a more conservative value of 2 in the paper.
+        :param loss_converge_maxiter: Maximum number of iterations for loss_diff_thres to hold to declare convergence.
+                                      Defaults to 1, but we assigned a more conservative value of 2 in the paper.
         :param verbose: Print intermediate loss value.
         :param init_near_query_instance: Boolean to indicate if counterfactuals are to be initialized near query_instance.
         :param tie_random: Used in rounding off CFs and intermediate projection.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
-        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary". Prefer binary search when a feature range is large (for instance, income varying from 10k to 1000k) and only if the features share a monotonic relationship with predicted outcome in the model.
-
-        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations (see diverse_counterfactuals.py).
-
+        :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary".
+                                           Prefer binary search when a feature range is large
+                                           (for instance, income varying from 10k to 1000k) and only if the features
+                                           share a monotonic relationship with predicted outcome in the model.
+        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
+                 (see diverse_counterfactuals.py).
         """
 
         # check feature MAD validity and throw warnings
@@ -107,27 +134,41 @@ class DiceTensorFlow1(ExplainerBase):
                 self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                 self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
-        if([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer] != (self.cf_init_weights + self.loss_weights + self.optimizer_weights)):
+        if ([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer] !=
+                (self.cf_init_weights + self.loss_weights + self.optimizer_weights)):
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
             self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights)
             self.do_optimizer_initializations(optimizer)
 
         """
-        Future Support: We have three main components in our tensorflow graph: (1) initialization of tf.variables (2) defining ops for loss function initializations, and (3) defining ops for optimizer initializations. Need to define methods to delete some nodes from a tensorflow graphs or update variables/ops in a tensorflow graph dynamically, so that only those components corresponding to the variables that are updated change.
-        """
+        Future Support: We have three main components in our tensorflow graph:
+        (1) initialization of tf.variables
+        (2) defining ops for loss function initializations, and
+        (3) defining ops for optimizer initializations.
 
+        Need to define methods to delete some nodes from a tensorflow graphs or update
+        variables/ops in a tensorflow graph dynamically, so that only those components
+        corresponding to the variables that are updated change.
+        """
         # check if hyperparameters are to be updated
-        if not collections.Counter([proximity_weight, diversity_weight, categorical_penalty]) == collections.Counter(self.hyperparameters):
+        if not collections.Counter([proximity_weight, diversity_weight, categorical_penalty]) == \
+                collections.Counter(self.hyperparameters):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
-        final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+        final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(
+            query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter,
+            loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random,
+            stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
-        return exp.CounterfactualExamples(data_interface=self.data_interface,
-                                          final_cfs_df=final_cfs_df,
-                                          test_instance_df=test_instance_df,
-                                          final_cfs_df_sparse = final_cfs_df_sparse,
-                                          posthoc_sparsity_param=posthoc_sparsity_param,
-                                          desired_class=desired_class)
+        counterfactual_explanations = exp.CounterfactualExamples(
+            data_interface=self.data_interface,
+            final_cfs_df=final_cfs_df,
+            test_instance_df=test_instance_df,
+            final_cfs_df_sparse=final_cfs_df_sparse,
+            posthoc_sparsity_param=posthoc_sparsity_param,
+            desired_class=desired_class)
+
+        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes TF variables required for CF generation."""
@@ -171,7 +212,8 @@ class DiceTensorFlow1(ExplainerBase):
             self.cfs_frozen.append(
                 frozen + tf.stop_gradient(-frozen + self.cfs[i]))
 
-        # Future Support: a dictionary of options for optimizers, only checked with tensorflow optimizers: need to check with others
+        # Future Support: a dictionary of options for optimizers, only checked with tensorflow optimizers:
+        # need to check with others
         self.optimizers_options = {
             "tensorflow": self.tensorflow_optimizers,
             "scipy": self.scipy_optimizers
@@ -194,17 +236,22 @@ class DiceTensorFlow1(ExplainerBase):
             if method == "l2_loss":
                 temp_loss = tf.square(tf.subtract(
                     self.model.get_output(self.cfs_frozen[i]), self.target_cf))
-                temp_loss = temp_loss[:,(self.num_ouput_nodes-1):][0][0]
+                temp_loss = temp_loss[:, (self.num_ouput_nodes-1):][0][0]
             elif method == "log_loss":
-                temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)), tf.subtract(
-                    1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
+                temp_logits = tf.log(
+                    tf.divide(
+                        tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
+                        tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(
+                            self.cfs_frozen[i]), 0.000001)))))
+                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf)[0][0]
             elif method == "hinge_loss":
-                temp_logits = tf.log(tf.divide(tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)), tf.subtract(
-                    1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:,(self.num_ouput_nodes-1):]
+                temp_logits = tf.log(
+                    tf.divide(
+                        tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
+                        tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
+                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
                 temp_loss = tf.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf)
 
@@ -262,12 +309,16 @@ class DiceTensorFlow1(ExplainerBase):
             for i in range(self.total_CFs):
                 for j in range(i+1, self.total_CFs):
                     count += 1.0
-                    diversity_loss = tf.add(diversity_loss,
-                                        tf.divide(1.0, tf.add(1.0, self.compute_dist(self.cfs_frozen[i], self.cfs_frozen[j]))))
+                    diversity_loss = tf.add(
+                        diversity_loss,
+                        tf.divide(1.0,
+                                  tf.add(1.0,
+                                         self.compute_dist(self.cfs_frozen[i], self.cfs_frozen[j]))))
             return tf.subtract(1.0, tf.divide(diversity_loss, count))
 
     def compute_regularization_loss(self):
-        """Adds a linear equality constraints to the loss functions - to ensure all levels of a categorical variable sums to one"""
+        """Adds a linear equality constraints to the loss functions -
+           to ensure all levels of a categorical variable sums to one"""
         regularization_loss = tf.constant(0.0)
         for i in range(self.total_CFs):
             for v in self.encoded_categorical_feature_indexes:
@@ -275,7 +326,8 @@ class DiceTensorFlow1(ExplainerBase):
                     tf.reduce_sum(self.cfs_frozen[i][0, v[0]:v[-1]+1]), 1.0)))
         return regularization_loss
 
-    def do_loss_initializations(self, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad"):
+    def do_loss_initializations(self, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
+                                feature_weights="inverse_mad"):
         """Defines the optimization loss"""
 
         # define the loss parts
@@ -319,13 +371,18 @@ class DiceTensorFlow1(ExplainerBase):
         self.regularization_loss = self.compute_regularization_loss()
 
         # final loss:
-        self.loss = tf.add(tf.subtract(tf.add(self.yloss, tf.scalar_mul(self.weights[0], self.proximity_loss)), tf.scalar_mul(self.weights[1], self.diversity_loss)), tf.scalar_mul(self.weights[2], self.regularization_loss))
+        self.loss = tf.add(
+            tf.subtract(
+                tf.add(self.yloss, tf.scalar_mul(
+                    self.weights[0], self.proximity_loss)), tf.scalar_mul(
+                        self.weights[1], self.diversity_loss)), tf.scalar_mul(
+                            self.weights[2], self.regularization_loss))
 
     def tensorflow_optimizers(self, method="adam"):
         """Initializes tensorflow optimizers."""
         if method == "adam":
             opt = tf.train.AdamOptimizer(self.learning_rate, name='myadam')
-            #opt = tf.contrib.optimizer_v2.AdamOptimizer(self.learning_rate)
+            # opt = tf.contrib.optimizer_v2.AdamOptimizer(self.learning_rate)
         elif method == "rmsprop":
             opt = tf.train.RMSPropOptimizer(self.learning_rate)
 
@@ -390,10 +447,11 @@ class DiceTensorFlow1(ExplainerBase):
         for index, tcf in enumerate(self.cfs):
             cf = self.dice_sess.run(tcf)
             for i, v in enumerate(self.encoded_continuous_feature_indexes):
-                org_cont = (cf[0, v]*(self.cont_maxx[i] - self.cont_minx[i])) + self.cont_minx[i] # continuous feature in orginal scale
-                org_cont = round(org_cont, self.cont_precisions[i]) # rounding off
+                # continuous feature in orginal scale
+                org_cont = (cf[0, v]*(self.cont_maxx[i] - self.cont_minx[i])) + self.cont_minx[i]
+                org_cont = round(org_cont, self.cont_precisions[i])  # rounding off
                 normalized_cont = (org_cont - self.cont_minx[i])/(self.cont_maxx[i] - self.cont_minx[i])
-                cf[0, v] = normalized_cont # assign the projected continuous value
+                cf[0, v] = normalized_cont  # assign the projected continuous value
 
             for v in self.encoded_categorical_feature_indexes:
                 maxs = np.argwhere(
@@ -459,7 +517,10 @@ class DiceTensorFlow1(ExplainerBase):
             self.loss_converge_iter = 0
             return False
 
-    def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=0.05, min_iter=500, max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False, init_near_query_instance=False, tie_random=False, stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
+    def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=0.05, min_iter=500,
+                             max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1,
+                             verbose=False, init_near_query_instance=False, tie_random=False,
+                             stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
         """Finds counterfactuals by gradient-descent."""
 
         # Prepares user defined query_instance for DiCE.
@@ -500,10 +561,11 @@ class DiceTensorFlow1(ExplainerBase):
         # looping the find CFs depending on whether its random initialization or not
         loop_find_CFs = self.total_random_inits if self.total_random_inits > 0 else 1
 
-        # variables to backup best known CFs so far in the optimization process - if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
+        # variables to backup best known CFs so far in the optimization process -
+        # if the CFs dont converge in max_iter iterations, then best_backup_cfs is returned.
         self.best_backup_cfs = [0]*max(self.total_CFs, loop_find_CFs)
         self.best_backup_cfs_preds = [0]*max(self.total_CFs, loop_find_CFs)
-        self.min_dist_from_threshold = [100]*loop_find_CFs # for backup CFs
+        self.min_dist_from_threshold = [100]*loop_find_CFs  # for backup CFs
 
         for loop_ix in range(loop_find_CFs):
             # CF init
@@ -523,8 +585,11 @@ class DiceTensorFlow1(ExplainerBase):
             while self.stop_loop(iterations, loss_diff) is False:
 
                 # gradient descent step
-                _, loss_value = self.dice_sess.run([self.optim_step, self.loss],
-                                                   feed_dict={self.learning_rate: learning_rate, self.target_cf: self.target_cf_class, self.x1: query_instance})
+                _, loss_value = self.dice_sess.run(
+                    [self.optim_step, self.loss],
+                    feed_dict={self.learning_rate: learning_rate,
+                               self.target_cf: self.target_cf_class,
+                               self.x1: query_instance})
 
                 # projection step
                 for j in range(0, self.total_CFs):
@@ -548,7 +613,8 @@ class DiceTensorFlow1(ExplainerBase):
                 temp_cfs_stored = self.round_off_cfs(assign=False)
                 test_preds_stored = [self.predict_fn(cf) for cf in temp_cfs_stored]
 
-                if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
+                if((self.target_cf_class[0][0] == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or
+                   (self.target_cf_class[0][0] == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold[loop_ix]:
                         self.min_dist_from_threshold[loop_ix] = avg_preds_dist
@@ -572,7 +638,8 @@ class DiceTensorFlow1(ExplainerBase):
         self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
 
         # update final_cfs from backed up CFs if valid CFs are not found
-        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in self.cfs_preds))):
+        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or
+           (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in self.cfs_preds))):
             for loop_ix in range(loop_find_CFs):
                 if self.min_dist_from_threshold[loop_ix] != 100:
                     for ix in range(self.total_CFs):
@@ -590,30 +657,40 @@ class DiceTensorFlow1(ExplainerBase):
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
-        if posthoc_sparsity_param != None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
+        if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
-            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(
+                final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
         else:
             final_cfs_df_sparse = None
 
         m, s = divmod(self.elapsed, 60)
-        if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in self.cfs_preds))):
+        if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or
+           (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in self.cfs_preds))):
             self.total_CFs_found = max(loop_find_CFs, self.total_CFs)
-            valid_ix = [ix for ix in range(max(loop_find_CFs, self.total_CFs))] # indexes of valid CFs
+            valid_ix = [ix for ix in range(max(loop_find_CFs, self.total_CFs))]  # indexes of valid CFs
             print('Diverse Counterfactuals found! total time taken: %02d' %
                   m, 'min %02d' % s, 'sec')
         else:
             self.total_CFs_found = 0
-            valid_ix = [] # indexes of valid CFs
+            valid_ix = []  # indexes of valid CFs
             for cf_ix, pred in enumerate(self.cfs_preds):
-                if((self.target_cf_class == 0 and pred < self.stopping_threshold) or (self.target_cf_class == 1 and pred > self.stopping_threshold)):
+                if((self.target_cf_class == 0 and pred < self.stopping_threshold) or
+                   (self.target_cf_class == 1 and pred > self.stopping_threshold)):
                     self.total_CFs_found += 1
                     valid_ix.append(cf_ix)
 
-            if self.total_CFs_found == 0 :
-                print('No Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...', '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+            if self.total_CFs_found == 0:
+                print('No Counterfactuals found for the given configuation, perhaps try with different '
+                      'values of proximity (or diversity) weights or learning rate...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
-                print('Only %d (required %d) Diverse Counterfactuals found for the given configuation, perhaps try with different values of proximity (or diversity) weights or learning rate...' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)), '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
+                print('Only %d (required %d)' % (self.total_CFs_found, max(loop_find_CFs, self.total_CFs)),
+                      ' Diverse Counterfactuals found for the given configuation, perhaps try with different'
+                      'values of proximity (or diversity) weights or learning rate...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
-        if final_cfs_df_sparse is not None: final_cfs_df_sparse = final_cfs_df_sparse.iloc[valid_ix].reset_index(drop=True)
-        return final_cfs_df.iloc[valid_ix].reset_index(drop=True), test_instance_df, final_cfs_df_sparse # returning only valid CFs
+        if final_cfs_df_sparse is not None:
+            final_cfs_df_sparse = final_cfs_df_sparse.iloc[valid_ix].reset_index(drop=True)
+        # returning only valid CFs
+        return final_cfs_df.iloc[valid_ix].reset_index(drop=True), test_instance_df, final_cfs_df_sparse
