@@ -126,7 +126,7 @@ class TestDiceKDBinaryClassificationMethods:
 
     # Testing if an error is thrown when the query instance has an unknown column
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_5, total_CFs):
+    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
         with pytest.raises(ValueError):
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_5, total_CFs=total_CFs,
                                                desired_class=desired_class)
