@@ -407,7 +407,7 @@ class PublicData:
             if (self.continuous_features_precision is not None) and (col in self.continuous_features_precision):
                 precisions[ix] = self.continuous_features_precision[col]
                 precisions_dict[col] = self.continuous_features_precision[col]
-            elif (self.data_df[col].dtype == np.float32) or (self.data_df[col].dtype == np.float64):
+            elif self.data_df[col].dtype == np.float32 or self.data_df[col].dtype == np.float64:
                 modes = self.data_df[col].mode()
                 maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
                 for mx in range(len(modes)):

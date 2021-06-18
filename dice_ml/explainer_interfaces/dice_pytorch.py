@@ -377,7 +377,7 @@ class DicePyTorch(ExplainerBase):
 
         # intermediate projections
         if self.project_iter > 0 and itr > 0:
-            if (itr % self.project_iter) == 0:
+            if itr % self.project_iter == 0:
                 self.round_off_cfs(assign=True)
 
         # do GD for min iterations
