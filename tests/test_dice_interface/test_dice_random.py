@@ -5,42 +5,42 @@ from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.fixture
-def genetic_binary_classification_exp_object():
+def random_binary_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='genetic')
+    exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 
 @pytest.fixture
-def genetic_multi_classification_exp_object():
+def random_multi_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='genetic')
+    exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 
 @pytest.fixture
-def genetic_regression_exp_object():
+def random_regression_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_regression()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
-    exp = dice_ml.Dice(d, m, method='genetic')
+    exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 
-class TestDiceGeneticBinaryClassificationMethods:
+class TestDiceRandomBinaryClassificationMethods:
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, genetic_binary_classification_exp_object):
-        self.exp = genetic_binary_classification_exp_object  # explainer object
+    def _initiate_exp_object(self, random_binary_classification_exp_object):
+        self.exp = random_binary_classification_exp_object  # explainer object
 
     # When invalid desired_class is given
     @pytest.mark.parametrize("desired_class, total_CFs", [(7, 3)])
@@ -126,17 +126,6 @@ class TestDiceGeneticBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
 
-    # Testing if only valid cfs are found after maxiterations
-    @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
-                             [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
-    def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 initialization=initialization, maxiterations=maxiterations)
-        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
-            assert i == desired_class
-
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
                              [(0, 0, "kdtree"), (0, 0, "random")])
@@ -147,10 +136,10 @@ class TestDiceGeneticBinaryClassificationMethods:
                                            initialization=initialization)
 
 
-class TestDiceGeneticMultiClassificationMethods:
+class TestDiceRandomMultiClassificationMethods:
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, genetic_multi_classification_exp_object):
-        self.exp = genetic_multi_classification_exp_object  # explainer object
+    def _initiate_exp_object(self, random_multi_classification_exp_object):
+        self.exp = random_multi_classification_exp_object  # explainer object
 
     # Testing that the counterfactuals are in the desired class
     @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
@@ -160,17 +149,6 @@ class TestDiceGeneticMultiClassificationMethods:
                                                  total_CFs=total_CFs, desired_class=desired_class,
                                                  initialization=initialization)
         assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
-    # Testing if only valid cfs are found after maxiterations
-    @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
-                             [(2, 7, "kdtree", 0), (2, 7, "random", 0)])
-    def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 initialization=initialization, maxiterations=maxiterations)
-        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
-            assert i == desired_class
 
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
@@ -182,10 +160,10 @@ class TestDiceGeneticMultiClassificationMethods:
                                            initialization=initialization)
 
 
-class TestDiceGeneticRegressionMethods:
+class TestDiceRandomRegressionMethods:
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, genetic_regression_exp_object):
-        self.exp = genetic_regression_exp_object  # explainer object
+    def _initiate_exp_object(self, random_regression_exp_object):
+        self.exp = random_regression_exp_object  # explainer object
 
     # features_range
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",
@@ -198,17 +176,6 @@ class TestDiceGeneticRegressionMethods:
         assert all(
             [desired_range[0]] * total_CFs <= ans.final_cfs_df[self.exp.data_interface.outcome_name].values) and all(
             ans.final_cfs_df[self.exp.data_interface.outcome_name].values <= [desired_range[1]] * total_CFs)
-
-    # Testing if only valid cfs are found after maxiterations
-    @pytest.mark.parametrize("desired_range, total_CFs, initialization, maxiterations",
-                             [([1, 2.8], 7, "kdtree", 0), ([1, 2.8], 7, "random", 0)])
-    def test_maxiter(self, desired_range, sample_custom_query_2, total_CFs, initialization, maxiterations):
-        self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_range=desired_range,
-                                                 initialization=initialization, maxiterations=maxiterations)
-        for i in ans.final_cfs_df[self.exp.data_interface.outcome_name].values:
-            assert desired_range[0] <= i <= desired_range[1]
 
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",

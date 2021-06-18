@@ -101,6 +101,13 @@ def sample_custom_query_3():
     """
     return pd.DataFrame({'Categorical': ['d'], 'Numerical': [1000000]})
 
+@pytest.fixture
+def sample_custom_query_5():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'X': ['d'], 'Numerical': [25]})
+
 
 @pytest.fixture
 def sample_custom_query_4():
@@ -117,7 +124,7 @@ def sample_custom_query_10():
     """
     return pd.DataFrame(
         {
-            'Categorical': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
+            'Categorical': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a'],
             'Numerical': [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
         }
     )

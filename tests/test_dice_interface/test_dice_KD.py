@@ -124,6 +124,13 @@ class TestDiceKDBinaryClassificationMethods:
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_3, total_CFs=total_CFs,
                                                desired_class=desired_class)
 
+    # Testing if an error is thrown when the query instance has an unknown column
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_5, total_CFs):
+        with pytest.raises(ValueError):
+            self.exp._generate_counterfactuals(query_instance=sample_custom_query_5, total_CFs=total_CFs,
+                                               desired_class=desired_class)
+
     # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
     def test_duplicates(self, desired_class, sample_custom_query_4, total_CFs):

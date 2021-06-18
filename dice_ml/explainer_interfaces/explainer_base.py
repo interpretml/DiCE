@@ -155,6 +155,10 @@ class ExplainerBase(ABC):
         return features_to_vary
 
     def check_query_instance_validity(self, features_to_vary, permitted_range, query_instance, feature_ranges_orig):
+        for feature in query_instance:
+            if feature not in self.data_interface.feature_names:
+                raise ValueError("Feature", feature, "not present in training data!")
+
         for feature in self.data_interface.categorical_feature_names:
             if query_instance[feature].values[0] not in feature_ranges_orig[feature]:
                 raise ValueError("Feature", feature, "has a value outside the dataset.")
