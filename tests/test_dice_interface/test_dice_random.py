@@ -95,11 +95,12 @@ class TestDiceRandomBinaryClassificationMethods:
     #     features_to_vary = self.exp.setup("all", permitted_range, sample_custom_query_2, "inverse_mad")
     #     ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
     #                                              features_to_vary=features_to_vary, permitted_range=permitted_range,
-    #                                              total_CFs=total_CFs, desired_class=desired_class, desired_range=desired_range)
+    #                                              total_CFs=total_CFs, desired_class=desired_class,
+    #                                              desired_range=desired_range)
     #
     #     for feature in permitted_range:
     #         assert all(
-    #             permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
+    #           permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
     #             in range(total_CFs))
 
     # Testing if you can provide permitted_range for categorical variables
