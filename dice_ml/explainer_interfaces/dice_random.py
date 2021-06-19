@@ -70,7 +70,6 @@ class DiceRandom(ExplainerBase):
                 if feature not in features_to_vary:
                     self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
-
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
         model_predictions = self.predict_fn(query_instance)
@@ -234,3 +233,4 @@ class DiceRandom(ExplainerBase):
             result = np.random.uniform(low, high+(10**-precision), size)
             result = [round(r, precision) for r in result]
         return result
+    
