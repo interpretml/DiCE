@@ -60,7 +60,7 @@ class CounterfactualExplanations:
         self._metadata = {'version': version if version is not None else _SchemaVersions.CURRENT_VERSION}
 
     def __eq__(self, other_cf):
-        if (isinstance(other_cf, CounterfactualExplanations)):
+        if isinstance(other_cf, CounterfactualExplanations):
             return self.cf_examples_list == other_cf.cf_examples_list and \
                     self.local_importance == other_cf.local_importance and \
                     self.summary_importance == other_cf.summary_importance and \
