@@ -44,7 +44,8 @@ class DiceGenetic(ExplainerBase):
 
         for column in self.data_interface.categorical_feature_names:
             self.labelencoder[column] = LabelEncoder()
-            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_interface.data_df[column])
+            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(
+                self.data_interface.data_df[column])
 
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
@@ -76,13 +77,13 @@ class DiceGenetic(ExplainerBase):
                     feature_weights[feature] = round(1 / normalized_mads[feature], 2)
 
             feature_weights_list = []
-            if(encoding == 'one-hot'):
+            if encoding == 'one-hot':
                 for feature in self.data_interface.encoded_feature_names:
                     if feature in feature_weights:
                         feature_weights_list.append(feature_weights[feature])
                     else:
                         feature_weights_list.append(1.0)
-            elif(encoding == 'label'):
+            elif encoding == 'label':
                 for feature in self.data_interface.feature_names:
                     if feature in feature_weights:
                         feature_weights_list.append(feature_weights[feature])
@@ -107,7 +108,7 @@ class DiceGenetic(ExplainerBase):
                         one_init[jx] = np.random.choice(self.feature_range[feature])
                 else:
                     one_init[jx] = query_instance[jx]
-            if(self.is_cf_valid(self.predict_fn_scores(one_init))):
+            if self.is_cf_valid(self.predict_fn_scores(one_init)):
                 remaining_cfs[kx] = one_init
                 kx += 1
         return remaining_cfs
@@ -153,7 +154,8 @@ class DiceGenetic(ExplainerBase):
                 self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
             self.cfs = np.concatenate([uniques, remaining_cfs])
 
-    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range, desired_class,
+    def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range,
+                              desired_class,
                               query_instance, query_instance_df_dummies, verbose):
         """Intializes CFs and other related variables."""
         self.cf_init_weights = [total_CFs, algorithm, features_to_vary]
@@ -185,7 +187,7 @@ class DiceGenetic(ExplainerBase):
                     self.population_size, features_to_vary, query_instance, desired_class, desired_range)
 
             else:
-                num_queries = min(len(self.dataset_with_predictions), self.population_size*self.total_CFs)
+                num_queries = min(len(self.dataset_with_predictions), self.population_size * self.total_CFs)
                 indices = self.KD_tree.query(query_instance_df_dummies, num_queries)[1][0]
                 KD_tree_output = self.dataset_with_predictions.iloc[indices].copy()
                 self.do_KD_init(features_to_vary, query_instance, KD_tree_output, desired_class, desired_range)
@@ -215,7 +217,8 @@ class DiceGenetic(ExplainerBase):
                                   diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                   features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
                                   diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad",
-                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="binary",
+                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                  posthoc_sparsity_algorithm="binary",
                                   maxiterations=500, thresh=1e-2, verbose=False):
         """Generates diverse counterfactual explanations
 
@@ -306,6 +309,27 @@ class DiceGenetic(ExplainerBase):
         input_instance = self.label_decode(input_instance)
         return self.model.get_output(input_instance, model_score=False)
 
+    def _predict_fn_custom(self, input_instance, desired_class):
+        """Checks that the maximum predicted score lies in the desired class."""
+        """The reason we do so can be illustrated by
+        this example: If the predict probabilities are [0, 0.5, 0,5], the computed yloss is 0 as class 2 has the same
+        value as the maximum score. sklearn's usual predict function, which implements argmax, returns class 1 instead
+        of 2. This is why we need a custom predict function that returns the desired class if the maximum predict
+        probability is the same as the probability of the desired class."""
+
+        input_instance = self.label_decode(input_instance)
+        output = self.model.get_output(input_instance, model_score=True)
+        desired_class = int(desired_class)
+        maxvalues = np.max(output, 1)
+        predicted_values = np.argmax(output, 1)
+
+        # We iterate through output as we often call _predict_fn_custom for multiple inputs at once
+        for i in range(len(output)):
+            if output[i][desired_class] == maxvalues[i]:
+                predicted_values[i] = desired_class
+
+        return predicted_values
+
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
@@ -325,30 +349,35 @@ class DiceGenetic(ExplainerBase):
                 yloss = np.zeros(len(predicted_value))
                 for i in range(len(predicted_value)):
                     if not desired_range[0] <= predicted_value[i] <= desired_range[1]:
-                        yloss[i] = min(abs(predicted_value[i] - desired_range[0]), abs(predicted_value[i] - desired_range[1]))
+                        yloss[i] = min(abs(predicted_value[i] - desired_range[0]),
+                                       abs(predicted_value[i] - desired_range[1]))
             return yloss
 
     def compute_proximity_loss(self, x_hat_unnormalized, query_instance_normalized):
         """Compute weighted distance between two vectors."""
         x_hat = self.data_interface.normalize_data(x_hat_unnormalized)
-        feature_weights = np.array([self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
-        product = np.multiply((abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]),
-                              feature_weights)
+        feature_weights = np.array(
+            [self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
+        product = np.multiply(
+            (abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]),
+            feature_weights)
         product = product.reshape(-1, product.shape[-1])
         proximity_loss = np.sum(product, axis=1)
-        return proximity_loss
+
+        # Dividing by the sum of feature weights to normalize proximity loss
+        return proximity_loss / sum(feature_weights)
 
     def compute_sparsity_loss(self, cfs):
         """Compute weighted distance between two vectors."""
         sparsity_loss = np.count_nonzero(cfs - self.x1, axis=1)
-        return sparsity_loss
+        return sparsity_loss / len(
+            self.data_interface.feature_names)  # Dividing by the number of features to normalize sparsity loss
 
     def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
-        query_instance_normalized = self.data_interface.normalize_data(self.x1)
-        query_instance_normalized = query_instance_normalized.astype('float')
-        self.proximity_loss = self.compute_proximity_loss(cfs, query_instance_normalized) if self.proximity_weight > 0 else 0.0
+        self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
+            if self.proximity_weight > 0 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
         self.loss = np.reshape(np.array(self.yloss + (self.proximity_weight * self.proximity_loss) +
                                         self.sparsity_weight * self.sparsity_loss), (-1, 1))
@@ -378,7 +407,8 @@ class DiceGenetic(ExplainerBase):
                 # otherwise insert random gene(mutate) for maintaining diversity
                 if feat_name in features_to_vary:
                     if feat_name in self.data_interface.continuous_feature_names:
-                        one_init[j] = np.random.uniform(self.feature_range[feat_name][0], self.feature_range[feat_name][0])
+                        one_init[j] = np.random.uniform(self.feature_range[feat_name][0],
+                                                        self.feature_range[feat_name][0])
                     else:
                         one_init[j] = np.random.choice(self.feature_range[feat_name])
                 else:
@@ -393,14 +423,17 @@ class DiceGenetic(ExplainerBase):
         previous_best_loss = -np.inf
         current_best_loss = np.inf
         stop_cnt = 0
-        cfs_preds = [np.inf]*self.total_CFs
+        cfs_preds = [np.inf] * self.total_CFs
         to_pred = None
+
+        self.query_instance_normalized = self.data_interface.normalize_data(self.x1)
+        self.query_instance_normalized = self.query_instance_normalized.astype('float')
 
         while iterations < maxiterations and self.total_CFs > 0:
             if abs(previous_best_loss - current_best_loss) <= thresh and \
-                (self.model.model_type == ModelTypes.Classifier and all(i == desired_class for i in cfs_preds) or
-                    (self.model.model_type == ModelTypes.Regressor and
-                     all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
+                    (self.model.model_type == ModelTypes.Classifier and all(i == desired_class for i in cfs_preds) or
+                     (self.model.model_type == ModelTypes.Regressor and
+                      all(desired_range[0] <= i <= desired_range[1] for i in cfs_preds))):
                 stop_cnt += 1
             else:
                 stop_cnt = 0
@@ -414,8 +447,12 @@ class DiceGenetic(ExplainerBase):
 
             current_best_loss = population_fitness[0][1]
             to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
+
             if self.total_CFs > 0:
-                cfs_preds = self.predict_fn(to_pred)
+                if self.model.model_type == ModelTypes.Classifier:
+                    cfs_preds = self._predict_fn_custom(to_pred, desired_class)
+                else:
+                    cfs_preds = self.predict_fn(to_pred)
 
             # self.total_CFS of the next generation obtained from the fittest members of current generation
             top_members = self.total_CFs

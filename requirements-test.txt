@@ -6,3 +6,4 @@ nbformat
 pytest
 pytest-cov
 twine
+pytest-mock

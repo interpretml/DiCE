@@ -140,6 +140,15 @@ class TestDiceGeneticBinaryClassificationMethods:
                                            total_CFs=total_CFs, desired_class=desired_class,
                                            initialization=initialization)
 
+    # Testing the custom predict function
+    @pytest.mark.parametrize("desired_class", [2])
+    def test_predict_custom(self, desired_class, sample_custom_query_2, mocker):
+        self.exp.yloss_type = 'hinge_loss'
+        mocker.patch('dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode', return_value=None)
+        mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
+        custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
+        assert custom_preds[0] == desired_class
+
 
 class TestDiceGeneticMultiClassificationMethods:
     @pytest.fixture(autouse=True)
@@ -174,6 +183,15 @@ class TestDiceGeneticMultiClassificationMethods:
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_class=desired_class,
                                            initialization=initialization)
+
+    # Testing the custom predict function
+    @pytest.mark.parametrize("desired_class", [2])
+    def test_predict_custom(self, desired_class, sample_custom_query_2, mocker):
+        self.exp.yloss_type = 'hinge_loss'
+        mocker.patch('dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode', return_value=None)
+        mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
+        custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
+        assert custom_preds[0] == desired_class
 
 
 class TestDiceGeneticRegressionMethods:
