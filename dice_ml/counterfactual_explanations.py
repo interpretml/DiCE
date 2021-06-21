@@ -1,4 +1,5 @@
 import json
+import jsonschema
 import os
 
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
@@ -124,11 +125,7 @@ class CounterfactualExplanations:
         with open(schema_path, 'r') as schema_file:
             schema_json = json.load(schema_file)
 
-        try:
-            import jsonschema
-            jsonschema.validate(cf_dict, schema_json)
-        except ImportError:
-            pass
+        jsonschema.validate(cf_dict, schema_json)
 
     def to_json(self):
         """ Serialize Explanations object to json.

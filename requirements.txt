@@ -1,3 +1,4 @@
+jsonschema
 numpy # if you are using tensorflow 1.x, it requires numpy<=1.16 
 pandas
 scikit-learn
