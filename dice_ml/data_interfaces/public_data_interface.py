@@ -96,7 +96,7 @@ class PublicData(_BaseData):
             raise ValueError("dataframe not found in params")
 
         if isinstance(params['dataframe'], pd.DataFrame):
-            self.data_df = params['dataframe']
+            self.data_df = params['dataframe'].copy()
         else:
             raise ValueError("should provide a pandas dataframe")
 
