@@ -1,5 +1,6 @@
 from enum import Enum
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn.datasets import load_iris
 
@@ -165,3 +166,14 @@ class TestErrorCasesPublicDataInterface:
 
         assert "continuous_features_precision contains some feature names which" + \
             " are not part of columns in dataframe" in str(ucve)
+
+
+class TestUserDataCorruption:
+
+    def test_user_data_corruption(self):
+        dataset = helpers.load_adult_income_dataset()
+        dataset_copy = dataset.copy()
+        dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'],
+                     outcome_name='income', permitted_range={'age': [45, 60]},
+                     continuous_features_precision={'hours_per_week': 2})
+        pd.testing.assert_frame_equal(dataset, dataset_copy)
