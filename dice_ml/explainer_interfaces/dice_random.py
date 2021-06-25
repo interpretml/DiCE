@@ -132,13 +132,8 @@ class DiceRandom(ExplainerBase):
             if len(cfs_df) > total_CFs:
                 cfs_df = cfs_df.sample(total_CFs)
             cfs_df.reset_index(inplace=True, drop=True)
-            if len(cfs_df) > 0:
-                self.cfs_pred_scores = self.predict_fn(cfs_df)
-            else:
-                if self.model.model_type == ModelTypes.Classifier:
-                    self.cfs_pred_scores = [0]*self.num_output_nodes
-                else:
-                    self.cfs_pred_scores = [0]
+            self.cfs_pred_scores = self.predict_fn(cfs_df)
+
             cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
 
             self.total_cfs_found = len(cfs_df)
