@@ -102,7 +102,7 @@ class TestDiceRandomBinaryClassificationMethods:
 
         for feature in permitted_range:
             assert all(
-              permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
+                permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
                 in range(total_CFs))
 
     # Testing if you can provide permitted_range for categorical variables
