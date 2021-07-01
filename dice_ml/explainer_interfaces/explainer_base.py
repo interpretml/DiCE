@@ -139,6 +139,8 @@ class ExplainerBase(ABC):
         pass
 
     def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        # import pdb
+        # pdb.set_trace()
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
@@ -156,6 +158,10 @@ class ExplainerBase(ABC):
 
     def check_query_instance_validity(self, features_to_vary, permitted_range, query_instance, feature_ranges_orig):
         for feature in query_instance:
+            print(feature)
+            if feature == self.data_interface.outcome_name:
+                raise ValueError("Target", self.data_interface.outcome_name, "present in query instance")
+
             if feature not in self.data_interface.feature_names:
                 raise ValueError("Feature", feature, "not present in training data!")
 
