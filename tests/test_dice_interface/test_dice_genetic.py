@@ -120,6 +120,12 @@ class TestDiceGeneticBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup("all", None, sample_custom_query_3, "inverse_mad")
 
+    # Testing if an error is thrown when the query instance has an unknown categorical variable
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
+        with pytest.raises(ValueError):
+            self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
+
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
