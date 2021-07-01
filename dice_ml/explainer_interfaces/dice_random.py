@@ -61,12 +61,15 @@ class DiceRandom(ExplainerBase):
 
         :returns: A CounterfactualExamples object that contains the dataframe of generated counterfactuals as an attribute.
         """
-        if permitted_range is None:
-            # use the precomputed default
-            self.feature_range = self.data_interface.permitted_range
+        self.features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights=None)
+
+        if features_to_vary == "all":
+            self.fixed_features_values = {}
         else:
-            # compute the new ranges based on user input
-            self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+            self.fixed_features_values = {}
+            for feature in self.data_interface.feature_names:
+                if feature not in features_to_vary:
+                    self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
@@ -86,15 +89,6 @@ class DiceRandom(ExplainerBase):
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
-        self.features_to_vary = features_to_vary
-        if features_to_vary == "all":
-            self.features_to_vary = self.data_interface.feature_names
-            self.fixed_features_values = {}
-        else:
-            self.fixed_features_values = {}
-            for feature in self.data_interface.feature_names:
-                if feature not in features_to_vary:
-                    self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         self.stopping_threshold = stopping_threshold
         if self.model.model_type == ModelTypes.Classifier:
@@ -139,7 +133,13 @@ class DiceRandom(ExplainerBase):
             if len(cfs_df) > total_CFs:
                 cfs_df = cfs_df.sample(total_CFs)
             cfs_df.reset_index(inplace=True, drop=True)
-            self.cfs_pred_scores = self.predict_fn(cfs_df)
+            if len(cfs_df) > 0:
+                self.cfs_pred_scores = self.predict_fn(cfs_df)
+            else:
+                if self.model.model_type == ModelTypes.Classifier:
+                    self.cfs_pred_scores = [0]*self.num_output_nodes
+                else:
+                    self.cfs_pred_scores = [0]
             cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
 
             self.total_cfs_found = len(cfs_df)
@@ -168,10 +168,6 @@ class DiceRandom(ExplainerBase):
         else:
             final_cfs_df_sparse = None
 
-        if final_cfs_df_sparse is None:
-            self.final_cfs_df = final_cfs_df
-        else:
-            self.final_cfs_df = final_cfs_df_sparse
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
         if self.valid_cfs_found:
