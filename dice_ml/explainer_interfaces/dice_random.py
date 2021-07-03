@@ -134,22 +134,26 @@ class DiceRandom(ExplainerBase):
             cfs_df.reset_index(inplace=True, drop=True)
             if len(cfs_df) > 0:
                 self.cfs_pred_scores = self.predict_fn(cfs_df)
+                cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
             else:
                 if self.model.model_type == ModelTypes.Classifier:
                     self.cfs_pred_scores = [0]*self.num_output_nodes
                 else:
                     self.cfs_pred_scores = [0]
-            cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
-
             self.total_cfs_found = len(cfs_df)
 
             self.valid_cfs_found = True if self.total_cfs_found >= self.total_CFs else False
-
-            final_cfs_df = cfs_df[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-            final_cfs_df[self.data_interface.outcome_name] = \
-                final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
-            self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
-            self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+            if len(cfs_df) > 0:
+                final_cfs_df = cfs_df[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+                final_cfs_df[self.data_interface.outcome_name] = \
+                    final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
+                self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
+                self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+            else:
+                final_cfs_df = None
+                self.cfs_preds = None
+                self.cfs_pred_scores = None
+                self.final_cfs = None
         else:
             final_cfs_df = None
             self.cfs_preds = None
