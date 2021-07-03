@@ -114,7 +114,7 @@ class CounterfactualExamples:
                         newdf[ix][jx] = '-'
                     else:
                         newdf[ix][jx] = str(newdf[ix][jx])
-            display(pd.DataFrame(newdf, columns=df.columns))  # works only in Jupyter notebook
+            display(pd.DataFrame(newdf, columns=df.columns, index=df.index))  # works only in Jupyter notebook
 
     def visualize_as_list(self, display_sparse_df=True, show_only_changes=False):
         # original instance

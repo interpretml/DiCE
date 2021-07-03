@@ -177,7 +177,6 @@ class DiceKD(ExplainerBase):
 
         # Iterating through the closest points from the KD tree and checking if any of these are valid
         if self.KD_tree is not None and total_CFs > 0:
-            cfs = cfs.reset_index(drop=True)
             for i in range(len(cfs)):
                 if total_cfs_found == total_CFs:
                     break
