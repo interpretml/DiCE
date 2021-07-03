@@ -117,6 +117,7 @@ def sample_custom_query_4():
     """
     return pd.DataFrame({'Categorical': ['c'], 'Numerical': [13]})
 
+
 @pytest.fixture
 def sample_custom_query_index():
     """

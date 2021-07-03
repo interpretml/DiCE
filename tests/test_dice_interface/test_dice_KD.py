@@ -156,11 +156,12 @@ class TestDiceKDBinaryClassificationMethods:
     # Testing for index returned
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
-    def test_zero_cfs(self, desired_class, sample_custom_query_index, total_CFs, posthoc_sparsity_algorithm):
+    def test_index(self, desired_class, sample_custom_query_index, total_CFs, posthoc_sparsity_algorithm):
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_index, total_CFs=total_CFs,
                                            desired_class=desired_class,
                                            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         assert self.exp.final_cfs_df.index[0] == 3
+
 
 class TestDiceKDMultiClassificationMethods:
     @pytest.fixture(autouse=True)
