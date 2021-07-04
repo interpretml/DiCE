@@ -163,10 +163,8 @@ class TestErrorCasesPublicDataInterface:
 
     def test_min_max_equal(self):
         dataset = helpers.load_min_max_equal_dataset()
-        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
-                         outcome_name='Outcome')
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
         assert all(dice_data.normalize_data(dice_data.data_df)['Numerical'] == 0)
-
 
     def test_unseen_continuous_features_precision(self):
         iris = load_iris(as_frame=True)
