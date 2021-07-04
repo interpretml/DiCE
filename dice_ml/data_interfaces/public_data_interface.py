@@ -193,10 +193,16 @@ class PublicData(_BaseData):
                 max_value = self.data_df[feature_name].max()
                 min_value = self.data_df[feature_name].min()
                 if len(df.shape) == 1:
-                    value = (df[feature_index] - min_value) / (max_value - min_value)
+                    if min_value == max_value:
+                        value = 0
+                    else:
+                        value = (df[feature_index] - min_value) / (max_value - min_value)
                     result[feature_index] = value
                 else:
-                    result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
+                    if min_value == max_value:
+                        result[:, feature_index] = np.zeros(len(df[:, feature_index]))
+                    else:
+                        result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):

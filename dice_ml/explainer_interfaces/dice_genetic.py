@@ -480,7 +480,7 @@ class DiceGenetic(ExplainerBase):
             predictions = self.predict_fn_scores(population[i])[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
-                if not isinstance(predictions, float) and len(predictions) > 1:
+                if not isinstance(predictions, float) and not isinstance(predictions, np.float32) and len(predictions) > 1:
                     self.cfs_preds.append(np.argmax(predictions))
                 else:
                     self.cfs_preds.append(predictions)
