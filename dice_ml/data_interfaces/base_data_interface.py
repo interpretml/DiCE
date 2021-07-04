@@ -22,6 +22,10 @@ class _BaseData(ABC):
         else:
             raise ValueError("should provide the name of outcome feature as a string")
 
+    def _validate_outcome_as_last_column(self):
+        if self.data_df.columns.get_loc(self.outcome_name) != len(self.data_df.columns) - 1:
+            raise ValueError("Outcome should be the last column! Please reorder!")
+
     @abstractmethod
     def __init__(self, params):
         """The init method needs to be implemented by the inherting classes."""

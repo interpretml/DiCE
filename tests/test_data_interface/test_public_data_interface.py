@@ -129,6 +129,14 @@ class TestErrorCasesPublicDataInterface:
 
         assert "outcome_name invalid not found in" in str(ucve)
 
+    def test_outcome_not_last_column(self):
+        dataset = helpers.load_outcome_not_last_column_dataset()
+        with pytest.raises(ValueError) as ve:
+            dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
+                         outcome_name='Outcome')
+        print(ve)
+        assert "Outcome should be the last column! Please reorder!" in str(ve)
+
     def test_unseen_continuous_feature_names(self):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
@@ -152,6 +160,13 @@ class TestErrorCasesPublicDataInterface:
                          outcome_name='target', permitted_range=permitted_range)
 
         assert "permitted_range contains some feature names which are not part of columns in dataframe" in str(ucve)
+
+    def test_min_max_equal(self):
+        dataset = helpers.load_min_max_equal_dataset()
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
+                         outcome_name='Outcome')
+        assert all(dice_data.normalize_data(dice_data.data_df)['Numerical'] == 0)
+
 
     def test_unseen_continuous_features_precision(self):
         iris = load_iris(as_frame=True)

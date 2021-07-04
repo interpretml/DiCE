@@ -29,6 +29,7 @@ class PublicData(_BaseData):
         self._validate_and_set_outcome_name(params=params)
         self._validate_and_set_dataframe(params=params)
         self._validate_and_set_continuous_features(params=params)
+        self._validate_outcome_as_last_column()
 
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
@@ -185,7 +186,10 @@ class PublicData(_BaseData):
             for feature_name in self.continuous_feature_names:
                 max_value = self.data_df[feature_name].max()
                 min_value = self.data_df[feature_name].min()
-                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+                if min_value == max_value:
+                    result[feature_name] = 0
+                else:
+                    result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         else:
             result = result.astype('float')
             for feature_index in self.continuous_feature_indexes:
