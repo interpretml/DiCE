@@ -156,6 +156,9 @@ class ExplainerBase(ABC):
 
     def check_query_instance_validity(self, features_to_vary, permitted_range, query_instance, feature_ranges_orig):
         for feature in query_instance:
+            if feature == self.data_interface.outcome_name:
+                raise ValueError("Target", self.data_interface.outcome_name, "present in query instance")
+
             if feature not in self.data_interface.feature_names:
                 raise ValueError("Feature", feature, "not present in training data!")
 
