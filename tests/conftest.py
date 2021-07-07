@@ -41,6 +41,51 @@ def regression_exp_object(method="random"):
 
 
 @pytest.fixture
+def KD_binary_classification_exp_object():
+    binary_classification_exp_object(method="kdtree")
+
+
+@pytest.fixture
+def KD_multi_classification_exp_object():
+    multi_classification_exp_object(method="kdtree")
+
+
+@pytest.fixture
+def KD_regression_exp_object():
+    regression_exp_object(method="kdtree")
+
+
+@pytest.fixture
+def genetic_binary_classification_exp_object():
+    binary_classification_exp_object(method="genetic")
+
+
+@pytest.fixture
+def genetic_multi_classification_exp_object():
+    multi_classification_exp_object(method="genetic")
+
+
+@pytest.fixture
+def genetic_regression_exp_object():
+    regression_exp_object(method="genetic")
+
+
+@pytest.fixture
+def random_binary_classification_exp_object():
+    binary_classification_exp_object()
+
+
+@pytest.fixture
+def random_multi_classification_exp_object():
+    multi_classification_exp_object()
+
+
+@pytest.fixture
+def random_regression_exp_object():
+    regression_exp_object()
+
+
+@pytest.fixture
 def public_data_object():
     """
     Returns a public data object for the adult income dataset
