@@ -6,9 +6,21 @@ from dice_ml.utils.exception import UserConfigValidationException
 
 
 class TestBaseExplainerLoader:
-    def _get_exp(self, backend, method="random"):
-        dataset = helpers.load_adult_income_dataset()
-        d = dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')
+    def _get_exp(self, backend, method="random", is_public_data_interface=True):
+        if is_public_data_interface:
+            dataset = helpers.load_adult_income_dataset()
+            d = dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')
+        else:
+            d = dice_ml.Data(features={
+                'age': [17, 90],
+                'workclass': ['Government', 'Other/Unknown', 'Private', 'Self-Employed'],
+                'education': ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college'],
+                'marital_status': ['Divorced', 'Married', 'Separated', 'Single', 'Widowed'],
+                'occupation': ['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar'],
+                'race': ['Other', 'White'],
+                'gender': ['Female', 'Male'],
+                'hours_per_week': [1, 99]},
+                            outcome_name='income')
         ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
         m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
         exp = dice_ml.Dice(d, m, method=method)
@@ -50,3 +62,12 @@ class TestBaseExplainerLoader:
         backend = 'sklearn'
         with pytest.raises(UserConfigValidationException):
             self._get_exp(backend, method="unsupported")
+
+    def test_private_data_interface_dice_kdtree(self):
+        pytest.importorskip("sklearn")
+        backend = 'sklearn'
+        with pytest.raises(UserConfigValidationException) as ucve:
+            self._get_exp(backend, method='kdtree', is_public_data_interface=False)
+
+        assert 'Private data interface is not supported with sklearn kdtree explainer' + \
+               ' since kdtree explainer needs access to entire training data' in str(ucve)

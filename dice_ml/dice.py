@@ -5,7 +5,7 @@
 from dice_ml.constants import BackEndTypes, SamplingStrategy
 from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-
+from dice_ml.data_interfaces.private_data_interface import PrivateData
 
 class Dice(ExplainerBase):
     """An interface class to different DiCE implementations."""
@@ -21,6 +21,11 @@ class Dice(ExplainerBase):
 
     def decide_implementation_type(self, data_interface, model_interface, method, **kwargs):
         """Decides DiCE implementation type."""
+        if model_interface.backend == BackEndTypes.Sklearn:
+            if method == SamplingStrategy.KdTree and isinstance(data_interface, PrivateData):
+                raise UserConfigValidationException(
+                    'Private data interface is not supported with sklearn kdtree explainer'
+                    ' since kdtree explainer needs access to entire training data')
         self.__class__ = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
 
