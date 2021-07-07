@@ -14,7 +14,8 @@ class TestBaseExplainerLoader:
             d = dice_ml.Data(features={
                 'age': [17, 90],
                 'workclass': ['Government', 'Other/Unknown', 'Private', 'Self-Employed'],
-                'education': ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters', 'Prof-school', 'School', 'Some-college'],
+                'education': ['Assoc', 'Bachelors', 'Doctorate', 'HS-grad', 'Masters',
+                              'Prof-school', 'School', 'Some-college'],
                 'marital_status': ['Divorced', 'Married', 'Separated', 'Single', 'Widowed'],
                 'occupation': ['Blue-Collar', 'Other/Unknown', 'Professional', 'Sales', 'Service', 'White-Collar'],
                 'race': ['Other', 'White'],

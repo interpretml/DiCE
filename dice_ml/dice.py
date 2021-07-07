@@ -7,6 +7,7 @@ from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.data_interfaces.private_data_interface import PrivateData
 
+
 class Dice(ExplainerBase):
     """An interface class to different DiCE implementations."""
 
