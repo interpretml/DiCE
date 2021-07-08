@@ -134,7 +134,6 @@ class TestErrorCasesPublicDataInterface:
         with pytest.raises(ValueError) as ve:
             dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
                          outcome_name='Outcome')
-        print(ve)
         assert "Outcome should be the last column! Please reorder!" in str(ve)
 
     def test_unseen_continuous_feature_names(self):
