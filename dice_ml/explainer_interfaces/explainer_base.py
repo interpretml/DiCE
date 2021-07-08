@@ -395,7 +395,7 @@ class ExplainerBase(ABC):
             for feature in features_sorted:
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
-                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.loc[[cf_ix]][feature])
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
                 if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
@@ -421,17 +421,17 @@ class ExplainerBase(ABC):
         current_pred = current_pred_orig
         if self.model.model_type == ModelTypes.Classifier:
             while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
-                old_val = int(final_cfs_sparse.loc[[cf_ix]][feature])
-                final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
+                old_val = int(final_cfs_sparse.at[cf_ix, feature])
+                final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
                 if not self.is_cf_valid(current_pred):
-                    final_cfs_sparse.loc[cf_ix, feature] = old_val
-                    diff = query_instance[feature].iat[0] - int(final_cfs_sparse.loc[[cf_ix]][feature])
+                    final_cfs_sparse.at[cf_ix, feature] = old_val
+                    diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
                     return final_cfs_sparse
 
-                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.loc[[cf_ix]][feature])
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
 
         return final_cfs_sparse
 
@@ -439,8 +439,8 @@ class ExplainerBase(ABC):
         """Performs a binary search between continuous features of a CF and corresponding values
            in query_instance until the prediction class changes."""
 
-        old_val = int(final_cfs_sparse.loc[[cf_ix]][feature])
-        final_cfs_sparse.loc[cf_ix, feature] = query_instance[feature].iat[0]
+        old_val = int(final_cfs_sparse.at[cf_ix, feature])
+        final_cfs_sparse.at[cf_ix, feature] = query_instance[feature].iat[0]
         # Prediction of the query instance
         current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
@@ -448,18 +448,18 @@ class ExplainerBase(ABC):
         if self.is_cf_valid(current_pred):
             return final_cfs_sparse
         else:
-            final_cfs_sparse.loc[cf_ix, feature] = old_val
+            final_cfs_sparse.at[cf_ix, feature] = old_val
 
         # move the CF values towards the query_instance
         if diff > 0:
-            left = int(final_cfs_sparse.loc[[cf_ix]][feature])
+            left = int(final_cfs_sparse.at[cf_ix, feature])
             right = query_instance[feature].iat[0]
 
             while left <= right:
                 current_val = left + ((right - left)/2)
                 current_val = round(current_val, decimal_prec[feature])
 
-                final_cfs_sparse.loc[cf_ix, feature] = current_val
+                final_cfs_sparse.at[cf_ix, feature] = current_val
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
@@ -472,13 +472,13 @@ class ExplainerBase(ABC):
 
         else:
             left = query_instance[feature].iat[0]
-            right = int(final_cfs_sparse.loc[[cf_ix]][feature])
+            right = int(final_cfs_sparse.at[cf_ix, feature])
 
             while right >= left:
                 current_val = right - ((right - left)/2)
                 current_val = round(current_val, decimal_prec[feature])
 
-                final_cfs_sparse.loc[cf_ix, feature] = current_val
+                final_cfs_sparse.at[cf_ix, feature] = current_val
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
