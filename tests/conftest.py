@@ -127,6 +127,14 @@ def sample_custom_query_6():
 
 
 @pytest.fixture
+def sample_custom_query_index():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['a'], 'Numerical': [88]})
+
+
+@pytest.fixture
 def sample_custom_query_10():
     """
     Returns a sample query instance for the custom dataset
