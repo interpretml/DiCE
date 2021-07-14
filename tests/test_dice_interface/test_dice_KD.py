@@ -71,9 +71,11 @@ class TestDiceKDBinaryClassificationMethods:
 
     # Verifying the output of the KD tree
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_KD_tree_output(self, desired_class, sample_custom_query_1, total_CFs):
+    @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
+    def test_KD_tree_output(self, desired_class, sample_custom_query_1, total_CFs, posthoc_sparsity_algorithm):
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, desired_class=desired_class,
-                                           total_CFs=total_CFs)
+                                           total_CFs=total_CFs,
+                                           posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
@@ -124,6 +126,13 @@ class TestDiceKDBinaryClassificationMethods:
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_3, total_CFs=total_CFs,
                                                desired_class=desired_class)
 
+    # Testing if an error is thrown when the query instance has an unknown column
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
+        with pytest.raises(ValueError):
+            self.exp._generate_counterfactuals(query_instance=sample_custom_query_5, total_CFs=total_CFs,
+                                               desired_class=desired_class)
+
     # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
     def test_duplicates(self, desired_class, sample_custom_query_4, total_CFs):
@@ -144,6 +153,15 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
                                            desired_class=desired_class)
 
+    # Testing for index returned
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
+    def test_index(self, desired_class, sample_custom_query_index, total_CFs, posthoc_sparsity_algorithm):
+        self.exp._generate_counterfactuals(query_instance=sample_custom_query_index, total_CFs=total_CFs,
+                                           desired_class=desired_class,
+                                           posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
+        assert self.exp.final_cfs_df.index[0] == 3
+
 
 class TestDiceKDMultiClassificationMethods:
     @pytest.fixture(autouse=True)
@@ -153,9 +171,12 @@ class TestDiceKDMultiClassificationMethods:
 
     # Testing that the output of multiclass classification lies in the desired_class
     @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
-    def test_KD_tree_output(self, desired_class, sample_custom_query_2, total_CFs):
+    @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
+    def test_KD_tree_output(self, desired_class, sample_custom_query_2, total_CFs,
+                            posthoc_sparsity_algorithm):
         self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
-                                                 desired_class=desired_class)
+                                                 desired_class=desired_class,
+                                                 posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         assert all(i == desired_class for i in self.exp_multi.cfs_preds)
 
     # Testing that the output of multiclass classification lies in the desired_class
@@ -195,9 +216,11 @@ class TestDiceKDRegressionMethods:
     # Testing that the output of regression lies in the desired_range
     @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
     @pytest.mark.parametrize("version", ['2.0', '1.0'])
-    def test_KD_tree_output(self, desired_range, sample_custom_query_2, total_CFs, version):
+    @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
+    def test_KD_tree_output(self, desired_range, sample_custom_query_2, total_CFs, version, posthoc_sparsity_algorithm):
         cf_examples = self.exp_regr._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
-                                                              desired_range=desired_range)
+                                                              desired_range=desired_range,
+                                                              posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         assert all(desired_range[0] <= i <= desired_range[1] for i in self.exp_regr.cfs_preds)
 
         assert cf_examples is not None

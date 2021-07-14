@@ -35,8 +35,9 @@ class DiceRandom(ExplainerBase):
         else:
             self.outcome_precision = 0
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range,  desired_class, permitted_range,
-                                  features_to_vary, stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+    def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None,
+                                  desired_class="opposite", permitted_range=None,
+                                  features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
                                   posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=None, verbose=False):
         """Generate counterfactuals by randomly sampling features.
 
@@ -60,12 +61,15 @@ class DiceRandom(ExplainerBase):
 
         :returns: A CounterfactualExamples object that contains the dataframe of generated counterfactuals as an attribute.
         """
-        if permitted_range is None:
-            # use the precomputed default
-            self.feature_range = self.data_interface.permitted_range
+        self.features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights=None)
+
+        if features_to_vary == "all":
+            self.fixed_features_values = {}
         else:
-            # compute the new ranges based on user input
-            self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+            self.fixed_features_values = {}
+            for feature in self.data_interface.feature_names:
+                if feature not in features_to_vary:
+                    self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
@@ -85,15 +89,6 @@ class DiceRandom(ExplainerBase):
             self.target_cf_range = self.infer_target_cfs_range(desired_range)
         # fixing features that are to be fixed
         self.total_CFs = total_CFs
-        self.features_to_vary = features_to_vary
-        if features_to_vary == "all":
-            self.features_to_vary = self.data_interface.feature_names
-            self.fixed_features_values = {}
-        else:
-            self.fixed_features_values = {}
-            for feature in self.data_interface.feature_names:
-                if feature not in features_to_vary:
-                    self.fixed_features_values[feature] = query_instance[feature].iat[0]
 
         self.stopping_threshold = stopping_threshold
         if self.model.model_type == ModelTypes.Classifier:
@@ -138,18 +133,28 @@ class DiceRandom(ExplainerBase):
             if len(cfs_df) > total_CFs:
                 cfs_df = cfs_df.sample(total_CFs)
             cfs_df.reset_index(inplace=True, drop=True)
-            self.cfs_pred_scores = self.predict_fn(cfs_df)
-            cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
-
+            if len(cfs_df) > 0:
+                self.cfs_pred_scores = self.predict_fn(cfs_df)
+                cfs_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.cfs_pred_scores)
+            else:
+                if self.model.model_type == ModelTypes.Classifier:
+                    self.cfs_pred_scores = [0]*self.num_output_nodes
+                else:
+                    self.cfs_pred_scores = [0]
             self.total_cfs_found = len(cfs_df)
 
             self.valid_cfs_found = True if self.total_cfs_found >= self.total_CFs else False
-
-            final_cfs_df = cfs_df[self.data_interface.feature_names + [self.data_interface.outcome_name]]
-            final_cfs_df[self.data_interface.outcome_name] = \
-                final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
-            self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
-            self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+            if len(cfs_df) > 0:
+                final_cfs_df = cfs_df[self.data_interface.feature_names + [self.data_interface.outcome_name]]
+                final_cfs_df[self.data_interface.outcome_name] = \
+                    final_cfs_df[self.data_interface.outcome_name].round(self.outcome_precision)
+                self.cfs_preds = final_cfs_df[[self.data_interface.outcome_name]].values
+                self.final_cfs = final_cfs_df[self.data_interface.feature_names].values
+            else:
+                final_cfs_df = None
+                self.cfs_preds = None
+                self.cfs_pred_scores = None
+                self.final_cfs = None
         else:
             final_cfs_df = None
             self.cfs_preds = None
