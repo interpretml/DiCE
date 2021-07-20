@@ -29,6 +29,7 @@ class TestExplainerBaseBinaryClassification:
             permitted_range=None,
             features_to_vary='all')
 
+
 class TestExplainerBaseMultiClassClassification:
 
     @pytest.mark.parametrize("desired_class, multi_classification_exp_object",
