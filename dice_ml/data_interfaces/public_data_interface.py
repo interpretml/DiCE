@@ -29,7 +29,6 @@ class PublicData(_BaseData):
         self._validate_and_set_outcome_name(params=params)
         self._validate_and_set_dataframe(params=params)
         self._validate_and_set_continuous_features(params=params)
-        # self._validate_outcome_as_last_column()
 
         self.feature_names = [
             name for name in self.data_df.columns.tolist() if name != self.outcome_name]
