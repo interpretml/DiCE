@@ -142,6 +142,8 @@ class ExplainerBase(ABC):
         pass
 
     def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        self.data_interface.continuous_feature_indexes = [query_instance.columns.get_loc(name) for name in
+                                                          self.data_interface.continuous_feature_names]
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
