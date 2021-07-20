@@ -131,10 +131,8 @@ class TestErrorCasesPublicDataInterface:
 
     def test_outcome_not_last_column(self):
         dataset = helpers.load_outcome_not_last_column_dataset()
-        with pytest.raises(ValueError) as ve:
-            dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
+        dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
                          outcome_name='Outcome')
-        assert "Outcome should be the last column! Please reorder!" in str(ve)
 
     def test_unseen_continuous_feature_names(self):
         iris = load_iris(as_frame=True)
