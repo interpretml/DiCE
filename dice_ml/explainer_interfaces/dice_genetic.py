@@ -264,9 +264,6 @@ class DiceGenetic(ExplainerBase):
 
         features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights)
 
-        # Remaps continuous feature indices based on the query instance
-        self.data_interface.continuous_feature_indexes = [query_instance.columns.get_loc(name) for name in self.data_interface.continuous_feature_names]
-
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
         query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)

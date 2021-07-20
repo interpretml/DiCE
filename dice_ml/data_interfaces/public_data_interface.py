@@ -44,9 +44,6 @@ class PublicData(_BaseData):
         self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
         ) if name not in self.continuous_feature_names + [self.outcome_name]]
 
-        self.continuous_feature_indexes = [self.data_df.columns.get_loc(
-            name) for name in self.continuous_feature_names if name in self.data_df]
-
         self.categorical_feature_indexes = [self.data_df.columns.get_loc(
             name) for name in self.categorical_feature_names if name in self.data_df]
 
