@@ -67,39 +67,55 @@ class CounterfactualExamples:
                     self.desired_range == self.desired_range
         return False
 
-    def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
-        from IPython.display import display
-        # original instance
-        print('Query instance (original outcome : %i)' % round(self.test_pred))
-        display(self.test_instance_df)  # works only in Jupyter notebook
+    def _dump_output(self, content, show_only_changes=False, is_notebook_console=False):
+        if is_notebook_console:
+            self.display_df(content, show_only_changes=show_only_changes)
+        else:
+            assert isinstance(content, pd.DataFrame), "Expecting a pandas dataframe"
+            self.print_list(content.values.tolist(),
+                            show_only_changes=show_only_changes)
+
+    def _visualize_internal(self, display_sparse_df=True, show_only_changes=False,
+                            is_notebook_console=False):
         if self.final_cfs_df is not None and len(self.final_cfs_df) > 0:
             if self.posthoc_sparsity_param is None:
                 print('\nCounterfactual set (new outcome: {0})'.format(self.new_outcome))
-                self.display_df(self.final_cfs_df, show_only_changes)
+                self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
+                                  is_notebook_console=is_notebook_console)
             elif hasattr(self.data_interface, 'data_df') and \
                     display_sparse_df is True and self.final_cfs_df_sparse is not None:
                 # CFs
                 print('\nDiverse Counterfactual set (new outcome: {0})'.format(self.new_outcome))
-                self.display_df(self.final_cfs_df_sparse, show_only_changes)
-
+                self._dump_output(content=self.final_cfs_df_sparse, show_only_changes=show_only_changes,
+                                  is_notebook_console=is_notebook_console)
             elif hasattr(self.data_interface, 'data_df') and \
                     display_sparse_df is True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. ',
                       'displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %
                       (self.new_outcome))
-                self.display_df(self.final_cfs_df, show_only_changes)
-
+                self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
+                                  is_notebook_console=is_notebook_console)
             elif not hasattr(self.data_interface, 'data_df'):  # for private data
                 print('\nDiverse Counterfactual set without sparsity correction since only metadata about each',
                       ' feature is available (new outcome: ', self.new_outcome)
-                self.display_df(self.final_cfs_df, show_only_changes)
-
+                self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
+                                  is_notebook_console=is_notebook_console)
             else:
                 # CFs
                 print('\nDiverse Counterfactual set without sparsity correction (new outcome: ', self.new_outcome)
-                self.display_df(self.final_cfs_df, show_only_changes)
+                self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
+                                  is_notebook_console=is_notebook_console)
         else:
             print('\nNo counterfactuals found!')
+
+    def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
+        from IPython.display import display
+        # original instance
+        print('Query instance (original outcome : %i)' % round(self.test_pred))
+        display(self.test_instance_df)  # works only in Jupyter notebook
+        self._visualize_internal(display_sparse_df=display_sparse_df,
+                                 show_only_changes=show_only_changes,
+                                 is_notebook_console=True)
 
     def display_df(self, df, show_only_changes):
         from IPython.display import display
@@ -120,36 +136,9 @@ class CounterfactualExamples:
         # original instance
         print('Query instance (original outcome : %i)' % round(self.test_pred))
         print(self.test_instance_df.values.tolist()[0])
-
-        if len(self.final_cfs) > 0:
-            if self.posthoc_sparsity_param is None:
-                print('\nCounterfactual set (new outcome : %i)' % (self.new_outcome))
-                self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
-
-            elif hasattr(self.data_interface, 'data_df') and \
-                    display_sparse_df is True and self.final_cfs_df_sparse is not None:
-                # CFs
-                print('\nDiverse Counterfactual set (new outcome : %i)' % (self.new_outcome))
-                self.print_list(self.final_cfs_df_sparse.values.tolist(), show_only_changes)
-
-            elif hasattr(self.data_interface, 'data_df') and \
-                    display_sparse_df is True and self.final_cfs_df_sparse is None:
-                print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. ',
-                      'displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)'
-                      % (self.new_outcome))
-                self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
-
-            elif not hasattr(self.data_interface, 'data_df'):  # for private data
-                print('\nDiverse Counterfactual set without sparsity correction since only metadata about ',
-                      'each feature is available (new outcome : %i)' % (self.new_outcome))
-                self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
-
-            else:
-                # CFs
-                print('\nDiverse Counterfactual set without sparsity correction (new outcome : %i)' % (self.new_outcome))
-                self.print_list(self.final_cfs_df.values.tolist(), show_only_changes)
-        else:
-            print('\n0 counterfactuals found!')
+        self._visualize_internal(display_sparse_df=display_sparse_df,
+                                 show_only_changes=show_only_changes,
+                                 is_notebook_console=False)
 
     def print_list(self, li, show_only_changes):
         if show_only_changes is False:
