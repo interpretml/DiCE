@@ -129,11 +129,6 @@ class TestErrorCasesPublicDataInterface:
 
         assert "outcome_name invalid not found in" in str(ucve)
 
-    def test_outcome_not_last_column(self):
-        dataset = helpers.load_outcome_not_last_column_dataset()
-        dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'],
-                         outcome_name='Outcome')
-
     def test_unseen_continuous_feature_names(self):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
