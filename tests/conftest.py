@@ -27,6 +27,7 @@ def binary_classification_exp_object_out_of_order(method="random"):
     exp = dice_ml.Dice(d, m, method=method)
     return exp
 
+
 @pytest.fixture
 def multi_classification_exp_object(method="random"):
     backend = 'sklearn'
