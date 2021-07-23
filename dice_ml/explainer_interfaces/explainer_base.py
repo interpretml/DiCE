@@ -326,6 +326,10 @@ class ExplainerBase(ABC):
                 df = cf_examples.final_cfs_df_sparse
             else:
                 df = cf_examples.final_cfs_df
+
+            if df is None:
+                continue
+
             for index, row in df.iterrows():
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
