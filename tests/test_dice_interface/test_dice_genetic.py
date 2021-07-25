@@ -46,6 +46,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs", [(7, 3)])
     def test_no_cfs(self, desired_class, sample_custom_query_1, total_CFs):
         with pytest.raises(UserConfigValidationException):
+            self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_1)
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
                                                desired_class=desired_class)
 
@@ -60,6 +61,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
                              [(1, 2, "all", "kdtree"), (1, 2, "all", "random")])
     def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  features_to_vary=features_to_vary,
@@ -71,6 +73,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
                              [(1, 2, ["Numerical"], "kdtree"), (1, 2, ["Numerical"], "random")])
     def test_features_to_vary(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  features_to_vary=features_to_vary,
@@ -86,6 +89,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, permitted_range, initialization",
                              [(1, 2, {'Numerical': [10, 15]}, "kdtree"), (1, 2, {'Numerical': [10, 15]}, "random")])
     def test_permitted_range(self, desired_class, sample_custom_query_2, total_CFs, permitted_range, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         features_to_vary = self.exp.setup("all", permitted_range, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  features_to_vary=features_to_vary, permitted_range=permitted_range,
@@ -103,6 +107,7 @@ class TestDiceGeneticBinaryClassificationMethods:
                               (1, 2, {'Categorical': ['a', 'c']}, "random")])
     def test_permitted_range_categorical(self, desired_class, total_CFs, sample_custom_query_2, permitted_range,
                                          initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         features_to_vary = self.exp.setup("all", permitted_range, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  features_to_vary=features_to_vary, permitted_range=permitted_range,
@@ -130,6 +135,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(0, 7, "kdtree", 0), (0, 7, "random", 0)])
     def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
@@ -141,6 +147,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
                              [(0, 0, "kdtree"), (0, 0, "random")])
     def test_zero_cfs(self, desired_class, sample_custom_query_2, total_CFs, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_class=desired_class,
@@ -149,6 +156,7 @@ class TestDiceGeneticBinaryClassificationMethods:
     # Testing the custom predict function
     @pytest.mark.parametrize("desired_class", [2])
     def test_predict_custom(self, desired_class, sample_custom_query_2, mocker):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.yloss_type = 'hinge_loss'
         mocker.patch('dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode', return_value=None)
         mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
@@ -164,6 +172,7 @@ class TestDiceGeneticMultiClassificationMethods:
     # Testing that the counterfactuals are in the desired class
     @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
     def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
@@ -174,6 +183,7 @@ class TestDiceGeneticMultiClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(2, 7, "kdtree", 0), (2, 7, "random", 0)])
     def test_maxiter(self, desired_class, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_class=desired_class,
@@ -185,6 +195,7 @@ class TestDiceGeneticMultiClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs, initialization",
                              [(2, 0, "kdtree"), (2, 0, "random")])
     def test_zero_cfs(self, desired_class, sample_custom_query_2, total_CFs, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_class=desired_class,
@@ -193,6 +204,7 @@ class TestDiceGeneticMultiClassificationMethods:
     # Testing the custom predict function
     @pytest.mark.parametrize("desired_class", [2])
     def test_predict_custom(self, desired_class, sample_custom_query_2, mocker):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.yloss_type = 'hinge_loss'
         mocker.patch('dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode', return_value=None)
         mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
@@ -209,6 +221,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",
                              [([1, 2.8], 2, "kdtree"), ([1, 2.8], 2, "random")])
     def test_desired_range(self, desired_range, sample_custom_query_2, total_CFs, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_range=desired_range,
@@ -221,6 +234,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization, maxiterations",
                              [([1, 2.8], 7, "kdtree", 0), ([1, 2.8], 7, "random", 0)])
     def test_maxiter(self, desired_range, sample_custom_query_2, total_CFs, initialization, maxiterations):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                                  total_CFs=total_CFs, desired_range=desired_range,
@@ -232,6 +246,7 @@ class TestDiceGeneticRegressionMethods:
     @pytest.mark.parametrize("desired_range, total_CFs, initialization",
                              [([1, 2.8], 0, "kdtree"), ([1, 2.8], 0, "random")])
     def test_zero_cfs(self, desired_range, sample_custom_query_2, total_CFs, initialization):
+        self.exp.data_interface.set_continuous_feature_indexes(query_instance=sample_custom_query_2)
         self.exp.setup("all", None, sample_custom_query_2, "inverse_mad")
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_range=desired_range,
