@@ -118,7 +118,7 @@ class PublicData(_BaseData):
     def set_continuous_feature_indexes(self, query_instance):
         """Remaps continuous feature indices based on the query instance"""
         self.continuous_feature_indexes = [query_instance.columns.get_loc(name) for name in
-                                                          self.continuous_feature_names]
+                                           self.continuous_feature_names]
 
     def _validate_and_set_continuous_features_precision(self, params):
         """Validate and set the dictionary of precision for continuous features."""
