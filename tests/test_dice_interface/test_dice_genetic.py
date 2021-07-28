@@ -133,6 +133,13 @@ class TestDiceGeneticBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, None, sample_custom_query_5, "inverse_mad")
 
+    # Testing if an error is thrown when the query instance has outcome variable
+    def test_query_instance_with_target_column(self, sample_custom_query_6):
+        with pytest.raises(ValueError) as ve:
+            self.exp.setup("all", None, sample_custom_query_6, "inverse_mad")
+
+        assert "present in query instance" in str(ve)
+
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(0, 7, "kdtree", 0), (0, 7, "random", 0)])

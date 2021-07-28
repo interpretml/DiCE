@@ -2,6 +2,8 @@ import pytest
 import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 
 @pytest.fixture
@@ -41,6 +43,27 @@ class TestDiceRandomBinaryClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, random_binary_classification_exp_object):
         self.exp = random_binary_classification_exp_object  # explainer object
+
+    # When no elements in the desired_class are present in the training data
+    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('a', 3)])
+    def test_unsupported_binary_class(self, desired_class, sample_custom_query_1, total_CFs):
+        with pytest.raises(UserConfigValidationException) as ucve:
+            self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
+                                               desired_class=desired_class)
+        if desired_class == 100:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
+
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1, desired_class=desired_class,
+            total_CFs=total_CFs)
+
+        assert counterfactual_explanations is not None
+        assert len(counterfactual_explanations.cf_examples_list) == sample_custom_query_1.shape[0]
+        assert counterfactual_explanations.cf_examples_list[0].final_cfs_df.shape[0] == total_CFs
 
     # When invalid desired_class is given
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs, features_to_vary, permitted_range",
@@ -161,6 +184,16 @@ class TestDiceRandomMultiClassificationMethods:
                                                  desired_range=desired_range, permitted_range=permitted_range)
         assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
 
+    # Testing that the output of multiclass classification lies in the desired_class
+    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
+    def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
+                                        desired_class=desired_class)
+        assert all(i == desired_class for i in self.exp.cfs_preds)
+
+        assert counterfactual_explanations is not None
+
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
                              [("all", 2, None, 0, None)])
@@ -169,6 +202,17 @@ class TestDiceRandomMultiClassificationMethods:
         self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_class=desired_class,
                                            desired_range=desired_range, permitted_range=permitted_range)
+
+    # When no elements in the desired_class are present in the training data
+    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
+    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
+        with pytest.raises(UserConfigValidationException) as ucve:
+            self.exp._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
+                                               desired_class=desired_class)
+        if desired_class == 100:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestDiceRandomRegressionMethods:
@@ -188,6 +232,36 @@ class TestDiceRandomRegressionMethods:
         assert all(
             [desired_range[0]] * total_CFs <= ans.final_cfs_df[self.exp.data_interface.outcome_name].values) and all(
             ans.final_cfs_df[self.exp.data_interface.outcome_name].values <= [desired_range[1]] * total_CFs)
+
+    # Testing that the output of regression lies in the desired_range
+    @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
+    @pytest.mark.parametrize("version", ['2.0', '1.0'])
+    def test_random_output(self, desired_range, sample_custom_query_2, total_CFs, version):
+        cf_examples = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2, total_CFs=total_CFs,
+                                                         desired_range=desired_range)
+        assert all(desired_range[0] <= i <= desired_range[1] for i in self.exp.cfs_preds)
+
+        assert cf_examples is not None
+        json_str = cf_examples.to_json(version)
+        assert json_str is not None
+
+        recovered_cf_examples = CounterfactualExamples.from_json(json_str)
+        assert recovered_cf_examples is not None
+        assert cf_examples == recovered_cf_examples
+
+    @pytest.mark.parametrize("desired_range, total_CFs", [([1, 2.8], 6)])
+    def test_random_counterfactual_explanations_output(self, desired_range, sample_custom_query_2, total_CFs):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+                                            query_instances=sample_custom_query_2, total_CFs=total_CFs,
+                                            desired_range=desired_range)
+
+        assert counterfactual_explanations is not None
+        json_str = counterfactual_explanations.to_json()
+        assert json_str is not None
+
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(json_str)
+        assert recovered_counterfactual_explanations is not None
+        assert counterfactual_explanations == recovered_counterfactual_explanations
 
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
