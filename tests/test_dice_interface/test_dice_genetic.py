@@ -121,8 +121,8 @@ class TestDiceGeneticBinaryClassificationMethods:
             self.exp.setup(features_to_vary, None, sample_custom_query_3, "inverse_mad")
 
     # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary", [(0, 1, "all")])
-    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs, features_to_vary):
+    @pytest.mark.parametrize("features_to_vary", [("all")])
+    def test_query_instance_unknown_column(self, sample_custom_query_5, features_to_vary):
         with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, None, sample_custom_query_5, "inverse_mad")
 
