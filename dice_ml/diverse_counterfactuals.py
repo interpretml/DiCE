@@ -63,13 +63,13 @@ class CounterfactualExamples:
 
     def __eq__(self, other_counterfactual_example):
         if isinstance(other_counterfactual_example, CounterfactualExamples):
-            fina_cfs_df = (self.final_cfs_df is None) == (other_counterfactual_example.final_cfs_df is None)
-            final_cfs_df_sparse = (self.final_cfs_df_sparse is None) == (other_counterfactual_example.final_cfs_df_sparse is None)
             return self.desired_class == other_counterfactual_example.desired_class and \
-                    self.desired_range == other_counterfactual_example.desired_range and \
-                    self.model_type == other_counterfactual_example.model_type and \
-                    (self.final_cfs_df is None) == (other_counterfactual_example.final_cfs_df is None) and \
-                    (self.final_cfs_df_sparse is None) == (other_counterfactual_example.final_cfs_df_sparse is None)
+                        self.desired_range == other_counterfactual_example.desired_range and \
+                        self.model_type == other_counterfactual_example.model_type and \
+                        (self.final_cfs_df is None) == \
+                        (other_counterfactual_example.final_cfs_df is None) and \
+                        (self.final_cfs_df_sparse is None) == \
+                        (other_counterfactual_example.final_cfs_df_sparse is None)
         return False
 
     def _dump_output(self, content, show_only_changes=False, is_notebook_console=False):
