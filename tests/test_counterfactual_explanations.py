@@ -151,9 +151,9 @@ class TestSerializationCounterfactualExplanations:
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
-    def test_random_counterfactual_explanations_output(self, desired_class,
-                                                       sample_custom_query_1, total_CFs,
-                                                       version):
+    def test_counterfactual_explanations_output(self, desired_class,
+                                                sample_custom_query_1, total_CFs,
+                                                version):
         counterfactual_explanations = self.exp.generate_counterfactuals(
             query_instances=sample_custom_query_1, desired_class=desired_class,
             total_CFs=total_CFs)
@@ -173,8 +173,8 @@ class TestSerializationCounterfactualExplanations:
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
-    def test_random_local_importance_output(self, desired_class, sample_custom_query_1,
-                                            total_CFs, version):
+    def test_local_importance_output(self, desired_class, sample_custom_query_1,
+                                     total_CFs, version):
         counterfactual_explanations = self.exp.local_feature_importance(
             query_instances=sample_custom_query_1, desired_class=desired_class,
             total_CFs=total_CFs)
@@ -196,8 +196,8 @@ class TestSerializationCounterfactualExplanations:
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
-    def test_random_summary_importance_output(self, desired_class, sample_custom_query_10,
-                                              total_CFs, version):
+    def test_summary_importance_output(self, desired_class, sample_custom_query_10,
+                                       total_CFs, version):
         counterfactual_explanations = self.exp.global_feature_importance(
             query_instances=sample_custom_query_10, desired_class=desired_class,
             total_CFs=total_CFs)
@@ -239,6 +239,71 @@ class TestSerializationCounterfactualExplanations:
         self.verify_counterfactual_explanations(recovered_counterfactual_explanations, None,
                                                 0, version)
 
+        assert counterfactual_explanations == recovered_counterfactual_explanations
+
+    @pytest.mark.parametrize("version", ['1.0', '2.0'])
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
+    def test_no_counterfactuals_found(self, desired_class,
+                                      sample_custom_query_1, total_CFs,
+                                      version):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1, desired_class=desired_class,
+            total_CFs=total_CFs)
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df = None
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df_sparse = None
+        self.verify_counterfactual_explanations(counterfactual_explanations, None,
+                                                sample_custom_query_1.shape[0], version)
+        counterfactual_explanations_as_json = counterfactual_explanations.to_json()
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(
+            counterfactual_explanations_as_json)
+        self.verify_counterfactual_explanations(recovered_counterfactual_explanations, None,
+                                                sample_custom_query_1.shape[0], version)
+        assert counterfactual_explanations == recovered_counterfactual_explanations
+
+    @pytest.mark.parametrize("version", ['1.0', '2.0'])
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    def test_no_counterfactuals_found_local_importance(self, desired_class,
+                                                       sample_custom_query_1, total_CFs,
+                                                       version):
+        counterfactual_explanations = self.exp.local_feature_importance(
+            query_instances=sample_custom_query_1, desired_class=desired_class,
+            total_CFs=total_CFs)
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df = None
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df_sparse = None
+        self.verify_counterfactual_explanations(counterfactual_explanations, None,
+                                                sample_custom_query_1.shape[0], version,
+                                                local_importance_available=True)
+        counterfactual_explanations_as_json = counterfactual_explanations.to_json()
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(
+            counterfactual_explanations_as_json)
+        self.verify_counterfactual_explanations(recovered_counterfactual_explanations, None,
+                                                sample_custom_query_1.shape[0], version,
+                                                local_importance_available=True)
+        assert counterfactual_explanations == recovered_counterfactual_explanations
+
+    @pytest.mark.parametrize("version", ['1.0', '2.0'])
+    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    def test_no_counterfactuals_found_summary_importance(self, desired_class,
+                                                         sample_custom_query_10, total_CFs,
+                                                         version):
+        counterfactual_explanations = self.exp.global_feature_importance(
+            query_instances=sample_custom_query_10, desired_class=desired_class,
+            total_CFs=total_CFs)
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df = None
+        counterfactual_explanations.cf_examples_list[0].final_cfs_df_sparse = None
+        counterfactual_explanations.cf_examples_list[9].final_cfs_df = None
+        counterfactual_explanations.cf_examples_list[9].final_cfs_df_sparse = None
+        self.verify_counterfactual_explanations(counterfactual_explanations, None,
+                                                sample_custom_query_10.shape[0], version,
+                                                local_importance_available=True,
+                                                summary_importance_available=True)
+        counterfactual_explanations_as_json = counterfactual_explanations.to_json()
+        recovered_counterfactual_explanations = CounterfactualExplanations.from_json(
+            counterfactual_explanations_as_json)
+        self.verify_counterfactual_explanations(recovered_counterfactual_explanations, None,
+                                                sample_custom_query_10.shape[0], version,
+                                                local_importance_available=True,
+                                                summary_importance_available=True)
         assert counterfactual_explanations == recovered_counterfactual_explanations
 
     @pytest.mark.parametrize('unsupported_version', ['3.0', ''])

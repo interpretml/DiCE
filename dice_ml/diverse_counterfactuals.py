@@ -63,8 +63,13 @@ class CounterfactualExamples:
 
     def __eq__(self, other_counterfactual_example):
         if isinstance(other_counterfactual_example, CounterfactualExamples):
+            fina_cfs_df = (self.final_cfs_df is None) == (other_counterfactual_example.final_cfs_df is None)
+            final_cfs_df_sparse = (self.final_cfs_df_sparse is None) == (other_counterfactual_example.final_cfs_df_sparse is None)
             return self.desired_class == other_counterfactual_example.desired_class and \
-                    self.desired_range == self.desired_range
+                    self.desired_range == other_counterfactual_example.desired_range and \
+                    self.model_type == other_counterfactual_example.model_type and \
+                    (self.final_cfs_df is None) == (other_counterfactual_example.final_cfs_df is None) and \
+                    (self.final_cfs_df_sparse is None) == (other_counterfactual_example.final_cfs_df_sparse is None)
         return False
 
     def _dump_output(self, content, show_only_changes=False, is_notebook_console=False):
@@ -184,7 +189,10 @@ class CounterfactualExamples:
             feature_names = self.test_instance_df.columns.tolist().copy()
             feature_names.remove(dummy_data_interface.outcome_name)
             test_instance_df_as_list = self.test_instance_df.values.tolist()
-            final_cfs_df_as_as_list = df.values.tolist()
+            if df is not None:
+                final_cfs_df_as_as_list = df.values.tolist()
+            else:
+                final_cfs_df_as_as_list = None
 
             alternate_obj = {
                 _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST: test_instance_df_as_list,
@@ -204,7 +212,10 @@ class CounterfactualExamples:
         if cf_example_dict.get(_DiverseCFV1SchemaConstants.TEST_INSTANCE_DF) is not None:
             test_instance_df = pd.read_json(cf_example_dict[
                 _DiverseCFV1SchemaConstants.TEST_INSTANCE_DF])
-            cfs_df = pd.read_json(cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF])
+            if cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF] is not None:
+                cfs_df = pd.read_json(cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF])
+            else:
+                cfs_df = None
 
             # Creating the object for dummy_data_interface
             dummy_data_interface = DummyDataInterface(**cf_example_dict[_DiverseCFV1SchemaConstants.DATA_INTERFACE])
@@ -228,8 +239,11 @@ class CounterfactualExamples:
 
             test_instance_df = pd.DataFrame(data=test_instance_list,
                                             columns=feature_names_including_target)
-            cfs_df = pd.DataFrame(data=final_cfs_list,
-                                  columns=feature_names_including_target)
+            if final_cfs_list is not None:
+                cfs_df = pd.DataFrame(data=final_cfs_list,
+                                      columns=feature_names_including_target)
+            else:
+                cfs_df = None
             # Creating the object for dummy_data_interface
             dummy_data_interface = DummyDataInterface(**data_interface)
             return CounterfactualExamples(data_interface=dummy_data_interface,
