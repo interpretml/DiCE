@@ -479,8 +479,13 @@ class DiceGenetic(ExplainerBase):
 
         self.cfs_preds = []
         self.final_cfs = []
+
+        if isinstance(population, np.ndarray):
+            population_size = population.shape[0]
+        else:
+            population_size = len(population)
         i = 0
-        while i < population.shape[0]:
+        while i < population_size:
             predictions = self.predict_fn_scores(population[i])[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
