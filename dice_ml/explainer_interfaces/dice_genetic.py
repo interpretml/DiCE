@@ -35,7 +35,7 @@ class DiceGenetic(ExplainerBase):
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.feature_weights_input = ''
-        self.population_size = 25
+        self.population_size = 200
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
@@ -460,23 +460,27 @@ class DiceGenetic(ExplainerBase):
 
             # rest of the next generation obtained from top 50% of fittest members of current generation
             rest_members = self.population_size - top_members
-            new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
-            for new_gen_idx in range(rest_members):
-                parent1 = random.choice(population[:int(len(population) / 2)])
-                parent2 = random.choice(population[:int(len(population) / 2)])
-                child = self.mate(parent1, parent2, features_to_vary, query_instance)
-                new_generation_2[new_gen_idx] = child
+            if rest_members > 0:
+                new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
+                for new_gen_idx in range(rest_members):
+                    parent1 = random.choice(population[:int(len(population) / 2)])
+                    parent2 = random.choice(population[:int(len(population) / 2)])
+                    child = self.mate(parent1, parent2, features_to_vary, query_instance)
+                    new_generation_2[new_gen_idx] = child
+            else:
+                new_generation_2 = None
 
-            if self.total_CFs > 0:
+            if self.total_CFs > 0 and new_generation_2 is not None:
                 population = np.concatenate([new_generation_1, new_generation_2])
             else:
-                population = new_generation_2
+                population = new_generation_1
+
             iterations += 1
 
         self.cfs_preds = []
         self.final_cfs = []
         i = 0
-        while i < self.total_CFs:
+        while i < population.shape[0]:
             predictions = self.predict_fn_scores(population[i])[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
