@@ -243,7 +243,7 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
-        if len(query_instances) < 10:
+        if query_instances is not None and len(query_instances) < 10:
             raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
         if cf_examples_list is not None:
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
