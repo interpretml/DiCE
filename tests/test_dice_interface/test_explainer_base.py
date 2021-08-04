@@ -52,7 +52,6 @@ class TestExplainerBaseBinaryClassification:
         for local_importance in local_importances.local_importance:
             self._verify_feature_importance(local_importance)
 
-
     @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
                              [(1, 'random')],
                              indirect=['binary_classification_exp_object'])

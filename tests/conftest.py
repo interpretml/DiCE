@@ -154,7 +154,7 @@ def sample_counterfactual_example_dummy():
     """
     return pd.DataFrame(
         {
-            'Categorical': ['a', 'b', 'c', 'a', 'b', 
+            'Categorical': ['a', 'b', 'c', 'a', 'b',
                             'c', 'a', 'b', 'c', 'a',
                             'a', 'b', 'c', 'c', 'c'],
             'Numerical': [25, 50, 75, 100, 125,
@@ -165,6 +165,7 @@ def sample_counterfactual_example_dummy():
                         1, 1, 1, 1, 1]
         }
     )
+
 
 @pytest.fixture
 def create_iris_data():
