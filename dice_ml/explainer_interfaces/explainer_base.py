@@ -317,6 +317,7 @@ class ExplainerBase(ABC):
                 for col in allcols:
                     local_importances[i][col] = 0
 
+        overall_num_cfs = 0
         # Summarizing the found counterfactuals
         for i in range(len(cf_examples_list)):
             cf_examples = cf_examples_list[i]
@@ -330,7 +331,9 @@ class ExplainerBase(ABC):
             if df is None:
                 continue
 
+            per_query_point_cfs = 0
             for index, row in df.iterrows():
+                per_query_point_cfs += 1
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
                         if summary_importance is not None:
@@ -346,10 +349,16 @@ class ExplainerBase(ABC):
 
             if local_importances is not None:
                 for col in allcols:
-                    local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
+                    if per_query_point_cfs > 0:
+                        local_importances[i][col] /= per_query_point_cfs
+
+            overall_num_cfs += per_query_point_cfs
+
         if summary_importance is not None:
             for col in allcols:
-                summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
+                if overall_num_cfs > 0:
+                    summary_importance[col] /= overall_num_cfs
+
         return CounterfactualExplanations(
             cf_examples_list,
             local_importance=local_importances,
