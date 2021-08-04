@@ -148,6 +148,25 @@ def sample_custom_query_10():
 
 
 @pytest.fixture
+def sample_counterfactual_example_dummy():
+    """
+    Returns a sample counterfactual example
+    """
+    return pd.DataFrame(
+        {
+            'Categorical': ['a', 'b', 'c', 'a', 'b', 
+                            'c', 'a', 'b', 'c', 'a',
+                            'a', 'b', 'c', 'c', 'c'],
+            'Numerical': [25, 50, 75, 100, 125,
+                          150, 175, 200, 225, 250,
+                          150, 175, 200, 225, 250],
+            'Outcome': [1, 1, 1, 1, 1,
+                        1, 1, 1, 1, 1,
+                        1, 1, 1, 1, 1]
+        }
+    )
+
+@pytest.fixture
 def create_iris_data():
     iris = load_iris()
     x_train, x_test, y_train, y_test = train_test_split(
