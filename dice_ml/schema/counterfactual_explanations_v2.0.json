@@ -8,7 +8,7 @@
             "description": "The list of the computed counterfactual examples.",
 			"type": "array",
 			"items": {
-				"type": "array"
+				"type": ["array", "null"]
 			}
 		},
 		"test_data": {

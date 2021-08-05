@@ -78,6 +78,20 @@ class TestExplainerBaseBinaryClassification:
 
         self._verify_feature_importance(global_importance.summary_importance)
 
+    @pytest.mark.parametrize("desired_class, binary_classification_exp_object_out_of_order",
+                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+                             indirect=['binary_classification_exp_object_out_of_order'])
+    def test_columns_out_of_order(self, desired_class, binary_classification_exp_object_out_of_order, sample_custom_query_1):
+        exp = binary_classification_exp_object_out_of_order  # explainer object
+        exp._generate_counterfactuals(
+            query_instance=sample_custom_query_1,
+            total_CFs=0,
+            desired_class=desired_class,
+            desired_range=None,
+            permitted_range=None,
+            features_to_vary='all')
+
+
 
 class TestExplainerBaseMultiClassClassification:
 

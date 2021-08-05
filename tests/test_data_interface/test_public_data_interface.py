@@ -153,6 +153,11 @@ class TestErrorCasesPublicDataInterface:
 
         assert "permitted_range contains some feature names which are not part of columns in dataframe" in str(ucve)
 
+    def test_min_max_equal(self):
+        dataset = helpers.load_min_max_equal_dataset()
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+        assert all(dice_data.normalize_data(dice_data.data_df)['Numerical'] == 0)
+
     def test_unseen_continuous_features_precision(self):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
