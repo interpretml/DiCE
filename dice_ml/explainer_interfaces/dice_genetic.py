@@ -480,7 +480,10 @@ class DiceGenetic(ExplainerBase):
             predictions = self.predict_fn_scores(population[i])[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
-                if not isinstance(predictions, float) and len(predictions) > 1:
+                # checking if predictions is a float before taking the length as len() works only for array-like
+                # elements. isinstance(predictions, (np.floating, float)) checks if it's any float (numpy or otherwise)
+                # We do this as we take the argmax if the prediction is a vector -- like the output of a classifier
+                if not isinstance(predictions, (np.floating, float)) and len(predictions) > 1:
                     self.cfs_preds.append(np.argmax(predictions))
                 else:
                     self.cfs_preds.append(predictions)

@@ -88,6 +88,7 @@ class ExplainerBase(ABC):
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
         for query_instance in tqdm(query_instances_list):
+            self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
                 query_instance, total_CFs,
                 desired_class=desired_class,
