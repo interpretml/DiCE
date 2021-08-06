@@ -211,14 +211,13 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, population_size=None, initialization="kdtree", desired_range=None,
-                                  desired_class="opposite", proximity_weight=0.2, sparsity_weight=0.2,
-                                  diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
-                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
-                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad",
-                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="binary",
-                                  maxiterations=500, thresh=1e-2, verbose=False):
+    def _generate_counterfactuals(self, query_instance, total_CFs, population_size=None, initialization="kdtree",
+                                  desired_range=None, desired_class="opposite", proximity_weight=0.2,
+                                  sparsity_weight=0.2, diversity_weight=5.0, categorical_penalty=0.1,
+                                  algorithm="DiverseCF", features_to_vary="all", permitted_range=None,
+                                  yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
+                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                  posthoc_sparsity_algorithm="binary", maxiterations=500, thresh=1e-2, verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.

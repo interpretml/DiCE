@@ -161,14 +161,14 @@ class TestDiceGeneticBinaryClassificationMethods:
         custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
         assert custom_preds[0] == desired_class
 
-
     # Testing if an error is thrown when the population size < total_CFs
-    @pytest.mark.parametrize("total_CFs, population_size",[(4, 3)])
+    @pytest.mark.parametrize("total_CFs, population_size", [(4, 3)])
     def test_population_size(self, total_CFs, population_size, sample_custom_query_2):
         with pytest.raises(ValueError) as ve:
             self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
                                               total_CFs=total_CFs, population_size=population_size)
             assert "Population size must be larger than the total number of cfs desired" in str(ve)
+
 
 class TestDiceGeneticMultiClassificationMethods:
     @pytest.fixture(autouse=True)
