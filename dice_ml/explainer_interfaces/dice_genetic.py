@@ -35,7 +35,6 @@ class DiceGenetic(ExplainerBase):
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.feature_weights_input = ''
-        self.population_size = 25
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
@@ -212,7 +211,7 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None,
+    def _generate_counterfactuals(self, query_instance, total_CFs, population_size=None, initialization="kdtree", desired_range=None,
                                   desired_class="opposite", proximity_weight=0.2, sparsity_weight=0.2,
                                   diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
                                   features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
@@ -224,6 +223,7 @@ class DiceGenetic(ExplainerBase):
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
         :param total_CFs: Total number of counterfactuals required.
+        :param population_size: Parameter for user to set the genetic algorithm population size
         :param initialization: Method to use to initialize the population of the genetic algorithm
         :param desired_range: For regression problems. Contains the outcome range to generate counterfactuals in.
         :param desired_class: For classification problems. Desired counterfactual class - can take 0 or 1.
@@ -260,6 +260,14 @@ class DiceGenetic(ExplainerBase):
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
         """
+        if population_size is None:
+            self.population_size = 10 * total_CFs
+        else:
+            self.population_size = population_size
+
+        if self.population_size < total_CFs:
+            raise ValueError("Population size must be larger than the total number of cfs desired")
+
         self.start_time = timeit.default_timer()
 
         features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights)
