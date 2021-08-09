@@ -90,6 +90,16 @@ def load_custom_testing_dataset():
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 
+def load_min_max_equal_dataset():
+    data = [['a', 10, 0], ['b', 10, 0], ['c', 10, 0], ['a', 10, 0], ['c', 10, 0]]
+    return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
+
+
+def load_outcome_not_last_column_dataset():
+    data = [['a', 0, 10], ['a', 0, 10000], ['a', 0, 14], ['a', 0, 10], ['a', 0, 10]]
+    return pd.DataFrame(data, columns=['Categorical', 'Outcome', 'Numerical'])
+
+
 def load_custom_testing_dataset_binary():
     data = [['a', 1, 0], ['b', 5, 1], ['c', 2, 0], ['a', 3, 0], ['c', 4, 1]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])

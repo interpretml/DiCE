@@ -43,9 +43,6 @@ class PublicData(_BaseData):
         self.categorical_feature_names = [name for name in self.data_df.columns.tolist(
         ) if name not in self.continuous_feature_names + [self.outcome_name]]
 
-        self.continuous_feature_indexes = [self.data_df.columns.get_loc(
-            name) for name in self.continuous_feature_names if name in self.data_df]
-
         self.categorical_feature_indexes = [self.data_df.columns.get_loc(
             name) for name in self.categorical_feature_names if name in self.data_df]
 
@@ -185,7 +182,10 @@ class PublicData(_BaseData):
             for feature_name in self.continuous_feature_names:
                 max_value = self.data_df[feature_name].max()
                 min_value = self.data_df[feature_name].min()
-                result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+                if min_value == max_value:
+                    result[feature_name] = 0
+                else:
+                    result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
         else:
             result = result.astype('float')
             for feature_index in self.continuous_feature_indexes:
@@ -193,10 +193,16 @@ class PublicData(_BaseData):
                 max_value = self.data_df[feature_name].max()
                 min_value = self.data_df[feature_name].min()
                 if len(df.shape) == 1:
-                    value = (df[feature_index] - min_value) / (max_value - min_value)
+                    if min_value == max_value:
+                        value = 0
+                    else:
+                        value = (df[feature_index] - min_value) / (max_value - min_value)
                     result[feature_index] = value
                 else:
-                    result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
+                    if min_value == max_value:
+                        result[:, feature_index] = np.zeros(len(df[:, feature_index]))
+                    else:
+                        result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
