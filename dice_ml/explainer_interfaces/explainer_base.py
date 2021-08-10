@@ -140,6 +140,9 @@ class ExplainerBase(ABC):
         pass
 
     def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        self.data_interface.check_features_to_vary(features_to_vary=features_to_vary)
+        self.data_interface.check_permitted_range(permitted_range)
+
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
@@ -148,10 +151,11 @@ class ExplainerBase(ABC):
             feature_ranges_orig = self.feature_range
         else:  # compute the new ranges based on user input
             self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+
         self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
 
         # check feature MAD validity and throw warnings
-        self.check_mad_validity(feature_weights)
+        self.data_interface.check_mad_validity(feature_weights)
 
         return features_to_vary
 
@@ -641,13 +645,6 @@ class ExplainerBase(ABC):
             for feature in self.data_interface.continuous_feature_names:
                 self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                 self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
-
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings.
-           TODO: add comments as to where this is used if this function is necessary, else remove.
-        """
-        if feature_weights == "inverse_mad":
-            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
     def sigmoid(self, z):
         """This is used in VAE-based CF explainers."""
