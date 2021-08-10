@@ -67,17 +67,15 @@ class TestErrorScenariosPublicDataInterface:
         dataset = iris.frame
 
         if data_type == DataTypeCombinations.Incorrect:
-            with pytest.raises(
-                    ValueError,
-                    match="should provide the name(s) of continuous features in the data as a list"):
+            with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, continuous_features=np.array(iris.feature_names),
                              outcome_name='target')
+            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         elif data_type == DataTypeCombinations.AsNone:
-            with pytest.raises(
-                    ValueError,
-                    match="should provide the name(s) of continuous features in the data as a list"):
+            with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, continuous_features=None,
                              outcome_name='target')
+            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         else:
             with pytest.raises(
                     ValueError,
@@ -211,10 +209,11 @@ class TestChecksPublicDataInterface:
                                  outcome_name='target')
 
         with pytest.raises(
-                UserConfigValidationException,
-                match='The category {0} does not occur in the training data for feature {1}.'
-                      ' Allowed categories are {2}'.format('unknown_category', 'new_feature', ['known_category'])):
+                UserConfigValidationException) as ucve:
             dice_data.check_permitted_range(permitted_range=permitted_range)
+
+        assert 'The category {0} does not occur in the training data for feature {1}. Allowed categories are {2}'.format(
+            'unknown_category', 'new_feature', ['known_category']) in str(ucve)
 
 
 class TestUserDataCorruption:
