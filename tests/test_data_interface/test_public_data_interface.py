@@ -37,35 +37,27 @@ class TestPublicDataMethods:
 
 
 class DataTypeCombinations(Enum):
-    Incorrect = 1
-    AsNone = 2
+    Incorrect = 0
+    AsNone = 1
     Omitted = 2
 
 
-class TestErrorCasesPublicDataInterface:
+class TestErrorScenariosPublicDataInterface:
     @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
-                                           DataTypeCombinations.AsNone,
-                                           DataTypeCombinations.Omitted])
+                                           DataTypeCombinations.AsNone])
     def test_invalid_dataframe(self, data_type):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
         dataset = iris.frame
 
         if data_type == DataTypeCombinations.Incorrect:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(ValueError, match="should provide a pandas dataframe"):
                 dice_ml.Data(dataframe=dataset.values, continuous_features=feature_names,
                              outcome_name='target')
-            assert "should provide a pandas dataframe" in str(ve)
-        elif data_type == DataTypeCombinations.AsNone:
-            with pytest.raises(ValueError) as ve:
+        else:
+            with pytest.raises(ValueError, match="should provide a pandas dataframe"):
                 dice_ml.Data(dataframe=None, continuous_features=feature_names,
                              outcome_name='target')
-            assert "should provide a pandas dataframe" in str(ve)
-        else:
-            with pytest.raises(ValueError) as ve:
-                dice_ml.Data(continuous_features=feature_names,
-                             outcome_name='target')
-            assert "dataframe not found in params" in str(ve)
 
     @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
                                            DataTypeCombinations.AsNone,
@@ -78,19 +70,17 @@ class TestErrorCasesPublicDataInterface:
             with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, continuous_features=np.array(iris.feature_names),
                              outcome_name='target')
-
             assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         elif data_type == DataTypeCombinations.AsNone:
             with pytest.raises(ValueError) as ve:
                 dice_ml.Data(dataframe=dataset, continuous_features=None,
                              outcome_name='target')
-
             assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         else:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match='continuous_features should be provided'):
                 dice_ml.Data(dataframe=dataset, outcome_name='target')
-
-            assert 'continuous_features should be provided' in str(ve)
 
     @pytest.mark.parametrize('data_type', [DataTypeCombinations.Incorrect,
                                            DataTypeCombinations.AsNone,
@@ -101,33 +91,33 @@ class TestErrorCasesPublicDataInterface:
         dataset = iris.frame
 
         if data_type == DataTypeCombinations.Incorrect:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match="should provide the name of outcome feature as a string"):
                 dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                              outcome_name=1)
-
-            assert "should provide the name of outcome feature as a string" in str(ve)
         elif data_type == DataTypeCombinations.AsNone:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match="should provide the name of outcome feature as a string"):
                 dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                              outcome_name=None)
-
-            assert "should provide the name of outcome feature as a string" in str(ve)
         else:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match="should provide the name of outcome feature"):
                 dice_ml.Data(dataframe=dataset, continuous_features=feature_names)
-
-            assert "should provide the name of outcome feature" in str(ve)
 
     def test_not_found_outcome_name(self):
         iris = load_iris(as_frame=True)
         feature_names = iris.feature_names
         dataset = iris.frame
 
-        with pytest.raises(UserConfigValidationException) as ucve:
+        with pytest.raises(
+                UserConfigValidationException,
+                match="outcome_name invalid not found in"):
             dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                          outcome_name='invalid')
-
-        assert "outcome_name invalid not found in" in str(ucve)
 
     def test_unseen_continuous_feature_names(self):
         iris = load_iris(as_frame=True)
@@ -135,11 +125,11 @@ class TestErrorCasesPublicDataInterface:
         feature_names.append("new feature")
         dataset = iris.frame
 
-        with pytest.raises(UserConfigValidationException) as ucve:
+        with pytest.raises(
+                UserConfigValidationException,
+                match="continuous_features contains some feature names which are not part of columns in dataframe"):
             dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                          outcome_name='target')
-
-        assert "continuous_features contains some feature names which are not part of columns in dataframe" in str(ucve)
 
     def test_unseen_permitted_range(self):
         iris = load_iris(as_frame=True)
@@ -147,11 +137,11 @@ class TestErrorCasesPublicDataInterface:
         permitted_range = {'age': [45, 60]}
         dataset = iris.frame
 
-        with pytest.raises(UserConfigValidationException) as ucve:
+        with pytest.raises(
+                UserConfigValidationException,
+                match="permitted_range contains some feature names which are not part of columns in dataframe"):
             dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                          outcome_name='target', permitted_range=permitted_range)
-
-        assert "permitted_range contains some feature names which are not part of columns in dataframe" in str(ucve)
 
     def test_min_max_equal(self):
         dataset = helpers.load_min_max_equal_dataset()
@@ -164,13 +154,66 @@ class TestErrorCasesPublicDataInterface:
         continuous_features_precision = {'hours_per_week': 2}
         dataset = iris.frame
 
-        with pytest.raises(UserConfigValidationException) as ucve:
+        with pytest.raises(
+                UserConfigValidationException,
+                match="continuous_features_precision contains some feature names which"
+                      " are not part of columns in dataframe"):
             dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
                          outcome_name='target',
                          continuous_features_precision=continuous_features_precision)
 
-        assert "continuous_features_precision contains some feature names which" + \
-            " are not part of columns in dataframe" in str(ucve)
+
+class TestChecksPublicDataInterface:
+    @pytest.mark.parametrize('features_to_vary', ['all', None, ['not_a_feature']])
+    def test_check_features_to_vary(self, features_to_vary):
+        iris = load_iris(as_frame=True)
+        feature_names = iris.feature_names
+        dataset = iris.frame
+
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                                 outcome_name='target')
+
+        if features_to_vary is not None and features_to_vary != 'all':
+            with pytest.raises(
+                    UserConfigValidationException,
+                    match="Got features {" + "'not_a_feature'" + "} which are not present in training data"):
+                dice_data.check_features_to_vary(features_to_vary=features_to_vary)
+        else:
+            dice_data.check_features_to_vary(features_to_vary=features_to_vary)
+
+    @pytest.mark.parametrize('permitted_range', [None, {'not_a_feature': [20, 30]}])
+    def test_check_permitted_range_with_unknown_feature(self, permitted_range):
+        iris = load_iris(as_frame=True)
+        feature_names = iris.feature_names
+        dataset = iris.frame
+
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                                 outcome_name='target')
+
+        if permitted_range is not None:
+            with pytest.raises(
+                    UserConfigValidationException,
+                    match="Got features {" + "'not_a_feature'" + "} which are not present in training data"):
+                dice_data.check_permitted_range(permitted_range=permitted_range)
+        else:
+            dice_data.check_permitted_range(permitted_range=permitted_range)
+
+    def test_check_permitted_range_with_unknown_categorical_value(self):
+        iris = load_iris(as_frame=True)
+        permitted_range = {'new_feature': ['unknown_category']}
+        feature_names = iris.feature_names
+        dataset = iris.frame
+        dataset['new_feature'] = np.repeat(['known_category'], dataset.shape[0])
+
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                                 outcome_name='target')
+
+        with pytest.raises(
+                UserConfigValidationException) as ucve:
+            dice_data.check_permitted_range(permitted_range=permitted_range)
+
+        assert 'The category {0} does not occur in the training data for feature {1}. Allowed categories are {2}'.format(
+            'unknown_category', 'new_feature', ['known_category']) in str(ucve)
 
 
 class TestUserDataCorruption:
