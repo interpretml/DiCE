@@ -477,7 +477,6 @@ class DiceGenetic(ExplainerBase):
                     population = new_generation_2
             else:
                 raise SystemError("The number of total_Cfs is greater than the population size!")
-                population = new_generation_1
             iterations += 1
 
         self.cfs_preds = []
