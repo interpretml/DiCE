@@ -91,6 +91,55 @@ class TestExplainerBaseBinaryClassification:
             permitted_range=None,
             features_to_vary='all')
 
+    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
+                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+                             indirect=['binary_classification_exp_object'])
+    def test_incorrect_features_to_vary_list(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
+        exp = binary_classification_exp_object  # explainer object
+        with pytest.raises(
+                UserConfigValidationException,
+                match="Got features {" + "'unknown_feature'" + "} which are not present in training data"):
+            exp.generate_counterfactuals(
+                query_instances=sample_custom_query_1,
+                total_CFs=10,
+                desired_class=desired_class,
+                desired_range=None,
+                permitted_range=None,
+                features_to_vary=['unknown_feature'])
+
+    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
+                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+                             indirect=['binary_classification_exp_object'])
+    def test_incorrect_features_permitted_range(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
+        exp = binary_classification_exp_object  # explainer object
+        with pytest.raises(
+                UserConfigValidationException,
+                match="Got features {" + "'unknown_feature'" + "} which are not present in training data"):
+            exp.generate_counterfactuals(
+                query_instances=sample_custom_query_1,
+                total_CFs=10,
+                desired_class=desired_class,
+                desired_range=None,
+                permitted_range={'unknown_feature': [1, 30]},
+                features_to_vary='all')
+
+    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
+                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+                             indirect=['binary_classification_exp_object'])
+    def test_incorrect_values_permitted_range(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
+        exp = binary_classification_exp_object  # explainer object
+        with pytest.raises(UserConfigValidationException) as ucve:
+            exp.generate_counterfactuals(
+                query_instances=sample_custom_query_1,
+                total_CFs=10,
+                desired_class=desired_class,
+                desired_range=None,
+                permitted_range={'Categorical': ['d']},
+                features_to_vary='all')
+
+        assert 'The category {0} does not occur in the training data for feature {1}. Allowed categories are {2}'.format(
+            'd', 'Categorical', ['a', 'b', 'c']) in str(ucve)
+
 
 class TestExplainerBaseMultiClassClassification:
 
