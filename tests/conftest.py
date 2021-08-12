@@ -19,6 +19,17 @@ def binary_classification_exp_object(method="random"):
 
 
 @pytest.fixture
+def binary_classification_exp_object_out_of_order(method="random"):
+    backend = 'sklearn'
+    dataset = helpers.load_outcome_not_last_column_dataset()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    exp = dice_ml.Dice(d, m, method=method)
+    return exp
+
+
+@pytest.fixture
 def multi_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
@@ -172,6 +183,14 @@ def sample_custom_query_6():
 
 
 @pytest.fixture
+def sample_custom_query_index():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['a'], 'Numerical': [88]})
+
+
+@pytest.fixture
 def sample_custom_query_10():
     """
     Returns a sample query instance for the custom dataset
@@ -180,6 +199,26 @@ def sample_custom_query_10():
         {
             'Categorical': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a'],
             'Numerical': [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
+        }
+    )
+
+
+@pytest.fixture
+def sample_counterfactual_example_dummy():
+    """
+    Returns a sample counterfactual example
+    """
+    return pd.DataFrame(
+        {
+            'Categorical': ['a', 'b', 'c', 'a', 'b',
+                            'c', 'a', 'b', 'c', 'a',
+                            'a', 'b', 'c', 'c', 'c'],
+            'Numerical': [25, 50, 75, 100, 125,
+                          150, 175, 200, 225, 250,
+                          150, 175, 200, 225, 250],
+            'Outcome': [1, 1, 1, 1, 1,
+                        1, 1, 1, 1, 1,
+                        1, 1, 1, 1, 1]
         }
     )
 

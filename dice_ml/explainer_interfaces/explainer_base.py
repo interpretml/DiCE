@@ -88,6 +88,7 @@ class ExplainerBase(ABC):
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
         for query_instance in tqdm(query_instances_list):
+            self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
                 query_instance, total_CFs,
                 desired_class=desired_class,
@@ -139,6 +140,9 @@ class ExplainerBase(ABC):
         pass
 
     def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        self.data_interface.check_features_to_vary(features_to_vary=features_to_vary)
+        self.data_interface.check_permitted_range(permitted_range)
+
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
@@ -147,10 +151,11 @@ class ExplainerBase(ABC):
             feature_ranges_orig = self.feature_range
         else:  # compute the new ranges based on user input
             self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+
         self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
 
         # check feature MAD validity and throw warnings
-        self.check_mad_validity(feature_weights)
+        self.data_interface.check_mad_validity(feature_weights)
 
         return features_to_vary
 
@@ -243,7 +248,7 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
-        if len(query_instances) < 10:
+        if query_instances is not None and len(query_instances) < 10:
             raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
         if cf_examples_list is not None:
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
@@ -317,6 +322,7 @@ class ExplainerBase(ABC):
                 for col in allcols:
                     local_importances[i][col] = 0
 
+        overall_num_cfs = 0
         # Summarizing the found counterfactuals
         for i in range(len(cf_examples_list)):
             cf_examples = cf_examples_list[i]
@@ -326,7 +332,13 @@ class ExplainerBase(ABC):
                 df = cf_examples.final_cfs_df_sparse
             else:
                 df = cf_examples.final_cfs_df
+
+            if df is None:
+                continue
+
+            per_query_point_cfs = 0
             for index, row in df.iterrows():
+                per_query_point_cfs += 1
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
                         if summary_importance is not None:
@@ -342,10 +354,16 @@ class ExplainerBase(ABC):
 
             if local_importances is not None:
                 for col in allcols:
-                    local_importances[i][col] /= (cf_examples_list[0].final_cfs_df.shape[0])
+                    if per_query_point_cfs > 0:
+                        local_importances[i][col] /= per_query_point_cfs
+
+            overall_num_cfs += per_query_point_cfs
+
         if summary_importance is not None:
             for col in allcols:
-                summary_importance[col] /= (cf_examples_list[0].final_cfs_df.shape[0]*len(cf_examples_list))
+                if overall_num_cfs > 0:
+                    summary_importance[col] /= overall_num_cfs
+
         return CounterfactualExplanations(
             cf_examples_list,
             local_importance=local_importances,
@@ -375,8 +393,6 @@ class ExplainerBase(ABC):
         if final_cfs_sparse is None:
             return final_cfs_sparse
 
-        # resetting index to make sure .loc works
-        final_cfs_sparse = final_cfs_sparse.reset_index(drop=True)
         # quantiles of the deviation from median for every continuous feature
         quantiles = self.data_interface.get_quantiles_from_training_data(quantile=posthoc_sparsity_param)
         mads = self.data_interface.get_valid_mads()
@@ -395,14 +411,13 @@ class ExplainerBase(ABC):
 
         cfs_preds_sparse = []
 
-        for cf_ix in range(len(final_cfs_sparse)):
-            current_pred = self.predict_fn_for_sparsity(
-                final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+        for cf_ix in list(final_cfs_sparse.index):
+            current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
             for feature in features_sorted:
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
-                diff = query_instance[feature].iat[0] - final_cfs_sparse[feature].iat[cf_ix]
-                if abs(diff) <= quantiles[feature]:
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
+                if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
                                                                  feature, final_cfs_sparse, current_pred)
@@ -411,7 +426,7 @@ class ExplainerBase(ABC):
                         final_cfs_sparse = self.do_binary_search(
                             diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
 
-            temp_preds = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+            temp_preds = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
             cfs_preds_sparse.append(temp_preds)
 
         final_cfs_sparse[self.data_interface.outcome_name] = self.get_model_output_from_scores(cfs_preds_sparse)
@@ -427,17 +442,17 @@ class ExplainerBase(ABC):
         current_pred = current_pred_orig
         if self.model.model_type == ModelTypes.Classifier:
             while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
-                old_val = final_cfs_sparse[feature].iat[cf_ix]
-                final_cfs_sparse.loc[cf_ix, feature] += np.sign(diff)*change
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+                old_val = int(final_cfs_sparse.at[cf_ix, feature])
+                final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
+                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
                 if not self.is_cf_valid(current_pred):
-                    final_cfs_sparse.loc[cf_ix, feature] = old_val
-                    diff = query_instance[feature].iat[0] - final_cfs_sparse[feature].iat[cf_ix]
+                    final_cfs_sparse.at[cf_ix, feature] = old_val
+                    diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
                     return final_cfs_sparse
 
-                diff = query_instance[feature].iat[0] - final_cfs_sparse[feature].iat[cf_ix]
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
 
         return final_cfs_sparse
 
@@ -445,28 +460,28 @@ class ExplainerBase(ABC):
         """Performs a binary search between continuous features of a CF and corresponding values
            in query_instance until the prediction class changes."""
 
-        old_val = final_cfs_sparse[feature].iat[cf_ix]
-        final_cfs_sparse.loc[cf_ix, feature] = query_instance[feature].iat[0]
+        old_val = int(final_cfs_sparse.at[cf_ix, feature])
+        final_cfs_sparse.at[cf_ix, feature] = query_instance[feature].iat[0]
         # Prediction of the query instance
-        current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+        current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
         # first check if assigning query_instance values to a CF is required.
         if self.is_cf_valid(current_pred):
             return final_cfs_sparse
         else:
-            final_cfs_sparse.loc[cf_ix, feature] = old_val
+            final_cfs_sparse.at[cf_ix, feature] = old_val
 
         # move the CF values towards the query_instance
         if diff > 0:
-            left = final_cfs_sparse[feature].iat[cf_ix]
+            left = int(final_cfs_sparse.at[cf_ix, feature])
             right = query_instance[feature].iat[0]
 
             while left <= right:
                 current_val = left + ((right - left)/2)
                 current_val = round(current_val, decimal_prec[feature])
 
-                final_cfs_sparse.loc[cf_ix, feature] = current_val
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+                final_cfs_sparse.at[cf_ix, feature] = current_val
+                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
                     break
@@ -478,14 +493,14 @@ class ExplainerBase(ABC):
 
         else:
             left = query_instance[feature].iat[0]
-            right = final_cfs_sparse[feature].iat[cf_ix]
+            right = int(final_cfs_sparse.at[cf_ix, feature])
 
             while right >= left:
                 current_val = right - ((right - left)/2)
                 current_val = round(current_val, decimal_prec[feature])
 
-                final_cfs_sparse.loc[cf_ix, feature] = current_val
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iloc[[cf_ix]][self.data_interface.feature_names])
+                final_cfs_sparse.at[cf_ix, feature] = current_val
+                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
                     break
@@ -630,13 +645,6 @@ class ExplainerBase(ABC):
             for feature in self.data_interface.continuous_feature_names:
                 self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                 self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
-
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings.
-           TODO: add comments as to where this is used if this function is necessary, else remove.
-        """
-        if feature_weights == "inverse_mad":
-            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
 
     def sigmoid(self, z):
         """This is used in VAE-based CF explainers."""

@@ -35,7 +35,6 @@ class DiceGenetic(ExplainerBase):
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
         self.feature_weights_input = ''
-        self.population_size = 25
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
         self.labelencoder = {}
@@ -212,14 +211,13 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree", desired_range=None,
-                                  desired_class="opposite", proximity_weight=0.2, sparsity_weight=0.2,
-                                  diversity_weight=5.0, categorical_penalty=0.1, algorithm="DiverseCF",
-                                  features_to_vary="all", permitted_range=None, yloss_type="hinge_loss",
-                                  diversity_loss_type="dpp_style:inverse_dist", feature_weights="inverse_mad",
-                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="binary",
-                                  maxiterations=500, thresh=1e-2, verbose=False):
+    def _generate_counterfactuals(self, query_instance, total_CFs, initialization="kdtree",
+                                  desired_range=None, desired_class="opposite", proximity_weight=0.2,
+                                  sparsity_weight=0.2, diversity_weight=5.0, categorical_penalty=0.1,
+                                  algorithm="DiverseCF", features_to_vary="all", permitted_range=None,
+                                  yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
+                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                  posthoc_sparsity_algorithm="binary", maxiterations=500, thresh=1e-2, verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -260,6 +258,9 @@ class DiceGenetic(ExplainerBase):
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
         """
+
+        self.population_size = 10 * total_CFs
+
         self.start_time = timeit.default_timer()
 
         features_to_vary = self.setup(features_to_vary, permitted_range, query_instance, feature_weights)
@@ -460,17 +461,22 @@ class DiceGenetic(ExplainerBase):
 
             # rest of the next generation obtained from top 50% of fittest members of current generation
             rest_members = self.population_size - top_members
-            new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
-            for new_gen_idx in range(rest_members):
-                parent1 = random.choice(population[:int(len(population) / 2)])
-                parent2 = random.choice(population[:int(len(population) / 2)])
-                child = self.mate(parent1, parent2, features_to_vary, query_instance)
-                new_generation_2[new_gen_idx] = child
+            new_generation_2 = None
+            if rest_members > 0:
+                new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
+                for new_gen_idx in range(rest_members):
+                    parent1 = random.choice(population[:int(len(population) / 2)])
+                    parent2 = random.choice(population[:int(len(population) / 2)])
+                    child = self.mate(parent1, parent2, features_to_vary, query_instance)
+                    new_generation_2[new_gen_idx] = child
 
-            if self.total_CFs > 0:
-                population = np.concatenate([new_generation_1, new_generation_2])
+            if new_generation_2 is not None:
+                if self.total_CFs > 0:
+                    population = np.concatenate([new_generation_1, new_generation_2])
+                else:
+                    population = new_generation_2
             else:
-                population = new_generation_2
+                raise SystemError("The number of total_Cfs is greater than the population size!")
             iterations += 1
 
         self.cfs_preds = []
@@ -480,7 +486,10 @@ class DiceGenetic(ExplainerBase):
             predictions = self.predict_fn_scores(population[i])[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
-                if not isinstance(predictions, float) and len(predictions) > 1:
+                # checking if predictions is a float before taking the length as len() works only for array-like
+                # elements. isinstance(predictions, (np.floating, float)) checks if it's any float (numpy or otherwise)
+                # We do this as we take the argmax if the prediction is a vector -- like the output of a classifier
+                if not isinstance(predictions, (np.floating, float)) and len(predictions) > 1:
                     self.cfs_preds.append(np.argmax(predictions))
                 else:
                     self.cfs_preds.append(predictions)
