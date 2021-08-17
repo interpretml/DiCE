@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.5 documentation</title>
+  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,12 +31,16 @@
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating counterfactual explanations with any ML model" href="DiCE_model_agnostic_CFs.html" />
+    <link rel="prev" title="Estimating local and global feature importance scores using DiCE" href="DiCE_feature_importances.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,11 +90,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generating counterfactuals for multi-class classification and regression models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Multiclass-Classification">Multiclass Classification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#1.-Independent-random-sampling-of-features">1. Independent random sampling of features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#2.-Genetic-Algorithm">2. Genetic Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#3.-Querying-a-KD-Tree">3. Querying a KD Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -143,6 +155,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
         
       <li>Generating counterfactuals for multi-class classification and regression models</li>
     
@@ -441,8 +455,17 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
+<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">Dice</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span><span class="p">,</span> <span class="n">load_boston</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
 </div>
@@ -451,46 +474,27 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
-<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">Dice</span>
-
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <p>We will use sklearn’s internal datasets to demonstrate DiCE’s features in this notebook</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">outcome_name</span> <span class="o">=</span> <span class="s1">&#39;target&#39;</span>
-<span class="c1"># Function to process sklearn&#39;s internal datasets</span>
-<span class="k">def</span> <span class="nf">sklearn_to_df</span><span class="p">(</span><span class="n">sklearn_dataset</span><span class="p">):</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sklearn_dataset</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">sklearn_dataset</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sklearn_dataset</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="Multiclass-Classification">
 <h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this headline">¶</a></h2>
 <p>For multiclass classification, we will use sklearn’s Iris dataset. This data set consists of 3 different types of irises’ (Setosa, Versicolour, and Virginica) petal and sepal length. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset</a></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-<span class="n">df_iris</span> <span class="o">=</span> <span class="n">sklearn_to_df</span><span class="p">(</span><span class="n">load_iris</span><span class="p">())</span>
+<span></span><span class="n">df_iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">frame</span>
 <span class="n">df_iris</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -565,7 +569,7 @@ div.rendered_html tbody tr:hover {
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -593,29 +597,26 @@ memory usage: 6.0 KB
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">continuous_features_iris</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span></span><span class="n">outcome_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+<span class="n">continuous_features_iris</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="n">target</span> <span class="o">=</span> <span class="n">df_iris</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Split data into train and test</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-
 <span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
                                                     <span class="n">target</span><span class="p">,</span>
-                                                    <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
                                                     <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                                                     <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 
@@ -636,13 +637,13 @@ memory usage: 6.0 KB
 <span class="c1"># Append classifier to preprocessing pipeline.</span>
 <span class="c1"># Now we have a full prediction pipeline.</span>
 <span class="n">clf_iris</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
-                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+                           <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
 <span class="n">model_iris</span> <span class="o">=</span> <span class="n">clf_iris</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -656,7 +657,7 @@ memory usage: 6.0 KB
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -666,13 +667,13 @@ memory usage: 6.0 KB
 </div>
 <p>As we can see below, all the target values will lie in the desired class</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Single input</span>
 <span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -680,9 +681,25 @@ memory usage: 6.0 KB
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 1/1 [00:20&lt;00:00, 20.54s/it]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Query instance (original outcome : 0)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -733,7 +750,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2)
+Diverse Counterfactual set (new outcome: 2.0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -769,71 +786,63 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>4.3</td>
-      <td>3.3</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
+      <td>3.0</td>
+      <td>4.5</td>
+      <td>1.8</td>
+      <td>2</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>0</th>
       <td>4.3</td>
       <td>3.0</td>
-      <td>1.0</td>
-      <td>0.2</td>
-      <td>0</td>
+      <td>5.1</td>
+      <td>1.8</td>
+      <td>2</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>4.3</td>
-      <td>2.7</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4.3</td>
-      <td>3.2</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>4.3</td>
-      <td>2.0</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>4.3</td>
-      <td>2.0</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>4.3</td>
+      <th>0</th>
+      <td>6.0</td>
       <td>3.0</td>
-      <td>1.0</td>
-      <td>0.1</td>
-      <td>0</td>
+      <td>4.8</td>
+      <td>1.8</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>5.9</td>
+      <td>3.0</td>
+      <td>5.1</td>
+      <td>1.8</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>4.9</td>
+      <td>1.8</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.1</td>
+      <td>3.0</td>
+      <td>4.9</td>
+      <td>1.8</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Multiple queries can be given as input at once</span>
 <span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span>
-<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -841,9 +850,25 @@ Diverse Counterfactual set (new outcome: 2)
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 2/2 [00:01&lt;00:00,  1.98it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Query instance (original outcome : 1)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -894,7 +919,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2)
+Diverse Counterfactual set (new outcome: 2.0)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -929,57 +954,57 @@ Diverse Counterfactual set (new outcome: 2)
   <tbody>
     <tr>
       <th>0</th>
-      <td>6.0</td>
-      <td>-</td>
-      <td>4.8</td>
+      <td>5.6</td>
+      <td>3.0</td>
+      <td>4.9</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>6.2</td>
-      <td>-</td>
+      <td>6.3</td>
+      <td>2.8</td>
+      <td>5.1</td>
+      <td>1.5</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>6.0</td>
+      <td>3.0</td>
       <td>4.8</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>6.1</td>
-      <td>-</td>
-      <td>4.9</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
       <th>3</th>
-      <td>-</td>
-      <td>-</td>
-      <td>4.9</td>
-      <td>2.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>4.9</td>
-      <td>2.5</td>
-      <td>4.5</td>
-      <td>1.7</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>5</th>
       <td>5.9</td>
-      <td>-</td>
+      <td>3.0</td>
       <td>5.1</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>6.3</td>
-      <td>2.7</td>
+      <th>4</th>
+      <td>6.1</td>
+      <td>3.0</td>
       <td>4.9</td>
+      <td>1.8</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5.6</td>
+      <td>2.8</td>
+      <td>4.9</td>
+      <td>2.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>6.2</td>
+      <td>2.8</td>
+      <td>4.8</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
@@ -1043,7 +1068,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2)
+Diverse Counterfactual set (new outcome: 2.0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1078,58 +1103,58 @@ Diverse Counterfactual set (new outcome: 2)
   <tbody>
     <tr>
       <th>0</th>
-      <td>6.1</td>
-      <td>3.0</td>
-      <td>-</td>
-      <td>1.8</td>
+      <td>6.5</td>
+      <td>3.2</td>
+      <td>5.1</td>
+      <td>2.0</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>6.0</td>
-      <td>3.0</td>
-      <td>-</td>
+      <td>6.4</td>
+      <td>3.1</td>
+      <td>5.5</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>-</td>
-      <td>2.8</td>
-      <td>-</td>
+      <td>6.1</td>
+      <td>3.0</td>
+      <td>4.9</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>6.5</td>
-      <td>-</td>
-      <td>5.1</td>
-      <td>2.0</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>4.8</td>
+      <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>-</td>
-      <td>2.8</td>
+      <td>5.7</td>
+      <td>3.4</td>
       <td>5.1</td>
-      <td>-</td>
+      <td>2.0</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>-</td>
-      <td>2.7</td>
-      <td>-</td>
-      <td>1.8</td>
+      <td>6.4</td>
+      <td>3.2</td>
+      <td>5.3</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>5.9</td>
-      <td>3.0</td>
-      <td>5.1</td>
-      <td>1.8</td>
+      <td>6.2</td>
+      <td>3.4</td>
+      <td>5.4</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1142,18 +1167,19 @@ Diverse Counterfactual set (new outcome: 2)
 <h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline">¶</a></h1>
 <p>For regression, we will use sklearn’s boston dataset. This dataset contains boston house-prices. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#boston-house-prices-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#boston-house-prices-dataset</a></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_boston</span>
-<span class="n">df_boston</span> <span class="o">=</span> <span class="n">sklearn_to_df</span><span class="p">(</span><span class="n">load_boston</span><span class="p">())</span>
+<span></span><span class="n">boston_data</span> <span class="o">=</span> <span class="n">load_boston</span><span class="p">()</span>
+<span class="n">df_boston</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">boston_data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">boston_data</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">df_boston</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">boston_data</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
 <span class="n">df_boston</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1282,7 +1308,7 @@ Diverse Counterfactual set (new outcome: 2)
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1319,7 +1345,7 @@ memory usage: 55.5 KB
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1329,18 +1355,15 @@ memory usage: 55.5 KB
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
-<span class="c1"># Split data into train and test</span>
+<span></span><span class="c1"># Split data into train and test</span>
 <span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_boston</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
                                                     <span class="n">target</span><span class="p">,</span>
-                                                    <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
                                                     <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">categorical_features</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">continuous_features_boston</span><span class="p">)</span>
@@ -1360,13 +1383,13 @@ memory usage: 55.5 KB
 <span class="c1"># Append classifier to preprocessing pipeline.</span>
 <span class="c1"># Now we have a full prediction pipeline.</span>
 <span class="n">regr_boston</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
-                      <span class="p">(</span><span class="s1">&#39;regressor&#39;</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">())])</span>
+                              <span class="p">(</span><span class="s1">&#39;regressor&#39;</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">())])</span>
 <span class="n">model_boston</span> <span class="o">=</span> <span class="n">regr_boston</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1377,7 +1400,7 @@ memory usage: 55.5 KB
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1387,7 +1410,7 @@ memory usage: 55.5 KB
 </div>
 <p>As we can see below, all the target values will lie in the desired range</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1405,8 +1428,9 @@ memory usage: 55.5 KB
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
+  0%|          | 0/1 [00:00&lt;?, ?it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
 WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
+100%|██████████| 1/1 [00:00&lt;00:00,  2.81it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1415,6 +1439,14 @@ WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Query instance (original outcome : 24)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1471,7 +1503,7 @@ Query instance (original outcome : 24)
       <td>16.6</td>
       <td>391.25</td>
       <td>11.38</td>
-      <td>24.014</td>
+      <td>24.44</td>
     </tr>
   </tbody>
 </table>
@@ -1527,44 +1559,44 @@ Diverse Counterfactual set (new outcome: [30, 45])
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.01301</td>
+      <td>0.1</td>
       <td>34.0</td>
       <td>6.1</td>
       <td>-</td>
-      <td>0.385</td>
+      <td>0.433</td>
       <td>6.982</td>
-      <td>49.3</td>
+      <td>17.7</td>
       <td>5.4917</td>
       <td>7.0</td>
       <td>329.0</td>
-      <td>15.5</td>
+      <td>16.1</td>
       <td>390.4</td>
       <td>4.86</td>
-      <td>33.047000885009766</td>
+      <td>32.81899999999999</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.10469</td>
-      <td>40.0</td>
-      <td>6.2</td>
-      <td>1.0</td>
-      <td>0.447</td>
-      <td>7.267</td>
-      <td>49.0</td>
-      <td>4.7872</td>
-      <td>4.0</td>
-      <td>254.0</td>
-      <td>17.6</td>
-      <td>389.2</td>
-      <td>6.05</td>
-      <td>33.95500183105469</td>
+      <td>0.08221</td>
+      <td>22.0</td>
+      <td>5.9</td>
+      <td>-</td>
+      <td>0.431</td>
+      <td>6.957</td>
+      <td>6.8</td>
+      <td>8.9067</td>
+      <td>7.0</td>
+      <td>330.0</td>
+      <td>19.1</td>
+      <td>386.1</td>
+      <td>3.53</td>
+      <td>30.928999999999977</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1580,10 +1612,11 @@ Diverse Counterfactual set (new outcome: [30, 45])
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
+  0%|          | 0/2 [00:00&lt;?, ?it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
 WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
-WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
+ 50%|█████     | 1/2 [00:00&lt;00:00,  2.72it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
 WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
+100%|██████████| 2/2 [00:00&lt;00:00,  2.76it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1592,6 +1625,14 @@ WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Query instance (original outcome : 49)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1648,7 +1689,7 @@ Query instance (original outcome : 49)
       <td>13.6</td>
       <td>395.52</td>
       <td>3.16</td>
-      <td>49.108</td>
+      <td>48.99</td>
     </tr>
   </tbody>
 </table>
@@ -1717,58 +1758,58 @@ Diverse Counterfactual set (new outcome: [40, 50])
       <td>-</td>
       <td>395.5</td>
       <td>-</td>
-      <td>49.108001708984375</td>
+      <td>-</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.02009</td>
-      <td>95.0</td>
-      <td>2.7</td>
-      <td>0.0</td>
-      <td>0.416</td>
-      <td>8.034</td>
-      <td>31.9</td>
-      <td>5.118</td>
-      <td>4.0</td>
-      <td>224.0</td>
-      <td>14.7</td>
-      <td>390.5</td>
-      <td>2.88</td>
-      <td>49.50899887084961</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.0351</td>
-      <td>95.0</td>
-      <td>2.7</td>
-      <td>0.0</td>
-      <td>0.416</td>
-      <td>7.853</td>
-      <td>33.2</td>
-      <td>5.118</td>
-      <td>4.0</td>
-      <td>224.0</td>
-      <td>14.7</td>
-      <td>392.8</td>
-      <td>3.81</td>
-      <td>48.40999984741211</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.01538</td>
+      <td>0.00632</td>
       <td>-</td>
       <td>3.8</td>
       <td>0.0</td>
-      <td>0.394</td>
+      <td>0.385</td>
+      <td>8.034</td>
+      <td>31.9</td>
+      <td>1.1296</td>
+      <td>-</td>
+      <td>-</td>
+      <td>14.7</td>
+      <td>390.5</td>
+      <td>1.73</td>
+      <td>48.61499999999999</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.00632</td>
+      <td>-</td>
+      <td>3.8</td>
+      <td>0.0</td>
+      <td>0.385</td>
+      <td>7.82</td>
+      <td>2.9</td>
+      <td>3.4952</td>
+      <td>-</td>
+      <td>-</td>
+      <td>12.6</td>
+      <td>0.3</td>
+      <td>1.73</td>
+      <td>46.21099999999999</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.00632</td>
+      <td>-</td>
+      <td>2.7</td>
+      <td>0.0</td>
+      <td>0.385</td>
       <td>7.454</td>
-      <td>34.2</td>
-      <td>6.3361</td>
-      <td>3.0</td>
-      <td>244.0</td>
+      <td>2.9</td>
+      <td>1.1296</td>
+      <td>-</td>
+      <td>-</td>
       <td>15.9</td>
       <td>386.3</td>
-      <td>3.11</td>
-      <td>43.03799819946289</td>
+      <td>1.73</td>
+      <td>45.22599999999999</td>
     </tr>
   </tbody>
 </table>
@@ -1779,7 +1820,7 @@ Diverse Counterfactual set (new outcome: [40, 50])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 31)
+Query instance (original outcome : 30)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1836,7 +1877,7 @@ Query instance (original outcome : 31)
       <td>15.2</td>
       <td>389.71</td>
       <td>4.69</td>
-      <td>30.827</td>
+      <td>30.28</td>
     </tr>
   </tbody>
 </table>
@@ -1892,57 +1933,6 @@ Diverse Counterfactual set (new outcome: [40, 50])
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.02009</td>
-      <td>95.0</td>
-      <td>2.7</td>
-      <td>-</td>
-      <td>0.416</td>
-      <td>8.034</td>
-      <td>31.9</td>
-      <td>5.118</td>
-      <td>4.0</td>
-      <td>224.0</td>
-      <td>14.7</td>
-      <td>390.5</td>
-      <td>2.88</td>
-      <td>49.50899887084961</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.0351</td>
-      <td>95.0</td>
-      <td>2.7</td>
-      <td>-</td>
-      <td>0.416</td>
-      <td>7.853</td>
-      <td>33.2</td>
-      <td>5.118</td>
-      <td>4.0</td>
-      <td>224.0</td>
-      <td>14.7</td>
-      <td>392.8</td>
-      <td>3.81</td>
-      <td>48.40999984741211</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.06129</td>
-      <td>20.0</td>
-      <td>3.3</td>
-      <td>1.0</td>
-      <td>0.443</td>
-      <td>7.645</td>
-      <td>49.7</td>
-      <td>5.2119</td>
-      <td>-</td>
-      <td>216.0</td>
-      <td>14.9</td>
-      <td>377.1</td>
-      <td>3.01</td>
-      <td>45.68299865722656</td>
-    </tr>
-    <tr>
-      <th>3</th>
       <td>0.03578</td>
       <td>20.0</td>
       <td>3.3</td>
@@ -1956,7 +1946,58 @@ Diverse Counterfactual set (new outcome: [40, 50])
       <td>14.9</td>
       <td>387.3</td>
       <td>3.76</td>
-      <td>45.4640007019043</td>
+      <td>45.59500000000002</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.02177</td>
+      <td>0.0</td>
+      <td>0.5</td>
+      <td>-</td>
+      <td>0.422</td>
+      <td>7.82</td>
+      <td>15.7</td>
+      <td>3.4952</td>
+      <td>-</td>
+      <td>255.0</td>
+      <td>14.7</td>
+      <td>377.1</td>
+      <td>3.57</td>
+      <td>46.923</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0351</td>
+      <td>90.0</td>
+      <td>3.8</td>
+      <td>-</td>
+      <td>0.416</td>
+      <td>7.454</td>
+      <td>33.2</td>
+      <td>6.3361</td>
+      <td>4.0</td>
+      <td>187.0</td>
+      <td>14.7</td>
+      <td>386.3</td>
+      <td>3.11</td>
+      <td>43.84800000000002</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.01381</td>
+      <td>80.0</td>
+      <td>0.5</td>
+      <td>-</td>
+      <td>0.422</td>
+      <td>7.875</td>
+      <td>32.0</td>
+      <td>5.6484</td>
+      <td>4.0</td>
+      <td>255.0</td>
+      <td>14.4</td>
+      <td>394.2</td>
+      <td>2.97</td>
+      <td>49.04</td>
     </tr>
   </tbody>
 </table>
@@ -1969,6 +2010,15 @@ Diverse Counterfactual set (new outcome: [40, 50])
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="DiCE_model_agnostic_CFs.html" class="btn btn-neutral float-right" title="Generating counterfactual explanations with any ML model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="DiCE_feature_importances.html" class="btn btn-neutral float-left" title="Estimating local and global feature importance scores using DiCE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
