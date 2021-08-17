@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.model_interfaces.base_model &mdash; DiCE 0.5 documentation</title>
+  <title>dice_ml.model_interfaces.base_model &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,6 +31,8 @@
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -88,9 +90,11 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -169,6 +173,9 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">dice_ml.utils.helpers</span> <span class="kn">import</span> <span class="n">DataTransfomer</span>
+<span class="kn">from</span> <span class="nn">dice_ml.constants</span> <span class="kn">import</span> <span class="n">ModelTypes</span>
+<span class="kn">from</span> <span class="nn">dice_ml.utils.exception</span> <span class="kn">import</span> <span class="n">SystemException</span>
+
 
 <div class="viewcode-block" id="BaseModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel">[docs]</a><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">:</span>
 
@@ -177,31 +184,42 @@
 
 <span class="sd">        :param model: trained ML Model.</span>
 <span class="sd">        :param model_path: path to trained model.</span>
-<span class="sd">        :param backend: ML framework. For frameworks other than TensorFlow or PyTorch, or for implementations other than standard DiCE (https://arxiv.org/pdf/1905.07697.pdf), provide both the module and class names as module_name.class_name. For instance, if there is a model interface class &quot;SklearnModel&quot; in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces, then backend parameter should be &quot;sklearn_model.SklearnModel&quot;.</span>
+<span class="sd">        :param backend: ML framework. For frameworks other than TensorFlow or PyTorch,</span>
+<span class="sd">                        or for implementations other than standard DiCE</span>
+<span class="sd">                        (https://arxiv.org/pdf/1905.07697.pdf),</span>
+<span class="sd">                        provide both the module and class names as module_name.class_name.</span>
+<span class="sd">                        For instance, if there is a model interface class &quot;SklearnModel&quot;</span>
+<span class="sd">                        in module &quot;sklearn_model.py&quot; inside the subpackage dice_ml.model_interfaces,</span>
+<span class="sd">                        then backend parameter should be &quot;sklearn_model.SklearnModel&quot;.</span>
 <span class="sd">        :param func: function transformation required for ML model. If func is None, then func will be the identity function.</span>
-<span class="sd">        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE&#39;s data_interface is appended to the dictionary of kw_args, by default.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE&#39;s data_interface is appended to the</span>
+<span class="sd">                        dictionary of kw_args, by default.</span>
 
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="n">DataTransfomer</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="p">)</span> <span class="c1"># calls FunctionTransformer of scikit-learn internally (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)</span>
+        <span class="c1"># calls FunctionTransformer of scikit-learn internally</span>
+        <span class="c1"># (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="n">DataTransfomer</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseModel.load_model"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">filehandle</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filehandle</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;returns prediction probabilities for a classifier and the</span>
-<span class="sd">        predicted output for a regressor.</span>
+<div class="viewcode-block" id="BaseModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">,</span> <span class="n">model_score</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns prediction probabilities for a classifier and the predicted output for a regressor.</span>
 
 <span class="sd">        :returns: an array of output scores for a classifier, and a singleton</span>
 <span class="sd">        array of predicted value for a regressor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_score</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
 
@@ -213,6 +231,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">temp_input</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="BaseModel.get_num_output_nodes2"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_num_output_nodes2">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_output_nodes2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Regressor</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SystemException</span><span class="p">(</span><span class="s1">&#39;Number of output nodes not supported for regression&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div></div>
 </pre></div>
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.dice &mdash; DiCE 0.5 documentation</title>
+  <title>dice_ml.dice &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,6 +31,8 @@
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -88,9 +90,11 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -162,9 +166,17 @@
            <div itemprop="articleBody">
             
   <h1>Source code for dice_ml.dice</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Module pointing to different implementations of DiCE based on different</span>
+<span class="sd">   frameworks such as Tensorflow or PyTorch or sklearn, and different methods</span>
+<span class="sd">   such as RandomSampling, DiCEKD or DiCEGenetic&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Dice"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice">[docs]</a><span class="k">class</span> <span class="nc">Dice</span><span class="p">:</span>
+<span class="kn">from</span> <span class="nn">dice_ml.constants</span> <span class="kn">import</span> <span class="n">BackEndTypes</span><span class="p">,</span> <span class="n">SamplingStrategy</span>
+<span class="kn">from</span> <span class="nn">dice_ml.utils.exception</span> <span class="kn">import</span> <span class="n">UserConfigValidationException</span>
+<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
+<span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.private_data_interface</span> <span class="kn">import</span> <span class="n">PrivateData</span>
+
+
+<div class="viewcode-block" id="Dice"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice">[docs]</a><span class="k">class</span> <span class="nc">Dice</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An interface class to different DiCE implementations.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -173,46 +185,71 @@
 <span class="sd">        :param data_interface: an interface to access data related params.</span>
 <span class="sd">        :param model_interface: an interface to access the output or gradients of a trained ML model.</span>
 <span class="sd">        :param method: Name of the method to use for generating counterfactuals</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dice.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.Dice.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">Sklearn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">KdTree</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">PrivateData</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
+                    <span class="s1">&#39;Private data interface is not supported with sklearn kdtree explainer&#39;</span>
+                    <span class="s1">&#39; since kdtree explainer needs access to entire training data&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>  <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                                  <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                                  <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This method should be implemented by the concrete classes &quot;</span>
+                                  <span class="s2">&quot;that inherit from ExplainerBase&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># To add new implementations of DiCE, add the class in explainer_interfaces subpackage and import-and-return the class in an elif loop as shown in the below method.</span>
 
 <div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.dice.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">model_interface</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Decides DiCE implementation type.</span>
 
-    <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sklearn&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span> <span class="c1"># random sampling of CFs</span>
+<span class="sd">    To add new implementations of DiCE, add the class in explainer_interfaces</span>
+<span class="sd">    subpackage and import-and-return the class in an elif loop as shown in</span>
+<span class="sd">    the below method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">Sklearn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">Random</span><span class="p">:</span>
+            <span class="c1"># random sampling of CFs</span>
             <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_random</span> <span class="kn">import</span> <span class="n">DiceRandom</span>
             <span class="k">return</span> <span class="n">DiceRandom</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;genetic&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">Genetic</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_genetic</span> <span class="kn">import</span> <span class="n">DiceGenetic</span>
             <span class="k">return</span> <span class="n">DiceGenetic</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kdtree&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">KdTree</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_KD</span> <span class="kn">import</span> <span class="n">DiceKD</span>
             <span class="k">return</span> <span class="n">DiceKD</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;Unsupported sample strategy </span><span class="si">{0}</span><span class="s2"> provided. &quot;</span>
+                                                <span class="s2">&quot;Please choose one of </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2"> or </span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                                    <span class="n">method</span><span class="p">,</span> <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">Random</span><span class="p">,</span>
+                                                    <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">Genetic</span><span class="p">,</span>
+                                                    <span class="n">SamplingStrategy</span><span class="o">.</span><span class="n">KdTree</span>
+                                                <span class="p">))</span>
 
-    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF1&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 1.x backend</span>
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">Tensorflow1</span><span class="p">:</span>
+        <span class="c1"># pretrained Keras Sequential model with Tensorflow 1.x backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_tensorflow1</span> <span class="kn">import</span> <span class="n">DiceTensorFlow1</span>
         <span class="k">return</span> <span class="n">DiceTensorFlow1</span>
 
-    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;TF2&#39;</span><span class="p">:</span> <span class="c1"># pretrained Keras Sequential model with Tensorflow 2.x backend</span>
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">Tensorflow2</span><span class="p">:</span>
+        <span class="c1"># pretrained Keras Sequential model with Tensorflow 2.x backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_tensorflow2</span> <span class="kn">import</span> <span class="n">DiceTensorFlow2</span>
         <span class="k">return</span> <span class="n">DiceTensorFlow2</span>
 
-    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;PYT&#39;</span><span class="p">:</span> <span class="c1"># PyTorch backend</span>
+    <span class="k">elif</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">Pytorch</span><span class="p">:</span>
+        <span class="c1"># PyTorch backend</span>
         <span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.dice_pytorch</span> <span class="kn">import</span> <span class="n">DicePyTorch</span>
         <span class="k">return</span> <span class="n">DicePyTorch</span>
 
-    <span class="k">else</span><span class="p">:</span> <span class="c1"># all other backends</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># all other backends</span>
         <span class="n">backend_dice</span> <span class="o">=</span> <span class="n">model_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">[</span><span class="s1">&#39;explainer&#39;</span><span class="p">]</span>
         <span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">backend_dice</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
         <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;dice_ml.explainer_interfaces.&quot;</span> <span class="o">+</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">class_name</span><span class="p">])</span>

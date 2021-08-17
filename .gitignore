@@ -113,5 +113,6 @@ docs/notebooks/DiCE_getting_started.ipynb
 docs/notebooks/DiCE_getting_started_feasible.ipynb
 docs/notebooks/DiCE_with_advanced_options.ipynb
 docs/notebooks/DiCE_with_private_data.ipynb
+docs/notebooks/*.ipynb
 
 

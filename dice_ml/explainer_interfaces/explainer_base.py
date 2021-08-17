@@ -531,8 +531,8 @@ class ExplainerBase(ABC):
     def infer_target_cfs_class(self, desired_class_input, original_pred, num_output_nodes):
         """ Infer the target class for generating CFs. Only called when
             model_type=="classifier".
-            TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
-                  whether it is allowed or not.
+            TODO: Add support for opposite desired class in multiclass.
+            Downstream methods should decide whether it is allowed or not.
         """
         if desired_class_input == "opposite":
             if num_output_nodes == 2:

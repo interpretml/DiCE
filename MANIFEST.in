@@ -1,5 +1,6 @@
 include requirements.txt
 include requirements-deeplearning.txt
+include requirements-test.txt
 include LICENSE
 recursive-include docs *
 recursive-include tests *.py
