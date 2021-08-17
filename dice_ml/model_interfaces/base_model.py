@@ -26,6 +26,7 @@ class BaseModel:
         :param func: function transformation required for ML model. If func is None, then func will be the identity function.
         :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the
                         dictionary of kw_args, by default.
+
         """
         self.model = model
         self.model_path = model_path
