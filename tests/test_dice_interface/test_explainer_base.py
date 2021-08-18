@@ -1,6 +1,8 @@
 import pandas as pd
 import pytest
+from sklearn.ensemble import RandomForestRegressor
 
+import dice_ml
 from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
@@ -157,16 +159,41 @@ class TestExplainerBaseMultiClassClassification:
 
 class TestExplainerBaseRegression:
 
-    @pytest.mark.parametrize("desired_class, regression_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+    @pytest.mark.parametrize("desired_range, regression_exp_object",
+                             [([10, 100], 'random'), ([10, 100], 'genetic'), ([10, 100], 'kdtree')],
                              indirect=['regression_exp_object'])
-    def test_zero_totalcfs(self, desired_class, regression_exp_object, sample_custom_query_1):
+    def test_zero_totalcfs(self, desired_range, regression_exp_object, sample_custom_query_1):
         exp = regression_exp_object  # explainer object
         with pytest.raises(UserConfigValidationException):
             exp.generate_counterfactuals(
                     query_instances=[sample_custom_query_1],
                     total_CFs=0,
-                    desired_class=desired_class)
+                    desired_range=desired_range)
+
+    @pytest.mark.parametrize("desired_range, method",
+                             [([10, 100], 'random')])
+    def test_numeric_categories(self, desired_range, method, create_boston_data):
+        x_train, x_test, y_train, y_test, feature_names = \
+            create_boston_data
+
+        rfc = RandomForestRegressor(n_estimators=10, max_depth=4,
+                                    random_state=777)
+        model = rfc.fit(x_train, y_train)
+
+        dataset_train = x_train.copy()
+        dataset_train['Outcome'] = y_train
+        feature_names.remove('CHAS')
+
+        d = dice_ml.Data(dataframe=dataset_train, continuous_features=feature_names, outcome_name='Outcome')
+        m = dice_ml.Model(model=model, backend='sklearn', model_type='regressor')
+        exp = dice_ml.Dice(d, m, method=method)
+
+        cf_explanation = exp.generate_counterfactuals(
+            query_instances=x_test.iloc[0:1],
+            total_CFs=10,
+            desired_range=desired_range)
+
+        assert cf_explanation is not None
 
 
 class TestExplainerBase:
