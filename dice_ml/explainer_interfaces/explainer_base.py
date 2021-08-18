@@ -168,7 +168,8 @@ class ExplainerBase(ABC):
                 raise ValueError("Feature", feature, "not present in training data!")
 
         for feature in self.data_interface.categorical_feature_names:
-            if query_instance[feature].values[0] not in feature_ranges_orig[feature]:
+            if query_instance[feature].values[0] not in feature_ranges_orig[feature] and \
+                    str(query_instance[feature].values[0]) not in feature_ranges_orig[feature]:
                 raise ValueError("Feature", feature, "has a value outside the dataset.")
 
             if feature not in features_to_vary and permitted_range is not None:
