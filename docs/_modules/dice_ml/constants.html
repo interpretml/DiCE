@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data &mdash; DiCE 0.7 documentation</title>
+  <title>dice_ml.constants &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -150,7 +150,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>dice_ml.data</li>
+      <li>dice_ml.constants</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -165,49 +165,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for dice_ml.data</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Module pointing to different implementations of Data class</span>
-
-<span class="sd">DiCE requires only few parameters about the data such as the range of continuous</span>
-<span class="sd">features and the levels of categorical features. Hence, DiCE can be used for a</span>
-<span class="sd">private data whose meta data are only available (such as the feature names and</span>
-<span class="sd">range/levels of different features) by specifying appropriate parameters.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.base_data_interface</span> <span class="kn">import</span> <span class="n">_BaseData</span>
+  <h1>Source code for dice_ml.constants</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Constants for dice-ml package.&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="Data"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.data.Data">[docs]</a><span class="k">class</span> <span class="nc">Data</span><span class="p">(</span><span class="n">_BaseData</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class containing all required information about the data for DiCE.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BackEndTypes"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.constants.BackEndTypes">[docs]</a><span class="k">class</span> <span class="nc">BackEndTypes</span><span class="p">:</span>
+    <span class="n">Sklearn</span> <span class="o">=</span> <span class="s1">&#39;sklearn&#39;</span>
+    <span class="n">Tensorflow1</span> <span class="o">=</span> <span class="s1">&#39;TF1&#39;</span>
+    <span class="n">Tensorflow2</span> <span class="o">=</span> <span class="s1">&#39;TF2&#39;</span>
+    <span class="n">Pytorch</span> <span class="o">=</span> <span class="s1">&#39;PYT&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Init method</span>
-
-<span class="sd">        :param **params: a dictionary of required parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decide_implementation_type</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Data.decide_implementation_type"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.data.Data.decide_implementation_type">[docs]</a>    <span class="k">def</span> <span class="nf">decide_implementation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Decides if the Data class is for public or private data.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">decide</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div></div>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="p">[</span><span class="n">Sklearn</span><span class="p">,</span> <span class="n">Tensorflow1</span><span class="p">,</span> <span class="n">Tensorflow2</span><span class="p">,</span> <span class="n">Pytorch</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="decide"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.data.decide">[docs]</a><span class="k">def</span> <span class="nf">decide</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Decides if the Data class is for public or private data.</span>
+<div class="viewcode-block" id="SamplingStrategy"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.constants.SamplingStrategy">[docs]</a><span class="k">class</span> <span class="nc">SamplingStrategy</span><span class="p">:</span>
+    <span class="n">Random</span> <span class="o">=</span> <span class="s1">&#39;random&#39;</span>
+    <span class="n">Genetic</span> <span class="o">=</span> <span class="s1">&#39;genetic&#39;</span>
+    <span class="n">KdTree</span> <span class="o">=</span> <span class="s1">&#39;kdtree&#39;</span></div>
 
-<span class="sd">    To add new implementations of Data, add the class in data_interfaces</span>
-<span class="sd">    subpackage and import-and-return the class in an elif loop as shown</span>
-<span class="sd">    in the below method.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s1">&#39;dataframe&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-        <span class="c1"># if params contain a Pandas dataframe, then use PublicData class</span>
-        <span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.public_data_interface</span> <span class="kn">import</span> <span class="n">PublicData</span>
-        <span class="k">return</span> <span class="n">PublicData</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># use PrivateData if only meta data is provided</span>
-        <span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.private_data_interface</span> <span class="kn">import</span> <span class="n">PrivateData</span>
-        <span class="k">return</span> <span class="n">PrivateData</span></div>
+
+<div class="viewcode-block" id="ModelTypes"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.constants.ModelTypes">[docs]</a><span class="k">class</span> <span class="nc">ModelTypes</span><span class="p">:</span>
+    <span class="n">Classifier</span> <span class="o">=</span> <span class="s1">&#39;classifier&#39;</span>
+    <span class="n">Regressor</span> <span class="o">=</span> <span class="s1">&#39;regressor&#39;</span>
+
+    <span class="n">ALL</span> <span class="o">=</span> <span class="p">[</span><span class="n">Classifier</span><span class="p">,</span> <span class="n">Regressor</span><span class="p">]</span></div>
+
+
+<span class="k">class</span> <span class="nc">_SchemaVersions</span><span class="p">:</span>
+    <span class="n">V1</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">V2</span> <span class="o">=</span> <span class="s1">&#39;2.0&#39;</span>
+    <span class="n">CURRENT_VERSION</span> <span class="o">=</span> <span class="n">V2</span>
+
+    <span class="n">ALL_VERSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="n">V1</span><span class="p">,</span> <span class="n">V2</span><span class="p">]</span>
 </pre></div>
 
            </div>

@@ -55,7 +55,7 @@ class DicePyTorch(ExplainerBase):
                                  max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
                                  init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
                                  posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
-        """Generates diverse counterfactual explanations
+        """Generates diverse counterfactual explanations.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe
         :param total_CFs: Total number of counterfactuals required.
@@ -67,7 +67,7 @@ class DicePyTorch(ExplainerBase):
         :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
-        param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values.
+        :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values.
                                Defaults to the range inferred from training data. If None, uses the parameters initialized in
                                data_interface.
         :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
@@ -94,6 +94,7 @@ class DicePyTorch(ExplainerBase):
                                            Prefer binary search when a feature range is large
                                            (for instance, income varying from 10k to 1000k) and only if the features
                                            share a monotonic relationship with predicted outcome in the model.
+
         :return: A CounterfactualExamples object to store and visualize the resulting
                  counterfactual explanations (see diverse_counterfactuals.py).
         """
@@ -417,7 +418,7 @@ class DicePyTorch(ExplainerBase):
                              max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose,
                              init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param,
                              posthoc_sparsity_algorithm):
-        """Finds counterfactuals by graident-descent."""
+        """Finds counterfactuals by gradient-descent."""
 
         # Prepares user defined query_instance for DiCE.
         # query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')

@@ -66,6 +66,7 @@ If you face any problems, try installing dependencies manually.
 
 DiCE requires the following packages:
 
+* jsonschema
 * numpy
 * scikit-learn
 * pandas

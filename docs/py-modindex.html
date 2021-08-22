@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; DiCE 0.5 documentation</title>
+  <title>Python Module Index &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,6 +31,8 @@
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -91,9 +93,11 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -182,6 +186,11 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="dice_ml.html#module-dice_ml.constants"><code class="xref">dice_ml.constants</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="dice_ml.html#module-dice_ml.counterfactual_explanations"><code class="xref">dice_ml.counterfactual_explanations</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
@@ -193,6 +202,11 @@
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces"><code class="xref">dice_ml.data_interfaces</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.base_data_interface"><code class="xref">dice_ml.data_interfaces.base_data_interface</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -288,6 +302,11 @@
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces.pytorch_model"><code class="xref">dice_ml.model_interfaces.pytorch_model</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="dice_ml.schema.html#module-dice_ml.schema"><code class="xref">dice_ml.schema</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>

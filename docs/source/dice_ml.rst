@@ -10,6 +10,7 @@ Subpackages
    dice_ml.data_interfaces
    dice_ml.explainer_interfaces
    dice_ml.model_interfaces
+   dice_ml.schema
    dice_ml.utils
 
 Submodules

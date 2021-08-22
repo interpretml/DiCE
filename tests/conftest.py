@@ -1,8 +1,9 @@
-import pytest
 from collections import OrderedDict
 import pandas as pd
+import pytest
 from sklearn.datasets import load_iris, load_boston
 from sklearn.model_selection import train_test_split
+
 import dice_ml
 from dice_ml.utils import helpers
 
@@ -239,4 +240,6 @@ def create_boston_data():
     x_train, x_test, y_train, y_test = train_test_split(
         boston.data, boston.target,
         test_size=0.2, random_state=7)
-    return x_train, x_test, y_train, y_test, boston.feature_names
+    x_train = pd.DataFrame(data=x_train, columns=boston.feature_names)
+    x_test = pd.DataFrame(data=x_test, columns=boston.feature_names)
+    return x_train, x_test, y_train, y_test, boston.feature_names.tolist()

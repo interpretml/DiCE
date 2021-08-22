@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml.data_interfaces package &mdash; DiCE 0.5 documentation</title>
+  <title>dice_ml.data_interfaces package &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,6 +31,8 @@
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -90,9 +92,14 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html#1.-Independent-random-sampling-of-features">1. Independent random sampling of features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html#2.-Genetic-Algorithm">2. Genetic Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html#3.-Querying-a-KD-Tree">3. Querying a KD Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -103,6 +110,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="dice_ml.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">dice_ml.data_interfaces package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces.base_data_interface">dice_ml.data_interfaces.base_data_interface module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces.private_data_interface">dice_ml.data_interfaces.private_data_interface module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces.public_data_interface">dice_ml.data_interfaces.public_data_interface module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.data_interfaces">Module contents</a></li>
@@ -110,10 +118,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.explainer_interfaces.html">dice_ml.explainer_interfaces package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.schema.html">dice_ml.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html">dice_ml.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.constants">dice_ml.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.html#module-dice_ml.dice">dice_ml.dice module</a></li>
@@ -218,13 +228,17 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-dice_ml.data_interfaces.base_data_interface">
+<span id="dice-ml-data-interfaces-base-data-interface-module"></span><h2>dice_ml.data_interfaces.base_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.base_data_interface" title="Permalink to this headline">¶</a></h2>
+<p>Module containing base class for data interfaces for dice-ml.</p>
+</div>
 <div class="section" id="module-dice_ml.data_interfaces.private_data_interface">
 <span id="dice-ml-data-interfaces-private-data-interface-module"></span><h2>dice_ml.data_interfaces.private_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.private_data_interface" title="Permalink to this headline">¶</a></h2>
 <p>Module containing meta data information about private data.</p>
 <dl class="py class">
 <dt id="dice_ml.data_interfaces.private_data_interface.PrivateData">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.data_interfaces.private_data_interface.</code><code class="sig-name descname">PrivateData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.data_interfaces.base_data_interface._BaseData</span></code></p>
 <p>A data interface for private data with meta information.</p>
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params">
@@ -282,7 +296,8 @@
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data">
 <code class="sig-name descname">get_inverse_ohe_min_max_normalized_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transformed_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array</p>
+<dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
+should be a dataframe or an array</p>
 </dd></dl>
 
 <dl class="py method">
@@ -300,7 +315,8 @@
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data">
 <code class="sig-name descname">get_ohe_min_max_normalized_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_ohe_min_max_normalized_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict, a dataframe, a list, or a list of dicts</p>
+<dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
+a dataframe, a list, or a list of dicts</p>
 </dd></dl>
 
 <dl class="py method">
@@ -338,12 +354,32 @@
 </div>
 <div class="section" id="module-dice_ml.data_interfaces.public_data_interface">
 <span id="dice-ml-data-interfaces-public-data-interface-module"></span><h2>dice_ml.data_interfaces.public_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.public_data_interface" title="Permalink to this headline">¶</a></h2>
-<p>Module containing all required information about the interface between raw (or transformed) public data and DiCE explainers.</p>
+<p>Module containing all required information about the interface between raw (or transformed)
+public data and DiCE explainers.</p>
 <dl class="py class">
 <dt id="dice_ml.data_interfaces.public_data_interface.PublicData">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.data_interfaces.public_data_interface.</code><code class="sig-name descname">PublicData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A data interface for public data. This class is an interface to DiCE explainers and contains methods to transform user-fed raw data into the format a DiCE explainer requires, and vice versa.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.data_interfaces.base_data_interface._BaseData</span></code></p>
+<p>A data interface for public data. This class is an interface to DiCE explainers
+and contains methods to transform user-fed raw data into the format a DiCE explainer
+requires, and vice versa.</p>
+<dl class="py method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.check_features_to_vary">
+<code class="sig-name descname">check_features_to_vary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">features_to_vary</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.check_features_to_vary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.check_features_to_vary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.check_mad_validity">
+<code class="sig-name descname">check_mad_validity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_weights</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.check_mad_validity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.check_mad_validity" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks feature MAD validity and throw warnings.
+TODO: add comments as to where this is used if this function is necessary, else remove.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dice_ml.data_interfaces.public_data_interface.PublicData.check_permitted_range">
+<code class="sig-name descname">check_permitted_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">permitted_range</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.check_permitted_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.check_permitted_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.public_data_interface.PublicData.create_ohe_params">
 <code class="sig-name descname">create_ohe_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.create_ohe_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.create_ohe_params" title="Permalink to this definition">¶</a></dt>
@@ -411,7 +447,8 @@
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_inverse_ohe_min_max_normalized_data">
 <code class="sig-name descname">get_inverse_ohe_min_max_normalized_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transformed_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_inverse_ohe_min_max_normalized_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data should be a dataframe or an array</p>
+<dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
+should be a dataframe or an array</p>
 </dd></dl>
 
 <dl class="py method">
@@ -429,7 +466,8 @@
 <dl class="py method">
 <dt id="dice_ml.data_interfaces.public_data_interface.PublicData.get_ohe_min_max_normalized_data">
 <code class="sig-name descname">get_ohe_min_max_normalized_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_ohe_min_max_normalized_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_ohe_min_max_normalized_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict, a dataframe, a list, or a list of dicts</p>
+<dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
+a dataframe, a list, or a list of dicts</p>
 </dd></dl>
 
 <dl class="py method">
