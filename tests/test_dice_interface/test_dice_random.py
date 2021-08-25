@@ -44,17 +44,6 @@ class TestDiceRandomBinaryClassificationMethods:
     def _initiate_exp_object(self, random_binary_classification_exp_object):
         self.exp = random_binary_classification_exp_object  # explainer object
 
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('a', 3)])
-    def test_unsupported_binary_class(self, desired_class, sample_custom_query_1, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
-
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
         counterfactual_explanations = self.exp.generate_counterfactuals(

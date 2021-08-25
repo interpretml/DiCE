@@ -52,49 +52,32 @@ def regression_exp_object(method="random"):
     return exp
 
 
-@pytest.fixture
-def KD_binary_classification_exp_object():
-    binary_classification_exp_object(method="kdtree")
+@pytest.fixture(scope='session')
+def custom_public_data_interface():
+    dataset = helpers.load_custom_testing_dataset_regression()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    return d
 
 
-@pytest.fixture
-def KD_multi_classification_exp_object():
-    multi_classification_exp_object(method="kdtree")
+@pytest.fixture(scope='session')
+def sklearn_binary_classification_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    return m
 
 
-@pytest.fixture
-def KD_regression_exp_object():
-    regression_exp_object(method="kdtree")
+@pytest.fixture(scope='session')
+def sklearn_multiclass_classification_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    return m
 
 
-@pytest.fixture
-def genetic_binary_classification_exp_object():
-    binary_classification_exp_object(method="genetic")
-
-
-@pytest.fixture
-def genetic_multi_classification_exp_object():
-    multi_classification_exp_object(method="genetic")
-
-
-@pytest.fixture
-def genetic_regression_exp_object():
-    regression_exp_object(method="genetic")
-
-
-@pytest.fixture
-def random_binary_classification_exp_object():
-    binary_classification_exp_object()
-
-
-@pytest.fixture
-def random_multi_classification_exp_object():
-    multi_classification_exp_object()
-
-
-@pytest.fixture
-def random_regression_exp_object():
-    regression_exp_object()
+@pytest.fixture(scope='session')
+def sklearn_regression_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='regression')
+    return m
 
 
 @pytest.fixture

@@ -7,6 +7,7 @@ from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
+@pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
 class TestExplainerBaseBinaryClassification:
 
     def _verify_feature_importance(self, feature_importance):
@@ -14,23 +15,33 @@ class TestExplainerBaseBinaryClassification:
             for key in feature_importance:
                 assert feature_importance[key] >= 0.0 and feature_importance[key] <= 1.0
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['binary_classification_exp_object'])
-    def test_zero_totalcfs(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_zero_totalcfs(
+        self, desired_class, method, sample_custom_query_1,
+        custom_public_data_interface,
+        sklearn_binary_classification_model_interface
+    ):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
         with pytest.raises(UserConfigValidationException):
             exp.generate_counterfactuals(
                     query_instances=[sample_custom_query_1],
                     total_CFs=0,
                     desired_class=desired_class)
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random')],
-                             indirect=['binary_classification_exp_object'])
-    def test_local_feature_importance(self, desired_class, binary_classification_exp_object,
-                                      sample_custom_query_1, sample_counterfactual_example_dummy):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_local_feature_importance(
+            self, desired_class, method,
+            sample_custom_query_1, sample_counterfactual_example_dummy,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
         sample_custom_query = pd.concat([sample_custom_query_1, sample_custom_query_1])
         cf_explanations = exp.generate_counterfactuals(
                     query_instances=sample_custom_query,
@@ -54,12 +65,17 @@ class TestExplainerBaseBinaryClassification:
         for local_importance in local_importances.local_importance:
             self._verify_feature_importance(local_importance)
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random')],
-                             indirect=['binary_classification_exp_object'])
-    def test_global_feature_importance(self, desired_class, binary_classification_exp_object,
-                                       sample_custom_query_10, sample_counterfactual_example_dummy):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_global_feature_importance(
+            self, desired_class, method,
+            sample_custom_query_10, sample_counterfactual_example_dummy,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
         cf_explanations = exp.generate_counterfactuals(
                     query_instances=sample_custom_query_10,
                     total_CFs=15,
@@ -80,24 +96,28 @@ class TestExplainerBaseBinaryClassification:
 
         self._verify_feature_importance(global_importance.summary_importance)
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object_out_of_order",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['binary_classification_exp_object_out_of_order'])
-    def test_columns_out_of_order(self, desired_class, binary_classification_exp_object_out_of_order, sample_custom_query_1):
-        exp = binary_classification_exp_object_out_of_order  # explainer object
-        exp._generate_counterfactuals(
-            query_instance=sample_custom_query_1,
-            total_CFs=0,
-            desired_class=desired_class,
-            desired_range=None,
-            permitted_range=None,
-            features_to_vary='all')
+    # @pytest.mark.parametrize("desired_class, binary_classification_exp_object_out_of_order",
+    #                          [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
+    #                          indirect=['binary_classification_exp_object_out_of_order'])
+    # def test_columns_out_of_order(self, desired_class, binary_classification_exp_object_out_of_order, sample_custom_query_1):
+    #     exp = binary_classification_exp_object_out_of_order  # explainer object
+    #     exp._generate_counterfactuals(
+    #         query_instance=sample_custom_query_1,
+    #         total_CFs=0,
+    #         desired_class=desired_class,
+    #         desired_range=None,
+    #         permitted_range=None,
+    #         features_to_vary='all')
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['binary_classification_exp_object'])
-    def test_incorrect_features_to_vary_list(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_incorrect_features_to_vary_list(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
         with pytest.raises(
                 UserConfigValidationException,
                 match="Got features {" + "'unknown_feature'" + "} which are not present in training data"):
@@ -109,11 +129,15 @@ class TestExplainerBaseBinaryClassification:
                 permitted_range=None,
                 features_to_vary=['unknown_feature'])
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['binary_classification_exp_object'])
-    def test_incorrect_features_permitted_range(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_incorrect_features_permitted_range(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
         with pytest.raises(
                 UserConfigValidationException,
                 match="Got features {" + "'unknown_feature'" + "} which are not present in training data"):
@@ -125,11 +149,15 @@ class TestExplainerBaseBinaryClassification:
                 permitted_range={'unknown_feature': [1, 30]},
                 features_to_vary='all')
 
-    @pytest.mark.parametrize("desired_class, binary_classification_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['binary_classification_exp_object'])
-    def test_incorrect_values_permitted_range(self, desired_class, binary_classification_exp_object, sample_custom_query_1):
-        exp = binary_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_incorrect_values_permitted_range(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
         with pytest.raises(UserConfigValidationException) as ucve:
             exp.generate_counterfactuals(
                 query_instances=sample_custom_query_1,
@@ -141,6 +169,24 @@ class TestExplainerBaseBinaryClassification:
 
         assert 'The category {0} does not occur in the training data for feature {1}. Allowed categories are {2}'.format(
             'd', 'Categorical', ['a', 'b', 'c']) in str(ucve)
+
+    # When no elements in the desired_class are present in the training data
+    @pytest.mark.parametrize("desired_class", [100, 'a'])
+    def test_unsupported_binary_class(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        with pytest.raises(UserConfigValidationException) as ucve:
+            exp.generate_counterfactuals(query_instances=sample_custom_query_1, total_CFs=3,
+                                         desired_class=desired_class)
+        if desired_class == 100:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
 
 
 class TestExplainerBaseMultiClassClassification:
