@@ -188,6 +188,55 @@ class TestExplainerBaseBinaryClassification:
         else:
             assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
 
+    # Testing if an error is thrown when the query instance has an unknown categorical variable
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_query_instance_unknown_column(
+            self, desired_class, method, sample_custom_query_5,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        with pytest.raises(ValueError, match='not present in training data') as ve:
+            exp.generate_counterfactuals(
+                query_instances=sample_custom_query_5, total_CFs=3,
+                desired_class=desired_class)
+            self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
+
+    # Testing if an error is thrown when the query instance has an unknown categorical variable
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_query_instance_outside_bounds(
+            self, desired_class, method, sample_custom_query_3,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        with pytest.raises(ValueError, match='has a value outside the dataset'):
+            exp.generate_counterfactuals(query_instances=sample_custom_query_3, total_CFs=1,
+                                         desired_class=desired_class)
+
+    # # Testing that the counterfactuals are in the desired class
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_desired_class(
+            self, desired_class, method, sample_custom_query_2,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        ans = exp.generate_counterfactuals(query_instances=sample_custom_query_2,
+                                           features_to_vary='all',
+                                           total_CFs=2, desired_class=desired_class,
+                                           permitted_range=None)
+        if method != 'kdtree':
+            assert all(ans.cf_examples_list[0].final_cfs_df[exp.data_interface.outcome_name].values == [desired_class] * 2)
+        else:
+            assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values == [desired_class] * 2)
+
 
 class TestExplainerBaseMultiClassClassification:
 

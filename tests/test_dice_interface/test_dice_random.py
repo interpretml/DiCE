@@ -72,18 +72,6 @@ class TestDiceRandomBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
-    # # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, desired_range, total_CFs, features_to_vary, permitted_range",
-                             [(1, None, 2, "all", None)])
-    def test_desired_class(self, desired_class, desired_range, sample_custom_query_2, total_CFs, features_to_vary,
-                           permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 features_to_vary=features_to_vary,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range, permitted_range=permitted_range)
-        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs, features_to_vary, permitted_range",
                              [(1, None, 2, ["Numerical"], None)])
@@ -132,18 +120,6 @@ class TestDiceRandomBinaryClassificationMethods:
             assert all(
                 permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
                 in range(total_CFs))
-
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp.setup("all", None, sample_custom_query_3, "inverse_mad")
-
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
 
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
