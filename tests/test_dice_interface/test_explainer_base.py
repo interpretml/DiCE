@@ -198,11 +198,10 @@ class TestExplainerBaseBinaryClassification:
             custom_public_data_interface,
             sklearn_binary_classification_model_interface,
             method=method)
-        with pytest.raises(ValueError, match='not present in training data') as ve:
+        with pytest.raises(ValueError, match='not present in training data'):
             exp.generate_counterfactuals(
                 query_instances=sample_custom_query_5, total_CFs=3,
                 desired_class=desired_class)
-            self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
 
     # Testing if an error is thrown when the query instance has an unknown categorical variable
     @pytest.mark.parametrize("desired_class", [1])
@@ -235,7 +234,8 @@ class TestExplainerBaseBinaryClassification:
         if method != 'kdtree':
             assert all(ans.cf_examples_list[0].final_cfs_df[exp.data_interface.outcome_name].values == [desired_class] * 2)
         else:
-            assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values == [desired_class] * 2)
+            assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values ==
+                       [desired_class] * 2)
 
 
 class TestExplainerBaseMultiClassClassification:
