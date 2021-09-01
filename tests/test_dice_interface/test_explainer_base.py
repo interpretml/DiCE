@@ -237,6 +237,25 @@ class TestExplainerBaseBinaryClassification:
             assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values ==
                        [desired_class] * 2)
 
+    @pytest.mark.parametrize("desired_class, total_CFs, permitted_range",
+                             [(1, 2, {'Numerical': [10, 15]})])
+    def test_permitted_range(
+            self, desired_class, method, total_CFs, permitted_range, sample_custom_query_2,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        ans = exp.generate_counterfactuals(query_instances=sample_custom_query_2,
+                                           permitted_range=permitted_range,
+                                           total_CFs=total_CFs, desired_class=desired_class)
+
+        for feature in permitted_range:
+            assert all(
+                permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
+                in range(total_CFs))
+
 
 class TestExplainerBaseMultiClassClassification:
 

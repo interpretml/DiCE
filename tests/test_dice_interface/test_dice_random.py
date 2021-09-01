@@ -88,23 +88,6 @@ class TestDiceRandomBinaryClassificationMethods:
                 assert all(ans.final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
                            range(total_CFs))
 
-    @pytest.mark.skip(reason="Currently, dice_random doesn't support permitted_range. Please un-skip this test once "
-                             "that functionality is implemented.")
-    # Testing that the permitted_range argument actually varies the features only within the permitted_range
-    @pytest.mark.parametrize("desired_class, desired_range, total_CFs, permitted_range",
-                             [(1, None, 2, {'Numerical': [10, 15]})])
-    def test_permitted_range(self, desired_class, desired_range, sample_custom_query_2, total_CFs, permitted_range):
-        features_to_vary = self.exp.setup("all", permitted_range, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 features_to_vary=features_to_vary, permitted_range=permitted_range,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range)
-
-        for feature in permitted_range:
-            assert all(
-                permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
-                in range(total_CFs))
-
     # Testing if you can provide permitted_range for categorical variables
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs, permitted_range",
                              [(1, None, 2, {'Categorical': ['a', 'c']})])
