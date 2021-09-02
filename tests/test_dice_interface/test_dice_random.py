@@ -104,31 +104,6 @@ class TestDiceRandomBinaryClassificationMethods:
                 permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
                 in range(total_CFs))
 
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 0, None, 0, None)])
-    def test_zero_cfs(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                      permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
-                                           total_CFs=total_CFs, desired_class=desired_class,
-                                           desired_range=desired_range, permitted_range=permitted_range)
-
-
-class TestDiceRandomMultiClassificationMethods:
-    @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, random_multi_classification_exp_object):
-        self.exp = random_multi_classification_exp_object  # explainer object
-
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 2, None, 0, None)])
-    def test_zero_cfs(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                      permitted_range):
-        self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
-                                           total_CFs=total_CFs, desired_class=desired_class,
-                                           desired_range=desired_range, permitted_range=permitted_range)
-
 
 class TestDiceRandomRegressionMethods:
     @pytest.fixture(autouse=True)

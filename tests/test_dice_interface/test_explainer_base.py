@@ -238,7 +238,7 @@ class TestExplainerBaseBinaryClassification:
                        [desired_class] * 2)
 
     @pytest.mark.parametrize("desired_class, total_CFs, permitted_range",
-                             [(1, 2, {'Numerical': [10, 15]})])
+                             [(1, 1, {'Numerical': [10, 150]})])
     def test_permitted_range(
             self, desired_class, method, total_CFs, permitted_range, sample_custom_query_2,
             custom_public_data_interface,
@@ -252,9 +252,31 @@ class TestExplainerBaseBinaryClassification:
                                            total_CFs=total_CFs, desired_class=desired_class)
 
         for feature in permitted_range:
-            assert all(
-                permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df[feature].values[i] <=
-                permitted_range[feature][1] for i in range(total_CFs))
+            if method != 'kdtree':
+                assert all(
+                    permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df[feature].values[i] <=
+                    permitted_range[feature][1] for i in range(total_CFs))
+            else:
+                assert all(
+                    permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df_sparse[feature].values[i] <=
+                    permitted_range[feature][1] for i in range(total_CFs))
+
+    # Testing for 0 CFs needed
+    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
+                             [("all", 0, None, 0, None)])
+    def test_zero_cfs_internal(
+            self, method, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
+            permitted_range, custom_public_data_interface, sklearn_binary_classification_model_interface):
+        if method == 'genetic':
+            pytest.skip('DiceGenetic explainer does not handle the total counterfactuals as zero')
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        features_to_vary = exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
+        exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
+                                      total_CFs=total_CFs, desired_class=desired_class,
+                                      desired_range=desired_range, permitted_range=permitted_range)
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
@@ -325,6 +347,23 @@ class TestExplainerBaseMultiClassClassification:
             assert "Desired class not present in training data!" in str(ucve)
         else:
             assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
+
+    # Testing for 0 CFs needed
+    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
+                             [("all", 0, None, 0, None)])
+    def test_zero_cfs_internal(
+            self, method, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
+            permitted_range, custom_public_data_interface, sklearn_multiclass_classification_model_interface):
+        if method == 'genetic':
+            pytest.skip('DiceGenetic explainer does not handle the total counterfactuals as zero')
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
+        features_to_vary = exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
+        exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
+                                      total_CFs=total_CFs, desired_class=desired_class,
+                                      desired_range=desired_range, permitted_range=permitted_range)
 
 
 class TestExplainerBaseRegression:
