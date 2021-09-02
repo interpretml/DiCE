@@ -143,16 +143,6 @@ class TestDiceGeneticMultiClassificationMethods:
     def _initiate_exp_object(self, genetic_multi_classification_exp_object):
         self.exp = genetic_multi_classification_exp_object  # explainer object
 
-    # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
-    def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-        ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                                total_CFs=total_CFs, desired_class=desired_class,
-                                                initialization=initialization)
-        for cfs_example in ans.cf_examples_list:
-            assert all(
-                cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
                              [(2, 7, "kdtree", 0), (2, 7, "random", 0)])

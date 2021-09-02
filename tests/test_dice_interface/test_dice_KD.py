@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
@@ -154,32 +153,11 @@ class TestDiceKDMultiClassificationMethods:
                                                  posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         assert all(i == desired_class for i in self.exp_multi.cfs_preds)
 
-    # Testing that the output of multiclass classification lies in the desired_class
-    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
-    def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
-        counterfactual_explanations = self.exp_multi.generate_counterfactuals(
-                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
-                                        desired_class=desired_class)
-        assert all(i == desired_class for i in self.exp_multi.cfs_preds)
-
-        assert counterfactual_explanations is not None
-
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 0)])
     def test_zero_cfs(self, desired_class, sample_custom_query_4, total_CFs):
         self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
                                                  desired_class=desired_class)
-
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
-    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                                     desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestDiceKDRegressionMethods:

@@ -120,28 +120,6 @@ class TestDiceRandomMultiClassificationMethods:
     def _initiate_exp_object(self, random_multi_classification_exp_object):
         self.exp = random_multi_classification_exp_object  # explainer object
 
-    # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 2, None, 2, None)])
-    def test_desired_class(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                           permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(features_to_vary=features_to_vary,
-                                                 query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range, permitted_range=permitted_range)
-        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
-    # Testing that the output of multiclass classification lies in the desired_class
-    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
-    def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
-        counterfactual_explanations = self.exp.generate_counterfactuals(
-                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
-                                        desired_class=desired_class)
-        assert all(i == desired_class for i in self.exp.cfs_preds)
-
-        assert counterfactual_explanations is not None
-
     # Testing for 0 CFs needed
     @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
                              [("all", 2, None, 0, None)])
@@ -150,17 +128,6 @@ class TestDiceRandomMultiClassificationMethods:
         self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
                                            total_CFs=total_CFs, desired_class=desired_class,
                                            desired_range=desired_range, permitted_range=permitted_range)
-
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
-    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestDiceRandomRegressionMethods:

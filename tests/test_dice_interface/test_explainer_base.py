@@ -253,22 +253,78 @@ class TestExplainerBaseBinaryClassification:
 
         for feature in permitted_range:
             assert all(
-                permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
-                in range(total_CFs))
+                permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df[feature].values[i] <=
+                permitted_range[feature][1] for i in range(total_CFs))
 
 
+@pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
 class TestExplainerBaseMultiClassClassification:
 
-    @pytest.mark.parametrize("desired_class, multi_classification_exp_object",
-                             [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-                             indirect=['multi_classification_exp_object'])
-    def test_zero_totalcfs(self, desired_class, multi_classification_exp_object, sample_custom_query_1):
-        exp = multi_classification_exp_object  # explainer object
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_zero_totalcfs(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
         with pytest.raises(UserConfigValidationException):
             exp.generate_counterfactuals(
                     query_instances=[sample_custom_query_1],
                     total_CFs=0,
                     desired_class=desired_class)
+
+    # Testing that the counterfactuals are in the desired class
+    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 2)])
+    @pytest.mark.parametrize("genetic_initialization", ['kdtree', 'random'])
+    def test_desired_class(
+            self, desired_class, total_CFs, method, genetic_initialization,
+            sample_custom_query_2,
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
+
+        if method != 'genetic':
+            ans = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_2,
+                    total_CFs=total_CFs, desired_class=desired_class)
+        else:
+            ans = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_2,
+                    total_CFs=total_CFs, desired_class=desired_class,
+                    initialization=genetic_initialization)
+
+        assert ans is not None
+        if method != 'kdtree':
+            assert all(
+                ans.cf_examples_list[0].final_cfs_df[exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
+        else:
+            assert all(
+                ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values ==
+                [desired_class] * total_CFs)
+        assert all(i == desired_class for i in exp.cfs_preds)
+
+    # When no elements in the desired_class are present in the training data
+    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
+    def test_unsupported_multiclass(
+            self, desired_class, total_CFs, method, sample_custom_query_4,
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
+        with pytest.raises(UserConfigValidationException) as ucve:
+            exp.generate_counterfactuals(query_instances=sample_custom_query_4, total_CFs=total_CFs,
+                                         desired_class=desired_class)
+        if desired_class == 100:
+            assert "Desired class not present in training data!" in str(ucve)
+        else:
+            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestExplainerBaseRegression:
