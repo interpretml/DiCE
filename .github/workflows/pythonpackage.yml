@@ -59,6 +59,15 @@ jobs:
         path: htmlcov
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - uses: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+      name: Test Line Coverage
+      with:
+        showStatistics: true
+        checkCoverage: true
+        coverageFailOption: fixed
+        coverageType: lines
+        coverageThreshold: 80
+        runTitle: Line Coverage
     - name: Check package consistency with twine
       run: |
         python setup.py check sdist bdist_wheel
