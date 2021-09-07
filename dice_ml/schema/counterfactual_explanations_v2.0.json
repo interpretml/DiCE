@@ -5,14 +5,14 @@
 	"type": "object",
 	"properties": {
 		"cfs_list": {
-            "description": "The list of the computed counterfactual examples.",
+			"description": "The list of the computed counterfactual examples.",
 			"type": "array",
 			"items": {
 				"type": ["array", "null"]
 			}
 		},
 		"test_data": {
-            "description": "The list of the input test samples for which counterfactual examples need to be computed.",
+			"description": "The list of the input test samples for which counterfactual examples need to be computed.",
 			"type": "array",
 			"items": {
 				"type": "array"
@@ -49,7 +49,7 @@
 		"model_type": {
 			"description": "The type of model is either a classifier/regressor",
 			"type": ["string", "null"]		
-        },
+		},
 		"desired_class": {
 			"description": "The target class for the generated counterfactual examples",
 			"type": ["string", "integer", "null"]
@@ -59,7 +59,7 @@
 			"type": ["array", "null"],
 			"items": {
 				"type": "number"
-			} 
+			}
 		},
 		"data_interface": {
 			"description": "The data interface details including outcome name.",
@@ -69,18 +69,18 @@
 			"description": "The metadata about the generated counterfactuals.",
 			"type": "object"
 		}
-    },
-    "required": [
+	},
+	"required": [
 		"cfs_list",
 		"test_data",
 		"local_importance",
 		"summary_importance",
-        "feature_names",
-        "feature_names_including_target",
-        "model_type",
-        "desired_class",
-        "desired_range",
-        "data_interface",
-        "metadata"
+		"feature_names",
+		"feature_names_including_target",
+		"model_type",
+		"desired_class",
+		"desired_range",
+		"data_interface",
+		"metadata"
 	]
 }
