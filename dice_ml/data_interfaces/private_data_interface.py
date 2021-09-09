@@ -9,7 +9,6 @@ import logging
 from dice_ml.data_interfaces.base_data_interface import _BaseData
 
 
-
 class PrivateData(_BaseData):
     """A data interface for private data with meta information."""
 
