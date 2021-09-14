@@ -56,18 +56,6 @@ class TestDiceGeneticBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
-    # # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
-                             [(1, 2, "all", "kdtree"), (1, 2, "all", "random")])
-    def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
-        ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                                features_to_vary=features_to_vary,
-                                                total_CFs=total_CFs, desired_class=desired_class,
-                                                initialization=initialization)
-        for cfs_example in ans.cf_examples_list:
-            assert all(
-                cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
                              [(1, 2, ["Numerical"], "kdtree"), (1, 2, ["Numerical"], "random")])
@@ -121,18 +109,6 @@ class TestDiceGeneticBinaryClassificationMethods:
                     permitted_range[feature][1] for i
                     in range(total_CFs))
 
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary", [(0, 1, "all")])
-    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs, features_to_vary):
-        with pytest.raises(ValueError):
-            self.exp.setup(features_to_vary, None, sample_custom_query_3, "inverse_mad")
-
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("features_to_vary", [("all")])
-    def test_query_instance_unknown_column(self, sample_custom_query_5, features_to_vary):
-        with pytest.raises(ValueError):
-            self.exp.setup(features_to_vary, None, sample_custom_query_5, "inverse_mad")
-
     # Testing if an error is thrown when the query instance has outcome variable
     def test_query_instance_with_target_column(self, sample_custom_query_6):
         with pytest.raises(ValueError) as ve:
@@ -166,16 +142,6 @@ class TestDiceGeneticMultiClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, genetic_multi_classification_exp_object):
         self.exp = genetic_multi_classification_exp_object  # explainer object
-
-    # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, total_CFs, initialization", [(2, 2, "kdtree"), (2, 2, "random")])
-    def test_desired_class(self, desired_class, sample_custom_query_2, total_CFs, initialization):
-        ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                                total_CFs=total_CFs, desired_class=desired_class,
-                                                initialization=initialization)
-        for cfs_example in ans.cf_examples_list:
-            assert all(
-                cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
 
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",

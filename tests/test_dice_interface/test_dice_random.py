@@ -44,17 +44,6 @@ class TestDiceRandomBinaryClassificationMethods:
     def _initiate_exp_object(self, random_binary_classification_exp_object):
         self.exp = random_binary_classification_exp_object  # explainer object
 
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('a', 3)])
-    def test_unsupported_binary_class(self, desired_class, sample_custom_query_1, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
-
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
         counterfactual_explanations = self.exp.generate_counterfactuals(
@@ -83,18 +72,6 @@ class TestDiceRandomBinaryClassificationMethods:
         with pytest.raises(ValueError):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
-    # # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, desired_range, total_CFs, features_to_vary, permitted_range",
-                             [(1, None, 2, "all", None)])
-    def test_desired_class(self, desired_class, desired_range, sample_custom_query_2, total_CFs, features_to_vary,
-                           permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 features_to_vary=features_to_vary,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range, permitted_range=permitted_range)
-        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs, features_to_vary, permitted_range",
                              [(1, None, 2, ["Numerical"], None)])
@@ -111,23 +88,6 @@ class TestDiceRandomBinaryClassificationMethods:
                 assert all(ans.final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
                            range(total_CFs))
 
-    @pytest.mark.skip(reason="Currently, dice_random doesn't support permitted_range. Please un-skip this test once "
-                             "that functionality is implemented.")
-    # Testing that the permitted_range argument actually varies the features only within the permitted_range
-    @pytest.mark.parametrize("desired_class, desired_range, total_CFs, permitted_range",
-                             [(1, None, 2, {'Numerical': [10, 15]})])
-    def test_permitted_range(self, desired_class, desired_range, sample_custom_query_2, total_CFs, permitted_range):
-        features_to_vary = self.exp.setup("all", permitted_range, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(query_instance=sample_custom_query_2,
-                                                 features_to_vary=features_to_vary, permitted_range=permitted_range,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range)
-
-        for feature in permitted_range:
-            assert all(
-                permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
-                in range(total_CFs))
-
     # Testing if you can provide permitted_range for categorical variables
     @pytest.mark.parametrize("desired_class, desired_range, total_CFs, permitted_range",
                              [(1, None, 2, {'Categorical': ['a', 'c']})])
@@ -143,76 +103,6 @@ class TestDiceRandomBinaryClassificationMethods:
             assert all(
                 permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
                 in range(total_CFs))
-
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp.setup("all", None, sample_custom_query_3, "inverse_mad")
-
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp.setup("all", None, sample_custom_query_5, "inverse_mad")
-
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 0, None, 0, None)])
-    def test_zero_cfs(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                      permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
-                                           total_CFs=total_CFs, desired_class=desired_class,
-                                           desired_range=desired_range, permitted_range=permitted_range)
-
-
-class TestDiceRandomMultiClassificationMethods:
-    @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, random_multi_classification_exp_object):
-        self.exp = random_multi_classification_exp_object  # explainer object
-
-    # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 2, None, 2, None)])
-    def test_desired_class(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                           permitted_range):
-        features_to_vary = self.exp.setup(features_to_vary, None, sample_custom_query_2, "inverse_mad")
-        ans = self.exp._generate_counterfactuals(features_to_vary=features_to_vary,
-                                                 query_instance=sample_custom_query_2,
-                                                 total_CFs=total_CFs, desired_class=desired_class,
-                                                 desired_range=desired_range, permitted_range=permitted_range)
-        assert all(ans.final_cfs_df[self.exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
-
-    # Testing that the output of multiclass classification lies in the desired_class
-    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
-    def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
-        counterfactual_explanations = self.exp.generate_counterfactuals(
-                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
-                                        desired_class=desired_class)
-        assert all(i == desired_class for i in self.exp.cfs_preds)
-
-        assert counterfactual_explanations is not None
-
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
-                             [("all", 2, None, 0, None)])
-    def test_zero_cfs(self, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
-                      permitted_range):
-        self.exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
-                                           total_CFs=total_CFs, desired_class=desired_class,
-                                           desired_range=desired_range, permitted_range=permitted_range)
-
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
-    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestDiceRandomRegressionMethods:
