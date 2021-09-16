@@ -53,7 +53,28 @@ def regression_exp_object(method="random"):
 
 
 @pytest.fixture(scope='session')
-def custom_public_data_interface():
+def custom_public_data_interface_binary_out_of_order():
+    dataset = helpers.load_outcome_not_last_column_dataset()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    return d
+
+
+@pytest.fixture(scope='session')
+def custom_public_data_interface_binary():
+    dataset = helpers.load_custom_testing_dataset_binary()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    return d
+
+
+@pytest.fixture(scope='session')
+def custom_public_data_interface_multicalss():
+    dataset = helpers.load_custom_testing_dataset_multiclass()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    return d
+
+
+@pytest.fixture(scope='session')
+def custom_public_data_interface_regression():
     dataset = helpers.load_custom_testing_dataset_regression()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     return d
@@ -76,7 +97,7 @@ def sklearn_multiclass_classification_model_interface():
 @pytest.fixture(scope='session')
 def sklearn_regression_model_interface():
     ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='regression')
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='regressor')
     return m
 
 
