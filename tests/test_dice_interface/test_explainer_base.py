@@ -253,6 +253,9 @@ class TestExplainerBaseBinaryClassification:
             self, desired_class, method, total_CFs, permitted_range, sample_custom_query_2,
             custom_public_data_interface_binary,
             sklearn_binary_classification_model_interface):
+        if method == 'kdtree':
+            pytest.skip('DiceKD cannot seem to handle permitted_range')
+
         exp = dice_ml.Dice(
             custom_public_data_interface_binary,
             sklearn_binary_classification_model_interface,
