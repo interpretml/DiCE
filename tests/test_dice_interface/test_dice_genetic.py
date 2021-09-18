@@ -42,13 +42,6 @@ class TestDiceGeneticBinaryClassificationMethods:
     def _initiate_exp_object(self, genetic_binary_classification_exp_object):
         self.exp = genetic_binary_classification_exp_object  # explainer object
 
-    # When invalid desired_class is given
-    @pytest.mark.parametrize("desired_class, total_CFs", [(7, 3)])
-    def test_no_cfs(self, desired_class, sample_custom_query_1, total_CFs):
-        with pytest.raises(UserConfigValidationException):
-            self.exp.generate_counterfactuals(query_instances=sample_custom_query_1, total_CFs=total_CFs,
-                                              desired_class=desired_class)
-
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("features_to_vary, permitted_range, feature_weights",
                              [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
