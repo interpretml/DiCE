@@ -15,8 +15,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
         # Check for cyclometric complexity for specific files where this metric has been 
         # reduced to ten and below
         flake8 dice_ml/data_interfaces/ --count --max-complexity=10 --max-line-length=127
-    - if: ${{ matrix.os != 'windows-latest' }}
+    - if: ${{ matrix.python-version != 3.5 }}
       name: Lint notebooks with flake8_nb
       run: |
         # stop the build if there are flake8 errors in notebooks
