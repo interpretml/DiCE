@@ -28,7 +28,7 @@ setuptools.setup(
     long_description_content_type="text/x-rst",
     url="https://github.com/interpretml/DiCE",
     download_url="https://github.com/interpretml/DiCE/archive/v"+VERSION_STR+".tar.gz",
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
