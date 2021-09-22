@@ -241,6 +241,11 @@ class TestExplainerBaseBinaryClassification:
                                            features_to_vary='all',
                                            total_CFs=2, desired_class=desired_class,
                                            permitted_range=None)
+        
+        assert ans is not None
+        assert len(ans.cf_examples_list) == sample_custom_query_2.shape[0]
+        assert ans.cf_examples_list[0].final_cfs_df.shape[0] == 2
+
         if method != 'kdtree':
             assert all(ans.cf_examples_list[0].final_cfs_df[exp.data_interface.outcome_name].values == [desired_class] * 2)
         else:
@@ -290,6 +295,100 @@ class TestExplainerBaseBinaryClassification:
         exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
                                       total_CFs=total_CFs, desired_class=desired_class,
                                       desired_range=desired_range, permitted_range=permitted_range)
+
+    # Testing if you can provide permitted_range for categorical variables
+    @pytest.mark.parametrize("desired_class", [1])
+    @pytest.mark.parametrize("permitted_range", [{'Categorical': ['a', 'c']}])
+    @pytest.mark.parametrize("genetic_initialization", ['kdtree', 'random'])
+    def test_permitted_range_categorical(
+            self, method, desired_class, permitted_range, genetic_initialization,
+            sample_custom_query_2, custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
+        if method != 'genetic':
+            ans = exp.generate_counterfactuals(
+                query_instances=sample_custom_query_2,
+                permitted_range=permitted_range,
+                total_CFs=2, desired_class=desired_class)
+        else:
+            ans = exp.generate_counterfactuals(
+                query_instances=sample_custom_query_2,
+                initialization=genetic_initialization,
+                permitted_range=permitted_range,
+                total_CFs=2, desired_class=desired_class)
+
+        ans = exp.generate_counterfactuals(query_instances=sample_custom_query_2,
+                                           permitted_range=permitted_range,
+                                           total_CFs=2, desired_class=desired_class)
+        assert all(i in permitted_range["Categorical"] for i in ans.cf_examples_list[0].final_cfs_df.Categorical.values)
+
+    # Testing that the features_to_vary argument actually varies only the features that you wish to vary
+    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary",
+                             [(1, 1, ["Numerical"])])
+    @pytest.mark.parametrize("genetic_initialization", ['kdtree', 'random'])
+    def test_features_to_vary(
+            self, method, desired_class, sample_custom_query_2,
+            total_CFs, features_to_vary, genetic_initialization,
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        if method != 'genetic':
+            ans = exp.generate_counterfactuals(
+                        query_instances=sample_custom_query_2,
+                        features_to_vary=features_to_vary,
+                        total_CFs=total_CFs, desired_class=desired_class)
+        else:
+            ans = exp.generate_counterfactuals(
+                        query_instances=sample_custom_query_2,
+                        features_to_vary=features_to_vary,
+                        total_CFs=total_CFs, desired_class=desired_class,
+                        initialization=genetic_initialization)
+
+        for feature in exp.data_interface.feature_names:
+            if feature not in features_to_vary:
+                if method != 'kdtree':
+                    assert all(ans.cf_examples_list[0].final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
+                            range(total_CFs))
+                else:
+                    assert all(ans.cf_examples_list[0].final_cfs_df_sparse[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
+                            range(total_CFs))          
+
+    # When a query's feature value is not within the permitted range and the feature is not allowed to vary
+    @pytest.mark.parametrize("features_to_vary, permitted_range, feature_weights",
+                             [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
+    def test_invalid_query_instance(
+            self, method, sample_custom_query_1,
+            features_to_vary, permitted_range,
+            feature_weights,
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        with pytest.raises(ValueError) as ve:
+            exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
+
+    # Testing if an error is thrown when the query instance has outcome variable
+    def test_query_instance_with_target_column(
+            self, method, sample_custom_query_6,
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface_binary,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        with pytest.raises(ValueError) as ve:
+            exp.setup("all", None, sample_custom_query_6, "inverse_mad")
+
+        assert "present in query instance" in str(ve)
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])

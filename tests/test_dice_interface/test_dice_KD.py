@@ -21,18 +21,6 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp = KD_binary_classification_exp_object  # explainer object
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
-    # When a query's feature value is not within the permitted range and the feature is not allowed to vary
-    @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
-                             [(None, 0, 4, ['Numerical'], {'Categorical': ['b', 'c']})])
-    def test_invalid_query_instance(self, desired_range, desired_class, sample_custom_query_1, total_CFs,
-                                    features_to_vary, permitted_range):
-        self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
-            self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
-
-        with pytest.raises(ValueError):
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
-                                               features_to_vary=features_to_vary, permitted_range=permitted_range)
-
     # Verifying the output of the KD tree
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
@@ -46,26 +34,6 @@ class TestDiceKDBinaryClassificationMethods:
         assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[0]) and \
                all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 
-    # Verifying the output of the KD tree
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
-        counterfactual_explanations = self.exp.generate_counterfactuals(
-            query_instances=sample_custom_query_1, desired_class=desired_class,
-            total_CFs=total_CFs)
-
-        assert counterfactual_explanations is not None
-
-    # Testing that the features_to_vary argument actually varies only the features that you wish to vary
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary", [(0, 1, ["Numerical"])])
-    def test_features_to_vary(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary):
-        self.exp._generate_counterfactuals(query_instance=sample_custom_query_2, desired_class=desired_class,
-                                           total_CFs=total_CFs, features_to_vary=features_to_vary)
-        self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
-        expected_output = self.exp.data_interface.data_df
-
-        assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[1]) and \
-               all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[1])
-
     # Testing that the permitted_range argument actually varies the features only within the permitted_range
     @pytest.mark.parametrize("desired_class, total_CFs, permitted_range", [(0, 1, {'Numerical': [1000, 10000]})])
     def test_permitted_range(self, desired_class, sample_custom_query_2, total_CFs, permitted_range):
@@ -75,13 +43,6 @@ class TestDiceKDBinaryClassificationMethods:
         expected_output = self.exp.data_interface.data_df
         assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[1]) and \
                all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[1])
-
-    # Testing if you can provide permitted_range for categorical variables
-    @pytest.mark.parametrize("desired_class, total_CFs, permitted_range", [(0, 4, {'Categorical': ['b', 'c']})])
-    def test_permitted_range_categorical(self, desired_class, sample_custom_query_2, total_CFs, permitted_range):
-        self.exp._generate_counterfactuals(query_instance=sample_custom_query_2, desired_class=desired_class,
-                                           total_CFs=total_CFs, permitted_range=permitted_range)
-        assert all(i in permitted_range["Categorical"] for i in self.exp.final_cfs_df.Categorical.values)
 
     # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])

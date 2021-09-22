@@ -42,29 +42,6 @@ class TestDiceGeneticBinaryClassificationMethods:
     def _initiate_exp_object(self, genetic_binary_classification_exp_object):
         self.exp = genetic_binary_classification_exp_object  # explainer object
 
-    # When a query's feature value is not within the permitted range and the feature is not allowed to vary
-    @pytest.mark.parametrize("features_to_vary, permitted_range, feature_weights",
-                             [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
-    def test_invalid_query_instance(self, sample_custom_query_1, features_to_vary, permitted_range, feature_weights):
-        with pytest.raises(ValueError):
-            self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
-
-    # Testing that the features_to_vary argument actually varies only the features that you wish to vary
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, initialization",
-                             [(1, 2, ["Numerical"], "kdtree"), (1, 2, ["Numerical"], "random")])
-    def test_features_to_vary(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary, initialization):
-        ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                                features_to_vary=features_to_vary,
-                                                total_CFs=total_CFs, desired_class=desired_class,
-                                                initialization=initialization)
-
-        for cfs_example in ans.cf_examples_list:
-            for feature in self.exp.data_interface.feature_names:
-                if feature not in features_to_vary:
-                    assert all(
-                        cfs_example.final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
-                        range(total_CFs))
-
     # Testing that the permitted_range argument actually varies the features only within the permitted_range
     @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, permitted_range, initialization",
                              [(1, 2, "all", {'Numerical': [10, 15]}, "kdtree"),
@@ -82,32 +59,6 @@ class TestDiceGeneticBinaryClassificationMethods:
                     permitted_range[feature][0] <= cfs_example.final_cfs_df[feature].values[i] <=
                     permitted_range[feature][1] for i
                     in range(total_CFs))
-
-    # Testing if you can provide permitted_range for categorical variables
-    @pytest.mark.parametrize("desired_class, total_CFs, features_to_vary, permitted_range, initialization",
-                             [(1, 2, "all", {'Categorical': ['a', 'c']}, "kdtree"),
-                              (1, 2, "all", {'Categorical': ['a', 'c']}, "random")])
-    def test_permitted_range_categorical(self, desired_class, total_CFs, features_to_vary, sample_custom_query_2,
-                                         permitted_range,
-                                         initialization):
-        ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                                features_to_vary=features_to_vary, permitted_range=permitted_range,
-                                                total_CFs=total_CFs, desired_class=desired_class,
-                                                initialization=initialization)
-
-        for cfs_example in ans.cf_examples_list:
-            for feature in permitted_range:
-                assert all(
-                    permitted_range[feature][0] <= cfs_example.final_cfs_df[feature].values[i] <=
-                    permitted_range[feature][1] for i
-                    in range(total_CFs))
-
-    # Testing if an error is thrown when the query instance has outcome variable
-    def test_query_instance_with_target_column(self, sample_custom_query_6):
-        with pytest.raises(ValueError) as ve:
-            self.exp.setup("all", None, sample_custom_query_6, "inverse_mad")
-
-        assert "present in query instance" in str(ve)
 
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize("desired_class, total_CFs, initialization, maxiterations",
