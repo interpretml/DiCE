@@ -241,7 +241,7 @@ class TestExplainerBaseBinaryClassification:
                                            features_to_vary='all',
                                            total_CFs=2, desired_class=desired_class,
                                            permitted_range=None)
-        
+
         assert ans is not None
         assert len(ans.cf_examples_list) == sample_custom_query_2.shape[0]
         assert ans.cf_examples_list[0].final_cfs_df.shape[0] == 2
@@ -354,11 +354,14 @@ class TestExplainerBaseBinaryClassification:
         for feature in exp.data_interface.feature_names:
             if feature not in features_to_vary:
                 if method != 'kdtree':
-                    assert all(ans.cf_examples_list[0].final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
-                            range(total_CFs))
+                    assert all(
+                        ans.cf_examples_list[0].final_cfs_df[feature].values[i] == sample_custom_query_2[feature].values[0]
+                        for i in range(total_CFs))
                 else:
-                    assert all(ans.cf_examples_list[0].final_cfs_df_sparse[feature].values[i] == sample_custom_query_2[feature].values[0] for i in
-                            range(total_CFs))          
+                    assert all(
+                        ans.cf_examples_list[0].final_cfs_df_sparse[feature].values[i] ==
+                        sample_custom_query_2[feature].values[0]
+                        for i in range(total_CFs))
 
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("features_to_vary, permitted_range, feature_weights",
@@ -373,7 +376,7 @@ class TestExplainerBaseBinaryClassification:
             custom_public_data_interface_binary,
             sklearn_binary_classification_model_interface,
             method=method)
-        with pytest.raises(ValueError) as ve:
+        with pytest.raises(ValueError):
             exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
     # Testing if an error is thrown when the query instance has outcome variable
