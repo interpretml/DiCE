@@ -298,7 +298,7 @@ class TestExplainerBaseBinaryClassification:
 
     # Testing if you can provide permitted_range for categorical variables
     @pytest.mark.parametrize("desired_class", [1])
-    @pytest.mark.parametrize("permitted_range", [{'Categorical': ['a', 'c']}])
+    @pytest.mark.parametrize("permitted_range", [{'Categorical': ['b', 'c']}])
     @pytest.mark.parametrize("genetic_initialization", ['kdtree', 'random'])
     def test_permitted_range_categorical(
             self, method, desired_class, permitted_range, genetic_initialization,
@@ -321,9 +321,6 @@ class TestExplainerBaseBinaryClassification:
                 permitted_range=permitted_range,
                 total_CFs=2, desired_class=desired_class)
 
-        ans = exp.generate_counterfactuals(query_instances=sample_custom_query_2,
-                                           permitted_range=permitted_range,
-                                           total_CFs=2, desired_class=desired_class)
         assert all(i in permitted_range["Categorical"] for i in ans.cf_examples_list[0].final_cfs_df.Categorical.values)
 
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
