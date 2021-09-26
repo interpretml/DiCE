@@ -206,10 +206,12 @@ class ExplainerBase(ABC):
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10 to compute feature importance for all query points")
         elif total_CFs < 10:
-            raise UserConfigValidationException("The number of counterfactuals generated per "
-                                                "query instance should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of counterfactuals requested per "
+                "query instance should be greater than or equal to 10 "
+                "to compute feature importance for all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
@@ -250,16 +252,20 @@ class ExplainerBase(ABC):
                   input, and the global feature importance summarized over all inputs.
         """
         if query_instances is not None and len(query_instances) < 10:
-            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of query instances should be greater than or equal to 10 "
+                "to compute global feature importance over all query points")
         if cf_examples_list is not None:
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10 "
+                    "to compute global feature importance over all query points")
         elif total_CFs < 10:
             raise UserConfigValidationException(
-                "The number of counterfactuals generated per query instance should be greater "
-                "than or equal to 10")
+                "The number of counterfactuals requested per query instance should be greater "
+                "than or equal to 10 "
+                "to compute global feature importance over all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
