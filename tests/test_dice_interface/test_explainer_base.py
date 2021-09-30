@@ -115,8 +115,8 @@ class TestExplainerBaseBinaryClassification:
         with pytest.raises(
             UserConfigValidationException,
             match="The number of points for which counterfactuals generated should be "
-                   "greater than or equal to 10 "
-                   "to compute global feature importance"):
+                  "greater than or equal to 10 "
+                  "to compute global feature importance"):
             exp.global_feature_importance(
                 query_instances=None,
                 cf_examples_list=cf_explanations.cf_examples_list)
