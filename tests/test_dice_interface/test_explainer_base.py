@@ -96,6 +96,109 @@ class TestExplainerBaseBinaryClassification:
 
         self._verify_feature_importance(global_importance.summary_importance)
 
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_global_feature_importance_error_conditions_with_insufficient_query_points(
+            self, desired_class, method,
+            sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_1,
+                    total_CFs=15,
+                    desired_class=desired_class)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of points for which counterfactuals generated should be "
+                   "greater than or equal to 10 "
+                   "to compute global feature importance"):
+            exp.global_feature_importance(
+                query_instances=None,
+                cf_examples_list=cf_explanations.cf_examples_list)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of query instances should be greater than or equal to 10 "
+                  "to compute global feature importance over all query points"):
+            exp.global_feature_importance(
+                query_instances=sample_custom_query_1,
+                total_CFs=15,
+                desired_class=desired_class)
+
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_global_feature_importance_error_conditions_with_insufficient_cfs_per_query_point(
+            self, desired_class, method,
+            sample_custom_query_10,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_10,
+                    total_CFs=1,
+                    desired_class=desired_class)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of counterfactuals generated per query instance should be "
+                  "greater than or equal to 10 "
+                  "to compute global feature importance over all query points"):
+            exp.global_feature_importance(
+                query_instances=None,
+                cf_examples_list=cf_explanations.cf_examples_list)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of counterfactuals requested per query instance should be greater "
+                  "than or equal to 10 "
+                  "to compute global feature importance over all query points"):
+            exp.global_feature_importance(
+                query_instances=sample_custom_query_10,
+                total_CFs=1,
+                desired_class=desired_class)
+
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_local_feature_importance_error_conditions_with_insufficient_cfs_per_query_point(
+            self, desired_class, method,
+            sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_1,
+                    total_CFs=1,
+                    desired_class=desired_class)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of counterfactuals generated per query instance should be "
+                  "greater than or equal to 10 to compute feature importance for all query points"):
+            exp.local_feature_importance(
+                query_instances=None,
+                cf_examples_list=cf_explanations.cf_examples_list)
+
+        with pytest.raises(
+            UserConfigValidationException,
+            match="The number of counterfactuals requested per "
+                  "query instance should be greater than or equal to 10 "
+                  "to compute feature importance for all query points"):
+            exp.local_feature_importance(
+                query_instances=sample_custom_query_1,
+                total_CFs=1,
+                desired_class=desired_class)
+
     # @pytest.mark.parametrize("desired_class, binary_classification_exp_object_out_of_order",
     #                          [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
     #                          indirect=['binary_classification_exp_object_out_of_order'])

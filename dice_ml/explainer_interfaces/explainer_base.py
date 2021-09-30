@@ -256,7 +256,12 @@ class ExplainerBase(ABC):
                 "The number of query instances should be greater than or equal to 10 "
                 "to compute global feature importance over all query points")
         if cf_examples_list is not None:
-            if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
+            if len(cf_examples_list) < 10:
+                raise UserConfigValidationException(
+                    "The number of points for which counterfactuals generated should be "
+                    "greater than or equal to 10 "
+                    "to compute global feature importance")
+            elif any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
                     "greater than or equal to 10 "
