@@ -87,6 +87,7 @@ class ExplainerBase(ABC):
                 query_instances_list.append(query_instances[ix:(ix+1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
+
         for query_instance in tqdm(query_instances_list):
             self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
@@ -101,6 +102,9 @@ class ExplainerBase(ABC):
                 verbose=verbose,
                 **kwargs)
             cf_examples_arr.append(res)
+
+        self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
+
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
     @abstractmethod
@@ -695,3 +699,15 @@ class ExplainerBase(ABC):
             self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
             if self.final_cfs_df_sparse is not None:
                 self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+
+    def _check_any_counterfactuals_computed(self, cf_examples_arr):
+        """Check if any counterfactuals were generated for any query point."""
+        no_cf_generated = True
+        # Check if any counterfactuals were generated for any query point
+        for cf_examples in cf_examples_arr:
+            if cf_examples.final_cfs_df is not None and len(cf_examples.final_cfs_df) > 0:
+                no_cf_generated = False
+                break
+        if no_cf_generated:
+            raise UserConfigValidationException(
+                "No counterfactuals found for any of the query points! Kindly check your configuration.")

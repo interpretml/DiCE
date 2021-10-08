@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 import dice_ml
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
@@ -14,6 +15,37 @@ class TestExplainerBaseBinaryClassification:
         if feature_importance is not None:
             for key in feature_importance:
                 assert feature_importance[key] >= 0.0 and feature_importance[key] <= 1.0
+
+    def test_check_any_counterfactuals_computed(
+        self, method,
+        custom_public_data_interface,
+        sklearn_binary_classification_model_interface
+    ):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+
+        sample_custom_query = custom_public_data_interface.data_df[0:1]
+        cf_example = CounterfactualExamples(
+            data_interface=custom_public_data_interface,
+            test_instance_df=sample_custom_query)
+        cf_examples_arr = [cf_example]
+
+        with pytest.raises(
+                UserConfigValidationException,
+                match="No counterfactuals found for any of the query points! Kindly check your configuration."):
+            exp._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
+
+        cf_example_has_cf = CounterfactualExamples(
+            data_interface=custom_public_data_interface,
+            final_cfs_df=sample_custom_query,
+            test_instance_df=sample_custom_query)
+        cf_example_no_cf = CounterfactualExamples(
+            data_interface=custom_public_data_interface,
+            test_instance_df=sample_custom_query)
+        cf_examples_arr = [cf_example_has_cf, cf_example_no_cf]
+        exp._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
 
     @pytest.mark.parametrize("desired_class", [1])
     def test_zero_totalcfs(
