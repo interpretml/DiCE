@@ -23,5 +23,5 @@ jobs:
         conda env update --file environment.yml --name base
     - name: Test with pytest
       run: |
-        conda install pytest
+        conda install pytest ipython jupyter nbformat
         pytest
