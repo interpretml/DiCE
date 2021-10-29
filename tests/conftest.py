@@ -1,11 +1,11 @@
 from collections import OrderedDict
-import pandas as pd
-import pytest
-from sklearn.datasets import load_iris, load_boston
-from sklearn.model_selection import train_test_split
 
 import dice_ml
+import pandas as pd
+import pytest
 from dice_ml.utils import helpers
+from sklearn.datasets import load_boston, load_iris
+from sklearn.model_selection import train_test_split
 
 
 @pytest.fixture

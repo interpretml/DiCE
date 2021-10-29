@@ -1,9 +1,8 @@
-import pytest
-
 import dice_ml
+import pytest
 from dice_ml.utils import helpers
-from sklearn.ensemble import RandomForestClassifier
 from dice_ml.utils.exception import UserConfigValidationException
+from sklearn.ensemble import RandomForestClassifier
 
 
 class TestBaseModelLoader:

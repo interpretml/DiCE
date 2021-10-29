@@ -1,9 +1,9 @@
-import pytest
-import numpy as np
 import dice_ml
-from dice_ml.utils import helpers
-from dice_ml.diverse_counterfactuals import CounterfactualExamples
+import numpy as np
+import pytest
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.utils import helpers
 
 
 @pytest.fixture

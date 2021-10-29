@@ -1,12 +1,12 @@
 from enum import Enum
+
+import dice_ml
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.datasets import load_iris
-
-import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
+from sklearn.datasets import load_iris
 
 
 @pytest.fixture

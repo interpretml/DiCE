@@ -1,7 +1,7 @@
-import pytest
 from collections import OrderedDict
 
 import dice_ml
+import pytest
 
 
 @pytest.fixture

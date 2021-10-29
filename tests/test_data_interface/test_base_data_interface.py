@@ -1,5 +1,4 @@
 import pytest
-
 from dice_ml.data_interfaces.base_data_interface import _BaseData
 
 

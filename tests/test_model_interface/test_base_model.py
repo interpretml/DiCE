@@ -1,9 +1,8 @@
-import pytest
-
-import numpy as np
 import dice_ml
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+import numpy as np
+import pytest
 from dice_ml.utils.exception import SystemException
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
 class TestModelClassification:
