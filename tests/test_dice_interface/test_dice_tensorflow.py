@@ -1,6 +1,7 @@
-import dice_ml
 import numpy as np
 import pytest
+
+import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils import helpers
 

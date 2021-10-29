@@ -1,5 +1,6 @@
-import dice_ml
 import pytest
+
+import dice_ml
 
 
 def test_data_initiation(public_data_object, private_data_object):
