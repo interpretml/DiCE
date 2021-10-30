@@ -36,7 +36,7 @@ jobs:
     - name: Install test dependencies
       run: |
         pip install -r requirements-test.txt
-    - name: Check sorted imported using isort
+    - name: Check sorted python imports using isort
       run: |
         isort . -c
     - name: Lint code with flake8
