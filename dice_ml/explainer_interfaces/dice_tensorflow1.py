@@ -1,17 +1,17 @@
 """
 Module to generate diverse counterfactual explanations based on tensorflow 1.x
 """
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-import tensorflow as tf
+import collections
+import copy
+import random
+import timeit
 
 import numpy as np
-import random
-import collections
-import timeit
-import copy
+import tensorflow as tf
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceTensorFlow1(ExplainerBase):

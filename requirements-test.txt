@@ -1,6 +1,7 @@
 flake8==3.9.2
 flake8-nb==0.3.0
 ipython
+isort
 jupyter
 nbformat
 pytest

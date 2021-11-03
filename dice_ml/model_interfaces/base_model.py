@@ -3,10 +3,12 @@
    All model interface methods are in dice_ml.model_interfaces"""
 
 import pickle
+
 import numpy as np
-from dice_ml.utils.helpers import DataTransfomer
+
 from dice_ml.constants import ModelTypes
 from dice_ml.utils.exception import SystemException
+from dice_ml.utils.helpers import DataTransfomer
 
 
 class BaseModel:
