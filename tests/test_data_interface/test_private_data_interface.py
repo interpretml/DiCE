@@ -1,5 +1,6 @@
-import pytest
 from collections import OrderedDict
+
+import pytest
 
 import dice_ml
 

@@ -1,8 +1,8 @@
-import pytest
-
 import numpy as np
-import dice_ml
+import pytest
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
+import dice_ml
 from dice_ml.utils.exception import SystemException
 
 

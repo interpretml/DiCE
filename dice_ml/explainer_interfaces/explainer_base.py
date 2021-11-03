@@ -3,15 +3,16 @@
    All methods are in dice_ml.explainer_interfaces"""
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
-from collections.abc import Iterable
-from sklearn.neighbors import KDTree
+from dice_ml.constants import ModelTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.constants import ModelTypes
 
 
 class ExplainerBase(ABC):

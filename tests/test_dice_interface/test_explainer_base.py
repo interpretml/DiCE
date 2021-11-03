@@ -3,9 +3,9 @@ import pytest
 from sklearn.ensemble import RandomForestRegressor
 
 import dice_ml
-from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])

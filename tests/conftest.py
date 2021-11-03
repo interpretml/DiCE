@@ -1,7 +1,8 @@
 from collections import OrderedDict
+
 import pandas as pd
 import pytest
-from sklearn.datasets import load_iris, load_boston
+from sklearn.datasets import load_boston, load_iris
 from sklearn.model_selection import train_test_split
 
 import dice_ml

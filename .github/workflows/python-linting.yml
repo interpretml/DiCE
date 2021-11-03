@@ -22,7 +22,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8==3.9.2 flake8-nb==0.3.0
+        python -m pip install flake8==3.9.2 flake8-nb==0.3.0 isort
+    - name: Check sorted python imports using isort
+      run: |
+        isort . -c
     - name: Lint code with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
