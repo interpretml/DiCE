@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Python package test
 
 on:
   push:
@@ -36,22 +36,6 @@ jobs:
     - name: Install test dependencies
       run: |
         pip install -r requirements-test.txt
-    - name: Check sorted python imports using isort
-      run: |
-        isort . -c
-    - name: Lint code with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # The GitHub editor is 127 chars wide.
-        flake8 . --count --max-complexity=30 --max-line-length=127 --statistics
-        # Check for cyclometric complexity for specific files where this metric has been 
-        # reduced to ten and below
-        flake8 dice_ml/data_interfaces/ --count --max-complexity=10 --max-line-length=127
-    - name: Lint notebooks with flake8_nb
-      run: |
-        # stop the build if there are flake8 errors in notebooks
-        flake8_nb docs/source/notebooks/ --statistics --max-line-length=127
     - name: Test with pytest
       run: |
         # pytest
