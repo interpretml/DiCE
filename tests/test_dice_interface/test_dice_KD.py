@@ -1,10 +1,10 @@
-import pytest
 import numpy as np
+import pytest
+
 import dice_ml
-from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.utils import helpers
 
 
 @pytest.fixture
@@ -45,17 +45,6 @@ class TestDiceKDBinaryClassificationMethods:
     def _initiate_exp_object(self, KD_binary_classification_exp_object):
         self.exp = KD_binary_classification_exp_object  # explainer object
         self.data_df_copy = self.exp.data_interface.data_df.copy()
-
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(1, 3), ('a', 3)])
-    def test_unsupported_binary_class(self, desired_class, sample_custom_query_1, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-        if desired_class == 1:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "The target class for {0} could not be identified".format(desired_class) in str(ucve)
 
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
     @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
@@ -119,20 +108,6 @@ class TestDiceKDBinaryClassificationMethods:
                                            total_CFs=total_CFs, permitted_range=permitted_range)
         assert all(i in permitted_range["Categorical"] for i in self.exp.final_cfs_df.Categorical.values)
 
-    # Testing if an error is thrown when the query instance has an unknown categorical variable
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_outside_bounds(self, desired_class, sample_custom_query_3, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_3, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-
-    # Testing if an error is thrown when the query instance has an unknown column
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
-    def test_query_instance_unknown_column(self, desired_class, sample_custom_query_5, total_CFs):
-        with pytest.raises(ValueError):
-            self.exp._generate_counterfactuals(query_instance=sample_custom_query_5, total_CFs=total_CFs,
-                                               desired_class=desired_class)
-
     # Ensuring that there are no duplicates in the resulting counterfactuals even if the dataset has duplicates
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
     def test_duplicates(self, desired_class, sample_custom_query_4, total_CFs):
@@ -146,12 +121,6 @@ class TestDiceKDBinaryClassificationMethods:
         expected_output = expected_output.reset_index(drop=True)
 
         assert all(self.exp.final_cfs_df == expected_output)
-
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 0)])
-    def test_zero_cfs(self, desired_class, sample_custom_query_4, total_CFs):
-        self.exp._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                           desired_class=desired_class)
 
     # Testing for index returned
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
@@ -178,33 +147,6 @@ class TestDiceKDMultiClassificationMethods:
                                                  desired_class=desired_class,
                                                  posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         assert all(i == desired_class for i in self.exp_multi.cfs_preds)
-
-    # Testing that the output of multiclass classification lies in the desired_class
-    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 3)])
-    def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_query_2, total_CFs):
-        counterfactual_explanations = self.exp_multi.generate_counterfactuals(
-                                        query_instances=sample_custom_query_2, total_CFs=total_CFs,
-                                        desired_class=desired_class)
-        assert all(i == desired_class for i in self.exp_multi.cfs_preds)
-
-        assert counterfactual_explanations is not None
-
-    # Testing for 0 CFs needed
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 0)])
-    def test_zero_cfs(self, desired_class, sample_custom_query_4, total_CFs):
-        self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                                 desired_class=desired_class)
-
-    # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
-    def test_unsupported_multiclass(self, desired_class, sample_custom_query_4, total_CFs):
-        with pytest.raises(UserConfigValidationException) as ucve:
-            self.exp_multi._generate_counterfactuals(query_instance=sample_custom_query_4, total_CFs=total_CFs,
-                                                     desired_class=desired_class)
-        if desired_class == 100:
-            assert "Desired class not present in training data!" in str(ucve)
-        else:
-            assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
 
 class TestDiceKDRegressionMethods:

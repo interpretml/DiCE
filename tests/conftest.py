@@ -1,8 +1,10 @@
-import pytest
 from collections import OrderedDict
+
 import pandas as pd
-from sklearn.datasets import load_iris, load_boston
+import pytest
+from sklearn.datasets import load_boston, load_iris
 from sklearn.model_selection import train_test_split
+
 import dice_ml
 from dice_ml.utils import helpers
 
@@ -49,6 +51,34 @@ def regression_exp_object(method="random"):
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
     exp = dice_ml.Dice(d, m, method=method)
     return exp
+
+
+@pytest.fixture(scope='session')
+def custom_public_data_interface():
+    dataset = helpers.load_custom_testing_dataset_regression()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    return d
+
+
+@pytest.fixture(scope='session')
+def sklearn_binary_classification_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    return m
+
+
+@pytest.fixture(scope='session')
+def sklearn_multiclass_classification_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    return m
+
+
+@pytest.fixture(scope='session')
+def sklearn_regression_model_interface():
+    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='regression')
+    return m
 
 
 @pytest.fixture
@@ -194,4 +224,6 @@ def create_boston_data():
     x_train, x_test, y_train, y_test = train_test_split(
         boston.data, boston.target,
         test_size=0.2, random_state=7)
-    return x_train, x_test, y_train, y_test, boston.feature_names
+    x_train = pd.DataFrame(data=x_train, columns=boston.feature_names)
+    x_test = pd.DataFrame(data=x_test, columns=boston.feature_names)
+    return x_train, x_test, y_train, y_test, boston.feature_names.tolist()

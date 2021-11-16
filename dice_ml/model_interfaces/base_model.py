@@ -3,10 +3,12 @@
    All model interface methods are in dice_ml.model_interfaces"""
 
 import pickle
+
 import numpy as np
-from dice_ml.utils.helpers import DataTransfomer
+
 from dice_ml.constants import ModelTypes
 from dice_ml.utils.exception import SystemException
+from dice_ml.utils.helpers import DataTransfomer
 
 
 class BaseModel:
@@ -26,6 +28,7 @@ class BaseModel:
         :param func: function transformation required for ML model. If func is None, then func will be the identity function.
         :param kw_args: Dictionary of additional keyword arguments to pass to func. DiCE's data_interface is appended to the
                         dictionary of kw_args, by default.
+
         """
         self.model = model
         self.model_path = model_path

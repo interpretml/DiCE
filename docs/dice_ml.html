@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>dice_ml package &mdash; DiCE 0.5 documentation</title>
+  <title>dice_ml package &mdash; DiCE 0.7 documentation</title>
   
 
   
@@ -31,6 +31,8 @@
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -90,9 +92,11 @@
 <p class="caption"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Defining meta data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -104,10 +108,12 @@
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.data_interfaces.html">dice_ml.data_interfaces package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.explainer_interfaces.html">dice_ml.explainer_interfaces package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.model_interfaces.html">dice_ml.model_interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.schema.html">dice_ml.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html">dice_ml.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.constants">dice_ml.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.counterfactual_explanations">dice_ml.counterfactual_explanations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.data">dice_ml.data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dice_ml.dice">dice_ml.dice module</a></li>
@@ -213,6 +219,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.data_interfaces.html">dice_ml.data_interfaces package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.base_data_interface">dice_ml.data_interfaces.base_data_interface module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.private_data_interface">dice_ml.data_interfaces.private_data_interface module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces.public_data_interface">dice_ml.data_interfaces.public_data_interface module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.data_interfaces.html#module-dice_ml.data_interfaces">Module contents</a></li>
@@ -240,6 +247,10 @@
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.model_interfaces.html#module-dice_ml.model_interfaces">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="dice_ml.schema.html">dice_ml.schema package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.schema.html#module-dice_ml.schema">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.utils.html">dice_ml.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.sample_architecture.html">dice_ml.utils.sample_architecture package</a><ul>
@@ -263,11 +274,88 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-dice_ml.constants">
+<span id="dice-ml-constants-module"></span><h2>dice_ml.constants module<a class="headerlink" href="#module-dice_ml.constants" title="Permalink to this headline">¶</a></h2>
+<p>Constants for dice-ml package.</p>
+<dl class="py class">
+<dt id="dice_ml.constants.BackEndTypes">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.constants.</code><code class="sig-name descname">BackEndTypes</code><a class="reference internal" href="_modules/dice_ml/constants.html#BackEndTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.constants.BackEndTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="dice_ml.constants.BackEndTypes.ALL">
+<code class="sig-name descname">ALL</code><em class="property"> = ['sklearn', 'TF1', 'TF2', 'PYT']</em><a class="headerlink" href="#dice_ml.constants.BackEndTypes.ALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.BackEndTypes.Pytorch">
+<code class="sig-name descname">Pytorch</code><em class="property"> = 'PYT'</em><a class="headerlink" href="#dice_ml.constants.BackEndTypes.Pytorch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.BackEndTypes.Sklearn">
+<code class="sig-name descname">Sklearn</code><em class="property"> = 'sklearn'</em><a class="headerlink" href="#dice_ml.constants.BackEndTypes.Sklearn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.BackEndTypes.Tensorflow1">
+<code class="sig-name descname">Tensorflow1</code><em class="property"> = 'TF1'</em><a class="headerlink" href="#dice_ml.constants.BackEndTypes.Tensorflow1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.BackEndTypes.Tensorflow2">
+<code class="sig-name descname">Tensorflow2</code><em class="property"> = 'TF2'</em><a class="headerlink" href="#dice_ml.constants.BackEndTypes.Tensorflow2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dice_ml.constants.ModelTypes">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.constants.</code><code class="sig-name descname">ModelTypes</code><a class="reference internal" href="_modules/dice_ml/constants.html#ModelTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.constants.ModelTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="dice_ml.constants.ModelTypes.ALL">
+<code class="sig-name descname">ALL</code><em class="property"> = ['classifier', 'regressor']</em><a class="headerlink" href="#dice_ml.constants.ModelTypes.ALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.ModelTypes.Classifier">
+<code class="sig-name descname">Classifier</code><em class="property"> = 'classifier'</em><a class="headerlink" href="#dice_ml.constants.ModelTypes.Classifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.ModelTypes.Regressor">
+<code class="sig-name descname">Regressor</code><em class="property"> = 'regressor'</em><a class="headerlink" href="#dice_ml.constants.ModelTypes.Regressor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dice_ml.constants.SamplingStrategy">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.constants.</code><code class="sig-name descname">SamplingStrategy</code><a class="reference internal" href="_modules/dice_ml/constants.html#SamplingStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.constants.SamplingStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="dice_ml.constants.SamplingStrategy.Genetic">
+<code class="sig-name descname">Genetic</code><em class="property"> = 'genetic'</em><a class="headerlink" href="#dice_ml.constants.SamplingStrategy.Genetic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.SamplingStrategy.KdTree">
+<code class="sig-name descname">KdTree</code><em class="property"> = 'kdtree'</em><a class="headerlink" href="#dice_ml.constants.SamplingStrategy.KdTree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dice_ml.constants.SamplingStrategy.Random">
+<code class="sig-name descname">Random</code><em class="property"> = 'random'</em><a class="headerlink" href="#dice_ml.constants.SamplingStrategy.Random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-dice_ml.counterfactual_explanations">
 <span id="dice-ml-counterfactual-explanations-module"></span><h2>dice_ml.counterfactual_explanations module<a class="headerlink" href="#module-dice_ml.counterfactual_explanations" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations">
-<em class="property">class </em><code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">CounterfactualExplanations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cf_examples_list</span></em>, <em class="sig-param"><span class="n">local_importance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">summary_importance</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">CounterfactualExplanations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cf_examples_list</span></em>, <em class="sig-param"><span class="n">local_importance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">summary_importance</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#CounterfactualExplanations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to store counterfactual examples for one or more inputs
 and feature importance scores.</p>
@@ -275,14 +363,14 @@ and feature importance scores.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cf_examples_list</strong> – A list of CounterfactualExamples instances</p></li>
-<li><p><strong>local_importance</strong> – List of estimated local importance scores. The</p></li>
+<li><p><strong>local_importance</strong> – List of estimated local importance scores. The
+size of the list is the number of input instances, each containing
+feature importance scores for that input.</p></li>
+<li><p><strong>summary_importance</strong> – Estimated global feature importance scores
+based on the input set of CounterfactualExamples instances</p></li>
 </ul>
 </dd>
 </dl>
-<p>size of the list is the number of input instances, each containing feature
-importance scores for that input.
-:param summary_importance: Estimated global feature importance scores
-based on the input set of CounterfactualExamples instances</p>
 <dl class="py method">
 <dt id="dice_ml.counterfactual_explanations.CounterfactualExplanations.cf_examples_list">
 <em class="property">property </em><code class="sig-name descname">cf_examples_list</code><a class="headerlink" href="#dice_ml.counterfactual_explanations.CounterfactualExplanations.cf_examples_list" title="Permalink to this definition">¶</a></dt>
@@ -327,28 +415,18 @@ based on the input set of CounterfactualExamples instances</p>
 
 </dd></dl>
 
-<dl class="py function">
-<dt id="dice_ml.counterfactual_explanations.as_counterfactual_explanations">
-<code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">as_counterfactual_explanations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#as_counterfactual_explanations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.as_counterfactual_explanations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to convert json string to a CounterfactualExplanations
-object.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="dice_ml.counterfactual_explanations.json_converter">
-<code class="sig-prename descclassname">dice_ml.counterfactual_explanations.</code><code class="sig-name descname">json_converter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/counterfactual_explanations.html#json_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.counterfactual_explanations.json_converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to convert CounterfactualExplanations object to json.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-dice_ml.data">
 <span id="dice-ml-data-module"></span><h2>dice_ml.data module<a class="headerlink" href="#module-dice_ml.data" title="Permalink to this headline">¶</a></h2>
 <p>Module pointing to different implementations of Data class</p>
-<p>DiCE requires only few parameters about the data such as the range of continuous features and the levels of categorical features. Hence, DiCE can be used for a private data whose meta data are only available (such as the feature names and range/levels of different features) by specifying appropriate parameters.</p>
+<p>DiCE requires only few parameters about the data such as the range of continuous
+features and the levels of categorical features. Hence, DiCE can be used for a
+private data whose meta data are only available (such as the feature names and
+range/levels of different features) by specifying appropriate parameters.</p>
 <dl class="py class">
 <dt id="dice_ml.data.Data">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.data.</code><code class="sig-name descname">Data</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data.html#Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data.Data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.data_interfaces.base_data_interface._BaseData</span></code></p>
 <p>Class containing all required information about the data for DiCE.</p>
 <dl class="py method">
 <dt id="dice_ml.data.Data.decide_implementation_type">
@@ -362,16 +440,21 @@ object.</p>
 <dt id="dice_ml.data.decide">
 <code class="sig-prename descclassname">dice_ml.data.</code><code class="sig-name descname">decide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data.html#decide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.data.decide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides if the Data class is for public or private data.</p>
+<p>To add new implementations of Data, add the class in data_interfaces
+subpackage and import-and-return the class in an elif loop as shown
+in the below method.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-dice_ml.dice">
 <span id="dice-ml-dice-module"></span><h2>dice_ml.dice module<a class="headerlink" href="#module-dice_ml.dice" title="Permalink to this headline">¶</a></h2>
-<p>Module pointing to different implementations of DiCE based on different frameworks such as Tensorflow or PyTorch or sklearn, and different methods such as RandomSampling, DiCEKD or DiCEGenetic</p>
+<p>Module pointing to different implementations of DiCE based on different
+frameworks such as Tensorflow or PyTorch or sklearn, and different methods
+such as RandomSampling, DiCEKD or DiCEGenetic</p>
 <dl class="py class">
 <dt id="dice_ml.dice.Dice">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'random'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.Dice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
 <p>An interface class to different DiCE implementations.</p>
 <dl class="py method">
 <dt id="dice_ml.dice.Dice.decide_implementation_type">
@@ -385,6 +468,9 @@ object.</p>
 <dt id="dice_ml.dice.decide">
 <code class="sig-prename descclassname">dice_ml.dice.</code><code class="sig-name descname">decide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#decide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.dice.decide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides DiCE implementation type.</p>
+<p>To add new implementations of DiCE, add the class in explainer_interfaces
+subpackage and import-and-return the class in an elif loop as shown in
+the below method.</p>
 </dd></dl>
 
 </div>
@@ -401,13 +487,18 @@ object.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.from_json">
+<em class="property">static </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cf_example_json_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.from_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list">
 <code class="sig-name descname">print_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">li</span></em>, <em class="sig-param"><span class="n">show_only_changes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.print_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">serialization_version</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/diverse_counterfactuals.html#CounterfactualExamples.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -432,7 +523,8 @@ object.</p>
 <div class="section" id="module-dice_ml.model">
 <span id="dice-ml-model-module"></span><h2>dice_ml.model module<a class="headerlink" href="#module-dice_ml.model" title="Permalink to this headline">¶</a></h2>
 <p>Module pointing to different implementations of Model class</p>
-<p>The implementations contain methods to access the output or gradients of ML models trained based on different frameworks such as Tensorflow or PyTorch.</p>
+<p>The implementations contain methods to access the output or gradients of ML models trained based on different
+frameworks such as Tensorflow or PyTorch.</p>
 <dl class="py class">
 <dt id="dice_ml.model.Model">
 <em class="property">class </em><code class="sig-prename descclassname">dice_ml.model.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'classifier'</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.Model" title="Permalink to this definition">¶</a></dt>
@@ -450,11 +542,52 @@ object.</p>
 <dt id="dice_ml.model.decide">
 <code class="sig-prename descclassname">dice_ml.model.</code><code class="sig-name descname">decide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backend</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#decide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.model.decide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decides the Model implementation type.</p>
+<p>To add new implementations of Model, add the class in model_interfaces subpackage and
+import-and-return the class in an elif loop as shown in the below method.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-dice_ml">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="dice_ml.Data">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.</code><code class="sig-name descname">Data</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data.html#Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.data_interfaces.base_data_interface._BaseData</span></code></p>
+<p>Class containing all required information about the data for DiCE.</p>
+<dl class="py method">
+<dt id="dice_ml.Data.decide_implementation_type">
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data.html#Data.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Data.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides if the Data class is for public or private data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dice_ml.Dice">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.</code><code class="sig-name descname">Dice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'random'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Dice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase" title="dice_ml.explainer_interfaces.explainer_base.ExplainerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">dice_ml.explainer_interfaces.explainer_base.ExplainerBase</span></code></a></p>
+<p>An interface class to different DiCE implementations.</p>
+<dl class="py method">
+<dt id="dice_ml.Dice.decide_implementation_type">
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_interface</span></em>, <em class="sig-param"><span class="n">model_interface</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/dice.html#Dice.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Dice.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides DiCE implementation type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="dice_ml.Model">
+<em class="property">class </em><code class="sig-prename descclassname">dice_ml.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">model_path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">'TF1'</span></em>, <em class="sig-param"><span class="n">model_type</span><span class="o">=</span><span class="default_value">'classifier'</span></em>, <em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kw_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An interface class to different ML Model implementations.</p>
+<dl class="py method">
+<dt id="dice_ml.Model.decide_implementation_type">
+<code class="sig-name descname">decide_implementation_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">model_path</span></em>, <em class="sig-param"><span class="n">backend</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">kw_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/model.html#Model.decide_implementation_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dice_ml.Model.decide_implementation_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides the Model implementation type.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

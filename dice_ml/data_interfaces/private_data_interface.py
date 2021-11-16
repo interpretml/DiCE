@@ -1,15 +1,13 @@
 """Module containing meta data information about private data."""
 
-import sys
-import pandas as pd
-import numpy as np
 import collections
 import logging
+import sys
+
+import numpy as np
+import pandas as pd
 
 from dice_ml.data_interfaces.base_data_interface import _BaseData
-
-
-logging.basicConfig(level=logging.NOTSET)
 
 
 class PrivateData(_BaseData):

@@ -1,11 +1,12 @@
 import json
-import jsonschema
 import os
 
-from dice_ml.diverse_counterfactuals import CounterfactualExamples
-from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.diverse_counterfactuals import _DiverseCFV2SchemaConstants
+import jsonschema
+
 from dice_ml.constants import _SchemaVersions
+from dice_ml.diverse_counterfactuals import (CounterfactualExamples,
+                                             _DiverseCFV2SchemaConstants)
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class _CommonSchemaConstants:
@@ -45,10 +46,10 @@ class CounterfactualExplanations:
 
     :param cf_examples_list: A list of CounterfactualExamples instances
     :param local_importance: List of estimated local importance scores. The
-    size of the list is the number of input instances, each containing feature
-    importance scores for that input.
+        size of the list is the number of input instances, each containing
+        feature importance scores for that input.
     :param summary_importance: Estimated global feature importance scores
-    based on the input set of CounterfactualExamples instances
+        based on the input set of CounterfactualExamples instances
 
     """
     def __init__(self, cf_examples_list,
@@ -118,6 +119,7 @@ class CounterfactualExplanations:
 
         :param cf_dict: Serialized version of the counterfactual explanations.
         :type cf_dict: Dict
+
         """
         schema_file_name = 'counterfactual_explanations_v{0}.json'.format(version)
         schema_path = os.path.join(os.path.dirname(__file__),

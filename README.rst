@@ -66,6 +66,7 @@ If you face any problems, try installing dependencies manually.
 
 DiCE requires the following packages:
 
+* jsonschema
 * numpy
 * scikit-learn
 * pandas
@@ -118,6 +119,18 @@ Using DiCE, we can now generate examples that would have been classified as clas
 .. image:: https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png 
   :width: 400
   :alt: List of counterfactual examples
+
+You can save the generated counterfactual examples in the following way:-
+
+.. code:: python
+
+    # Generate counterfactual examples
+    dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
+    # Visualize counterfactual explanation
+    dice_exp.visualize_as_dataframe()
+    # Save generated counterfactual examples to disk
+    dice_exp.cf_examples_list[0].final_cfs_df.to_csv(path_or_buf='counterfactuals.csv', index=False)
+
 
 For more details, check out the `docs/source/notebooks <https://github.com/interpretml/DiCE/tree/master/docs/source/notebooks>`_ folder. Here are some example notebooks:
 

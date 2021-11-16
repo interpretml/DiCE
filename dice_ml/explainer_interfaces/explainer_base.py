@@ -3,15 +3,16 @@
    All methods are in dice_ml.explainer_interfaces"""
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
-from collections.abc import Iterable
-from sklearn.neighbors import KDTree
+from dice_ml.constants import ModelTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.constants import ModelTypes
 
 
 class ExplainerBase(ABC):
@@ -113,6 +114,7 @@ class ExplainerBase(ABC):
                 query_instances_list.append(query_instances[ix:(ix+1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
+
         for query_instance in tqdm(query_instances_list):
             self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
@@ -127,6 +129,9 @@ class ExplainerBase(ABC):
                 verbose=verbose,
                 **kwargs)
             cf_examples_arr.append(res)
+
+        self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
+
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
     @abstractmethod
@@ -166,6 +171,9 @@ class ExplainerBase(ABC):
         pass
 
     def setup(self, features_to_vary, permitted_range, query_instance, feature_weights):
+        self.data_interface.check_features_to_vary(features_to_vary=features_to_vary)
+        self.data_interface.check_permitted_range(permitted_range)
+
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
@@ -174,10 +182,11 @@ class ExplainerBase(ABC):
             feature_ranges_orig = self.feature_range
         else:  # compute the new ranges based on user input
             self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
+
         self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
 
         # check feature MAD validity and throw warnings
-        self.check_mad_validity(feature_weights)
+        self.data_interface.check_mad_validity(feature_weights)
 
         return features_to_vary
 
@@ -190,7 +199,8 @@ class ExplainerBase(ABC):
                 raise ValueError("Feature", feature, "not present in training data!")
 
         for feature in self.data_interface.categorical_feature_names:
-            if query_instance[feature].values[0] not in feature_ranges_orig[feature]:
+            if query_instance[feature].values[0] not in feature_ranges_orig[feature] and \
+                    str(query_instance[feature].values[0]) not in feature_ranges_orig[feature]:
                 raise ValueError("Feature", feature, "has a value outside the dataset.")
 
             if feature not in features_to_vary and permitted_range is not None:
@@ -227,10 +237,12 @@ class ExplainerBase(ABC):
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10 to compute feature importance for all query points")
         elif total_CFs < 10:
-            raise UserConfigValidationException("The number of counterfactuals generated per "
-                                                "query instance should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of counterfactuals requested per "
+                "query instance should be greater than or equal to 10 "
+                "to compute feature importance for all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
@@ -271,16 +283,25 @@ class ExplainerBase(ABC):
                   input, and the global feature importance summarized over all inputs.
         """
         if query_instances is not None and len(query_instances) < 10:
-            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of query instances should be greater than or equal to 10 "
+                "to compute global feature importance over all query points")
         if cf_examples_list is not None:
-            if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
+            if len(cf_examples_list) < 10:
+                raise UserConfigValidationException(
+                    "The number of points for which counterfactuals generated should be "
+                    "greater than or equal to 10 "
+                    "to compute global feature importance")
+            elif any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10 "
+                    "to compute global feature importance over all query points")
         elif total_CFs < 10:
             raise UserConfigValidationException(
-                "The number of counterfactuals generated per query instance should be greater "
-                "than or equal to 10")
+                "The number of counterfactuals requested per query instance should be greater "
+                "than or equal to 10 "
+                "to compute global feature importance over all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
@@ -553,8 +574,8 @@ class ExplainerBase(ABC):
     def infer_target_cfs_class(self, desired_class_input, original_pred, num_output_nodes):
         """ Infer the target class for generating CFs. Only called when
             model_type=="classifier".
-            TODO: Add support for opposite desired class in multiclass. Downstream methods should decide
-                  whether it is allowed or not.
+            TODO: Add support for opposite desired class in multiclass.
+            Downstream methods should decide whether it is allowed or not.
         """
         if desired_class_input == "opposite":
             if num_output_nodes == 2:
@@ -668,13 +689,6 @@ class ExplainerBase(ABC):
                 self.cont_minx.append(self.data_interface.permitted_range[feature][0])
                 self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
 
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings.
-           TODO: add comments as to where this is used if this function is necessary, else remove.
-        """
-        if feature_weights == "inverse_mad":
-            self.data_interface.get_valid_mads(display_warnings=True, return_mads=False)
-
     def sigmoid(self, z):
         """This is used in VAE-based CF explainers."""
         return 1 / (1 + np.exp(-z))
@@ -712,3 +726,15 @@ class ExplainerBase(ABC):
             self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
             if self.final_cfs_df_sparse is not None:
                 self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+
+    def _check_any_counterfactuals_computed(self, cf_examples_arr):
+        """Check if any counterfactuals were generated for any query point."""
+        no_cf_generated = True
+        # Check if any counterfactuals were generated for any query point
+        for cf_examples in cf_examples_arr:
+            if cf_examples.final_cfs_df is not None and len(cf_examples.final_cfs_df) > 0:
+                no_cf_generated = False
+                break
+        if no_cf_generated:
+            raise UserConfigValidationException(
+                "No counterfactuals found for any of the query points! Kindly check your configuration.")

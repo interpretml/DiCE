@@ -1,17 +1,17 @@
 """
 Module to generate diverse counterfactual explanations based on tensorflow 1.x
 """
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-import tensorflow as tf
+import collections
+import copy
+import random
+import timeit
 
 import numpy as np
-import random
-import collections
-import timeit
-import copy
+import tensorflow as tf
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceTensorFlow1(ExplainerBase):
@@ -21,6 +21,7 @@ class DiceTensorFlow1(ExplainerBase):
 
         :param data_interface: an interface class to access data related params.
         :param model_interface: an interface class to access trained ML model.
+
         """
         # initiating data related parameters
         super().__init__(data_interface)
@@ -83,7 +84,7 @@ class DiceTensorFlow1(ExplainerBase):
 
         :param algorithm: Counterfactual generation algorithm. Either "DiverseCF" or "RandomInitCF".
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
-        param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values.
+        :param permitted_range: Dictionary with continuous feature names as keys and permitted min-max range in list as values.
                                Defaults to the range inferred from training data. If None, uses the parameters initialized in
                                data_interface.
         :param yloss_type: Metric for y-loss of the optimization function. Takes "l2_loss" or "log_loss" or "hinge_loss".
@@ -112,8 +113,10 @@ class DiceTensorFlow1(ExplainerBase):
                                            Prefer binary search when a feature range is large
                                            (for instance, income varying from 10k to 1000k) and only if the features
                                            share a monotonic relationship with predicted outcome in the model.
+
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
+
         """
 
         # check feature MAD validity and throw warnings
