@@ -12,6 +12,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath("../../"))
 
 
@@ -22,7 +23,7 @@ copyright = '2020, Ramaravind, Amit, Chenhao'
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.7.1'
+release = '0.7.2'
 
 
 # -- General configuration ---------------------------------------------------

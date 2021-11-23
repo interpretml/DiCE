@@ -1,7 +1,8 @@
 """Module containing an interface to trained PyTorch model."""
 
-from dice_ml.model_interfaces.base_model import BaseModel
 import torch
+
+from dice_ml.model_interfaces.base_model import BaseModel
 
 
 class PyTorchModel(BaseModel):

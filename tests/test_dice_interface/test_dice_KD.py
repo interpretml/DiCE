@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+
 import dice_ml
 from dice_ml.utils import helpers
 
