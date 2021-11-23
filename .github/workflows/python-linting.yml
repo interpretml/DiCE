@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8==3.9.2 flake8-nb==0.3.0 isort
+        pip install -r requirements-linting.txt
     - name: Check sorted python imports using isort
       run: |
         isort . -c
