@@ -2,6 +2,6 @@ name: example-environment
 
 dependencies:
   - pip
-    - tensorflow>=1.13.0-rc1
+    - tensorflow
     - torch
     - torchvision
