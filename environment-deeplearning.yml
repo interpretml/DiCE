@@ -2,3 +2,4 @@ name: example-environment
 
 dependencies:
   - tensorflow
+  - pytorch
