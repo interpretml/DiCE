@@ -1,7 +1,6 @@
 name: example-environment
 
 dependencies:
-  - pip
-    - tensorflow
-    - torch
-    - torchvision
+  - tensorflow
+  - torch
+  - torchvision
