@@ -1,0 +1,41 @@
+# This workflow will lint python code with flake8 and flake8-nb.
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python linting
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8==3.9.2 flake8-nb==0.3.0 isort
+    - name: Check sorted python imports using isort
+      run: |
+        isort . -c
+    - name: Lint code with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # The GitHub editor is 127 chars wide.
+        flake8 . --count --max-complexity=30 --max-line-length=127 --statistics
+        # Check for cyclometric complexity for specific files where this metric has been 
+        # reduced to ten and below
+        flake8 dice_ml/data_interfaces/ --count --max-complexity=10 --max-line-length=127
+    - name: Lint notebooks with flake8_nb
+      run: |
+        # stop the build if there are flake8 errors in notebooks
+        flake8_nb docs/source/notebooks/ --statistics --max-line-length=127
