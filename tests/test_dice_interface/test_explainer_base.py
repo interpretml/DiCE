@@ -150,6 +150,7 @@ class TestExplainerBaseBinaryClassification:
 
         assert cf_explanation is not None
 
+    @pytest.mark.parametrize("desired_class", [1])
     def test_global_feature_importance_error_conditions_with_insufficient_query_points(
             self, desired_class, method,
             sample_custom_query_1,
