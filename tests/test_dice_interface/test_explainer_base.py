@@ -129,26 +129,26 @@ class TestExplainerBaseBinaryClassification:
 
         self._verify_feature_importance(global_importance.summary_importance)
 
-    @pytest.mark.parametrize("desired_class", [1])
-    def test_columns_out_of_order(
-            self, desired_class, method, sample_custom_query_1,
-            custom_public_data_interface_binary_out_of_order,
-            sklearn_binary_classification_model_interface):
-        if method == 'genetic':
-            pytest.skip('DiceGenetic takes a very long time to run this test')
+    # @pytest.mark.parametrize("desired_class", [1])
+    # def test_columns_out_of_order(
+    #         self, desired_class, method, sample_custom_query_1,
+    #         custom_public_data_interface_binary_out_of_order,
+    #         sklearn_binary_classification_model_interface):
+    #     if method == 'genetic':
+    #         pytest.skip('DiceGenetic takes a very long time to run this test')
 
-        exp = dice_ml.Dice(
-            custom_public_data_interface_binary_out_of_order,
-            sklearn_binary_classification_model_interface,
-            method=method)
+    #     exp = dice_ml.Dice(
+    #         custom_public_data_interface_binary_out_of_order,
+    #         sklearn_binary_classification_model_interface,
+    #         method=method)
 
-        cf_explanation = exp.generate_counterfactuals(
-            query_instances=sample_custom_query_1,
-            total_CFs=1,
-            desired_class=desired_class,
-            features_to_vary='all')
+    #     cf_explanation = exp.generate_counterfactuals(
+    #         query_instances=sample_custom_query_1,
+    #         total_CFs=1,
+    #         desired_class=desired_class,
+    #         features_to_vary='all')
 
-        assert cf_explanation is not None
+    #     assert cf_explanation is not None
 
     @pytest.mark.parametrize("desired_class", [1])
     def test_global_feature_importance_error_conditions_with_insufficient_query_points(
