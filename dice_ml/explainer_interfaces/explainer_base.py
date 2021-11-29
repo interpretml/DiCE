@@ -535,7 +535,7 @@ class ExplainerBase(ABC):
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
-            desired_class = self.target_cf_class[0][0]
+            desired_class = int(self.target_cf_class[0][0])
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
                 self.stopping_threshold = 0.25
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
