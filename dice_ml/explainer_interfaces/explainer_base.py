@@ -50,6 +50,8 @@ class ExplainerBase(ABC):
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                 proximity_weight=0.2, sparsity_weight=0.2, diversity_weight=5.0,
+                                 categorical_penalty=0.1,
                                  posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
         """General method for generating counterfactuals.
 
@@ -65,6 +67,11 @@ class ExplainerBase(ABC):
                                 If None, uses the parameters initialized in data_interface.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
+                                 query_instance.
+        :param sparsity_weight: A positive float. Larger this weight, less features are changed from the query_instance.
+        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
+        :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary".
                                            Prefer binary search when a feature range is large (for instance,
