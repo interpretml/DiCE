@@ -186,7 +186,7 @@ class FeasibleBaseVAE(ExplainerBase):
             curr_cf_pred = []
             curr_test_pred = train_y.numpy()
 
-            for cf_count in range(total_CFs):
+            for _ in range(total_CFs):
                 recon_err, kl_err, x_true, x_pred, cf_label = \
                     self.cf_vae.compute_elbo(train_x, 1.0-train_y, self.pred_model)
                 while(cf_label == train_y):

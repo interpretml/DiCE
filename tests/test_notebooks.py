@@ -41,7 +41,7 @@ def _check_notebook_cell_outputs(filepath):
     for cell in nb.cells:
         if "outputs" in cell:
             if len(cell['outputs']) > 0:
-                assert False, "Output cell found in notebook. Please clean your notebook"
+                raise AssertionError("Output cell found in notebook. Please clean your notebook")
 
 
 def _notebook_run(filepath):

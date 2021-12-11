@@ -38,7 +38,7 @@ class PyTorchModel(BaseModel):
     def set_eval_mode(self):
         self.model.eval()
 
-    def get_gradient(self, input):
+    def get_gradient(self, input_instance):
         # Future Support
         raise NotImplementedError("Future Support")
 
