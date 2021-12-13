@@ -1,0 +1,5 @@
+name: example-environment
+
+dependencies:
+  - tensorflow>=1.13.0-rc1
+  - pytorch

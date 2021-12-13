@@ -1,13 +1,15 @@
 """Module containing all required information about the interface between raw (or transformed)
 public data and DiCE explainers."""
 
-import pandas as pd
-import numpy as np
 import logging
 from collections import defaultdict
 
+import numpy as np
+import pandas as pd
+
 from dice_ml.data_interfaces.base_data_interface import _BaseData
-from dice_ml.utils.exception import SystemException, UserConfigValidationException
+from dice_ml.utils.exception import (SystemException,
+                                     UserConfigValidationException)
 
 
 class PublicData(_BaseData):
@@ -258,7 +260,7 @@ class PublicData(_BaseData):
         """
         feature_range = {}
 
-        for idx, feature_name in enumerate(self.feature_names):
+        for _, feature_name in enumerate(self.feature_names):
             feature_range[feature_name] = []
             if feature_name in self.continuous_feature_names:
                 max_value = self.data_df[feature_name].max()

@@ -1,8 +1,8 @@
 import pytest
+from sklearn.ensemble import RandomForestClassifier
 
 import dice_ml
 from dice_ml.utils import helpers
-from sklearn.ensemble import RandomForestClassifier
 from dice_ml.utils.exception import UserConfigValidationException
 
 
