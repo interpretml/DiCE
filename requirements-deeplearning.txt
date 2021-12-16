@@ -1,3 +1,2 @@
 tensorflow>=1.13.0-rc1 
 torch
-torchvision
