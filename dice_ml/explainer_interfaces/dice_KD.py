@@ -260,7 +260,7 @@ class DiceKD(ExplainerBase):
             if total_cfs_found < total_CFs:
                 self.elapsed = timeit.default_timer() - start_time
                 m, s = divmod(self.elapsed, 60)
-                print('Only %d (required %d) ' % (total_cfs_found, self.total_CFs),
+                print('Only %d (required %d) ' % (total_cfs_found, total_CFs),
                       'Diverse Counterfactuals found for the given configuation, perhaps ',
                       'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
                       'min %02d' % s, 'sec')
