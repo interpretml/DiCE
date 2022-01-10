@@ -40,7 +40,7 @@ class KerasTensorFlowModel(BaseModel):
         else:
             return self.model(input_tensor)
 
-    def get_gradient(self, input):
+    def get_gradient(self, input_instance):
         # Future Support
         raise NotImplementedError("Future Support")
 

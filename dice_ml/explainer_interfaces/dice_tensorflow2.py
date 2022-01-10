@@ -177,7 +177,7 @@ class DiceTensorFlow2(ExplainerBase):
         # CF initialization
         if len(self.cfs) != self.total_CFs:
             self.cfs = []
-            for ix in range(self.total_CFs):
+            for _ in range(self.total_CFs):
                 one_init = [[]]
                 for jx in range(self.minx.shape[1]):
                     one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))

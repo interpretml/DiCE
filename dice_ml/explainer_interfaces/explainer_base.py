@@ -364,7 +364,7 @@ class ExplainerBase(ABC):
                 continue
 
             per_query_point_cfs = 0
-            for index, row in df.iterrows():
+            for _, row in df.iterrows():
                 per_query_point_cfs += 1
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
