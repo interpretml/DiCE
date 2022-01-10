@@ -68,7 +68,8 @@ class ExplainerBase(ABC):
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
         :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
-                                 query_instance. Used by ['genetic', 'gradientdescent'], ignored by ['random', 'kdtree'] methods.
+                                 query_instance. Used by ['genetic', 'gradientdescent'],
+                                 ignored by ['random', 'kdtree'] methods.
         :param sparsity_weight: A positive float. Larger this weight, less features are changed from the query_instance.
                                 Used by ['genetic', 'kdtree'], ignored by ['random', 'gradientdescent'] methods.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
