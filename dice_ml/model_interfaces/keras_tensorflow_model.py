@@ -1,8 +1,9 @@
 """Module containing an interface to trained Keras Tensorflow model."""
 
-from dice_ml.model_interfaces.base_model import BaseModel
 import tensorflow as tf
 from tensorflow import keras
+
+from dice_ml.model_interfaces.base_model import BaseModel
 
 
 class KerasTensorFlowModel(BaseModel):
@@ -39,7 +40,7 @@ class KerasTensorFlowModel(BaseModel):
         else:
             return self.model(input_tensor)
 
-    def get_gradient(self, input):
+    def get_gradient(self, input_instance):
         # Future Support
         raise NotImplementedError("Future Support")
 

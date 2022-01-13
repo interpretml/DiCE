@@ -2,17 +2,17 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
-import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
-from collections.abc import Iterable
-from sklearn.neighbors import KDTree
+from dice_ml.constants import ModelTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.constants import ModelTypes
 
 
 class ExplainerBase(ABC):
@@ -85,6 +85,7 @@ class ExplainerBase(ABC):
             if posthoc_sparsity_algorithm == None:
                 posthoc_sparsity_algorithm = 'binary'
             elif total_CFs >50 and posthoc_sparsity_algorithm == 'linear':
+                import warnings
                 warnings.warn("The number of counterfactuals (total_CFs={}) generated per query instance could take much time; "
                               "if too slow try to change the parameter 'posthoc_sparsity_algorithm' from 'linear' to "
                               "'binary' search!".format(total_CFs))
@@ -98,6 +99,7 @@ class ExplainerBase(ABC):
                 query_instances_list.append(query_instances[ix:(ix+1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
+
         for query_instance in tqdm(query_instances_list):
             self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
@@ -112,6 +114,9 @@ class ExplainerBase(ABC):
                 verbose=verbose,
                 **kwargs)
             cf_examples_arr.append(res)
+
+        self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
+
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
 
     @abstractmethod
@@ -217,10 +222,12 @@ class ExplainerBase(ABC):
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10 to compute feature importance for all query points")
         elif total_CFs < 10:
-            raise UserConfigValidationException("The number of counterfactuals generated per "
-                                                "query instance should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of counterfactuals requested per "
+                "query instance should be greater than or equal to 10 "
+                "to compute feature importance for all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
@@ -261,16 +268,25 @@ class ExplainerBase(ABC):
                   input, and the global feature importance summarized over all inputs.
         """
         if query_instances is not None and len(query_instances) < 10:
-            raise UserConfigValidationException("The number of query instances should be greater than or equal to 10")
+            raise UserConfigValidationException(
+                "The number of query instances should be greater than or equal to 10 "
+                "to compute global feature importance over all query points")
         if cf_examples_list is not None:
-            if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
+            if len(cf_examples_list) < 10:
+                raise UserConfigValidationException(
+                    "The number of points for which counterfactuals generated should be "
+                    "greater than or equal to 10 "
+                    "to compute global feature importance")
+            elif any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
                     "The number of counterfactuals generated per query instance should be "
-                    "greater than or equal to 10")
+                    "greater than or equal to 10"
+                    "to compute global feature importance over all query points")
         elif total_CFs < 10:
             raise UserConfigValidationException(
                 "The number of counterfactuals generated per query instance should be greater "
-                "than or equal to 10")
+                "than or equal to 10"
+                "to compute global feature importance over all query points")
         importances = self.feature_importance(
             query_instances,
             cf_examples_list=cf_examples_list,
@@ -349,7 +365,7 @@ class ExplainerBase(ABC):
                 continue
 
             per_query_point_cfs = 0
-            for index, row in df.iterrows():
+            for _, row in df.iterrows():
                 per_query_point_cfs += 1
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
@@ -530,7 +546,7 @@ class ExplainerBase(ABC):
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
-            desired_class = self.target_cf_class[0][0]
+            desired_class = int(self.target_cf_class[0][0])
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
                 self.stopping_threshold = 0.25
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
@@ -695,3 +711,15 @@ class ExplainerBase(ABC):
             self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
             if self.final_cfs_df_sparse is not None:
                 self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+
+    def _check_any_counterfactuals_computed(self, cf_examples_arr):
+        """Check if any counterfactuals were generated for any query point."""
+        no_cf_generated = True
+        # Check if any counterfactuals were generated for any query point
+        for cf_examples in cf_examples_arr:
+            if cf_examples.final_cfs_df is not None and len(cf_examples.final_cfs_df) > 0:
+                no_cf_generated = False
+                break
+        if no_cf_generated:
+            raise UserConfigValidationException(
+                "No counterfactuals found for any of the query points! Kindly check your configuration.")

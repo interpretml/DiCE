@@ -2,14 +2,15 @@
 Module to generate counterfactual explanations from a KD-Tree
 This code is similar to 'Interpretable Counterfactual Explanations Guided by Prototypes': https://arxiv.org/pdf/1907.02584.pdf
 """
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-import numpy as np
-import timeit
-import pandas as pd
 import copy
+import timeit
+
+import numpy as np
+import pandas as pd
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceKD(ExplainerBase):

@@ -1,16 +1,17 @@
 """
 This module containts helper functions to load data and get meta deta.
 """
+import os
+import shutil
+
 import numpy as np
 import pandas as pd
-import shutil
-import os
-
-import dice_ml
-
+from sklearn.model_selection import train_test_split
 # for data transformations
 from sklearn.preprocessing import FunctionTransformer
-from sklearn.model_selection import train_test_split
+import dice_ml
+
+
 
 
 def load_adult_income_dataset(only_train=True):
@@ -168,10 +169,10 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
                                    wm1, wm2, wm3, learning_rate):
     # Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py.
     #                      Check dependencies.
-    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
-
     # Pytorch
     from torch import optim
+
+    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)

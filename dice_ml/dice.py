@@ -3,9 +3,9 @@
    such as RandomSampling, DiCEKD or DiCEGenetic"""
 
 from dice_ml.constants import BackEndTypes, SamplingStrategy
-from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.data_interfaces.private_data_interface import PrivateData
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class Dice(ExplainerBase):
@@ -67,12 +67,14 @@ def decide(model_interface, method):
 
     elif model_interface.backend == BackEndTypes.Tensorflow1:
         # pretrained Keras Sequential model with Tensorflow 1.x backend
-        from dice_ml.explainer_interfaces.dice_tensorflow1 import DiceTensorFlow1
+        from dice_ml.explainer_interfaces.dice_tensorflow1 import \
+            DiceTensorFlow1
         return DiceTensorFlow1
 
     elif model_interface.backend == BackEndTypes.Tensorflow2:
         # pretrained Keras Sequential model with Tensorflow 2.x backend
-        from dice_ml.explainer_interfaces.dice_tensorflow2 import DiceTensorFlow2
+        from dice_ml.explainer_interfaces.dice_tensorflow2 import \
+            DiceTensorFlow2
         return DiceTensorFlow2
 
     elif model_interface.backend == BackEndTypes.Pytorch:

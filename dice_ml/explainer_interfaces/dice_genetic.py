@@ -2,16 +2,17 @@
 Module to generate diverse counterfactual explanations based on genetic algorithm
 This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time': https://arxiv.org/pdf/2101.01292.pdf
 """
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-import numpy as np
-import pandas as pd
+import copy
 import random
 import timeit
-import copy
+
+import numpy as np
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceGenetic(ExplainerBase):
