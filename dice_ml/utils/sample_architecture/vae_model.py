@@ -109,7 +109,7 @@ class CF_VAE(nn.Module):
         res['z'] = []
         res['x_pred'] = []
         res['mc_samples'] = mc_samples
-        for _ in range(mc_samples):
+        for i in range(mc_samples):
             z = self.sample_latent_code(em, ev)
             x_pred = self.decoder(torch.cat((z, c), 1))
             res['z'].append(z)
@@ -239,7 +239,7 @@ class AutoEncoder(nn.Module):
         res['z'] = []
         res['x_pred'] = []
         res['mc_samples'] = mc_samples
-        for _ in range(mc_samples):
+        for i in range(mc_samples):
             z = self.sample_latent_code(em, ev)
             x_pred = self.decoder(z)
             res['z'].append(z)

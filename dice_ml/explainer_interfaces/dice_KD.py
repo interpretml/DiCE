@@ -2,15 +2,14 @@
 Module to generate counterfactual explanations from a KD-Tree
 This code is similar to 'Interpretable Counterfactual Explanations Guided by Prototypes': https://arxiv.org/pdf/1907.02584.pdf
 """
-import copy
-import timeit
-
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import numpy as np
+import timeit
 import pandas as pd
+import copy
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceKD(ExplainerBase):
@@ -260,10 +259,14 @@ class DiceKD(ExplainerBase):
             if total_cfs_found < total_CFs:
                 self.elapsed = timeit.default_timer() - start_time
                 m, s = divmod(self.elapsed, 60)
-                print('Only %d (required %d) ' % (total_cfs_found, self.total_CFs),
+                print('Only %d (required %d) ' % (total_cfs_found, total_CFs),
                       'Diverse Counterfactuals found for the given configuation, perhaps ',
                       'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
                       'min %02d' % s, 'sec')
+            elif total_cfs_found == 0:
+                 print(
+                        'No Counterfactuals found for the given configuration, perhaps try with different parameters...',
+                        '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
 

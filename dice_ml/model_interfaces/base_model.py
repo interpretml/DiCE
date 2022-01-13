@@ -3,12 +3,10 @@
    All model interface methods are in dice_ml.model_interfaces"""
 
 import pickle
-
 import numpy as np
-
+from dice_ml.utils.helpers import DataTransfomer
 from dice_ml.constants import ModelTypes
 from dice_ml.utils.exception import SystemException
-from dice_ml.utils.helpers import DataTransfomer
 
 
 class BaseModel:
@@ -64,7 +62,7 @@ class BaseModel:
         temp_input = np.transpose(np.array([np.random.uniform(0, 1) for i in range(inp_size)]).reshape(-1, 1))
         return self.get_output(temp_input).shape[1]
 
-    def get_num_output_nodes2(self, input_instance):
+    def get_num_output_nodes2(self, input):
         if self.model_type == ModelTypes.Regressor:
             raise SystemException('Number of output nodes not supported for regression')
-        return self.get_output(input_instance).shape[1]
+        return self.get_output(input).shape[1]

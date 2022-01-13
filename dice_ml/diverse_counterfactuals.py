@@ -1,10 +1,8 @@
+import pandas as pd
 import copy
 import json
-
-import pandas as pd
-
-from dice_ml.constants import ModelTypes, _SchemaVersions
 from dice_ml.utils.serialize import DummyDataInterface
+from dice_ml.constants import _SchemaVersions, ModelTypes
 
 
 class _DiverseCFV1SchemaConstants:
@@ -117,7 +115,6 @@ class CounterfactualExamples:
 
     def visualize_as_dataframe(self, display_sparse_df=True, show_only_changes=False):
         from IPython.display import display
-
         # original instance
         print('Query instance (original outcome : %i)' % round(self.test_pred))
         display(self.test_instance_df)  # works only in Jupyter notebook

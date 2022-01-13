@@ -1,8 +1,7 @@
 """Module containing an interface to trained PyTorch model."""
 
-import torch
-
 from dice_ml.model_interfaces.base_model import BaseModel
+import torch
 
 
 class PyTorchModel(BaseModel):
@@ -38,7 +37,7 @@ class PyTorchModel(BaseModel):
     def set_eval_mode(self):
         self.model.eval()
 
-    def get_gradient(self, input_instance):
+    def get_gradient(self, input):
         # Future Support
         raise NotImplementedError("Future Support")
 

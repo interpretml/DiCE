@@ -3,15 +3,14 @@
 Module to generate diverse counterfactual explanations based on random sampling.
 A simple implementation.
 """
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+import numpy as np
+import pandas as pd
 import random
 import timeit
 
-import numpy as np
-import pandas as pd
-
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceRandom(ExplainerBase):
@@ -109,11 +108,17 @@ class DiceRandom(ExplainerBase):
         cfs_df = None
         candidate_cfs = pd.DataFrame(
             np.repeat(query_instance.values, sample_size, axis=0), columns=query_instance.columns)
-        # Loop to change one feature at a time, then two features, and so on.
+        # Loop to change one feature at a time ##->(NOT TRUE), then two features, and so on.
         for num_features_to_vary in range(1, len(self.features_to_vary)+1):
+            # commented lines allow more values to change as num_features_to_vary increases, instead of .at you should use .loc
+            # is deliberately left commented out to let you choose.
+            # is slower, but more complete and still faster than genetic/KDtree
+            # selected_features = np.random.choice(self.features_to_vary, (sample_size, num_features_to_vary), replace=True)
             selected_features = np.random.choice(self.features_to_vary, (sample_size, 1), replace=True)
             for k in range(sample_size):
-                candidate_cfs.at[k, selected_features[k][0]] = random_instances.at[k, selected_features[k][0]]
+                candidate_cfs.at[k, selected_features[k][0]] = random_instances._get_value(k, selected_features[k][0])
+                # If you only want to change one feature, you should use _get_value
+                # candidate_cfs.iloc[k][selected_features[k]]=random_instances.iloc[k][selected_features[k]]
             scores = self.predict_fn(candidate_cfs)
             validity = self.decide_cf_validity(scores)
             if sum(validity) > 0:

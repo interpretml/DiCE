@@ -1,16 +1,16 @@
 """
 Module to generate diverse counterfactual explanations based on PyTorch framework
 """
-import copy
-import random
-import timeit
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+import torch
 
 import numpy as np
-import torch
+import random
+import timeit
+import copy
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DicePyTorch(ExplainerBase):

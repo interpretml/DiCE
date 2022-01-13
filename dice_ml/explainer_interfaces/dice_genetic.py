@@ -2,17 +2,16 @@
 Module to generate diverse counterfactual explanations based on genetic algorithm
 This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time': https://arxiv.org/pdf/2101.01292.pdf
 """
-import copy
-import random
-import timeit
-
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 import numpy as np
 import pandas as pd
+import random
+import timeit
+import copy
 from sklearn.preprocessing import LabelEncoder
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceGenetic(ExplainerBase):
@@ -116,9 +115,8 @@ class DiceGenetic(ExplainerBase):
     def do_KD_init(self, features_to_vary, query_instance, cfs, desired_class, desired_range):
         cfs = self.label_encode(cfs)
         cfs = cfs.reset_index(drop=True)
-
-        self.cfs = np.zeros((self.population_size, self.data_interface.number_of_features))
-        for kx in range(self.population_size):
+        row = []
+        for kx in range(self.population_size*5):
             if kx >= len(cfs):
                 break
             one_init = np.zeros(self.data_interface.number_of_features)
@@ -143,16 +141,21 @@ class DiceGenetic(ExplainerBase):
                                 one_init[jx] = query_instance[jx]
                             else:
                                 one_init[jx] = np.random.choice(self.feature_range[feature])
-            self.cfs[kx] = one_init
+            t = tuple(one_init)
+            if t not in row:
+                row.append(t)
+                if len(row) == self.population_size:
+                    break
             kx += 1
+        self.cfs = np.array(row)
 
-        new_array = [tuple(row) for row in self.cfs]
-        uniques = np.unique(new_array, axis=0)
-
-        if len(uniques) != self.population_size:
+        #if len(self.cfs) > self.population_size:
+        #    pass
+        if len(self.cfs) != self.population_size:
+            print("Pericolo Loop infinito....!!!!")
             remaining_cfs = self.do_random_init(
-                self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
-            self.cfs = np.concatenate([uniques, remaining_cfs])
+                self.population_size - len(self.cfs), features_to_vary, query_instance, desired_class, desired_range)
+            self.cfs = np.concatenate([self.cfs, remaining_cfs])
 
     def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range,
                               desired_class,
@@ -260,7 +263,7 @@ class DiceGenetic(ExplainerBase):
                  (see diverse_counterfactuals.py).
         """
 
-        self.population_size = 10 * total_CFs
+        self.population_size = 3 * total_CFs
 
         self.start_time = timeit.default_timer()
 
@@ -514,6 +517,9 @@ class DiceGenetic(ExplainerBase):
             if len(self.final_cfs) == self.total_CFs:
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')
+            elif len(self.final_cfs) == 0:
+                print('No Counterfactuals found for the given configuration, perhaps try with different parameters...',
+                      '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
                 print('Only %d (required %d) ' % (len(self.final_cfs), self.total_CFs),
                       'Diverse Counterfactuals found for the given configuation, perhaps ',

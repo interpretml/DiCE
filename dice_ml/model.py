@@ -4,7 +4,6 @@ The implementations contain methods to access the output or gradients of ML mode
 frameworks such as Tensorflow or PyTorch.
 """
 import warnings
-
 from dice_ml.constants import BackEndTypes, ModelTypes
 from dice_ml.utils.exception import UserConfigValidationException
 
@@ -70,8 +69,7 @@ def decide(backend):
             import tensorflow  # noqa: F401
         except ImportError:
             raise UserConfigValidationException("Unable to import tensorflow. Please install tensorflow")
-        from dice_ml.model_interfaces.keras_tensorflow_model import \
-            KerasTensorFlowModel
+        from dice_ml.model_interfaces.keras_tensorflow_model import KerasTensorFlowModel
         return KerasTensorFlowModel
 
     elif backend == BackEndTypes.Pytorch:

@@ -1,16 +1,16 @@
 """
 Module to generate diverse counterfactual explanations based on tensorflow 2.x
 """
-import copy
-import random
-import timeit
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+import tensorflow as tf
 
 import numpy as np
-import tensorflow as tf
+import random
+import timeit
+import copy
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
 class DiceTensorFlow2(ExplainerBase):
@@ -177,7 +177,7 @@ class DiceTensorFlow2(ExplainerBase):
         # CF initialization
         if len(self.cfs) != self.total_CFs:
             self.cfs = []
-            for _ in range(self.total_CFs):
+            for ix in range(self.total_CFs):
                 one_init = [[]]
                 for jx in range(self.minx.shape[1]):
                     one_init[0].append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
