@@ -82,21 +82,22 @@ class ExplainerBase(ABC):
             raise UserConfigValidationException(
                 "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
         if total_CFs > 10:
-            if posthoc_sparsity_algorithm == None:
+            if posthoc_sparsity_algorithm is None:
                 posthoc_sparsity_algorithm = 'binary'
-            elif total_CFs >50 and posthoc_sparsity_algorithm == 'linear':
+            elif total_CFs > 50 and posthoc_sparsity_algorithm == 'linear':
                 import warnings
-                warnings.warn("The number of counterfactuals (total_CFs={}) generated per query instance could take much time; "
-                              "if too slow try to change the parameter 'posthoc_sparsity_algorithm' from 'linear' to "
-                              "'binary' search!".format(total_CFs))
-        elif posthoc_sparsity_algorithm == None:
+                warnings.warn(
+                    "The number of counterfactuals (total_CFs={}) generated per query instance could take much time; "
+                    "if too slow try to change the parameter 'posthoc_sparsity_algorithm' from 'linear' to "
+                    "'binary' search!".format(total_CFs))
+        elif posthoc_sparsity_algorithm is None:
             posthoc_sparsity_algorithm = 'linear'
 
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
             for ix in range(query_instances.shape[0]):
-                query_instances_list.append(query_instances[ix:(ix+1)])
+                query_instances_list.append(query_instances[ix:(ix + 1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
 
@@ -190,11 +191,14 @@ class ExplainerBase(ABC):
 
             if feature not in features_to_vary and permitted_range is not None:
                 if feature in permitted_range and feature in self.data_interface.continuous_feature_names:
-                    if not permitted_range[feature][0] <= query_instance[feature].values[0] <= permitted_range[feature][1]:
-                        raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
+                    if not permitted_range[feature][0] <= query_instance[feature].values[0] <= permitted_range[feature][
+                        1]:
+                        raise ValueError("Feature:", feature,
+                                         "is outside the permitted range and isn't allowed to vary.")
                 elif feature in permitted_range and feature in self.data_interface.categorical_feature_names:
                     if query_instance[feature].values[0] not in self.feature_range[feature]:
-                        raise ValueError("Feature:", feature, "is outside the permitted range and isn't allowed to vary.")
+                        raise ValueError("Feature:", feature,
+                                         "is outside the permitted range and isn't allowed to vary.")
 
     def local_feature_importance(self, query_instances, cf_examples_list=None,
                                  total_CFs=10,
@@ -440,12 +444,13 @@ class ExplainerBase(ABC):
         cfs_preds_sparse = []
 
         for cf_ix in list(final_cfs_sparse.index):
-            current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
+            current_pred = self.predict_fn_for_sparsity(
+                final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
             for feature in features_sorted:
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
-                if(abs(diff) <= quantiles[feature]):
+                if (abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
                                                                  feature, final_cfs_sparse, current_pred)
@@ -466,13 +471,14 @@ class ExplainerBase(ABC):
            query_instance greedily until the prediction class changes."""
 
         old_diff = diff
-        change = (10**-decimal_prec[feature])  # the minimal possible change for a feature
+        change = (10 ** -decimal_prec[feature])  # the minimal possible change for a feature
         current_pred = current_pred_orig
         if self.model.model_type == ModelTypes.Classifier:
-            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
+            while ((abs(diff) > 10e-4) and (np.sign(diff * old_diff) > 0) and self.is_cf_valid(current_pred)):
                 old_val = int(final_cfs_sparse.at[cf_ix, feature])
-                final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
+                final_cfs_sparse.at[cf_ix, feature] += np.sign(diff) * change
+                current_pred = self.predict_fn_for_sparsity(
+                    final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
                 if not self.is_cf_valid(current_pred):
@@ -505,11 +511,12 @@ class ExplainerBase(ABC):
             right = query_instance[feature].iat[0]
 
             while left <= right:
-                current_val = left + ((right - left)/2)
+                current_val = left + ((right - left) / 2)
                 current_val = round(current_val, decimal_prec[feature])
 
                 final_cfs_sparse.at[cf_ix, feature] = current_val
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
+                current_pred = self.predict_fn_for_sparsity(
+                    final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
                     break
@@ -524,19 +531,20 @@ class ExplainerBase(ABC):
             right = int(final_cfs_sparse.at[cf_ix, feature])
 
             while right >= left:
-                current_val = right - ((right - left)/2)
+                current_val = right - ((right - left) / 2)
                 current_val = round(current_val, decimal_prec[feature])
 
                 final_cfs_sparse.at[cf_ix, feature] = current_val
-                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
+                current_pred = self.predict_fn_for_sparsity(
+                    final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
                 if current_val == right or current_val == left:
                     break
 
                 if self.is_cf_valid(current_pred):
-                    right = current_val - (10**-decimal_prec[feature])
+                    right = current_val - (10 ** -decimal_prec[feature])
                 else:
-                    left = current_val + (10**-decimal_prec[feature])
+                    left = current_val + (10 ** -decimal_prec[feature])
 
         return final_cfs_sparse
 
@@ -578,7 +586,7 @@ class ExplainerBase(ABC):
                 raise UserConfigValidationException("Desired class not present in training data!")
         else:
             raise UserConfigValidationException("The target class for {0} could not be identified".format(
-                                                desired_class_input))
+                desired_class_input))
 
     def infer_target_cfs_range(self, desired_range_input):
         target_range = None
@@ -597,7 +605,7 @@ class ExplainerBase(ABC):
             pred = model_outputs[i]
             if self.model.model_type == ModelTypes.Classifier:
                 if self.num_output_nodes == 2:  # binary
-                    pred_1 = pred[self.num_output_nodes-1]
+                    pred_1 = pred[self.num_output_nodes - 1]
                     validity[i] = 1 if \
                         ((self.target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
                          (self.target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else 0
@@ -634,7 +642,7 @@ class ExplainerBase(ABC):
                      (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
                 return validity
             if self.num_output_nodes == 2:  # binary
-                pred_1 = model_score[self.num_output_nodes-1]
+                pred_1 = model_score[self.num_output_nodes - 1]
                 validity = True if \
                     ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
                      (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
@@ -710,7 +718,8 @@ class ExplainerBase(ABC):
         for ix, feature in enumerate(self.data_interface.continuous_feature_names):
             self.final_cfs_df[feature] = self.final_cfs_df[feature].astype(float).round(precisions[ix])
             if self.final_cfs_df_sparse is not None:
-                self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(precisions[ix])
+                self.final_cfs_df_sparse[feature] = self.final_cfs_df_sparse[feature].astype(float).round(
+                    precisions[ix])
 
     def _check_any_counterfactuals_computed(self, cf_examples_arr):
         """Check if any counterfactuals were generated for any query point."""

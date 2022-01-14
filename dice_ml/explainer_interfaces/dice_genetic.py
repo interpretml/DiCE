@@ -150,8 +150,6 @@ class DiceGenetic(ExplainerBase):
             kx += 1
         self.cfs = np.array(row)
 
-        #if len(self.cfs) > self.population_size:
-        #    pass
         if len(self.cfs) != self.population_size:
             print("Pericolo Loop infinito....!!!!")
             remaining_cfs = self.do_random_init(
@@ -264,7 +262,7 @@ class DiceGenetic(ExplainerBase):
                  (see diverse_counterfactuals.py).
         """
 
-        self.population_size = 3 * total_CFs
+        self.population_size = 10 * total_CFs
 
         self.start_time = timeit.default_timer()
 
@@ -470,8 +468,8 @@ class DiceGenetic(ExplainerBase):
             if rest_members > 0:
                 new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
                 for new_gen_idx in range(rest_members):
-                    parent1 = random.choice(population[:max(int(len(population) / 2),1)])
-                    parent2 = random.choice(population[:max(int(len(population) / 2),1)])
+                    parent1 = random.choice(population[:max(int(len(population) / 2), 1)])
+                    parent2 = random.choice(population[:max(int(len(population) / 2), 1)])
                     child = self.mate(parent1, parent2, features_to_vary, query_instance)
                     new_generation_2[new_gen_idx] = child
 

@@ -9,7 +9,7 @@ import tempfile
 import nbformat
 import pytest
 
-NOTEBOOKS_PATH = "../docs/source/notebooks/"
+NOTEBOOKS_PATH = "docs/source/notebooks/"
 notebooks_list = [f.name for f in os.scandir(NOTEBOOKS_PATH) if f.name.endswith(".ipynb")]
 # notebooks that should not be run
 advanced_notebooks = [
