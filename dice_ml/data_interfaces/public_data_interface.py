@@ -11,6 +11,7 @@ from dice_ml.data_interfaces.base_data_interface import _BaseData
 from dice_ml.utils.exception import (SystemException,
                                      UserConfigValidationException)
 
+
 class PublicData(_BaseData):
     """A data interface for public data. This class is an interface to DiCE explainers
        and contains methods to transform user-fed raw data into the format a DiCE explainer

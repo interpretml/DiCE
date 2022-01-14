@@ -3,8 +3,8 @@
    such as RandomSampling, DiCEKD or DiCEGenetic"""
 
 from dice_ml.constants import BackEndTypes, SamplingStrategy
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.data_interfaces.private_data_interface import PrivateData
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.utils.exception import UserConfigValidationException
 
 

@@ -4,8 +4,8 @@ Module to generate diverse counterfactual explanations based on PyTorch framewor
 import copy
 import random
 import timeit
-import numpy as np
 
+import numpy as np
 import torch
 
 from dice_ml import diverse_counterfactuals as exp

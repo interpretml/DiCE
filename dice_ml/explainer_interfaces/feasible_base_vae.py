@@ -11,7 +11,6 @@ from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.utils.helpers import get_base_gen_cf_initialization
 
 
-
 class FeasibleBaseVAE(ExplainerBase):
 
     def __init__(self, data_interface, model_interface, **kwargs):
