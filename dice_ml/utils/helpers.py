@@ -13,8 +13,6 @@ from sklearn.preprocessing import FunctionTransformer
 import dice_ml
 
 
-
-
 def load_adult_income_dataset(only_train=True):
     """Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares
        the data for data analysis based on https://rpubs.com/H_Zhu/235617
