@@ -191,8 +191,8 @@ class ExplainerBase(ABC):
 
             if feature not in features_to_vary and permitted_range is not None:
                 if feature in permitted_range and feature in self.data_interface.continuous_feature_names:
-                    if not permitted_range[feature][0] <= query_instance[feature].values[0] <= permitted_range[feature][
-                        1]:
+                    if not permitted_range[feature][0] <= query_instance[feature].values[0] <= permitted_range[feature][\
+                            1]:
                         raise ValueError("Feature:", feature,
                                          "is outside the permitted range and isn't allowed to vary.")
                 elif feature in permitted_range and feature in self.data_interface.categorical_feature_names:
