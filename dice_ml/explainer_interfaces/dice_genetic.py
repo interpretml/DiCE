@@ -304,7 +304,11 @@ class DiceGenetic(ExplainerBase):
     def predict_fn_scores(self, input_instance):
         """Returns prediction scores."""
         input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance)
+        out = self.model.get_output(input_instance)
+        if out.shape[1] == 1 and self.model.model_type == ModelTypes.Classifier:
+            # DL models return only 1 for binary classification
+            out = np.hstack((1-out, out))
+        return out
 
     def predict_fn(self, input_instance):
         """Returns actual prediction."""
@@ -321,6 +325,9 @@ class DiceGenetic(ExplainerBase):
 
         input_instance = self.label_decode(input_instance)
         output = self.model.get_output(input_instance, model_score=True)
+        if output.shape[1] == 1 and self.model.model_type == ModelTypes.Classifier:
+            # DL models return only 1 for binary classification
+            output = np.hstack((1-output, output))
         desired_class = int(desired_class)
         maxvalues = np.max(output, 1)
         predicted_values = np.argmax(output, 1)

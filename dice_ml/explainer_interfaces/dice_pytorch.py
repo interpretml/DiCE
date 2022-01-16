@@ -48,7 +48,9 @@ class DicePyTorch(ExplainerBase):
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
+    def _generate_counterfactuals(self, query_instance, total_CFs,
+                                 desired_class="opposite", desired_range=None,
+                                 proximity_weight=0.5,
                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all",
                                  permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
                                  feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500,
@@ -61,6 +63,7 @@ class DicePyTorch(ExplainerBase):
         :param total_CFs: Total number of counterfactuals required.
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class
                               of query_instance for binary classification.
+        :param desired_range: Not supported currently.
         :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
                                  query_instance.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
@@ -129,7 +132,7 @@ class DicePyTorch(ExplainerBase):
                 project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance,
                 tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
-        counterfactual_explanations = exp.CounterfactualExamples(
+        return exp.CounterfactualExamples(
             data_interface=self.data_interface,
             final_cfs_df=final_cfs_df,
             test_instance_df=test_instance_df,
@@ -137,17 +140,15 @@ class DicePyTorch(ExplainerBase):
             posthoc_sparsity_param=posthoc_sparsity_param,
             desired_class=desired_class)
 
-        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
-
-    def get_model_output(self, input_instance):
+    def get_model_output(self, input_instance, out_tensor=True):
         """get output probability of ML model"""
-        return self.model.get_output(input_instance)[(self.num_output_nodes-1):]
+        return self.model.get_output(input_instance, out_tensor=out_tensor)[(self.num_output_nodes-1):]
 
     def predict_fn(self, input_instance):
         """prediction function"""
         if not torch.is_tensor(input_instance):
             input_instance = torch.tensor(input_instance).float()
-        return self.get_model_output(input_instance).data.numpy()
+        return self.get_model_output(input_instance, out_tensor=False)#.data.numpy()
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
@@ -563,9 +564,11 @@ class DicePyTorch(ExplainerBase):
         # do inverse transform of CFs to original user-fed format
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
         final_cfs_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(cfs)
+        # rounding off to 3 decimal places
         cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds]
         cfs_preds = [item for sublist in cfs_preds for item in sublist]
         final_cfs_df[self.data_interface.outcome_name] = np.array(cfs_preds)
+        print(final_cfs_df)
 
         test_instance_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(query_instance)
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
@@ -606,5 +609,6 @@ class DicePyTorch(ExplainerBase):
 
         if final_cfs_df_sparse is not None:
             final_cfs_df_sparse = final_cfs_df_sparse.iloc[valid_ix].reset_index(drop=True)
+        print(final_cfs_df_sparse)
         # returning only valid CFs
         return final_cfs_df.iloc[valid_ix].reset_index(drop=True), test_instance_df, final_cfs_df_sparse

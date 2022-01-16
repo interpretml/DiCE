@@ -388,6 +388,9 @@ class ExplainerBase(ABC):
 
     def predict_fn(self, input_instance):
         """prediction function"""
+
+        #input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance)
+        #input_instance = input_instance.astype('float64')
         return self.model.get_output(input_instance)
 
     def predict_fn_for_sparsity(self, input_instance):
@@ -556,6 +559,10 @@ class ExplainerBase(ABC):
                 original_pred_1 = np.argmax(original_pred)
                 target_class = int(1 - original_pred_1)
                 return target_class
+            elif num_output_nodes == 1: # only for pytorch DL model
+                original_pred_1 = np.round(original_pred)
+                target_class = int(1-original_pred_1)
+                return target_class
             elif num_output_nodes > 2:
                 raise UserConfigValidationException(
                     "Desired class cannot be opposite if the number of classes is more than 2.")
@@ -641,7 +648,10 @@ class ExplainerBase(ABC):
         model_output = np.zeros(len(model_scores), dtype=output_type)
         for i in range(len(model_scores)):
             if self.model.model_type == ModelTypes.Classifier:
-                model_output[i] = np.argmax(model_scores[i])
+                if model_scores[i].shape[0] > 1:
+                    model_output[i] = np.argmax(model_scores[i])
+                else:
+                    model_output[i] = np.round(model_scores[i])[0]
             elif self.model.model_type == ModelTypes.Regressor:
                 model_output[i] = model_scores[i]
         return model_output
@@ -672,7 +682,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.model.model.predict(dataset_instance)
+        predictions = self.model.get_output(dataset_instance, model_score=False).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 

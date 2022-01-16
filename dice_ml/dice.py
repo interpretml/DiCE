@@ -46,45 +46,44 @@ def decide(model_interface, method):
     subpackage and import-and-return the class in an elif loop as shown in
     the below method.
     """
-    if model_interface.backend == BackEndTypes.Sklearn:
-        if method == SamplingStrategy.Random:
-            # random sampling of CFs
-            from dice_ml.explainer_interfaces.dice_random import DiceRandom
-            return DiceRandom
-        elif method == SamplingStrategy.Genetic:
-            from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
-            return DiceGenetic
-        elif method == SamplingStrategy.KdTree:
-            from dice_ml.explainer_interfaces.dice_KD import DiceKD
-            return DiceKD
+    if method == SamplingStrategy.Random:
+        # random sampling of CFs
+        from dice_ml.explainer_interfaces.dice_random import DiceRandom
+        return DiceRandom
+    elif method == SamplingStrategy.Genetic:
+        from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
+        return DiceGenetic
+    elif method == SamplingStrategy.KdTree:
+        from dice_ml.explainer_interfaces.dice_KD import DiceKD
+        return DiceKD
+    elif method is None:
+        if model_interface.backend == BackEndTypes.Tensorflow1:
+            # pretrained Keras Sequential model with Tensorflow 1.x backend
+            from dice_ml.explainer_interfaces.dice_tensorflow1 import \
+                DiceTensorFlow1
+            return DiceTensorFlow1
+
+        elif model_interface.backend == BackEndTypes.Tensorflow2:
+            # pretrained Keras Sequential model with Tensorflow 2.x backend
+            from dice_ml.explainer_interfaces.dice_tensorflow2 import \
+                DiceTensorFlow2
+            return DiceTensorFlow2
+
+        elif model_interface.backend == BackEndTypes.Pytorch:
+            # PyTorch backend
+            from dice_ml.explainer_interfaces.dice_pytorch import DicePyTorch
+            return DicePyTorch
+
         else:
-            raise UserConfigValidationException("Unsupported sample strategy {0} provided. "
-                                                "Please choose one of {1}, {2} or {3}".format(
-                                                    method, SamplingStrategy.Random,
-                                                    SamplingStrategy.Genetic,
-                                                    SamplingStrategy.KdTree
-                                                ))
-
-    elif model_interface.backend == BackEndTypes.Tensorflow1:
-        # pretrained Keras Sequential model with Tensorflow 1.x backend
-        from dice_ml.explainer_interfaces.dice_tensorflow1 import \
-            DiceTensorFlow1
-        return DiceTensorFlow1
-
-    elif model_interface.backend == BackEndTypes.Tensorflow2:
-        # pretrained Keras Sequential model with Tensorflow 2.x backend
-        from dice_ml.explainer_interfaces.dice_tensorflow2 import \
-            DiceTensorFlow2
-        return DiceTensorFlow2
-
-    elif model_interface.backend == BackEndTypes.Pytorch:
-        # PyTorch backend
-        from dice_ml.explainer_interfaces.dice_pytorch import DicePyTorch
-        return DicePyTorch
-
+            # all other backends
+            backend_dice = model_interface.backend['explainer']
+            module_name, class_name = backend_dice.split('.')
+            module = __import__("dice_ml.explainer_interfaces." + module_name, fromlist=[class_name])
+            return getattr(module, class_name)
     else:
-        # all other backends
-        backend_dice = model_interface.backend['explainer']
-        module_name, class_name = backend_dice.split('.')
-        module = __import__("dice_ml.explainer_interfaces." + module_name, fromlist=[class_name])
-        return getattr(module, class_name)
+        raise UserConfigValidationException("Unsupported sample strategy {0} provided. "
+                                            "Please choose one of {1}, {2} or {3}".format(
+                                                method, SamplingStrategy.Random,
+                                                SamplingStrategy.Genetic,
+                                                SamplingStrategy.KdTree
+                                            ))

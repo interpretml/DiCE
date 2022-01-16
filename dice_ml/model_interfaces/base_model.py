@@ -35,6 +35,7 @@ class BaseModel:
         self.backend = backend
         # calls FunctionTransformer of scikit-learn internally
         # (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html)
+        print(func)
         self.transformer = DataTransfomer(func, kw_args)
 
     def load_model(self):

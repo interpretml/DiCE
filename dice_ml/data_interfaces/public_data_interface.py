@@ -570,8 +570,8 @@ class PublicData(_BaseData):
         temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
-        # returns a pandas dataframe
-        return self.normalize_data(temp)
+        # returns a pandas dataframe with all numeric values
+        return self.normalize_data(temp).apply(pd.to_numeric)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
