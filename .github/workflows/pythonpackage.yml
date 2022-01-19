@@ -59,15 +59,17 @@ jobs:
         path: htmlcov
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-    - uses: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
-      name: Test Line Coverage
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
       with:
-        showStatistics: true
-        checkCoverage: true
-        coverageFailOption: fixed
-        coverageType: lines
-        coverageThreshold: 80
-        runTitle: Line Coverage
+        token: ${{ secrets.CODECOV_TOKEN }}
+        env_vars: OS,PYTHON
+        fail_ci_if_error: true
+        files: ./junit/test-results.xml
+        flags: unittests
+        name: codecov-umbrella
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true
     - name: Check package consistency with twine
       run: |
         python setup.py check sdist bdist_wheel
