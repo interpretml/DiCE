@@ -103,10 +103,6 @@ class PrivateData(_BaseData):
         else:
             self.mad = {}
 
-    def one_hot_encode_data(self, data):
-        """One-hot-encodes the data."""
-        return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
-
     def normalize_data(self, df, encoding='one-hot'):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
@@ -254,17 +250,6 @@ class PrivateData(_BaseData):
                 out[column] = self.labelencoder[self.feature_names[column]].inverse_transform([round(out[column])])[0]
             return out
 
-    def from_dummies(self, data, prefix_sep='_'):
-        """Gets the original data from dummy encoded data with k levels."""
-        out = data.copy()
-        for feature_name in self.categorical_feature_names:
-            cols, labs = [[c.replace(
-                x, "") for c in data.columns if feature_name+prefix_sep in c] for x in ["", feature_name+prefix_sep]]
-            out[feature_name] = pd.Categorical(
-                np.array(labs)[np.argmax(data[cols].values, axis=1)])
-            out.drop(cols, axis=1, inplace=True)
-        return out
-
     def get_decimal_precisions(self):
         """"Gets the precision of continuous features in the data."""
         precisions = [0]*len(self.continuous_feature_names)
@@ -275,27 +260,6 @@ class PrivateData(_BaseData):
             else:
                 precisions[ix] = self.type_and_precision[feature_name][1]
         return precisions
-
-    def get_decoded_data(self, data, encoding='one-hot'):
-        """Gets the original data from encoded data."""
-        if len(data) == 0:
-            return data
-
-        index = [i for i in range(0, len(data))]
-        if encoding == 'one-hot':
-            if isinstance(data, pd.DataFrame):
-                return self.from_dummies(data)
-            elif isinstance(data, np.ndarray):
-                data = pd.DataFrame(data=data, index=index,
-                                    columns=self.ohe_encoded_feature_names)
-                return self.from_dummies(data)
-            else:
-                raise ValueError("data should be a pandas dataframe or a numpy array")
-
-        elif encoding == 'label':
-            data = pd.DataFrame(data=data, index=index,
-                                columns=self.feature_names)
-            return data
 
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
