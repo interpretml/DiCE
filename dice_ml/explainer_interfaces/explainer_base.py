@@ -380,7 +380,7 @@ class ExplainerBase(ABC):
                 continue
 
             per_query_point_cfs = 0
-            for index, row in df.iterrows():
+            for _, row in df.iterrows():
                 per_query_point_cfs += 1
                 for col in self.data_interface.continuous_feature_names:
                     if not np.isclose(org_instance[col].iat[0], row[col]):
@@ -561,7 +561,7 @@ class ExplainerBase(ABC):
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
-            desired_class = self.target_cf_class[0][0]
+            desired_class = int(self.target_cf_class[0][0])
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
                 self.stopping_threshold = 0.25
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:

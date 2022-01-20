@@ -260,7 +260,7 @@ class PublicData(_BaseData):
         """
         feature_range = {}
 
-        for idx, feature_name in enumerate(self.feature_names):
+        for _, feature_name in enumerate(self.feature_names):
             feature_range[feature_name] = []
             if feature_name in self.continuous_feature_names:
                 max_value = self.data_df[feature_name].max()
