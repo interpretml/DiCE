@@ -10,7 +10,7 @@ import pandas as pd
 from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
-from dice_ml.constants import ModelTypes
+from dice_ml.constants import ModelTypes, _PostHocSparsityTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
 
@@ -57,7 +57,6 @@ class ExplainerBase(ABC):
             raise UserConfigValidationException(
                 "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
 
-        from dice_ml.constants import _PostHocSparsityTypes
         if posthoc_sparsity_algorithm not in _PostHocSparsityTypes.ALL:
             raise UserConfigValidationException(
                 'The posthoc_sparsity_algorithm should be {0} and not {1}'.format(
@@ -71,6 +70,16 @@ class ExplainerBase(ABC):
         if posthoc_sparsity_param < 0.0 or posthoc_sparsity_param > 1.0:
             raise UserConfigValidationException('The posthoc_sparsity_param should lie between {0} and {1}'.format(
                 str(0.0), str(1.0)))
+
+        if self.model is not None and self.model.model_type == ModelTypes.Classifier:
+            if desired_range is not None:
+                raise UserConfigValidationException(
+                    'The desired_range parameter should not be set for classification task')
+
+        if self.model is not None and self.model.model_type == ModelTypes.Regressor:
+            if desired_range is None:
+                raise UserConfigValidationException(
+                    'The desired_range parameter should be set for regression task')
 
     def generate_counterfactuals(self, query_instances, total_CFs,
                                  desired_class="opposite", desired_range=None,
@@ -104,9 +113,17 @@ class ExplainerBase(ABC):
         :returns: A CounterfactualExplanations object that contains the list of
                   counterfactual examples per query_instance as one of its attributes.
         """
-        if total_CFs <= 0:
-            raise UserConfigValidationException(
-                "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm, verbose=verbose,
+            kwargs=kwargs
+        )
+
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
