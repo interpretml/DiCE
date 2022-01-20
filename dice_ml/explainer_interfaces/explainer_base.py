@@ -67,7 +67,7 @@ class ExplainerBase(ABC):
             raise UserConfigValidationException('The stopping_threshold should lie between {0} and {1}'.format(
                 str(0.0), str(1.0)))
 
-        if posthoc_sparsity_param < 0.0 or posthoc_sparsity_param > 1.0:
+        if posthoc_sparsity_param is not None and (posthoc_sparsity_param < 0.0 or posthoc_sparsity_param > 1.0):
             raise UserConfigValidationException('The posthoc_sparsity_param should lie between {0} and {1}'.format(
                 str(0.0), str(1.0)))
 
