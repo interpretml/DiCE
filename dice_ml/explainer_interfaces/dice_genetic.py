@@ -151,7 +151,6 @@ class DiceGenetic(ExplainerBase):
         self.cfs = np.array(row)
 
         if len(self.cfs) != self.population_size:
-            print("Pericolo Loop infinito....!!!!")
             remaining_cfs = self.do_random_init(
                 self.population_size - len(self.cfs), features_to_vary, query_instance, desired_class, desired_range)
             self.cfs = np.concatenate([self.cfs, remaining_cfs])
