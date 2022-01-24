@@ -240,7 +240,8 @@ class DiceKD(ExplainerBase):
             # post-hoc operation on continuous features to enhance sparsity - only for public data
             if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
                 self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs)
-                self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.final_cfs_df_sparse, query_instance,
+                self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.final_cfs_df_sparse,
+                                                                                query_instance,
                                                                                 posthoc_sparsity_param,
                                                                                 posthoc_sparsity_algorithm)
             else:
@@ -264,6 +265,10 @@ class DiceKD(ExplainerBase):
                       'Diverse Counterfactuals found for the given configuation, perhaps ',
                       'change the query instance or the features to vary...'  '; total time taken: %02d' % m,
                       'min %02d' % s, 'sec')
+            elif total_cfs_found == 0:
+                print(
+                    'No Counterfactuals found for the given configuration, perhaps try with different parameters...',
+                    '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
             else:
                 print('Diverse Counterfactuals found! total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
