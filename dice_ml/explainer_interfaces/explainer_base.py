@@ -60,7 +60,7 @@ class ExplainerBase(ABC):
         if posthoc_sparsity_algorithm not in _PostHocSparsityTypes.ALL:
             raise UserConfigValidationException(
                 'The posthoc_sparsity_algorithm should be {0} and not {1}'.format(
-                    ','.join(_PostHocSparsityTypes.ALL), posthoc_sparsity_algorithm)
+                    ' or '.join(_PostHocSparsityTypes.ALL), posthoc_sparsity_algorithm)
                 )
 
         if stopping_threshold < 0.0 or stopping_threshold > 1.0:
@@ -250,6 +250,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if cf_examples_list is not None:
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
@@ -299,6 +309,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if query_instances is not None and len(query_instances) < 10:
             raise UserConfigValidationException(
                 "The number of query instances should be greater than or equal to 10 "
@@ -355,6 +375,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if cf_examples_list is None:
             cf_examples_list = self.generate_counterfactuals(
                 query_instances, total_CFs,
