@@ -519,9 +519,9 @@ class TestExplainerBaseRegression:
 
     @pytest.mark.parametrize("desired_range, method",
                              [([10, 100], 'random')])
-    def test_numeric_categories(self, desired_range, method, create_boston_data):
+    def test_numeric_categories(self, desired_range, method, create_housing_data):
         x_train, x_test, y_train, y_test, feature_names = \
-            create_boston_data
+            create_housing_data
 
         rfc = RandomForestRegressor(n_estimators=10, max_depth=4,
                                     random_state=777)

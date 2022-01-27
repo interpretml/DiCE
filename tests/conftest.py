@@ -2,7 +2,8 @@ from collections import OrderedDict
 
 import pandas as pd
 import pytest
-from sklearn.datasets import load_boston, load_iris
+from sklearn.datasets import fetch_california_housing, load_iris
+
 from sklearn.model_selection import train_test_split
 
 import dice_ml
@@ -219,11 +220,11 @@ def create_iris_data():
 
 
 @pytest.fixture
-def create_boston_data():
-    boston = load_boston()
+def create_housing_data():
+    housing = fetch_california_housing()
     x_train, x_test, y_train, y_test = train_test_split(
-        boston.data, boston.target,
+        housing.data, housing.target,
         test_size=0.2, random_state=7)
-    x_train = pd.DataFrame(data=x_train, columns=boston.feature_names)
-    x_test = pd.DataFrame(data=x_test, columns=boston.feature_names)
-    return x_train, x_test, y_train, y_test, boston.feature_names.tolist()
+    x_train = pd.DataFrame(data=x_train, columns=housing.feature_names)
+    x_test = pd.DataFrame(data=x_test, columns=housing.feature_names)
+    return x_train, x_test, y_train, y_test, housing.feature_names.tolist()
