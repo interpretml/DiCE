@@ -522,7 +522,6 @@ class TestExplainerBaseUserConfigValidations:
             explainer_function(query_instances=sample_custom_query_1,
                                total_CFs=10, desired_range=[4, 3])
 
-
     def test_global_feature_importance_error_conditions_with_insufficient_query_points(
             self, method,
             sample_custom_query_1,
