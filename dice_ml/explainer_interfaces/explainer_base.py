@@ -81,6 +81,14 @@ class ExplainerBase(ABC):
                 raise UserConfigValidationException(
                     'The desired_range parameter should be set for regression task')
 
+        if desired_range is not None:
+            if len(desired_range) != 2:
+                raise UserConfigValidationException(
+                    "The parameter desired_range needs to have two numbers in ascending order.")
+            if desired_range[0] > desired_range[1]:
+                raise UserConfigValidationException(
+                    "The range provided in desired_range should be in ascending order.")
+
     def generate_counterfactuals(self, query_instances, total_CFs,
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
@@ -96,7 +104,8 @@ class ExplainerBase(ABC):
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value
                               is "opposite" to the outcome class of query_instance for binary classification.
         :param desired_range: For regression problems. Contains the outcome range to
-                              generate counterfactuals in.
+                              generate counterfactuals in. This should be a list of two numbers in
+                              ascending order.
         :param permitted_range: Dictionary with feature names as keys and permitted range in list as values.
                                 Defaults to the range inferred from training data.
                                 If None, uses the parameters initialized in data_interface.
