@@ -1,2 +1,2 @@
 tensorflow>=1.13.0-rc1 
-torch
+torch; python_version < '3.10'
