@@ -82,7 +82,7 @@ for nb in notebooks_list:
             nb,
             marks=[pytest.mark.skip, pytest.mark.advanced],
             id=nb)
-    elif sys.version >= (3, 10) and nb in torch_notebooks_not_3_10:
+    elif sys.version_info >= (3, 10) and nb in torch_notebooks_not_3_10:
         param = pytest.param(
             nb,
             marks=[pytest.mark.skip, pytest.mark.advanced],
