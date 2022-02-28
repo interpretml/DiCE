@@ -47,9 +47,9 @@ class TestModelRegression:
         model = rfc.fit(X, y)
         return model
 
-    def test_base_model_regression(self, create_boston_data):
+    def test_base_model_regression(self, create_housing_data):
         x_train, x_test, y_train, y_test, feature_names = \
-            create_boston_data
+            create_housing_data
         trained_model = self.create_sklearn_random_forest_regressor(x_train, y_train)
 
         diceml_model = dice_ml.Model(model=trained_model, model_type='regressor', backend='sklearn')
