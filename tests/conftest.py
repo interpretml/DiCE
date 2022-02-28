@@ -3,7 +3,6 @@ from collections import OrderedDict
 import pandas as pd
 import pytest
 from sklearn.datasets import fetch_california_housing, load_iris
-
 from sklearn.model_selection import train_test_split
 
 import dice_ml
