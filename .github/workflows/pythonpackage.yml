@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
         os: [ubuntu-latest, macos-latest]
         exclude:
           - os: macos-latest
@@ -47,13 +47,18 @@ jobs:
       if: always()
       with:
         files: junit/test-results.xml
-    - name: Upload code coverage results
-      uses: actions/upload-artifact@v2
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
       with:
-        name: code-coverage-results
-        path: htmlcov
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: .
+        env_vars: OS,PYTHON
+        fail_ci_if_error: true
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true
     - name: Check package consistency with twine
       run: |
         python setup.py check sdist bdist_wheel

@@ -89,9 +89,6 @@ class DiceKD(ExplainerBase):
 
         query_instance[self.data_interface.outcome_name] = test_pred
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
-        if desired_range is not None:
-            if desired_range[0] > desired_range[1]:
-                raise ValueError("Invalid Range!")
 
         if desired_class == "opposite" and self.model.model_type == ModelTypes.Classifier:
             if self.num_output_nodes == 2:
