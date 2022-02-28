@@ -398,7 +398,7 @@ class TestExplainerBaseRegression:
                     desired_range=desired_range)
 
     @pytest.mark.parametrize("desired_range, method",
-                             [([10, 100], 'random')])
+                             [([3, 5], 'random')])
     def test_numeric_categories(self, desired_range, method, create_housing_data):
         x_train, x_test, y_train, y_test, feature_names = \
             create_housing_data
@@ -409,7 +409,6 @@ class TestExplainerBaseRegression:
 
         dataset_train = x_train.copy()
         dataset_train['Outcome'] = y_train
-        feature_names.remove('CHAS')
 
         d = dice_ml.Data(dataframe=dataset_train, continuous_features=feature_names, outcome_name='Outcome')
         m = dice_ml.Model(model=model, backend='sklearn', model_type='regressor')

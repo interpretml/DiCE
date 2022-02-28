@@ -226,4 +226,4 @@ def create_housing_data():
         test_size=0.2, random_state=7)
     x_train = pd.DataFrame(data=x_train, columns=housing.feature_names)
     x_test = pd.DataFrame(data=x_test, columns=housing.feature_names)
-    return x_train, x_test, y_train, y_test, housing.feature_names.tolist()
+    return x_train, x_test, y_train, y_test, housing.feature_names
