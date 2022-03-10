@@ -139,7 +139,7 @@ class PublicData(_BaseData):
         self.permitted_range, _ = self.get_features_range(input_permitted_range)
 
     def _set_feature_dtypes(self, data_df, categorical_feature_names,
-            continuous_feature_names):
+                            continuous_feature_names):
         """Set the correct type of each feature column."""
         if len(categorical_feature_names) > 0:
             for feature in categorical_feature_names:
@@ -556,8 +556,8 @@ class PublicData(_BaseData):
         test = test.reset_index(drop=True)
         # encode categorical and numerical columns
         test = self._set_feature_dtypes(test,
-                self.categorical_feature_names,
-                self.continuous_feature_names)
+                                        self.categorical_feature_names,
+                                        self.continuous_feature_names)
         return test
 
         # TODO: create a new method, get_LE_min_max_normalized_data() to get label-encoded and normalized data. Keep this
