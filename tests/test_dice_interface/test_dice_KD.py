@@ -17,6 +17,7 @@ def KD_binary_classification_exp_object():
     exp = dice_ml.Dice(d, m, method='kdtree')
     return exp
 
+
 @pytest.fixture
 def KD_binary_vars_classification_exp_object():
     backend = 'sklearn'
@@ -26,6 +27,7 @@ def KD_binary_vars_classification_exp_object():
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
     exp = dice_ml.Dice(d, m, method='kdtree')
     return exp
+
 
 @pytest.fixture
 def KD_multi_classification_exp_object():
@@ -243,4 +245,3 @@ class TestDiceKDBinaryVarsClassificationMethods:
             total_CFs=total_CFs)
 
         assert counterfactual_explanations is not None
-

@@ -195,6 +195,7 @@ def sample_custom_vars_query_1():
     """
     return pd.DataFrame({'Categorical': ['a'], 'CategoricalNum': [0], 'Numerical': [25]})
 
+
 @pytest.fixture
 def sample_counterfactual_example_dummy():
     """
