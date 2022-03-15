@@ -89,6 +89,9 @@ def load_custom_testing_dataset():
     data = [['a', 10, 0], ['b', 10000, 0], ['c', 14, 0], ['a', 88, 0], ['c', 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
+def load_custom_vars_testing_dataset():
+    data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
+    return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
 
 def load_min_max_equal_dataset():
     data = [['a', 10, 0], ['b', 10, 0], ['c', 10, 0], ['a', 10, 0], ['c', 10, 0]]
@@ -115,6 +118,32 @@ def load_custom_testing_dataset_regression():
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 
+def save_custom_vars_dataset_model():
+    from sklearn.compose import ColumnTransformer
+    from sklearn.pipeline import Pipeline
+    from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder
+    from sklearn.ensemble import RandomForestClassifier
+    import pickle
+    numeric_trans = Pipeline(steps=[('imputer',SimpleImputer(strategy='median')),
+                                    ('scaler',StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                   SimpleImputer(fill_value='missing',
+                                                 strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat',cat_trans,
+                                                      pd.Index(['Categorical','CategoricalNum'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                       ('regressor', RandomForestClassifier())])
+    dataset = load_custom_vars_testing_dataset()
+    model = clf.fit(dataset[["Categorical", "CategoricalNum", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = get_custom_vars_dataset_modelpath_pipeline()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
 def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
     model_ext = '.h5' if 'TF' in backend else '.pth'
@@ -128,6 +157,11 @@ def get_custom_dataset_modelpath_pipeline():
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom'+model_ext)
     return modelpath
 
+def get_custom_vars_dataset_modelpath_pipeline():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom_vars'+model_ext)
+    return modelpath
 
 def get_custom_dataset_modelpath_pipeline_binary():
     pkg_path = dice_ml.__path__[0]

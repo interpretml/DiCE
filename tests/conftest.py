@@ -189,6 +189,13 @@ def sample_custom_query_10():
 
 
 @pytest.fixture
+def sample_custom_vars_query_1():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['a'], 'CategoricalNum': [0], 'Numerical': [25]})
+
+@pytest.fixture
 def sample_counterfactual_example_dummy():
     """
     Returns a sample counterfactual example
