@@ -2,15 +2,22 @@
 This module containts helper functions to load data and get meta deta.
 """
 import os
+import pickle
 import shutil
 
 import numpy as np
 import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-# for data transformations
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (FunctionTransformer, OneHotEncoder,
+                                   StandardScaler)
+from torch import optim
 
 import dice_ml
+from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 
 
 def load_adult_income_dataset(only_train=True):
@@ -119,12 +126,6 @@ def load_custom_testing_dataset_regression():
 
 
 def save_custom_vars_dataset_model():
-    from sklearn.compose import ColumnTransformer
-    from sklearn.pipeline import Pipeline
-    from sklearn.impute import SimpleImputer
-    from sklearn.preprocessing import StandardScaler, OneHotEncoder
-    from sklearn.ensemble import RandomForestClassifier
-    import pickle
     numeric_trans = Pipeline(steps=[('imputer',SimpleImputer(strategy='median')),
                                     ('scaler',StandardScaler())])
     cat_trans = Pipeline(steps=[('imputer',
@@ -202,11 +203,6 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
                                    wm1, wm2, wm3, learning_rate):
     # Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py.
     #                      Check dependencies.
-    # Pytorch
-    from torch import optim
-
-    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
-
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
     encoded_data = df[data_interface.ohe_encoded_feature_names + [data_interface.outcome_name]]
