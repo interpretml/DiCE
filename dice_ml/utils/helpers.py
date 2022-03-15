@@ -14,10 +14,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (FunctionTransformer, OneHotEncoder,
                                    StandardScaler)
-from torch import optim
 
 import dice_ml
-from dice_ml.utils.sample_architecture.vae_model import CF_VAE
 
 
 def load_adult_income_dataset(only_train=True):
@@ -207,6 +205,10 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
                                    wm1, wm2, wm3, learning_rate):
     # Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py.
     #                      Check dependencies.
+    from torch import optim
+
+    from dice_ml.utils.sample_architecture.vae_model import CF_VAE
+
     # Dataset for training Variational Encoder Decoder model for CF Generation
     df = data_interface.normalize_data(data_interface.one_hot_encoded_data)
     encoded_data = df[data_interface.ohe_encoded_feature_names + [data_interface.outcome_name]]
