@@ -5,4 +5,5 @@ flake8-breakpoint
 flake8-builtins==1.5.3
 flake8-logging-format==0.6.0
 flake8-nb==0.3.0
+flake8-pytest-style
 isort
