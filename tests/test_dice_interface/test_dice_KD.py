@@ -7,7 +7,7 @@ from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
 
 
-@pytest.fixture
+@pytest.fixture()
 def KD_binary_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset()
@@ -18,7 +18,7 @@ def KD_binary_classification_exp_object():
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def KD_multi_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
@@ -29,7 +29,7 @@ def KD_multi_classification_exp_object():
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def KD_regression_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_regression()

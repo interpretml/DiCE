@@ -7,7 +7,7 @@ from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
 
 
-@pytest.fixture
+@pytest.fixture()
 def random_binary_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
@@ -18,7 +18,7 @@ def random_binary_classification_exp_object():
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def random_multi_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
@@ -29,7 +29,7 @@ def random_multi_classification_exp_object():
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def random_regression_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_regression()

@@ -10,7 +10,7 @@ from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_object():
     dataset = helpers.load_adult_income_dataset()
     return dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'],

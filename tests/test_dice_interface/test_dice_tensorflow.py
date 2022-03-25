@@ -8,7 +8,7 @@ from dice_ml.utils import helpers
 tf = pytest.importorskip("tensorflow")
 
 
-@pytest.fixture
+@pytest.fixture()
 def tf_exp_object():
     backend = 'TF'+tf.__version__[0]
     dataset = helpers.load_adult_income_dataset()

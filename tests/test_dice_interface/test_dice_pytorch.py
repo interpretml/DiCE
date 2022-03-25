@@ -8,7 +8,7 @@ from dice_ml.utils import helpers
 torch = pytest.importorskip("torch")
 
 
-@pytest.fixture
+@pytest.fixture()
 def pyt_exp_object():
     backend = 'PYT'
     dataset = helpers.load_adult_income_dataset()

@@ -14,7 +14,8 @@ class TestExplainerBaseBinaryClassification:
     def _verify_feature_importance(self, feature_importance):
         if feature_importance is not None:
             for key in feature_importance:
-                assert feature_importance[key] >= 0.0 and feature_importance[key] <= 1.0
+                assert feature_importance[key] >= 0.0
+                assert feature_importance[key] <= 1.0
 
     def test_check_any_counterfactuals_computed(
         self, method,
