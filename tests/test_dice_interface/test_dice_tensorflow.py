@@ -47,7 +47,7 @@ class TestDiceTensorFlowMethods:
         else:
             self.exp.feature_weights_list = tf.constant([weights], dtype=tf.float32)
 
-    @pytest.mark.parametrize("yloss, output", [("hinge_loss", 4.6711), ("l2_loss", 0.9501), ("log_loss", 3.6968)])
+    @pytest.mark.parametrize(("yloss", "output"), [("hinge_loss", 4.6711), ("l2_loss", 0.9501), ("log_loss", 3.6968)])
     def test_yloss(self, yloss, output):
         if tf.__version__[0] == '1':
             loss1 = self.exp.compute_yloss(method=yloss)
@@ -68,7 +68,7 @@ class TestDiceTensorFlowMethods:
         # proximity loss computed for given query instance and feature weights.
         assert pytest.approx(loss2, abs=1e-4) == 0.0068
 
-    @pytest.mark.parametrize("diversity_loss, output", [("dpp_style:inverse_dist", 0.0104), ("avg_dist", 0.1743)])
+    @pytest.mark.parametrize(("diversity_loss", "output"), [("dpp_style:inverse_dist", 0.0104), ("avg_dist", 0.1743)])
     def test_diversity_loss(self, diversity_loss, output):
         if tf.__version__[0] == '1':
             loss3 = self.exp.compute_diversity_loss(diversity_loss)

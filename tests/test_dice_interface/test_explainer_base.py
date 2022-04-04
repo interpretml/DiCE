@@ -256,7 +256,7 @@ class TestExplainerBaseBinaryClassification:
             assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values ==
                        [desired_class] * 2)
 
-    @pytest.mark.parametrize("desired_class, total_CFs, permitted_range",
+    @pytest.mark.parametrize(("desired_class", "total_CFs", "permitted_range"),
                              [(1, 1, {'Numerical': [10, 150]})])
     def test_permitted_range(
             self, desired_class, method, total_CFs, permitted_range, sample_custom_query_2,
@@ -281,7 +281,7 @@ class TestExplainerBaseBinaryClassification:
                     permitted_range[feature][1] for i in range(total_CFs))
 
     # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
+    @pytest.mark.parametrize(("features_to_vary", "desired_class", "desired_range", "total_CFs", "permitted_range"),
                              [("all", 0, None, 0, None)])
     def test_zero_cfs_internal(
             self, method, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
@@ -317,7 +317,7 @@ class TestExplainerBaseMultiClassClassification:
                     desired_class=desired_class)
 
     # Testing that the counterfactuals are in the desired class
-    @pytest.mark.parametrize("desired_class, total_CFs", [(2, 2)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(2, 2)])
     @pytest.mark.parametrize("genetic_initialization", ['kdtree', 'random'])
     def test_desired_class(
             self, desired_class, total_CFs, method, genetic_initialization,
@@ -350,7 +350,7 @@ class TestExplainerBaseMultiClassClassification:
         assert all(i == desired_class for i in exp.cfs_preds)
 
     # When no elements in the desired_class are present in the training data
-    @pytest.mark.parametrize("desired_class, total_CFs", [(100, 3), ('opposite', 3)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(100, 3), ('opposite', 3)])
     def test_unsupported_multiclass(
             self, desired_class, total_CFs, method, sample_custom_query_4,
             custom_public_data_interface,
@@ -368,7 +368,7 @@ class TestExplainerBaseMultiClassClassification:
             assert "Desired class cannot be opposite if the number of classes is more than 2." in str(ucve)
 
     # Testing for 0 CFs needed
-    @pytest.mark.parametrize("features_to_vary, desired_class, desired_range, total_CFs, permitted_range",
+    @pytest.mark.parametrize(("features_to_vary", "desired_class", "desired_range", "total_CFs", "permitted_range"),
                              [("all", 0, None, 0, None)])
     def test_zero_cfs_internal(
             self, method, features_to_vary, desired_class, desired_range, sample_custom_query_2, total_CFs,
@@ -387,7 +387,7 @@ class TestExplainerBaseMultiClassClassification:
 
 class TestExplainerBaseRegression:
 
-    @pytest.mark.parametrize("desired_range, regression_exp_object",
+    @pytest.mark.parametrize(("desired_range", "regression_exp_object"),
                              [([10, 100], 'random'), ([10, 100], 'genetic'), ([10, 100], 'kdtree')],
                              indirect=['regression_exp_object'])
     def test_zero_totalcfs(self, desired_range, regression_exp_object, sample_custom_query_1):
@@ -398,7 +398,7 @@ class TestExplainerBaseRegression:
                     total_CFs=0,
                     desired_range=desired_range)
 
-    @pytest.mark.parametrize("desired_range, method",
+    @pytest.mark.parametrize(("desired_range", "method"),
                              [([3, 5], 'random')])
     def test_numeric_categories(self, desired_range, method, create_housing_data):
         x_train, x_test, y_train, y_test, feature_names = \
