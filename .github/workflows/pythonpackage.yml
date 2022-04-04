@@ -49,6 +49,7 @@ jobs:
         files: junit/test-results.xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
+      if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: .
