@@ -44,7 +44,7 @@ jobs:
         pytest tests/ --durations=10 --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
-      if: always()
+      if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
       with:
         files: junit/test-results.xml
     - name: Upload coverage to Codecov
