@@ -122,7 +122,7 @@ class DiceRandom(ExplainerBase):
                 if cfs_df is None:
                     cfs_df = rows_to_add.copy()
                 else:
-                    cfs_df = cfs_df.append(rows_to_add)
+                    cfs_df = pd.concat([cfs_df, rows_to_add])
                 cfs_df.drop_duplicates(inplace=True)
                 # Always change at least 2 features before stopping
                 if num_features_to_vary >= 2 and len(cfs_df) >= total_CFs:
