@@ -563,7 +563,7 @@ class DiceGenetic(ExplainerBase):
             if ret_df is None:
                 ret_df = df
             else:
-                ret_df = ret_df.append(df)
+                ret_df = pd.concat([ret_df, df])
         return ret_df
 
     def get_valid_feature_range(self, normalized=False):
