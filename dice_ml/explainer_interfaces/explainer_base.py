@@ -2,11 +2,11 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
+import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
 import numpy as np
-import pickle
 import pandas as pd
 from sklearn.neighbors import KDTree
 from tqdm import tqdm
