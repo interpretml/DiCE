@@ -3,6 +3,7 @@ import pytest
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
 
@@ -48,6 +49,18 @@ class TestDiceRandomBinaryClassificationMethods:
     @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
     def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
         counterfactual_explanations = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1, desired_class=desired_class,
+            total_CFs=total_CFs)
+
+        assert counterfactual_explanations is not None
+        assert len(counterfactual_explanations.cf_examples_list) == sample_custom_query_1.shape[0]
+        assert counterfactual_explanations.cf_examples_list[0].final_cfs_df.shape[0] == total_CFs
+
+        self.exp.serialize_explainer("random.pkl")
+        new_exp = ExplainerBase.deserialize_explainer("random.pkl")
+
+        assert new_exp is not None
+        counterfactual_explanations = new_exp.generate_counterfactuals(
             query_instances=sample_custom_query_1, desired_class=desired_class,
             total_CFs=total_CFs)
 
