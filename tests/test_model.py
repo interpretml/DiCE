@@ -53,5 +53,7 @@ class TestModelUserValidations:
             dice_ml.Model(model=trained_model, backend='sklearn', model_type='random')
 
     def test_model_user_validation_no_valid_model(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(
+                ValueError,
+                match="should provide either a trained model or the path to a model"):
             dice_ml.Model(backend='sklearn')

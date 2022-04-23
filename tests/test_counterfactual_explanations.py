@@ -109,7 +109,7 @@ class TestCounterfactualExplanations:
                 list(counterfactual_explanations.local_importance[index].keys())
 
 
-@pytest.fixture
+@pytest.fixture()
 def random_binary_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset()
@@ -150,7 +150,7 @@ class TestSerializationCounterfactualExplanations:
             assert counterfactual_explanations.summary_importance is None
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 2)])
     def test_counterfactual_explanations_output(self, desired_class,
                                                 sample_custom_query_1, total_CFs,
                                                 version):
@@ -172,7 +172,7 @@ class TestSerializationCounterfactualExplanations:
         assert recovered_counterfactual_explanations == counterfactual_explanations
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 10)])
     def test_local_importance_output(self, desired_class, sample_custom_query_1,
                                      total_CFs, version):
         counterfactual_explanations = self.exp.local_feature_importance(
@@ -195,7 +195,7 @@ class TestSerializationCounterfactualExplanations:
         assert recovered_counterfactual_explanations == counterfactual_explanations
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 10)])
     def test_summary_importance_output(self, desired_class, sample_custom_query_10,
                                        total_CFs, version):
         counterfactual_explanations = self.exp.global_feature_importance(
@@ -242,7 +242,7 @@ class TestSerializationCounterfactualExplanations:
         assert counterfactual_explanations == recovered_counterfactual_explanations
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 2)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 2)])
     def test_no_counterfactuals_found(self, desired_class,
                                       sample_custom_query_1, total_CFs,
                                       version):
@@ -261,7 +261,7 @@ class TestSerializationCounterfactualExplanations:
         assert counterfactual_explanations == recovered_counterfactual_explanations
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 10)])
     def test_no_counterfactuals_found_local_importance(self, desired_class,
                                                        sample_custom_query_1, total_CFs,
                                                        version):
@@ -282,7 +282,7 @@ class TestSerializationCounterfactualExplanations:
         assert counterfactual_explanations == recovered_counterfactual_explanations
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 10)])
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 10)])
     def test_no_counterfactuals_found_summary_importance(self, desired_class,
                                                          sample_custom_query_10, total_CFs,
                                                          version):

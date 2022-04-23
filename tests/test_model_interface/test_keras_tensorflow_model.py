@@ -7,14 +7,14 @@ from dice_ml.utils.helpers import DataTransfomer
 tf = pytest.importorskip("tensorflow")
 
 
-@pytest.fixture
+@pytest.fixture()
 def tf_session():
     if tf.__version__[0] == '1':
         sess = tf.InteractiveSession()
         return sess
 
 
-@pytest.fixture
+@pytest.fixture()
 def tf_model_object():
     backend = 'TF'+tf.__version__[0]
     ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
