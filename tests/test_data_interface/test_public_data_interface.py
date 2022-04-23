@@ -67,16 +67,19 @@ class TestErrorScenariosPublicDataInterface:
         iris = load_iris(as_frame=True)
         dataset = iris.frame
 
+        import re
         if data_type == DataTypeCombinations.Incorrect:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match=re.escape("should provide the name(s) of continuous features in the data as a list")):
                 dice_ml.Data(dataframe=dataset, continuous_features=np.array(iris.feature_names),
                              outcome_name='target')
-            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         elif data_type == DataTypeCombinations.AsNone:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match=re.escape("should provide the name(s) of continuous features in the data as a list")):
                 dice_ml.Data(dataframe=dataset, continuous_features=None,
                              outcome_name='target')
-            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         else:
             with pytest.raises(
                     ValueError,

@@ -54,7 +54,8 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+                ValueError, match="is outside the permitted range and isn't allowed to vary"):
             self.exp._generate_counterfactuals(query_instance=sample_custom_query_1, total_CFs=total_CFs,
                                                features_to_vary=features_to_vary, permitted_range=permitted_range)
 

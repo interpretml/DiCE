@@ -54,7 +54,9 @@ class TestDiceGeneticBinaryClassificationMethods:
     @pytest.mark.parametrize(("features_to_vary", "permitted_range", "feature_weights"),
                              [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
     def test_invalid_query_instance(self, sample_custom_query_1, features_to_vary, permitted_range, feature_weights):
-        with pytest.raises(ValueError):
+        with pytest.raises(
+                ValueError,
+                match="is outside the permitted range and isn't allowed to vary"):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
@@ -112,10 +114,9 @@ class TestDiceGeneticBinaryClassificationMethods:
 
     # Testing if an error is thrown when the query instance has outcome variable
     def test_query_instance_with_target_column(self, sample_custom_query_6):
-        with pytest.raises(ValueError) as ve:
+        with pytest.raises(
+                ValueError, match="present in query instance"):
             self.exp.setup("all", None, sample_custom_query_6, "inverse_mad")
-
-        assert "present in query instance" in str(ve)
 
     # Testing if only valid cfs are found after maxiterations
     @pytest.mark.parametrize(("desired_class", "total_CFs", "initialization", "maxiterations"),

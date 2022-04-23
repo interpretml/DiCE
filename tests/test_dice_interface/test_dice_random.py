@@ -70,7 +70,8 @@ class TestDiceRandomBinaryClassificationMethods:
     @pytest.mark.parametrize(("features_to_vary", "permitted_range", "feature_weights"),
                              [(['Numerical'], {'Categorical': ['b', 'c']}, "inverse_mad")])
     def test_invalid_query_instance(self, sample_custom_query_1, features_to_vary, permitted_range, feature_weights):
-        with pytest.raises(ValueError):
+        with pytest.raises(
+                ValueError, match="is outside the permitted range and isn't allowed to vary"):
             self.exp.setup(features_to_vary, permitted_range, sample_custom_query_1, feature_weights)
 
     # Testing that the features_to_vary argument actually varies only the features that you wish to vary
