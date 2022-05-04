@@ -225,7 +225,7 @@ class DiceTensorFlow1(ExplainerBase):
     def predict_fn(self, input_instance):
         """prediction function"""
         temp_preds = self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
-        return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds])
+        return np.array([preds[(self.num_output_nodes-1):] for preds in temp_preds])
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
@@ -239,14 +239,14 @@ class DiceTensorFlow1(ExplainerBase):
             if method == "l2_loss":
                 temp_loss = tf.square(tf.subtract(
                     self.model.get_output(self.cfs_frozen[i]), self.target_cf))
-                temp_loss = temp_loss[:, (self.num_ouput_nodes-1):][0][0]
+                temp_loss = temp_loss[:, (self.num_output_nodes-1):][0][0]
             elif method == "log_loss":
                 temp_logits = tf.log(
                     tf.divide(
                         tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
                         tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(
                             self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
+                temp_logits = temp_logits[:, (self.num_output_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf)[0][0]
             elif method == "hinge_loss":
@@ -254,7 +254,7 @@ class DiceTensorFlow1(ExplainerBase):
                     tf.divide(
                         tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
                         tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
+                temp_logits = temp_logits[:, (self.num_output_nodes-1):]
                 temp_loss = tf.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf)
 
