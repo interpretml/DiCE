@@ -381,7 +381,8 @@ class TestExplainerBaseMultiClassClassification:
         assert ans is not None
         if method != 'kdtree':
             assert all(
-                ans.cf_examples_list[0].final_cfs_df[new_exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
+                ans.cf_examples_list[0].final_cfs_df[
+                    new_exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
         else:
             assert all(
                 ans.cf_examples_list[0].final_cfs_df_sparse[new_exp.data_interface.outcome_name].values ==
