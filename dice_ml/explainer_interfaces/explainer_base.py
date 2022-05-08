@@ -488,7 +488,7 @@ class ExplainerBase(ABC):
         return self.model.get_output(input_instance)
 
     def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, query_instance, posthoc_sparsity_param,
-                                        posthoc_sparsity_algorithm):
+                                        posthoc_sparsity_algorithm, limit_steps_ls):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
 
         :param final_cfs_sparse: Final CFs in original user-fed format, in a pandas dataframe.
@@ -499,6 +499,8 @@ class ExplainerBase(ABC):
                                            large (for instance, income varying from 10k to 1000k)
                                            and only if the features share a monotonic relationship
                                            with predicted outcome in the model.
+        :param limit_steps_ls: Defines the limit of steps to be done in the linear search,
+                                necessary to avoid infinite loops
         """
         if final_cfs_sparse is None:
             return final_cfs_sparse
@@ -530,7 +532,7 @@ class ExplainerBase(ABC):
                 if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
-                                                                 feature, final_cfs_sparse, current_pred)
+                                                                 feature, final_cfs_sparse, current_pred, limit_steps_ls)
 
                     elif posthoc_sparsity_algorithm == "binary":
                         final_cfs_sparse = self.do_binary_search(
@@ -543,15 +545,19 @@ class ExplainerBase(ABC):
         # final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
         return final_cfs_sparse
 
-    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred_orig):
+    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse,
+                         current_pred_orig, limit_steps_ls):
         """Performs a greedy linear search - moves the continuous features in CFs towards original values in
-           query_instance greedily until the prediction class changes."""
+           query_instance greedily until the prediction class changes, or it reaches the maximum number of steps"""
 
         old_diff = diff
         change = (10**-decimal_prec[feature])  # the minimal possible change for a feature
         current_pred = current_pred_orig
+        count_steps = 0
         if self.model.model_type == ModelTypes.Classifier:
-            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
+            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and
+                  self.is_cf_valid(current_pred)) and (count_steps < limit_steps_ls):
+
                 old_val = int(final_cfs_sparse.at[cf_ix, feature])
                 final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
@@ -563,6 +569,8 @@ class ExplainerBase(ABC):
                     return final_cfs_sparse
 
                 diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
+
+                count_steps += 1
 
         return final_cfs_sparse
 

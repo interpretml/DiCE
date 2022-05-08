@@ -48,7 +48,7 @@ class DiceKD(ExplainerBase):
                                   features_to_vary="all",
                                   permitted_range=None, sparsity_weight=1,
                                   feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="linear", verbose=False):
+                                  posthoc_sparsity_algorithm="linear", verbose=False, limit_steps_ls=10000):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -72,6 +72,7 @@ class DiceKD(ExplainerBase):
                                            varying from 10k to 1000k) and only if the features share a monotonic
                                            relationship with predicted outcome in the model.
         :param verbose: Parameter to determine whether to print 'Diverse Counterfactuals found!'
+        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
@@ -113,7 +114,9 @@ class DiceKD(ExplainerBase):
                                                               sparsity_weight,
                                                               stopping_threshold,
                                                               posthoc_sparsity_param,
-                                                              posthoc_sparsity_algorithm, verbose)
+                                                              posthoc_sparsity_algorithm,
+                                                              verbose,
+                                                              limit_steps_ls)
         self.cfs_preds = cfs_preds
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
@@ -214,7 +217,7 @@ class DiceKD(ExplainerBase):
     def find_counterfactuals(self, data_df_copy, query_instance, query_instance_orig, desired_range, desired_class,
                              total_CFs, features_to_vary, permitted_range,
                              sparsity_weight, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm,
-                             verbose):
+                             verbose, limit_steps_ls):
         """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
         start_time = timeit.default_timer()
@@ -239,7 +242,8 @@ class DiceKD(ExplainerBase):
                 self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs)
                 self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.final_cfs_df_sparse, query_instance,
                                                                                 posthoc_sparsity_param,
-                                                                                posthoc_sparsity_algorithm)
+                                                                                posthoc_sparsity_algorithm,
+                                                                                limit_steps_ls)
             else:
                 self.final_cfs_df_sparse = None
         else:
