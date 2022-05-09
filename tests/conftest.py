@@ -9,7 +9,7 @@ import dice_ml
 from dice_ml.utils import helpers
 
 
-@pytest.fixture
+@pytest.fixture()
 def binary_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
@@ -20,7 +20,7 @@ def binary_classification_exp_object(method="random"):
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def binary_classification_exp_object_out_of_order(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_outcome_not_last_column_dataset()
@@ -31,7 +31,7 @@ def binary_classification_exp_object_out_of_order(method="random"):
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def multi_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
@@ -42,7 +42,7 @@ def multi_classification_exp_object(method="random"):
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def regression_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_regression()
@@ -81,7 +81,7 @@ def sklearn_regression_model_interface():
     return m
 
 
-@pytest.fixture
+@pytest.fixture()
 def public_data_object():
     """
     Returns a public data object for the adult income dataset
@@ -90,7 +90,7 @@ def public_data_object():
     return dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')
 
 
-@pytest.fixture
+@pytest.fixture()
 def private_data_object():
     """
     Returns a private data object containing meta information about the adult income dataset.
@@ -110,7 +110,7 @@ def private_data_object():
     return dice_ml.Data(features=features_dict, outcome_name='income')
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_adultincome_query():
     """
     Returns a sample query instance for adult income dataset
@@ -119,7 +119,7 @@ def sample_adultincome_query():
             'race': 'White', 'gender': 'Female', 'hours_per_week': 45}
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_1():
     """
     Returns a sample query instance for the custom dataset
@@ -127,7 +127,7 @@ def sample_custom_query_1():
     return pd.DataFrame({'Categorical': ['a'], 'Numerical': [25]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_2():
     """
     Returns a sample query instance for the custom dataset
@@ -135,7 +135,7 @@ def sample_custom_query_2():
     return pd.DataFrame({'Categorical': ['b'], 'Numerical': [25]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_3():
     """
     Returns a sample query instance for the custom dataset
@@ -143,7 +143,7 @@ def sample_custom_query_3():
     return pd.DataFrame({'Categorical': ['d'], 'Numerical': [1000000]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_4():
     """
     Returns a sample query instance for the custom dataset
@@ -151,7 +151,7 @@ def sample_custom_query_4():
     return pd.DataFrame({'Categorical': ['c'], 'Numerical': [13]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_5():
     """
     Returns a sample query instance for the custom dataset
@@ -159,7 +159,7 @@ def sample_custom_query_5():
     return pd.DataFrame({'X': ['d'], 'Numerical': [25]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_6():
     """
     Returns a sample query instance for the custom dataset including Outcome
@@ -167,7 +167,7 @@ def sample_custom_query_6():
     return pd.DataFrame({'Categorical': ['c'], 'Numerical': [13], 'Outcome': 0})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_index():
     """
     Returns a sample query instance for the custom dataset
@@ -175,7 +175,7 @@ def sample_custom_query_index():
     return pd.DataFrame({'Categorical': ['a'], 'Numerical': [88]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_custom_query_10():
     """
     Returns a sample query instance for the custom dataset
@@ -187,7 +187,7 @@ def sample_custom_query_10():
         }
     )
 
-
+  
 @pytest.fixture
 def sample_custom_vars_query_1():
     """
@@ -196,7 +196,7 @@ def sample_custom_vars_query_1():
     return pd.DataFrame({'Categorical': ['a'], 'CategoricalNum': [0], 'Numerical': [25]})
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_counterfactual_example_dummy():
     """
     Returns a sample counterfactual example
@@ -216,7 +216,7 @@ def sample_counterfactual_example_dummy():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def create_iris_data():
     iris = load_iris()
     x_train, x_test, y_train, y_test = train_test_split(
@@ -226,7 +226,7 @@ def create_iris_data():
     return x_train, x_test, y_train, y_test, feature_names, classes
 
 
-@pytest.fixture
+@pytest.fixture()
 def create_housing_data():
     housing = fetch_california_housing()
     x_train, x_test, y_train, y_test = train_test_split(
