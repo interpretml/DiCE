@@ -1,16 +1,16 @@
+import pickle
 from collections import OrderedDict
 
 import pandas as pd
 import pytest
-from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
+from sklearn.datasets import fetch_california_housing, load_iris
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (FunctionTransformer, OneHotEncoder,
                                    StandardScaler)
-import pickle
 
 import dice_ml
 from dice_ml.utils import helpers
