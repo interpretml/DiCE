@@ -2,6 +2,7 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
+import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
@@ -805,3 +806,17 @@ class ExplainerBase(ABC):
         if no_cf_generated:
             raise UserConfigValidationException(
                 "No counterfactuals found for any of the query points! Kindly check your configuration.")
+
+    def serialize_explainer(self, path):
+        """Serialize the explainer to the file specified by path."""
+        with open(path, "wb") as pickle_file:
+            pickle.dump(self, pickle_file)
+
+    @staticmethod
+    def deserialize_explainer(path):
+        """Reload the explainer into the memory by reading the file specified by path."""
+        deserialized_exp = None
+        with open(path, "rb") as pickle_file:
+            deserialized_exp = pickle.load(pickle_file)
+
+        return deserialized_exp

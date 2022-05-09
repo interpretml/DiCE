@@ -256,6 +256,22 @@ class TestExplainerBaseBinaryClassification:
             assert all(ans.cf_examples_list[0].final_cfs_df_sparse[exp.data_interface.outcome_name].values ==
                        [desired_class] * 2)
 
+        exp.serialize_explainer(method + '.pkl')
+        new_exp = ExplainerBase.deserialize_explainer(method + '.pkl')
+
+        ans = new_exp.generate_counterfactuals(query_instances=sample_custom_query_2,
+                                               features_to_vary='all',
+                                               total_CFs=2, desired_class=desired_class,
+                                               proximity_weight=0.2, sparsity_weight=0.2,
+                                               diversity_weight=5.0,
+                                               categorical_penalty=0.1,
+                                               permitted_range=None)
+        if method != 'kdtree':
+            assert all(ans.cf_examples_list[0].final_cfs_df[new_exp.data_interface.outcome_name].values == [desired_class] * 2)
+        else:
+            assert all(ans.cf_examples_list[0].final_cfs_df_sparse[new_exp.data_interface.outcome_name].values ==
+                       [desired_class] * 2)
+
     @pytest.mark.parametrize(("desired_class", "total_CFs", "permitted_range"),
                              [(1, 1, {'Numerical': [10, 150]})])
     def test_permitted_range(
@@ -349,6 +365,30 @@ class TestExplainerBaseMultiClassClassification:
                 [desired_class] * total_CFs)
         assert all(i == desired_class for i in exp.cfs_preds)
 
+        exp.serialize_explainer(method + '.pkl')
+        new_exp = ExplainerBase.deserialize_explainer(method + '.pkl')
+
+        if method != 'genetic':
+            ans = new_exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_2,
+                    total_CFs=total_CFs, desired_class=desired_class)
+        else:
+            ans = new_exp.generate_counterfactuals(
+                    query_instances=sample_custom_query_2,
+                    total_CFs=total_CFs, desired_class=desired_class,
+                    initialization=genetic_initialization)
+
+        assert ans is not None
+        if method != 'kdtree':
+            assert all(
+                ans.cf_examples_list[0].final_cfs_df[
+                    new_exp.data_interface.outcome_name].values == [desired_class] * total_CFs)
+        else:
+            assert all(
+                ans.cf_examples_list[0].final_cfs_df_sparse[new_exp.data_interface.outcome_name].values ==
+                [desired_class] * total_CFs)
+        assert all(i == desired_class for i in new_exp.cfs_preds)
+
     # When no elements in the desired_class are present in the training data
     @pytest.mark.parametrize(("desired_class", "total_CFs"), [(100, 3), ('opposite', 3)])
     def test_unsupported_multiclass(
@@ -416,6 +456,16 @@ class TestExplainerBaseRegression:
         exp = dice_ml.Dice(d, m, method=method)
 
         cf_explanation = exp.generate_counterfactuals(
+            query_instances=x_test.iloc[0:1],
+            total_CFs=10,
+            desired_range=desired_range)
+
+        assert cf_explanation is not None
+
+        exp.serialize_explainer("explainer.pkl")
+        new_exp = ExplainerBase.deserialize_explainer("explainer.pkl")
+
+        cf_explanation = new_exp.generate_counterfactuals(
             query_instances=x_test.iloc[0:1],
             total_CFs=10,
             desired_range=desired_range)
