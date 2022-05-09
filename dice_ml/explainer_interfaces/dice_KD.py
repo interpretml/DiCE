@@ -82,7 +82,10 @@ class DiceKD(ExplainerBase):
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance.copy()
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance_orig = self.data_interface.prepare_query_instance(
+                query_instance=query_instance_orig)
+        query_instance = self.data_interface.prepare_query_instance(
+                query_instance=query_instance)
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
@@ -103,7 +106,6 @@ class DiceKD(ExplainerBase):
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions, self.KD_tree, self.predictions = \
             self.build_KD_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
-
         query_instance, cfs_preds = self.find_counterfactuals(data_df_copy,
                                                               query_instance, query_instance_orig,
                                                               desired_range,
@@ -224,7 +226,6 @@ class DiceKD(ExplainerBase):
         for col in pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns:
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
-
         self.final_cfs, cfs_preds = self.vary_valid(query_instance_df_dummies,
                                                     total_CFs,
                                                     features_to_vary,
