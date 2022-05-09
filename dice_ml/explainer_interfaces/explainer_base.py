@@ -814,7 +814,7 @@ class ExplainerBase(ABC):
 
     @staticmethod
     def deserialize_explainer(path):
-        """Reload the explainer into the memroy by reading the file specified by path."""
+        """Reload the explainer into the memory by reading the file specified by path."""
         deserialized_exp = None
         with open(path, "rb") as pickle_file:
             deserialized_exp = pickle.load(pickle_file)
