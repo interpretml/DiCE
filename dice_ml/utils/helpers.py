@@ -2,18 +2,12 @@
 This module containts helper functions to load data and get meta deta.
 """
 import os
-import pickle
 import shutil
 
 import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import (FunctionTransformer, OneHotEncoder,
-                                   StandardScaler)
+from sklearn.preprocessing import FunctionTransformer
 
 import dice_ml
 
@@ -95,11 +89,6 @@ def load_custom_testing_dataset():
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 
-def load_custom_vars_testing_dataset():
-    data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
-    return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
-
-
 def load_min_max_equal_dataset():
     data = [['a', 10, 0], ['b', 10, 0], ['c', 10, 0], ['a', 10, 0], ['c', 10, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
@@ -123,26 +112,6 @@ def load_custom_testing_dataset_multiclass():
 def load_custom_testing_dataset_regression():
     data = [['a', 10, 1], ['b', 21, 2.1], ['c', 14, 1.4], ['a', 23, 2.3], ['c', 7, 0.7]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
-
-
-def save_custom_vars_dataset_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical', 'CategoricalNum'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestClassifier())])
-    dataset = load_custom_vars_testing_dataset()
-    model = clf.fit(dataset[["Categorical", "CategoricalNum", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = get_custom_vars_dataset_modelpath_pipeline()
-    pickle.dump(model, open(modelpath, 'wb'))
 
 
 def get_adult_income_modelpath(backend='TF1'):

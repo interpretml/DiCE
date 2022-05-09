@@ -17,11 +17,11 @@ def KD_binary_classification_exp_object():
     exp = dice_ml.Dice(d, m, method='kdtree')
     return exp
 
-  
-@pytest.fixture
-def KD_binary_vars_classification_exp_object():
+
+@pytest.fixture()
+def KD_binary_vars_classification_exp_object(load_custom_vars_testing_dataset):
     backend = 'sklearn'
-    dataset = helpers.load_custom_vars_testing_dataset()
+    dataset = load_custom_vars_testing_dataset
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     ML_modelpath = helpers.get_custom_vars_dataset_modelpath_pipeline()
     m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
@@ -29,7 +29,7 @@ def KD_binary_vars_classification_exp_object():
     return exp
 
 
-@pytest.fixture
+@pytest.fixture()
 def KD_multi_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
