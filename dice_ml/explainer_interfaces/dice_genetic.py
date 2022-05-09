@@ -268,7 +268,10 @@ class DiceGenetic(ExplainerBase):
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance_orig = self.data_interface.prepare_query_instance(
+                query_instance=query_instance_orig)
+        query_instance = self.data_interface.prepare_query_instance(
+                query_instance=query_instance)
         query_instance = self.label_encode(query_instance)
         query_instance = np.array(query_instance.values[0])
         self.x1 = query_instance

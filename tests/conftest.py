@@ -1,9 +1,15 @@
+import pickle
 from collections import OrderedDict
 
 import pandas as pd
 import pytest
+from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_california_housing, load_iris
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import dice_ml
 from dice_ml.utils import helpers
@@ -111,6 +117,33 @@ def private_data_object():
 
 
 @pytest.fixture()
+def load_custom_vars_testing_dataset():
+    data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
+    return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
+
+
+@pytest.fixture()
+def _save_custom_vars_dataset_model():
+    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                                    ('scaler', StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                SimpleImputer(fill_value='missing',
+                                              strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat', cat_trans,
+                                                      pd.Index(['Categorical', 'CategoricalNum'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('regressor', RandomForestClassifier())])
+    dataset = load_custom_vars_testing_dataset()
+    model = clf.fit(dataset[["Categorical", "CategoricalNum", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = helpers.get_custom_vars_dataset_modelpath_pipeline()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
+@pytest.fixture()
 def sample_adultincome_query():
     """
     Returns a sample query instance for adult income dataset
@@ -186,6 +219,14 @@ def sample_custom_query_10():
             'Numerical': [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
         }
     )
+
+
+@pytest.fixture()
+def sample_custom_vars_query_1():
+    """
+    Returns a sample query instance for the custom dataset
+    """
+    return pd.DataFrame({'Categorical': ['a'], 'CategoricalNum': [0], 'Numerical': [25]})
 
 
 @pytest.fixture()
