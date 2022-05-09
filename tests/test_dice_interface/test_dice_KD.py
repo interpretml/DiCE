@@ -214,19 +214,19 @@ class TestDiceKDBinaryVarsClassificationMethods:
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
     # When a query's feature value is not within the permitted range and the feature is not allowed to vary
-    @pytest.mark.parametrize("desired_range, desired_class, total_CFs, features_to_vary, permitted_range",
+    @pytest.mark.parametrize(("desired_range, desired_class, total_CFs, features_to_vary, permitted_range"),
                              [(None, 0, 4, ['Numerical'], {'CategoricalNum': ['1', '2']})])
     def test_invalid_query_instance(self, desired_range, desired_class, sample_custom_vars_query_1, total_CFs,
                                     features_to_vary, permitted_range):
         self.exp.dataset_with_predictions, self.exp.KD_tree, self.exp.predictions = \
             self.exp.build_KD_tree(self.data_df_copy, desired_range, desired_class, self.exp.predicted_outcome_name)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="is outside the permitted range and isn't allowed to vary"):
             self.exp._generate_counterfactuals(query_instance=sample_custom_vars_query_1, total_CFs=total_CFs,
                                                features_to_vary=features_to_vary, permitted_range=permitted_range)
 
     # Verifying the output of the KD tree
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    @pytest.mark.parametrize(("desired_class, total_CFs"), [(0, 1)])
     @pytest.mark.parametrize('posthoc_sparsity_algorithm', ['linear', 'binary', None])
     def test_KD_tree_output(self, desired_class, sample_custom_vars_query_1, total_CFs, posthoc_sparsity_algorithm):
         self.exp._generate_counterfactuals(query_instance=sample_custom_vars_query_1, desired_class=desired_class,
@@ -239,7 +239,7 @@ class TestDiceKDBinaryVarsClassificationMethods:
                all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 
     # Verifying the output of the KD tree
-    @pytest.mark.parametrize("desired_class, total_CFs", [(0, 1)])
+    @pytest.mark.parametrize(("desired_class, total_CFs"), [(0, 1)])
     def test_KD_tree_counterfactual_explanations_output(self, desired_class, sample_custom_vars_query_1, total_CFs):
         counterfactual_explanations = self.exp.generate_counterfactuals(
             query_instances=sample_custom_vars_query_1, desired_class=desired_class,

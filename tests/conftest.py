@@ -123,7 +123,7 @@ def load_custom_vars_testing_dataset():
 
 
 @pytest.fixture()
-def save_custom_vars_dataset_model():
+def _save_custom_vars_dataset_model():
     numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                                     ('scaler', StandardScaler())])
     cat_trans = Pipeline(steps=[('imputer',
