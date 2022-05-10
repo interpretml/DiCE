@@ -547,6 +547,12 @@ class TestExplainerBaseUserConfigValidations:
             explainer_function(query_instances=sample_custom_query_2,
                                total_CFs=10, desired_range=[0, 10])
 
+        with pytest.raises(
+                UserConfigValidationException,
+                match=r'Some features need to be varied for generating counterfactuals.'):
+            explainer_function(query_instances=sample_custom_query_2,
+                               total_CFs=10, features_to_vary=[])
+
     @pytest.mark.parametrize('explainer_function',
                              ['generate_counterfactuals', 'local_feature_importance',
                               'feature_importance', 'global_feature_importance'])
@@ -572,6 +578,9 @@ class TestExplainerBaseUserConfigValidations:
             explainer_function(query_instances=sample_custom_query_1,
                                total_CFs=10, desired_range=[4, 3])
 
+
+@pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
+class TestExplainerBaseDataValidations:
     def test_global_feature_importance_error_conditions_with_insufficient_query_points(
             self, method,
             sample_custom_query_1,
@@ -665,5 +674,3 @@ class TestExplainerBaseUserConfigValidations:
             exp.local_feature_importance(
                 query_instances=sample_custom_query_1,
                 total_CFs=1)
-
-# class TestExplainerBaseDataValidations:
