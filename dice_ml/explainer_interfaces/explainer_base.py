@@ -58,6 +58,10 @@ class ExplainerBase(ABC):
             raise UserConfigValidationException(
                 "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
 
+        if features_to_vary != "all":
+            if len(features_to_vary) == 0:
+                raise UserConfigValidationException("Some features need to be varied for generating counterfactuals.")
+
         if posthoc_sparsity_algorithm not in _PostHocSparsityTypes.ALL:
             raise UserConfigValidationException(
                 'The posthoc_sparsity_algorithm should be {0} and not {1}'.format(
