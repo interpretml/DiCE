@@ -116,7 +116,6 @@ def private_data_object():
     return dice_ml.Data(features=features_dict, outcome_name='income')
 
 
-
 def _save_custom_testing_model():
     numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                                     ('scaler', StandardScaler())])
@@ -156,6 +155,7 @@ def _save_custom_testing_binary_model():
     modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
     pickle.dump(model, open(modelpath, 'wb'))
 
+
 def _save_custom_testing_multiclass_model():
     numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                                     ('scaler', StandardScaler())])
@@ -175,6 +175,7 @@ def _save_custom_testing_multiclass_model():
     modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
     pickle.dump(model, open(modelpath, 'wb'))
 
+
 def _save_custom_testing_regression_model():
     numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                                     ('scaler', StandardScaler())])
@@ -193,6 +194,7 @@ def _save_custom_testing_regression_model():
                     dataset["Outcome"])
     modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
     pickle.dump(model, open(modelpath, 'wb'))
+
 
 @pytest.fixture()
 def load_custom_vars_testing_dataset():
