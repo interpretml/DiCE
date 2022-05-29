@@ -1,71 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.7 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Generating counterfactual explanations with any ML model" href="DiCE_model_agnostic_CFs.html" />
     <link rel="prev" title="Estimating local and global feature importance scores using DiCE" href="DiCE_feature_importances.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
-          
-
-          
+            <a href="../index.html" class="icon icon-home"> DiCE
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -73,23 +39,12 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Notebooks:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
@@ -99,84 +54,41 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#1.-Independent-random-sampling-of-features">1. Independent random sampling of features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#2.-Genetic-Algorithm">2. Genetic Algorithm</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#3.-Querying-a-KD-Tree">3. Querying a KD Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dice_ml.html">dice_ml package</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DiCE</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
-        
       <li>Generating counterfactuals for multi-class classification and regression models</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/notebooks/DiCE_multiclass_classification_and_regression.ipynb.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   
 <style>
 /* CSS for nbsphinx extension */
@@ -387,7 +299,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -447,18 +359,17 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
-<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this headline">¶</a></h1>
+<section id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
+<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this headline"></a></h1>
 <p>This notebook will demonstrate how the DiCE library can be used for multiclass classification and regression for scikit-learn models. You can use any method (“random”, “kdtree”, “genetic”), just specific it in the method argument in the initialization step. The rest of the code is completely identical. For demonstration, we will be using the genetic algorithm for CFs.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
 <span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">Dice</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span><span class="p">,</span> <span class="n">load_boston</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span><span class="p">,</span> <span class="n">fetch_california_housing</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
@@ -473,22 +384,20 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
 <span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <p>We will use sklearn’s internal datasets to demonstrate DiCE’s features in this notebook</p>
-<div class="section" id="Multiclass-Classification">
-<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this headline">¶</a></h2>
+<section id="Multiclass-Classification">
+<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this headline"></a></h2>
 <p>For multiclass classification, we will use sklearn’s Iris dataset. This data set consists of 3 different types of irises’ (Setosa, Versicolour, and Virginica) petal and sepal length. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">frame</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">frame</span>
 <span class="n">df_iris</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -572,8 +481,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_iris</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_iris</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -600,8 +508,7 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">outcome_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outcome_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
 <span class="n">continuous_features_iris</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="n">target</span> <span class="o">=</span> <span class="n">df_iris</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
 </pre></div>
@@ -611,8 +518,7 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Split data into train and test</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split data into train and test</span>
 <span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
                                                     <span class="n">target</span><span class="p">,</span>
@@ -646,8 +552,7 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">d_iris</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_iris</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_iris</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_iris</span><span class="p">,</span>
                       <span class="n">continuous_features</span><span class="o">=</span><span class="n">continuous_features_iris</span><span class="p">,</span>
                       <span class="n">outcome_name</span><span class="o">=</span><span class="n">outcome_name</span><span class="p">)</span>
 
@@ -660,8 +565,7 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">exp_genetic_iris</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_iris</span><span class="p">,</span> <span class="n">m_iris</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_genetic_iris</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_iris</span><span class="p">,</span> <span class="n">m_iris</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -670,9 +574,8 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Single input</span>
-<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single input</span>
+<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
 </pre></div>
@@ -683,7 +586,7 @@ memory usage: 6.0 KB
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 1/1 [00:20&lt;00:00, 20.54s/it]
+100%|███████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.15s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -734,10 +637,10 @@ Query instance (original outcome : 0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>4.4</td>
-      <td>3.0</td>
-      <td>1.3</td>
-      <td>0.2</td>
+      <td>5.1</td>
+      <td>3.8</td>
+      <td>1.9</td>
+      <td>0.4</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -750,7 +653,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2.0)
+Diverse Counterfactual set (new outcome: 2)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -785,50 +688,58 @@ Diverse Counterfactual set (new outcome: 2.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>4.3</td>
-      <td>3.0</td>
-      <td>4.5</td>
-      <td>1.8</td>
+      <td>7.9</td>
+      <td>3.8</td>
+      <td>6.4</td>
+      <td>2.0</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>4.3</td>
-      <td>3.0</td>
-      <td>5.1</td>
-      <td>1.8</td>
+      <td>7.7</td>
+      <td>3.8</td>
+      <td>6.7</td>
+      <td>2.2</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>6.0</td>
-      <td>3.0</td>
-      <td>4.8</td>
-      <td>1.8</td>
+      <td>5.0</td>
+      <td>3.7</td>
+      <td>5.7</td>
+      <td>2.1</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>5.9</td>
-      <td>3.0</td>
-      <td>5.1</td>
-      <td>1.8</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.0</td>
-      <td>3.0</td>
-      <td>4.9</td>
-      <td>1.8</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
+      <td>5.0</td>
+      <td>4.1</td>
       <td>6.1</td>
-      <td>3.0</td>
+      <td>1.7</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
       <td>4.9</td>
-      <td>1.8</td>
+      <td>3.5</td>
+      <td>5.0</td>
+      <td>1.9</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>4.3</td>
+      <td>3.7</td>
+      <td>5.3</td>
+      <td>2.1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>7.0</td>
+      <td>3.8</td>
+      <td>6.2</td>
+      <td>1.4</td>
       <td>2</td>
     </tr>
   </tbody>
@@ -839,9 +750,8 @@ Diverse Counterfactual set (new outcome: 2.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Multiple queries can be given as input at once</span>
-<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple queries can be given as input at once</span>
+<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span>
 <span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -852,7 +762,7 @@ Diverse Counterfactual set (new outcome: 2.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 2/2 [00:01&lt;00:00,  1.98it/s]
+100%|███████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.42s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -903,10 +813,10 @@ Query instance (original outcome : 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>5.7</td>
-      <td>2.9</td>
-      <td>4.2</td>
-      <td>1.3</td>
+      <td>6.7</td>
+      <td>3.1</td>
+      <td>4.4</td>
+      <td>1.4</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -919,7 +829,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2.0)
+Diverse Counterfactual set (new outcome: 2)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -954,58 +864,58 @@ Diverse Counterfactual set (new outcome: 2.0)
   <tbody>
     <tr>
       <th>0</th>
+      <td>6.7</td>
+      <td>3.1</td>
       <td>5.6</td>
-      <td>3.0</td>
-      <td>4.9</td>
+      <td>2.4</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.4</td>
+      <td>3.1</td>
+      <td>5.5</td>
       <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>6.3</td>
-      <td>2.8</td>
+      <th>0</th>
+      <td>6.9</td>
+      <td>3.1</td>
+      <td>5.4</td>
+      <td>2.1</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.9</td>
+      <td>3.1</td>
       <td>5.1</td>
-      <td>1.5</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>6.0</td>
+      <th>0</th>
+      <td>6.7</td>
       <td>3.0</td>
-      <td>4.8</td>
-      <td>1.8</td>
+      <td>5.2</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>5.9</td>
-      <td>3.0</td>
-      <td>5.1</td>
-      <td>1.8</td>
+      <th>0</th>
+      <td>6.7</td>
+      <td>3.3</td>
+      <td>5.7</td>
+      <td>2.1</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>6.1</td>
-      <td>3.0</td>
-      <td>4.9</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>5.6</td>
-      <td>2.8</td>
-      <td>4.9</td>
-      <td>2.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>6.2</td>
-      <td>2.8</td>
-      <td>4.8</td>
-      <td>1.8</td>
+      <th>0</th>
+      <td>6.7</td>
+      <td>3.3</td>
+      <td>5.7</td>
+      <td>2.5</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1052,10 +962,10 @@ Query instance (original outcome : 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>6.3</td>
-      <td>3.3</td>
+      <td>7.0</td>
+      <td>3.2</td>
       <td>4.7</td>
-      <td>1.6</td>
+      <td>1.4</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -1068,7 +978,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 2.0)
+Diverse Counterfactual set (new outcome: 2)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1103,6 +1013,22 @@ Diverse Counterfactual set (new outcome: 2.0)
   <tbody>
     <tr>
       <th>0</th>
+      <td>7.2</td>
+      <td>3.2</td>
+      <td>6.0</td>
+      <td>1.8</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.5</td>
+      <td>3.2</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
       <td>6.5</td>
       <td>3.2</td>
       <td>5.1</td>
@@ -1110,39 +1036,23 @@ Diverse Counterfactual set (new outcome: 2.0)
       <td>2.0</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>6.4</td>
-      <td>3.1</td>
-      <td>5.5</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>6.1</td>
-      <td>3.0</td>
-      <td>4.9</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>6.0</td>
-      <td>3.0</td>
-      <td>4.8</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
+      <th>0</th>
+      <td>6.9</td>
+      <td>3.2</td>
       <td>5.7</td>
-      <td>3.4</td>
-      <td>5.1</td>
-      <td>2.0</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>0</th>
+      <td>6.8</td>
+      <td>3.2</td>
+      <td>5.9</td>
+      <td>2.3</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
       <td>6.4</td>
       <td>3.2</td>
       <td>5.3</td>
@@ -1150,31 +1060,30 @@ Diverse Counterfactual set (new outcome: 2.0)
       <td>2.0</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>6.2</td>
-      <td>3.4</td>
-      <td>5.4</td>
-      <td>2.3</td>
+      <th>0</th>
+      <td>6.4</td>
+      <td>3.2</td>
+      <td>5.3</td>
+      <td>0.1</td>
       <td>2.0</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
-</div>
-</div>
-<div class="section" id="Regression">
-<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline">¶</a></h1>
-<p>For regression, we will use sklearn’s boston dataset. This dataset contains boston house-prices. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#boston-house-prices-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#boston-house-prices-dataset</a></p>
+</section>
+</section>
+<section id="Regression">
+<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline"></a></h1>
+<p>For regression, we will use sklearn’s California Housing dataset. This dataset contains California house prices. More information at <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html">https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">boston_data</span> <span class="o">=</span> <span class="n">load_boston</span><span class="p">()</span>
-<span class="n">df_boston</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">boston_data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">boston_data</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
-<span class="n">df_boston</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">boston_data</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-<span class="n">df_boston</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">housing_data</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">()</span>
+<span class="n">df_housing</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">housing_data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">housing_data</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">df_housing</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">housing_data</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+<span class="n">df_housing</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1201,107 +1110,77 @@ Diverse Counterfactual set (new outcome: 2.0)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
+      <th>MedInc</th>
+      <th>HouseAge</th>
+      <th>AveRooms</th>
+      <th>AveBedrms</th>
+      <th>Population</th>
+      <th>AveOccup</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
       <th>target</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.00632</td>
-      <td>18.0</td>
-      <td>2.31</td>
-      <td>0.0</td>
-      <td>0.538</td>
-      <td>6.575</td>
-      <td>65.2</td>
-      <td>4.0900</td>
-      <td>1.0</td>
-      <td>296.0</td>
-      <td>15.3</td>
-      <td>396.90</td>
-      <td>4.98</td>
-      <td>24.0</td>
+      <td>8.3252</td>
+      <td>41.0</td>
+      <td>6.984127</td>
+      <td>1.023810</td>
+      <td>322.0</td>
+      <td>2.555556</td>
+      <td>37.88</td>
+      <td>-122.23</td>
+      <td>4.526</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.02731</td>
-      <td>0.0</td>
-      <td>7.07</td>
-      <td>0.0</td>
-      <td>0.469</td>
-      <td>6.421</td>
-      <td>78.9</td>
-      <td>4.9671</td>
-      <td>2.0</td>
-      <td>242.0</td>
-      <td>17.8</td>
-      <td>396.90</td>
-      <td>9.14</td>
-      <td>21.6</td>
+      <td>8.3014</td>
+      <td>21.0</td>
+      <td>6.238137</td>
+      <td>0.971880</td>
+      <td>2401.0</td>
+      <td>2.109842</td>
+      <td>37.86</td>
+      <td>-122.22</td>
+      <td>3.585</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.02729</td>
-      <td>0.0</td>
-      <td>7.07</td>
-      <td>0.0</td>
-      <td>0.469</td>
-      <td>7.185</td>
-      <td>61.1</td>
-      <td>4.9671</td>
-      <td>2.0</td>
-      <td>242.0</td>
-      <td>17.8</td>
-      <td>392.83</td>
-      <td>4.03</td>
-      <td>34.7</td>
+      <td>7.2574</td>
+      <td>52.0</td>
+      <td>8.288136</td>
+      <td>1.073446</td>
+      <td>496.0</td>
+      <td>2.802260</td>
+      <td>37.85</td>
+      <td>-122.24</td>
+      <td>3.521</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.03237</td>
-      <td>0.0</td>
-      <td>2.18</td>
-      <td>0.0</td>
-      <td>0.458</td>
-      <td>6.998</td>
-      <td>45.8</td>
-      <td>6.0622</td>
-      <td>3.0</td>
-      <td>222.0</td>
-      <td>18.7</td>
-      <td>394.63</td>
-      <td>2.94</td>
-      <td>33.4</td>
+      <td>5.6431</td>
+      <td>52.0</td>
+      <td>5.817352</td>
+      <td>1.073059</td>
+      <td>558.0</td>
+      <td>2.547945</td>
+      <td>37.85</td>
+      <td>-122.25</td>
+      <td>3.413</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.06905</td>
-      <td>0.0</td>
-      <td>2.18</td>
-      <td>0.0</td>
-      <td>0.458</td>
-      <td>7.147</td>
-      <td>54.2</td>
-      <td>6.0622</td>
-      <td>3.0</td>
-      <td>222.0</td>
-      <td>18.7</td>
-      <td>396.90</td>
-      <td>5.33</td>
-      <td>36.2</td>
+      <td>3.8462</td>
+      <td>52.0</td>
+      <td>6.281853</td>
+      <td>1.081081</td>
+      <td>565.0</td>
+      <td>2.181467</td>
+      <td>37.85</td>
+      <td>-122.25</td>
+      <td>3.422</td>
     </tr>
   </tbody>
 </table>
@@ -1311,8 +1190,7 @@ Diverse Counterfactual set (new outcome: 2.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_boston</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_housing</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1322,35 +1200,29 @@ Diverse Counterfactual set (new outcome: 2.0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 &lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
-RangeIndex: 506 entries, 0 to 505
-Data columns (total 14 columns):
- #   Column   Non-Null Count  Dtype
----  ------   --------------  -----
- 0   CRIM     506 non-null    float64
- 1   ZN       506 non-null    float64
- 2   INDUS    506 non-null    float64
- 3   CHAS     506 non-null    float64
- 4   NOX      506 non-null    float64
- 5   RM       506 non-null    float64
- 6   AGE      506 non-null    float64
- 7   DIS      506 non-null    float64
- 8   RAD      506 non-null    float64
- 9   TAX      506 non-null    float64
- 10  PTRATIO  506 non-null    float64
- 11  B        506 non-null    float64
- 12  LSTAT    506 non-null    float64
- 13  target   506 non-null    float64
-dtypes: float64(14)
-memory usage: 55.5 KB
+RangeIndex: 20640 entries, 0 to 20639
+Data columns (total 9 columns):
+ #   Column      Non-Null Count  Dtype
+---  ------      --------------  -----
+ 0   MedInc      20640 non-null  float64
+ 1   HouseAge    20640 non-null  float64
+ 2   AveRooms    20640 non-null  float64
+ 3   AveBedrms   20640 non-null  float64
+ 4   Population  20640 non-null  float64
+ 5   AveOccup    20640 non-null  float64
+ 6   Latitude    20640 non-null  float64
+ 7   Longitude   20640 non-null  float64
+ 8   target      20640 non-null  float64
+dtypes: float64(9)
+memory usage: 1.4 MB
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">continuous_features_boston</span> <span class="o">=</span> <span class="n">df_boston</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<span class="n">target</span> <span class="o">=</span> <span class="n">df_boston</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">continuous_features_housing</span> <span class="o">=</span> <span class="n">df_housing</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">df_housing</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1358,15 +1230,14 @@ memory usage: 55.5 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Split data into train and test</span>
-<span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_boston</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split data into train and test</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_housing</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
                                                     <span class="n">target</span><span class="p">,</span>
                                                     <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
                                                     <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="n">categorical_features</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">continuous_features_boston</span><span class="p">)</span>
+<span class="n">categorical_features</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">continuous_features_housing</span><span class="p">)</span>
 
 <span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
 <span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
@@ -1377,14 +1248,14 @@ memory usage: 55.5 KB
 
 <span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
     <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">continuous_features_boston</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">continuous_features_housing</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical_features</span><span class="p">)])</span>
 
 <span class="c1"># Append classifier to preprocessing pipeline.</span>
 <span class="c1"># Now we have a full prediction pipeline.</span>
-<span class="n">regr_boston</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
-                              <span class="p">(</span><span class="s1">&#39;regressor&#39;</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">())])</span>
-<span class="n">model_boston</span> <span class="o">=</span> <span class="n">regr_boston</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">regr_housing</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                               <span class="p">(</span><span class="s1">&#39;regressor&#39;</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">())])</span>
+<span class="n">model_housing</span> <span class="o">=</span> <span class="n">regr_housing</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1392,10 +1263,9 @@ memory usage: 55.5 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">d_boston</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_boston</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="n">continuous_features_boston</span><span class="p">,</span> <span class="n">outcome_name</span><span class="o">=</span><span class="n">outcome_name</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_housing</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_housing</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="n">continuous_features_housing</span><span class="p">,</span> <span class="n">outcome_name</span><span class="o">=</span><span class="n">outcome_name</span><span class="p">)</span>
 <span class="c1"># We provide the type of model as a parameter (model_type)</span>
-<span class="n">m_boston</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_boston</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;regressor&#39;</span><span class="p">)</span>
+<span class="n">m_housing</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_housing</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;regressor&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1403,8 +1273,7 @@ memory usage: 55.5 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">exp_genetic_boston</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_boston</span><span class="p">,</span> <span class="n">m_boston</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_genetic_housing</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_housing</span><span class="p">,</span> <span class="n">m_housing</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1413,13 +1282,12 @@ memory usage: 55.5 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Multiple queries can be given as input at once</span>
-<span class="n">query_instances_boston</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-<span class="n">genetic_boston</span> <span class="o">=</span> <span class="n">exp_genetic_boston</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_boston</span><span class="p">,</span>
-                                                             <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                                             <span class="n">desired_range</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">45</span><span class="p">])</span>
-<span class="n">genetic_boston</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple queries can be given as input at once</span>
+<span class="n">query_instances_housing</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">genetic_housing</span> <span class="o">=</span> <span class="n">exp_genetic_housing</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_housing</span><span class="p">,</span>
+                                                               <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                                               <span class="n">desired_range</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">])</span>
+<span class="n">genetic_housing</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1428,9 +1296,7 @@ memory usage: 55.5 KB
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-  0%|          | 0/1 [00:00&lt;?, ?it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
-WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
-100%|██████████| 1/1 [00:00&lt;00:00,  2.81it/s]
+100%|███████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.50it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1438,7 +1304,7 @@ WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 24)
+Query instance (original outcome : 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1471,39 +1337,29 @@ Query instance (original outcome : 24)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
+      <th>MedInc</th>
+      <th>HouseAge</th>
+      <th>AveRooms</th>
+      <th>AveBedrms</th>
+      <th>Population</th>
+      <th>AveOccup</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
       <th>target</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.11329</td>
-      <td>30.0</td>
-      <td>4.93</td>
-      <td>0.0</td>
-      <td>0.428</td>
-      <td>6.897</td>
-      <td>54.3</td>
-      <td>6.3361</td>
-      <td>6.0</td>
-      <td>300.0</td>
-      <td>16.6</td>
-      <td>391.25</td>
-      <td>11.38</td>
-      <td>24.44</td>
+      <td>4.3487</td>
+      <td>29.0</td>
+      <td>5.930712</td>
+      <td>1.026217</td>
+      <td>1554.0</td>
+      <td>2.910112</td>
+      <td>38.650002</td>
+      <td>-121.839996</td>
+      <td>1.44691</td>
     </tr>
   </tbody>
 </table>
@@ -1515,124 +1371,7 @@ Query instance (original outcome : 24)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: [30, 45])
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
-      <th>target</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.1</td>
-      <td>34.0</td>
-      <td>6.1</td>
-      <td>-</td>
-      <td>0.433</td>
-      <td>6.982</td>
-      <td>17.7</td>
-      <td>5.4917</td>
-      <td>7.0</td>
-      <td>329.0</td>
-      <td>16.1</td>
-      <td>390.4</td>
-      <td>4.86</td>
-      <td>32.81899999999999</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.08221</td>
-      <td>22.0</td>
-      <td>5.9</td>
-      <td>-</td>
-      <td>0.431</td>
-      <td>6.957</td>
-      <td>6.8</td>
-      <td>8.9067</td>
-      <td>7.0</td>
-      <td>330.0</td>
-      <td>19.1</td>
-      <td>386.1</td>
-      <td>3.53</td>
-      <td>30.928999999999977</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Multiple queries can be given as input at once</span>
-<span class="n">query_instances_boston</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span>
-<span class="n">genetic_boston</span> <span class="o">=</span> <span class="n">exp_genetic_boston</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_boston</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">])</span>
-<span class="n">genetic_boston</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  0%|          | 0/2 [00:00&lt;?, ?it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
-WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
- 50%|█████     | 1/2 [00:00&lt;00:00,  2.72it/s]WARNING:root: MAD for feature ZN is 0, so replacing it with 1.0 to avoid error.
-WARNING:root: MAD for feature CHAS is 0, so replacing it with 1.0 to avoid error.
-100%|██████████| 2/2 [00:00&lt;00:00,  2.76it/s]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Query instance (original outcome : 49)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-
+Diverse Counterfactual set (new outcome: [3.0, 5.0])
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1657,159 +1396,41 @@ Query instance (original outcome : 49)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
+      <th>MedInc</th>
+      <th>HouseAge</th>
+      <th>AveRooms</th>
+      <th>AveBedrms</th>
+      <th>Population</th>
+      <th>AveOccup</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
       <th>target</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.01501</td>
-      <td>90.0</td>
-      <td>1.21</td>
+      <td>6.5173</td>
+      <td>24.0</td>
+      <td>6.5</td>
       <td>1.0</td>
-      <td>0.401</td>
-      <td>7.923</td>
-      <td>24.8</td>
-      <td>5.885</td>
-      <td>1.0</td>
-      <td>198.0</td>
-      <td>13.6</td>
-      <td>395.52</td>
-      <td>3.16</td>
-      <td>48.99</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-Diverse Counterfactual set (new outcome: [40, 50])
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
-      <th>target</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>-</td>
-      <td>-</td>
-      <td>1.2</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>395.5</td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.00632</td>
-      <td>-</td>
-      <td>3.8</td>
-      <td>0.0</td>
-      <td>0.385</td>
-      <td>8.034</td>
-      <td>31.9</td>
-      <td>1.1296</td>
-      <td>-</td>
-      <td>-</td>
-      <td>14.7</td>
-      <td>390.5</td>
-      <td>1.73</td>
-      <td>48.61499999999999</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.00632</td>
-      <td>-</td>
-      <td>3.8</td>
-      <td>0.0</td>
-      <td>0.385</td>
-      <td>7.82</td>
-      <td>2.9</td>
-      <td>3.4952</td>
-      <td>-</td>
-      <td>-</td>
-      <td>12.6</td>
-      <td>0.3</td>
-      <td>1.73</td>
-      <td>46.21099999999999</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.00632</td>
       <td>-</td>
       <td>2.7</td>
-      <td>0.0</td>
-      <td>0.385</td>
-      <td>7.454</td>
-      <td>2.9</td>
-      <td>1.1296</td>
+      <td>34.45</td>
+      <td>-119.81</td>
+      <td>3.3564200999999985</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>5.6184</td>
       <td>-</td>
-      <td>-</td>
-      <td>15.9</td>
-      <td>386.3</td>
-      <td>1.73</td>
-      <td>45.22599999999999</td>
+      <td>5.9</td>
+      <td>1.0</td>
+      <td>1543.0</td>
+      <td>2.7</td>
+      <td>34.24</td>
+      <td>-118.28</td>
+      <td>3.0918301</td>
     </tr>
   </tbody>
 </table>
@@ -1820,7 +1441,7 @@ Diverse Counterfactual set (new outcome: [40, 50])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 30)
+Query instance (original outcome : 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1845,39 +1466,29 @@ Query instance (original outcome : 30)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
+      <th>MedInc</th>
+      <th>HouseAge</th>
+      <th>AveRooms</th>
+      <th>AveBedrms</th>
+      <th>Population</th>
+      <th>AveOccup</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
       <th>target</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.06911</td>
-      <td>45.0</td>
-      <td>3.44</td>
-      <td>0.0</td>
-      <td>0.437</td>
-      <td>6.739</td>
-      <td>30.8</td>
-      <td>6.4798</td>
-      <td>5.0</td>
-      <td>398.0</td>
-      <td>15.2</td>
-      <td>389.71</td>
-      <td>4.69</td>
-      <td>30.28</td>
+      <td>2.4511</td>
+      <td>37.0</td>
+      <td>4.992958</td>
+      <td>1.316901</td>
+      <td>390.0</td>
+      <td>2.746479</td>
+      <td>33.200001</td>
+      <td>-115.599998</td>
+      <td>0.88245</td>
     </tr>
   </tbody>
 </table>
@@ -1889,7 +1500,7 @@ Query instance (original outcome : 30)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: [40, 50])
+Diverse Counterfactual set (new outcome: [3.0, 5.0])
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1914,151 +1525,77 @@ Diverse Counterfactual set (new outcome: [40, 50])
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>CRIM</th>
-      <th>ZN</th>
-      <th>INDUS</th>
-      <th>CHAS</th>
-      <th>NOX</th>
-      <th>RM</th>
-      <th>AGE</th>
-      <th>DIS</th>
-      <th>RAD</th>
-      <th>TAX</th>
-      <th>PTRATIO</th>
-      <th>B</th>
-      <th>LSTAT</th>
+      <th>MedInc</th>
+      <th>HouseAge</th>
+      <th>AveRooms</th>
+      <th>AveBedrms</th>
+      <th>Population</th>
+      <th>AveOccup</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
       <th>target</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.03578</td>
-      <td>20.0</td>
-      <td>3.3</td>
+      <td>10.3682</td>
       <td>-</td>
-      <td>0.443</td>
-      <td>7.82</td>
-      <td>64.5</td>
-      <td>4.6947</td>
-      <td>-</td>
-      <td>216.0</td>
-      <td>14.9</td>
-      <td>387.3</td>
-      <td>3.76</td>
-      <td>45.59500000000002</td>
+      <td>8.1</td>
+      <td>1.1</td>
+      <td>394.0</td>
+      <td>2.6</td>
+      <td>33.61</td>
+      <td>-117.92</td>
+      <td>4.96489929999999</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>0.02177</td>
-      <td>0.0</td>
-      <td>0.5</td>
-      <td>-</td>
-      <td>0.422</td>
-      <td>7.82</td>
-      <td>15.7</td>
-      <td>3.4952</td>
-      <td>-</td>
-      <td>255.0</td>
-      <td>14.7</td>
-      <td>377.1</td>
-      <td>3.57</td>
-      <td>46.923</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.0351</td>
-      <td>90.0</td>
-      <td>3.8</td>
-      <td>-</td>
-      <td>0.416</td>
-      <td>7.454</td>
-      <td>33.2</td>
-      <td>6.3361</td>
-      <td>4.0</td>
-      <td>187.0</td>
-      <td>14.7</td>
-      <td>386.3</td>
-      <td>3.11</td>
-      <td>43.84800000000002</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.01381</td>
-      <td>80.0</td>
-      <td>0.5</td>
-      <td>-</td>
-      <td>0.422</td>
-      <td>7.875</td>
-      <td>32.0</td>
-      <td>5.6484</td>
-      <td>4.0</td>
-      <td>255.0</td>
-      <td>14.4</td>
-      <td>394.2</td>
-      <td>2.97</td>
-      <td>49.04</td>
+      <th>0</th>
+      <td>2.9167</td>
+      <td>43.0</td>
+      <td>4.6</td>
+      <td>1.2</td>
+      <td>393.0</td>
+      <td>1.6</td>
+      <td>34.01</td>
+      <td>-118.47</td>
+      <td>4.039710699999995</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="DiCE_model_agnostic_CFs.html" class="btn btn-neutral float-right" title="Generating counterfactual explanations with any ML model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="DiCE_feature_importances.html" class="btn btn-neutral float-left" title="Estimating local and global feature importance scores using DiCE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DiCE_feature_importances.html" class="btn btn-neutral float-left" title="Estimating local and global feature importance scores using DiCE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DiCE_model_agnostic_CFs.html" class="btn btn-neutral float-right" title="Generating counterfactual explanations with any ML model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
-
-    </p>
+    <p>&#169; Copyright 2020, Ramaravind, Amit, Chenhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
