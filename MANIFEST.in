@@ -2,6 +2,8 @@ include requirements.txt
 include requirements-deeplearning.txt
 include requirements-test.txt
 include requirements-linting.txt
+include environment.yml
+include environment-deeplearning.yml
 include LICENSE
 recursive-include docs *
 recursive-include tests *.py
