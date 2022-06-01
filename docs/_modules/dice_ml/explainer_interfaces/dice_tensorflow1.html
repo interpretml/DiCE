@@ -1,69 +1,32 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.7 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.8 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
-          
-
-          
+            <a href="../../../index.html" class="icon icon-home"> DiCE
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -71,23 +34,12 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Notebooks:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
@@ -99,87 +51,50 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../dice_ml.html">dice_ml package</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">DiCE</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
       <li>dice_ml.explainer_interfaces.dice_tensorflow1</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for dice_ml.explainer_interfaces.dice_tensorflow1</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module to generate diverse counterfactual explanations based on tensorflow 1.x</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">timeit</span>
-<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
 <span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
 <span class="kn">from</span> <span class="nn">dice_ml.counterfactual_explanations</span> <span class="kn">import</span> <span class="n">CounterfactualExplanations</span>
+<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
 
 
 <div class="viewcode-block" id="DiceTensorFlow1"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1">[docs]</a><span class="k">class</span> <span class="nc">DiceTensorFlow1</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
@@ -393,7 +308,7 @@
 <div class="viewcode-block" id="DiceTensorFlow1.predict_fn"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;prediction function&quot;&quot;&quot;</span>
         <span class="n">temp_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_tensor</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span><span class="p">:</span> <span class="n">input_instance</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">preds</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ouput_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="n">temp_preds</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">preds</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="n">temp_preds</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="DiceTensorFlow1.predict_fn_for_sparsity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;prediction function for sparsity correction&quot;&quot;&quot;</span>
@@ -407,14 +322,14 @@
             <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;l2_loss&quot;</span><span class="p">:</span>
                 <span class="n">temp_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf</span><span class="p">))</span>
-                <span class="n">temp_loss</span> <span class="o">=</span> <span class="n">temp_loss</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ouput_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">temp_loss</span> <span class="o">=</span> <span class="n">temp_loss</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;log_loss&quot;</span><span class="p">:</span>
                 <span class="n">temp_logits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
                         <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="mf">0.000001</span><span class="p">)),</span>
                         <span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="mf">0.000001</span><span class="p">)))))</span>
-                <span class="n">temp_logits</span> <span class="o">=</span> <span class="n">temp_logits</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ouput_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span>
+                <span class="n">temp_logits</span> <span class="o">=</span> <span class="n">temp_logits</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span>
                 <span class="n">temp_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span>
                     <span class="n">logits</span><span class="o">=</span><span class="n">temp_logits</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;hinge_loss&quot;</span><span class="p">:</span>
@@ -422,7 +337,7 @@
                     <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
                         <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="mf">0.000001</span><span class="p">)),</span>
                         <span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="mf">0.000001</span><span class="p">)))))</span>
-                <span class="n">temp_logits</span> <span class="o">=</span> <span class="n">temp_logits</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ouput_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span>
+                <span class="n">temp_logits</span> <span class="o">=</span> <span class="n">temp_logits</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span>
                 <span class="n">temp_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">hinge_loss</span><span class="p">(</span>
                     <span class="n">logits</span><span class="o">=</span><span class="n">temp_logits</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf</span><span class="p">)</span>
 
@@ -868,49 +783,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
-
-    </p>
+    <p>&#169; Copyright 2020, Ramaravind, Amit, Chenhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

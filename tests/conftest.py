@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -116,13 +116,92 @@ def private_data_object():
     return dice_ml.Data(features=features_dict, outcome_name='income')
 
 
+def _save_custom_testing_model():
+    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                                    ('scaler', StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                SimpleImputer(fill_value='missing',
+                                              strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat', cat_trans,
+                                                      pd.Index(['Categorical'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('classifier', RandomForestClassifier())])
+    dataset = helpers.load_custom_testing_dataset()
+    model = clf.fit(dataset[["Categorical", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = helpers.get_custom_dataset_modelpath_pipeline()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
+def _save_custom_testing_binary_model():
+    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                                    ('scaler', StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                SimpleImputer(fill_value='missing',
+                                              strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat', cat_trans,
+                                                      pd.Index(['Categorical'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('classifier', RandomForestClassifier())])
+    dataset = helpers.load_custom_testing_dataset_binary()
+    model = clf.fit(dataset[["Categorical", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
+def _save_custom_testing_multiclass_model():
+    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                                    ('scaler', StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                SimpleImputer(fill_value='missing',
+                                              strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat', cat_trans,
+                                                      pd.Index(['Categorical'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('regressor', RandomForestClassifier())])
+    dataset = helpers.load_custom_testing_dataset_multiclass()
+    model = clf.fit(dataset[["Categorical", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
+def _save_custom_testing_regression_model():
+    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                                    ('scaler', StandardScaler())])
+    cat_trans = Pipeline(steps=[('imputer',
+                                SimpleImputer(fill_value='missing',
+                                              strategy='constant')),
+                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
+                                                      ['Numerical']),
+                                                      ('cat', cat_trans,
+                                                      pd.Index(['Categorical'], dtype='object'))])
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('regressor', RandomForestRegressor())])
+    dataset = helpers.load_custom_testing_dataset_regression()
+    model = clf.fit(dataset[["Categorical", "Numerical"]],
+                    dataset["Outcome"])
+    modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
 @pytest.fixture()
 def load_custom_vars_testing_dataset():
     data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
 
 
-@pytest.fixture()
 def _save_custom_vars_dataset_model():
     numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
                                     ('scaler', StandardScaler())])
