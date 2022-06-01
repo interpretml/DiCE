@@ -223,9 +223,16 @@ class DiceKD(ExplainerBase):
 
         # Making the one-hot-encoded version of query instance match the one-hot encoded version of the dataset
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
-        for col in pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns:
+
+        data_df_columns = pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns
+        for col in data_df_columns:
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
+
+        # Fix order of columns in the query instance. This is necessary because KD-tree treats data as a simple array
+        # instead of a dataframe.
+        query_instance_df_dummies = query_instance_df_dummies.reindex(columns=data_df_columns)
+
         self.final_cfs, cfs_preds = self.vary_valid(query_instance_df_dummies,
                                                     total_CFs,
                                                     features_to_vary,
