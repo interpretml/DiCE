@@ -73,6 +73,13 @@ def decide(model_interface, method):
 
     elif model_interface.backend == BackEndTypes.Tensorflow2:
         # pretrained Keras Sequential model with Tensorflow 2.x backend
+
+        # Modified
+        if method == "multi":
+            from dice_ml.explainer_interfaces.dice_tensorflow2_multi import \
+                DiceTensorFlow2Multi
+            return DiceTensorFlow2Multi
+
         from dice_ml.explainer_interfaces.dice_tensorflow2 import \
             DiceTensorFlow2
         return DiceTensorFlow2
