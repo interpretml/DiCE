@@ -100,7 +100,7 @@ class PublicData(_BaseData):
         if 'continuous_features' not in params:
             raise ValueError('continuous_features should be provided')
 
-        if type(params['continuous_features']) is list:
+        if isinstance(params['continuous_features'], list):
             self.continuous_feature_names = params['continuous_features']
         else:
             raise ValueError(

@@ -34,7 +34,7 @@ class PrivateData(_BaseData):
         """
         if sys.version_info > (3, 6, 0) and type(params['features']) in [dict, collections.OrderedDict]:
             features_dict = params['features']
-        elif sys.version_info <= (3, 6, 0) and type(params['features']) is collections.OrderedDict:
+        elif sys.version_info <= (3, 6, 0) and isinstance(params['features'], collections.OrderedDict):
             features_dict = params['features']
         else:
             raise ValueError(
@@ -51,7 +51,7 @@ class PrivateData(_BaseData):
         self.categorical_levels = {}
 
         for feature in features_dict:
-            if type(features_dict[feature][0]) is int:  # continuous feature
+            if isinstance(features_dict[feature][0] ,int):  # continuous feature
                 self.continuous_feature_names.append(feature)
                 self.permitted_range[feature] = features_dict[feature]
             else:
