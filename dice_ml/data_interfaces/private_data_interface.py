@@ -32,7 +32,7 @@ class PrivateData(_BaseData):
                                Default MAD value is 1 for all features.
         :param data_name (optional): Dataset name
         """
-        if sys.version_info > (3, 6, 0) and type(params['features']) in [dict, collections.OrderedDict]:
+        if sys.version_info > (3, 6, 0) and isinstance(params['features'], (dict, collections.OrderedDict)):
             features_dict = params['features']
         elif sys.version_info <= (3, 6, 0) and isinstance(params['features'], collections.OrderedDict):
             features_dict = params['features']
