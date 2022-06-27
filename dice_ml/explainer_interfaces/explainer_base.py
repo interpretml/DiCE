@@ -651,7 +651,13 @@ class ExplainerBase(ABC):
         """
         if desired_class_input == "opposite":
             if num_output_nodes == 2:
-                original_pred_1 = np.argmax(original_pred)
+                # 'original_pred' needs to be converted to the proper class if 'original_pred' comes from the
+                # 'predict_proba' method (length is 2 and class is index with maximum value). Otherwise 'original_pred'
+                # already contains the class.
+                if hasattr(original_pred, "__len__") and len(original_pred) > 1:
+                    original_pred_1 = np.argmax(original_pred)
+                else:
+                    original_pred_1 = original_pred
                 target_class = int(1 - original_pred_1)
                 return target_class
             elif num_output_nodes > 2:
