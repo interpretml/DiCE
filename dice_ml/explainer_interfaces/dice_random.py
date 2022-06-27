@@ -39,7 +39,8 @@ class DiceRandom(ExplainerBase):
     def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None,
                                   desired_class="opposite", permitted_range=None,
                                   features_to_vary="all", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=None, verbose=False):
+                                  posthoc_sparsity_algorithm="linear", sample_size=1000, random_seed=None, verbose=False,
+                                  limit_steps_ls=10000):
         """Generate counterfactuals by randomly sampling features.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
@@ -59,6 +60,7 @@ class DiceRandom(ExplainerBase):
                                            share a monotonic relationship with predicted outcome in the model.
         :param sample_size: Sampling size
         :param random_seed: Random seed for reproducibility
+        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement
 
         :returns: A CounterfactualExamples object that contains the dataframe of generated counterfactuals as an attribute.
         """
@@ -168,8 +170,11 @@ class DiceRandom(ExplainerBase):
         if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and \
                 self.final_cfs is not None and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
-            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(
-                final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse,
+                                                                       test_instance_df,
+                                                                       posthoc_sparsity_param,
+                                                                       posthoc_sparsity_algorithm,
+                                                                       limit_steps_ls)
         else:
             final_cfs_df_sparse = None
 
