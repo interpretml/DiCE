@@ -24,12 +24,7 @@ class DiceGenetic(ExplainerBase):
         :param model_interface: an interface class to access trained ML model.
         """
         super().__init__(data_interface, model_interface)  # initiating data related parameters
-
-        # number of output nodes of ML model
-        if self.model.model_type == ModelTypes.Classifier:
-            self.num_output_nodes = self.model.get_num_output_nodes2(
-                self.data_interface.data_df[0:1][self.data_interface.feature_names])
-
+        self.num_output_nodes = None
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
         self.features_to_vary = []
@@ -279,6 +274,10 @@ class DiceGenetic(ExplainerBase):
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
         self.test_pred = test_pred
+
+        # number of output nodes of ML model
+        if self.model.model_type == ModelTypes.Classifier:
+            self.num_output_nodes = test_pred.shape[1]
 
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
 
