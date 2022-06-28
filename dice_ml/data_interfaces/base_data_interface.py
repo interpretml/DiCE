@@ -17,7 +17,7 @@ class _BaseData(ABC):
         if 'outcome_name' not in params:
             raise ValueError("should provide the name of outcome feature")
 
-        if isinstance(params['outcome_name'] ,str):
+        if isinstance(params['outcome_name'], str):
             self.outcome_name = params['outcome_name']
         else:
             raise ValueError("should provide the name of outcome feature as a string")

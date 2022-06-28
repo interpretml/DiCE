@@ -51,7 +51,7 @@ class PrivateData(_BaseData):
         self.categorical_levels = {}
 
         for feature in features_dict:
-            if isinstance(features_dict[feature][0] ,int):  # continuous feature
+            if isinstance(features_dict[feature][0], int):  # continuous feature
                 self.continuous_feature_names.append(feature)
                 self.permitted_range[feature] = features_dict[feature]
             else:
