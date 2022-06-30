@@ -1,4 +1,5 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |AnacondaVersion|_
+|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |CondaVersion|_
+
 
 .. |BuildStatus| image:: https://github.com/interpretml/dice/workflows/Python%20package/badge.svg
 .. _BuildStatus: https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22
