@@ -1,4 +1,4 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |AnacondaVersion|_
+|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |CondaVersion|_
 
 .. |BuildStatus| image:: https://github.com/interpretml/dice/workflows/Python%20package/badge.svg
 .. _BuildStatus: https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22
@@ -9,8 +9,8 @@
 .. |PythonSupport| image:: https://img.shields.io/pypi/pyversions/dice-ml
 .. _PythonSupport: https://pypi.org/project/dice-ml/
 
-.. |AnacondaVersion| image:: https://anaconda.org/conda-forge/dice-ml/badges/version.svg
-.. _AnacondaVersion: https://anaconda.org/conda-forge/dice-ml
+.. |CondaVersion| image:: https://anaconda.org/conda-forge/dice-ml/badges/version.svg
+.. _CondaVersion: https://anaconda.org/conda-forge/dice-ml
 
 Diverse Counterfactual Explanations (DiCE) for ML
 ======================================================================
