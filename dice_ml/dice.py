@@ -56,7 +56,7 @@ def decide(model_interface, method):
     elif method == SamplingStrategy.KdTree:
         from dice_ml.explainer_interfaces.dice_KD import DiceKD
         return DiceKD
-    elif method is None:
+    elif method == SamplingStrategy.Gradient:
         if model_interface.backend == BackEndTypes.Tensorflow1:
             # pretrained Keras Sequential model with Tensorflow 1.x backend
             from dice_ml.explainer_interfaces.dice_tensorflow1 import \
@@ -73,8 +73,14 @@ def decide(model_interface, method):
             # PyTorch backend
             from dice_ml.explainer_interfaces.dice_pytorch import DicePyTorch
             return DicePyTorch
-
         else:
+            raise UserConfigValidationException("{0} is only supported for differentiable neural network models. "
+                                            "Please choose one of {1}, {2} or {3}".format(
+                                                method, SamplingStrategy.Random,
+                                                SamplingStrategy.Genetic,
+                                                SamplingStrategy.KdTree
+                                            ))
+    elif method is None:
             # all other backends
             backend_dice = model_interface.backend['explainer']
             module_name, class_name = backend_dice.split('.')

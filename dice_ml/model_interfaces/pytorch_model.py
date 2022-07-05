@@ -33,9 +33,9 @@ class PyTorchModel(BaseModel):
         """
         input_tensor = input_instance
         if transform_data:
-            input_tensor = torch.tensor(self.transformer.transform(input_instance)).float()
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
         if not torch.is_tensor(input_instance):
-            input_tensor = torch.tensor(self.transformer.transform(input_instance)).float()
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
         out = self.model(input_tensor).float()
         if not out_tensor:
             out = out.data.numpy()

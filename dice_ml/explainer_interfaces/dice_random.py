@@ -24,11 +24,11 @@ class DiceRandom(ExplainerBase):
         """
         super().__init__(data_interface)  # initiating data related parameters
 
-        self.data_interface.create_ohe_params()
         self.model = model_interface
         self.model.load_model()  # loading pickled trained model if applicable
         self.model.transformer.feed_data_params(data_interface)
         self.model.transformer.initialize_transform_func()
+
 
         self.precisions = self.data_interface.get_decimal_precisions(output_type="dict")
         if self.data_interface.outcome_name in self.precisions:
