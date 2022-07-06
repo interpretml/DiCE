@@ -75,7 +75,6 @@ class DiceRandom(ExplainerBase):
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
         model_predictions = self.predict_fn(query_instance)
-
         # number of output nodes of ML model
         self.num_output_nodes = None
         if self.model.model_type == ModelTypes.Classifier:

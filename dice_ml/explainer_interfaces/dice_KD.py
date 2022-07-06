@@ -25,14 +25,17 @@ class DiceKD(ExplainerBase):
         self.total_random_inits = 0
         super().__init__(data_interface)  # initiating data related parameters
 
-        # As DiCE KD uses one-hot-encoding
-        self.data_interface.create_ohe_params()
 
         # initializing model variables
         self.model = model_interface
         self.model.load_model()  # loading pickled trained model if applicable
         self.model.transformer.feed_data_params(data_interface)
         self.model.transformer.initialize_transform_func()
+
+        # As DiCE KD uses one-hot-encoding
+        # temp data to create some attributes like encoded feature names
+        temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        self.data_interface.create_ohe_params(temp_ohe_data)
 
         # loading trained model
         self.model.load_model()
