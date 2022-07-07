@@ -7,7 +7,6 @@ import shutil
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-# for data transformations
 from sklearn.preprocessing import FunctionTransformer
 
 import dice_ml
@@ -129,6 +128,13 @@ def get_custom_dataset_modelpath_pipeline():
     return modelpath
 
 
+def get_custom_vars_dataset_modelpath_pipeline():
+    pkg_path = dice_ml.__path__[0]
+    model_ext = '.sav'
+    modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'custom_vars'+model_ext)
+    return modelpath
+
+
 def get_custom_dataset_modelpath_pipeline_binary():
     pkg_path = dice_ml.__path__[0]
     model_ext = '.sav'
@@ -168,7 +174,6 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
                                    wm1, wm2, wm3, learning_rate):
     # Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py.
     #                      Check dependencies.
-    # Pytorch
     from torch import optim
 
     from dice_ml.utils.sample_architecture.vae_model import CF_VAE

@@ -49,21 +49,10 @@ class PublicData(_BaseData):
             name) for name in self.categorical_feature_names if name in self.data_df]
 
         self._validate_and_set_continuous_features_precision(params=params)
-
-        if len(self.categorical_feature_names) > 0:
-            for feature in self.categorical_feature_names:
-                self.data_df[feature] = self.data_df[feature].apply(str)
-            self.data_df[self.categorical_feature_names] = self.data_df[self.categorical_feature_names].astype(
-                'category')
-
-        if len(self.continuous_feature_names) > 0:
-            for feature in self.continuous_feature_names:
-                if self.get_data_type(feature) == 'float':
-                    self.data_df[feature] = self.data_df[feature].astype(
-                        np.float32)
-                else:
-                    self.data_df[feature] = self.data_df[feature].astype(
-                        np.int32)
+        self.data_df = self._set_feature_dtypes(
+                self.data_df,
+                self.categorical_feature_names,
+                self.continuous_feature_names)
 
         self._validate_and_set_permitted_range(params=params)
         self._validate_and_set_data_name(params=params)
@@ -127,6 +116,25 @@ class PublicData(_BaseData):
                         "permitted_range contains some feature names which are not part of columns in dataframe"
                     )
         self.permitted_range, _ = self.get_features_range(input_permitted_range)
+
+    def _set_feature_dtypes(self, data_df, categorical_feature_names,
+                            continuous_feature_names):
+        """Set the correct type of each feature column."""
+        if len(categorical_feature_names) > 0:
+            for feature in categorical_feature_names:
+                data_df[feature] = data_df[feature].apply(str)
+            data_df[categorical_feature_names] = data_df[categorical_feature_names].astype(
+                'category')
+
+        if len(continuous_feature_names) > 0:
+            for feature in continuous_feature_names:
+                if self.get_data_type(feature) == 'float':
+                    data_df[feature] = data_df[feature].astype(
+                        np.float32)
+                else:
+                    data_df[feature] = data_df[feature].astype(
+                        np.int32)
+        return data_df
 
     def check_features_to_vary(self, features_to_vary):
         if features_to_vary is not None and features_to_vary != 'all':
@@ -500,6 +508,10 @@ class PublicData(_BaseData):
             raise ValueError("Query instance should be a dict, a pandas dataframe, a list, or a list of dicts")
 
         test = test.reset_index(drop=True)
+        # encode categorical and numerical columns
+        test = self._set_feature_dtypes(test,
+                                        self.categorical_feature_names,
+                                        self.continuous_feature_names)
         return test
 
 

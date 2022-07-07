@@ -4,6 +4,7 @@ Adapted from the same code for the Microsoft DoWhy library.
 
 import os
 import subprocess
+import sys
 import tempfile
 
 import nbformat
@@ -16,7 +17,11 @@ advanced_notebooks = [
         "DiCE_with_advanced_options.ipynb",  # requires tensorflow 1.x
         "DiCE_getting_started_feasible.ipynb",  # needs changes after latest refactor
         "Benchmarking_different_CF_explanation_methods.ipynb"
-        ]
+]
+# notebooks that don't need to run on python 3.10
+torch_notebooks_not_3_10 = [
+    "DiCE_getting_started.ipynb"
+]
 
 # Adding the dice root folder to the python path so that jupyter notebooks
 if 'PYTHONPATH' not in os.environ:
@@ -73,6 +78,11 @@ def _notebook_run(filepath):
 parameter_list = []
 for nb in notebooks_list:
     if nb in advanced_notebooks:
+        param = pytest.param(
+            nb,
+            marks=[pytest.mark.skip, pytest.mark.advanced],
+            id=nb)
+    elif sys.version_info >= (3, 10) and nb in torch_notebooks_not_3_10:
         param = pytest.param(
             nb,
             marks=[pytest.mark.skip, pytest.mark.advanced],

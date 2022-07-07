@@ -51,7 +51,7 @@ class DiceKD(ExplainerBase):
                                   features_to_vary="all",
                                   permitted_range=None, sparsity_weight=1,
                                   feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="linear", verbose=False):
+                                  posthoc_sparsity_algorithm="linear", verbose=False, limit_steps_ls=10000):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -75,6 +75,7 @@ class DiceKD(ExplainerBase):
                                            varying from 10k to 1000k) and only if the features share a monotonic
                                            relationship with predicted outcome in the model.
         :param verbose: Parameter to determine whether to print 'Diverse Counterfactuals found!'
+        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
@@ -85,16 +86,16 @@ class DiceKD(ExplainerBase):
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance.copy()
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance_orig = self.data_interface.prepare_query_instance(
+                query_instance=query_instance_orig)
+        query_instance = self.data_interface.prepare_query_instance(
+                query_instance=query_instance)
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)[0]
 
         query_instance[self.data_interface.outcome_name] = test_pred
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
-        if desired_range is not None:
-            if desired_range[0] > desired_range[1]:
-                raise ValueError("Invalid Range!")
 
         if desired_class == "opposite" and self.model.model_type == ModelTypes.Classifier:
             if self.num_output_nodes == 2:
@@ -109,7 +110,6 @@ class DiceKD(ExplainerBase):
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
         self.dataset_with_predictions, self.KD_tree, self.predictions = \
             self.build_KD_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
-
         query_instance, cfs_preds = self.find_counterfactuals(data_df_copy,
                                                               query_instance, query_instance_orig,
                                                               desired_range,
@@ -119,7 +119,9 @@ class DiceKD(ExplainerBase):
                                                               sparsity_weight,
                                                               stopping_threshold,
                                                               posthoc_sparsity_param,
-                                                              posthoc_sparsity_algorithm, verbose)
+                                                              posthoc_sparsity_algorithm,
+                                                              verbose,
+                                                              limit_steps_ls)
         self.cfs_preds = cfs_preds
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
@@ -220,16 +222,22 @@ class DiceKD(ExplainerBase):
     def find_counterfactuals(self, data_df_copy, query_instance, query_instance_orig, desired_range, desired_class,
                              total_CFs, features_to_vary, permitted_range,
                              sparsity_weight, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm,
-                             verbose):
+                             verbose, limit_steps_ls):
         """Finds counterfactuals by querying a K-D tree for the nearest data points in the desired class from the dataset."""
 
         start_time = timeit.default_timer()
 
         # Making the one-hot-encoded version of query instance match the one-hot encoded version of the dataset
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
-        for col in pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns:
+
+        data_df_columns = pd.get_dummies(data_df_copy[self.data_interface.feature_names]).columns
+        for col in data_df_columns:
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
+
+        # Fix order of columns in the query instance. This is necessary because KD-tree treats data as a simple array
+        # instead of a dataframe.
+        query_instance_df_dummies = query_instance_df_dummies.reindex(columns=data_df_columns)
 
         self.final_cfs, cfs_preds = self.vary_valid(query_instance_df_dummies,
                                                     total_CFs,
@@ -245,7 +253,8 @@ class DiceKD(ExplainerBase):
                 self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs)
                 self.final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(self.final_cfs_df_sparse, query_instance,
                                                                                 posthoc_sparsity_param,
-                                                                                posthoc_sparsity_algorithm)
+                                                                                posthoc_sparsity_algorithm,
+                                                                                limit_steps_ls)
             else:
                 self.final_cfs_df_sparse = None
         else:

@@ -10,7 +10,7 @@ from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_object():
     dataset = helpers.load_adult_income_dataset()
     return dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'],
@@ -68,16 +68,19 @@ class TestErrorScenariosPublicDataInterface:
         iris = load_iris(as_frame=True)
         dataset = iris.frame
 
+        import re
         if data_type == DataTypeCombinations.Incorrect:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match=re.escape("should provide the name(s) of continuous features in the data as a list")):
                 dice_ml.Data(dataframe=dataset, continuous_features=np.array(iris.feature_names),
                              outcome_name='target')
-            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         elif data_type == DataTypeCombinations.AsNone:
-            with pytest.raises(ValueError) as ve:
+            with pytest.raises(
+                    ValueError,
+                    match=re.escape("should provide the name(s) of continuous features in the data as a list")):
                 dice_ml.Data(dataframe=dataset, continuous_features=None,
                              outcome_name='target')
-            assert "should provide the name(s) of continuous features in the data as a list" in str(ve)
         else:
             with pytest.raises(
                     ValueError,

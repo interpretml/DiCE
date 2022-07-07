@@ -2,6 +2,7 @@
    Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.
    All methods are in dice_ml.explainer_interfaces"""
 
+import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
@@ -10,7 +11,7 @@ import pandas as pd
 from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
-from dice_ml.constants import ModelTypes
+from dice_ml.constants import ModelTypes, _PostHocSparsityTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils.exception import UserConfigValidationException
 
@@ -32,10 +33,74 @@ class ExplainerBase(ABC):
             self.model.transformer.feed_data_params(data_interface)
             self.model.transformer.initialize_transform_func()
 
+        # moved the following snippet to a method in public_data_interface
+        # self.minx, self.maxx, self.encoded_categorical_feature_indexes = self.data_interface.get_data_params()
+        #
+        # # min and max for continuous features in original scale
+        # flattened_indexes = [item for sublist in self.encoded_categorical_feature_indexes for item in sublist]
+        # self.encoded_continuous_feature_indexes = [ix for ix in range(len(self.minx[0])) if ix not in flattened_indexes]
+        # org_minx, org_maxx = self.data_interface.get_minx_maxx(normalized=False)
+        # self.cont_minx = list(org_minx[0][self.encoded_continuous_feature_indexes])
+        # self.cont_maxx = list(org_maxx[0][self.encoded_continuous_feature_indexes])
+        #
+        # # decimal precisions for continuous features
+        # self.cont_precisions = \
+        #   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
+
+    def _validate_counterfactual_configuration(
+            self, query_instances, total_CFs,
+            desired_class="opposite", desired_range=None,
+            permitted_range=None, features_to_vary="all",
+            stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+            posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+
+        if total_CFs <= 0:
+            raise UserConfigValidationException(
+                "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
+
+        if features_to_vary != "all":
+            if len(features_to_vary) == 0:
+                raise UserConfigValidationException("Some features need to be varied for generating counterfactuals.")
+
+        if posthoc_sparsity_algorithm not in _PostHocSparsityTypes.ALL:
+            raise UserConfigValidationException(
+                'The posthoc_sparsity_algorithm should be {0} and not {1}'.format(
+                    ' or '.join(_PostHocSparsityTypes.ALL), posthoc_sparsity_algorithm)
+                )
+
+        if stopping_threshold < 0.0 or stopping_threshold > 1.0:
+            raise UserConfigValidationException('The stopping_threshold should lie between {0} and {1}'.format(
+                str(0.0), str(1.0)))
+
+        if posthoc_sparsity_param is not None and (posthoc_sparsity_param < 0.0 or posthoc_sparsity_param > 1.0):
+            raise UserConfigValidationException('The posthoc_sparsity_param should lie between {0} and {1}'.format(
+                str(0.0), str(1.0)))
+
+        if self.model is not None and self.model.model_type == ModelTypes.Classifier:
+            if desired_range is not None:
+                raise UserConfigValidationException(
+                    'The desired_range parameter should not be set for classification task')
+
+        if self.model is not None and self.model.model_type == ModelTypes.Regressor:
+            if desired_range is None:
+                raise UserConfigValidationException(
+                    'The desired_range parameter should be set for regression task')
+
+        if desired_range is not None:
+            if len(desired_range) != 2:
+                raise UserConfigValidationException(
+                    "The parameter desired_range needs to have two numbers in ascending order.")
+            if desired_range[0] > desired_range[1]:
+                raise UserConfigValidationException(
+                    "The range provided in desired_range should be in ascending order.")
+
+
     def generate_counterfactuals(self, query_instances, total_CFs,
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
+                                 proximity_weight=0.2, sparsity_weight=0.2, diversity_weight=5.0,
+                                 categorical_penalty=0.1,
                                  posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
         """General method for generating counterfactuals.
 
@@ -45,12 +110,22 @@ class ExplainerBase(ABC):
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value
                               is "opposite" to the outcome class of query_instance for binary classification.
         :param desired_range: For regression problems. Contains the outcome range to
-                              generate counterfactuals in.
+                              generate counterfactuals in. This should be a list of two numbers in
+                              ascending order.
         :param permitted_range: Dictionary with feature names as keys and permitted range in list as values.
                                 Defaults to the range inferred from training data.
                                 If None, uses the parameters initialized in data_interface.
         :param features_to_vary: Either a string "all" or a list of feature names to vary.
         :param stopping_threshold: Minimum threshold for counterfactuals target class probability.
+        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
+                                 query_instance. Used by ['genetic', 'gradientdescent'],
+                                 ignored by ['random', 'kdtree'] methods.
+        :param sparsity_weight: A positive float. Larger this weight, less features are changed from the query_instance.
+                                Used by ['genetic', 'kdtree'], ignored by ['random', 'gradientdescent'] methods.
+        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
+                                 Used by ['genetic', 'gradientdescent'], ignored by ['random', 'kdtree'] methods.
+        :param categorical_penalty: A positive float. A weight to ensure that all levels of a categorical variable sums to 1.
+                                 Used by ['genetic', 'gradientdescent'], ignored by ['random', 'kdtree'] methods.
         :param posthoc_sparsity_param: Parameter for the post-hoc operation on continuous features to enhance sparsity.
         :param posthoc_sparsity_algorithm: Perform either linear or binary search. Takes "linear" or "binary".
                                            Prefer binary search when a feature range is large (for instance,
@@ -64,9 +139,17 @@ class ExplainerBase(ABC):
         :returns: A CounterfactualExplanations object that contains the list of
                   counterfactual examples per query_instance as one of its attributes.
         """
-        if total_CFs <= 0:
-            raise UserConfigValidationException(
-                "The number of counterfactuals generated per query instance (total_CFs) should be a positive integer.")
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm, verbose=verbose,
+            kwargs=kwargs
+        )
+
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
@@ -191,6 +274,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if cf_examples_list is not None:
             if any([len(cf_examples.final_cfs_df) < 10 for cf_examples in cf_examples_list]):
                 raise UserConfigValidationException(
@@ -240,6 +333,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if query_instances is not None and len(query_instances) < 10:
             raise UserConfigValidationException(
                 "The number of query instances should be greater than or equal to 10 "
@@ -296,6 +399,16 @@ class ExplainerBase(ABC):
                   the list of counterfactuals per input, local feature importances per
                   input, and the global feature importance summarized over all inputs.
         """
+        self._validate_counterfactual_configuration(
+            query_instances=query_instances,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+            desired_range=desired_range,
+            permitted_range=permitted_range, features_to_vary=features_to_vary,
+            stopping_threshold=stopping_threshold, posthoc_sparsity_param=posthoc_sparsity_param,
+            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
+            kwargs=kwargs
+        )
         if cf_examples_list is None:
             cf_examples_list = self.generate_counterfactuals(
                 query_instances, total_CFs,
@@ -384,7 +497,7 @@ class ExplainerBase(ABC):
         return self.model.get_output(input_instance)
 
     def do_posthoc_sparsity_enhancement(self, final_cfs_sparse, query_instance, posthoc_sparsity_param,
-                                        posthoc_sparsity_algorithm):
+                                        posthoc_sparsity_algorithm, limit_steps_ls):
         """Post-hoc method to encourage sparsity in a generated counterfactuals.
 
         :param final_cfs_sparse: Final CFs in original user-fed format, in a pandas dataframe.
@@ -395,6 +508,8 @@ class ExplainerBase(ABC):
                                            large (for instance, income varying from 10k to 1000k)
                                            and only if the features share a monotonic relationship
                                            with predicted outcome in the model.
+        :param limit_steps_ls: Defines the limit of steps to be done in the linear search,
+                                necessary to avoid infinite loops
         """
         if final_cfs_sparse is None:
             return final_cfs_sparse
@@ -426,7 +541,7 @@ class ExplainerBase(ABC):
                 if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
-                                                                 feature, final_cfs_sparse, current_pred)
+                                                                 feature, final_cfs_sparse, current_pred, limit_steps_ls)
 
                     elif posthoc_sparsity_algorithm == "binary":
                         final_cfs_sparse = self.do_binary_search(
@@ -438,15 +553,19 @@ class ExplainerBase(ABC):
         # final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
         return final_cfs_sparse
 
-    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred_orig):
+    def do_linear_search(self, diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse,
+                         current_pred_orig, limit_steps_ls):
         """Performs a greedy linear search - moves the continuous features in CFs towards original values in
-           query_instance greedily until the prediction class changes."""
+           query_instance greedily until the prediction class changes, or it reaches the maximum number of steps"""
 
         old_diff = diff
         change = (10**-decimal_prec[feature])  # the minimal possible change for a feature
         current_pred = current_pred_orig
+        count_steps = 0
         if self.model.model_type == ModelTypes.Classifier:
-            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and self.is_cf_valid(current_pred)):
+            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and
+                  self.is_cf_valid(current_pred)) and (count_steps < limit_steps_ls):
+
                 old_val = int(final_cfs_sparse.at[cf_ix, feature])
                 final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
@@ -458,6 +577,8 @@ class ExplainerBase(ABC):
                     return final_cfs_sparse
 
                 diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
+
+                count_steps += 1
 
         return final_cfs_sparse
 
@@ -541,7 +662,13 @@ class ExplainerBase(ABC):
         """
         if desired_class_input == "opposite":
             if num_output_nodes == 2:
-                original_pred_1 = np.argmax(original_pred)
+                # 'original_pred' needs to be converted to the proper class if 'original_pred' comes from the
+                # 'predict_proba' method (length is 2 and class is index with maximum value). Otherwise 'original_pred'
+                # already contains the class.
+                if hasattr(original_pred, "__len__") and len(original_pred) > 1:
+                    original_pred_1 = np.argmax(original_pred)
+                else:
+                    original_pred_1 = original_pred
                 target_class = int(1 - original_pred_1)
                 return target_class
             elif num_output_nodes == 1: # only for pytorch DL model
@@ -714,3 +841,17 @@ class ExplainerBase(ABC):
         if no_cf_generated:
             raise UserConfigValidationException(
                 "No counterfactuals found for any of the query points! Kindly check your configuration.")
+
+    def serialize_explainer(self, path):
+        """Serialize the explainer to the file specified by path."""
+        with open(path, "wb") as pickle_file:
+            pickle.dump(self, pickle_file)
+
+    @staticmethod
+    def deserialize_explainer(path):
+        """Reload the explainer into the memory by reading the file specified by path."""
+        deserialized_exp = None
+        with open(path, "rb") as pickle_file:
+            deserialized_exp = pickle.load(pickle_file)
+
+        return deserialized_exp

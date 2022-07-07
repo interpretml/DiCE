@@ -1,4 +1,4 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_
+|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |CondaVersion|_
 
 .. |BuildStatus| image:: https://github.com/interpretml/dice/workflows/Python%20package/badge.svg
 .. _BuildStatus: https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22
@@ -8,6 +8,9 @@
 
 .. |PythonSupport| image:: https://img.shields.io/pypi/pyversions/dice-ml
 .. _PythonSupport: https://pypi.org/project/dice-ml/
+
+.. |CondaVersion| image:: https://anaconda.org/conda-forge/dice-ml/badges/version.svg
+.. _CondaVersion: https://anaconda.org/conda-forge/dice-ml
 
 Diverse Counterfactual Explanations (DiCE) for ML
 ======================================================================
@@ -47,6 +50,12 @@ DiCE supports Python 3+. The stable version of DiCE is available on `PyPI <https
 .. code:: bash
 
     pip install dice-ml
+
+DiCE is also available on `conda-forge <https://anaconda.org/conda-forge/dice-ml>`_. 
+
+.. code:: bash
+
+    conda install -c conda-forge dice-ml
 
 To install the latest (dev) version of DiCE and its dependencies, clone this repo and run `pip install` from the top-most folder of the repo:
 

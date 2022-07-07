@@ -70,7 +70,7 @@ class DiceTensorFlow1(ExplainerBase):
                                  optimizer="tensorflow:adam", learning_rate=0.05, min_iter=500, max_iter=5000,
                                  project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
                                  init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
-                                 posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
+                                 posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", limit_steps_ls=10000):
         """Generates diverse counterfactual explanations
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.
@@ -113,6 +113,8 @@ class DiceTensorFlow1(ExplainerBase):
                                            Prefer binary search when a feature range is large
                                            (for instance, income varying from 10k to 1000k) and only if the features
                                            share a monotonic relationship with predicted outcome in the model.
+        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement
+
 
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
@@ -159,7 +161,7 @@ class DiceTensorFlow1(ExplainerBase):
             self.update_hyperparameters(proximity_weight, diversity_weight, categorical_penalty)
 
         final_cfs_df, test_instance_df, final_cfs_df_sparse = self.find_counterfactuals(
-            query_instance, desired_class, learning_rate, min_iter, max_iter, project_iter,
+            query_instance, limit_steps_ls, desired_class, learning_rate, min_iter, max_iter, project_iter,
             loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance, tie_random,
             stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
 
@@ -225,7 +227,7 @@ class DiceTensorFlow1(ExplainerBase):
     def predict_fn(self, input_instance):
         """prediction function"""
         temp_preds = self.dice_sess.run(self.output_tensor, feed_dict={self.input_tensor: input_instance})
-        return np.array([preds[(self.num_ouput_nodes-1):] for preds in temp_preds])
+        return np.array([preds[(self.num_output_nodes-1):] for preds in temp_preds])
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
@@ -239,14 +241,14 @@ class DiceTensorFlow1(ExplainerBase):
             if method == "l2_loss":
                 temp_loss = tf.square(tf.subtract(
                     self.model.get_output(self.cfs_frozen[i]), self.target_cf))
-                temp_loss = temp_loss[:, (self.num_ouput_nodes-1):][0][0]
+                temp_loss = temp_loss[:, (self.num_output_nodes-1):][0][0]
             elif method == "log_loss":
                 temp_logits = tf.log(
                     tf.divide(
                         tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
                         tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(
                             self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
+                temp_logits = temp_logits[:, (self.num_output_nodes-1):]
                 temp_loss = tf.nn.sigmoid_cross_entropy_with_logits(
                     logits=temp_logits, labels=self.target_cf)[0][0]
             elif method == "hinge_loss":
@@ -254,7 +256,7 @@ class DiceTensorFlow1(ExplainerBase):
                     tf.divide(
                         tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)),
                         tf.subtract(1.0, tf.abs(tf.subtract(self.model.get_output(self.cfs_frozen[i]), 0.000001)))))
-                temp_logits = temp_logits[:, (self.num_ouput_nodes-1):]
+                temp_logits = temp_logits[:, (self.num_output_nodes-1):]
                 temp_loss = tf.losses.hinge_loss(
                     logits=temp_logits, labels=self.target_cf)
 
@@ -520,7 +522,7 @@ class DiceTensorFlow1(ExplainerBase):
             self.loss_converge_iter = 0
             return False
 
-    def find_counterfactuals(self, query_instance, desired_class="opposite", learning_rate=0.05, min_iter=500,
+    def find_counterfactuals(self, query_instance, limit_steps_ls, desired_class="opposite", learning_rate=0.05, min_iter=500,
                              max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1,
                              verbose=False, init_near_query_instance=False, tie_random=False,
                              stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
@@ -662,8 +664,11 @@ class DiceTensorFlow1(ExplainerBase):
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
-            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(
-                final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse,
+                                                                       test_instance_df,
+                                                                       posthoc_sparsity_param,
+                                                                       posthoc_sparsity_algorithm,
+                                                                       limit_steps_ls)
         else:
             final_cfs_df_sparse = None
 
