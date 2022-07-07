@@ -14,8 +14,8 @@ def pyt_exp_object():
     dataset = helpers.load_adult_income_dataset()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'], outcome_name='income')
     ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m)
+    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func="ohe-min-max")
+    exp = dice_ml.Dice(d, m, method="gradient")
     return exp
 
 

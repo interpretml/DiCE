@@ -374,8 +374,9 @@ class ExplainerBase(ABC):
         """prediction function"""
 
         preds = self.model.get_output(input_instance)
-        if len(preds.shape) == 1: # from deep learning predictors
-            preds = np.column_stack([preds, 1-preds])
+        if self.model.model_type == ModelTypes.Classifier and \
+           len(preds.shape) == 1: # from deep learning predictors
+            preds = np.column_stack([1 - preds, preds])
         return preds
 
     def predict_fn_for_sparsity(self, input_instance):

@@ -23,20 +23,17 @@ class DiceTensorFlow2(ExplainerBase):
         """
         # initiating data related parameters
         super().__init__(data_interface)
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
-            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
-
         # initializing model related variables
         self.model = model_interface
         self.model.load_model()  # loading trained model
-        # TODO: this error is probably too big - need to change it.
-        if self.model.transformer.func is not None:
-            raise ValueError("Gradient-based DiCE currently "
-                             "(1) accepts the data only in raw categorical and continuous formats, "
-                             "(2) does one-hot-encoding and min-max-normalization internally, "
-                             "(3) expects the ML model the accept the data in this same format. "
-                             "If your problem supports this, please initialize model class again "
-                             "with no custom transformation function.")
+        self.model.transformer.feed_data_params(data_interface)
+        self.model.transformer.initialize_transform_func()
+        # temp data to create some attributes like encoded feature names
+        temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        self.data_interface.create_ohe_params(temp_ohe_data)
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
+            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
+
         # number of output nodes of ML model
         self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names)).shape[1]
 

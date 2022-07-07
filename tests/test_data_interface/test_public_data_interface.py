@@ -24,7 +24,8 @@ class TestPublicDataMethods:
         self.d = data_object
 
     def test_permitted_range(self):
-        self.d.create_ohe_params()
+        temp_ohe_data = self.d.get_ohe_min_max_normalized_data(self.d.data_df.iloc[[0]])
+        self.d.create_ohe_params(temp_ohe_data)
         minx, maxx = self.d.get_minx_maxx(normalized=False)
         assert [minx[0][0], maxx[0][0]] == [45, 60]
         minx, maxx = self.d.get_minx_maxx(normalized=True)
