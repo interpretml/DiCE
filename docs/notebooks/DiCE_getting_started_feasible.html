@@ -1,71 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Generate feasible counterfactual explanations using a VAE &mdash; DiCE 0.7 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generate feasible counterfactual explanations using a VAE &mdash; DiCE 0.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dice_ml package" href="../dice_ml.html" />
     <link rel="prev" title="Advanced options to customize Counterfactual Explanations" href="DiCE_with_advanced_options.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> DiCE
-          
-
-          
+            <a href="../index.html" class="icon icon-home"> DiCE
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -73,32 +39,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">Diverse Counterfactual Explanations (DiCE) for ML</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Notebooks:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Notebooks:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started.html">Quick introduction to generating counterfactual explanations using DiCE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#1.-Independent-random-sampling-of-features">1. Independent random sampling of features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#2.-Genetic-Algorithm">2. Genetic Algorithm</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html#3.-Querying-a-KD-Tree">3. Querying a KD Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Generate feasible counterfactual explanations using a VAE</a><ul>
@@ -113,76 +65,36 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Package:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dice_ml.html">dice_ml package</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DiCE</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
-        
       <li>Generate feasible counterfactual explanations using a VAE</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/notebooks/DiCE_getting_started_feasible.ipynb.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   
 <style>
 /* CSS for nbsphinx extension */
@@ -393,7 +305,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -453,15 +365,14 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Generate-feasible-counterfactual-explanations-using-a-VAE">
-<h1>Generate feasible counterfactual explanations using a VAE<a class="headerlink" href="#Generate-feasible-counterfactual-explanations-using-a-VAE" title="Permalink to this headline">¶</a></h1>
+<section id="Generate-feasible-counterfactual-explanations-using-a-VAE">
+<h1>Generate feasible counterfactual explanations using a VAE<a class="headerlink" href="#Generate-feasible-counterfactual-explanations-using-a-VAE" title="Permalink to this headline"></a></h1>
 <p>This presents the variational inference based approach for generating feasible counterfactuals, where we first train an encoder-decoder framework to generate counterfactuals. More details about our framework can be found here: <a class="reference external" href="https://arxiv.org/abs/1912.03277">https://arxiv.org/abs/1912.03277</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># import DiCE</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import DiCE</span>
 <span class="kn">import</span> <span class="nn">dice_ml</span>
 <span class="kn">from</span> <span class="nn">dice_ml.utils</span> <span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
 
@@ -471,15 +382,14 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>DiCE requires two inputs: a training dataset and a pre-trained ML model. It can also work without access to the full dataset (see this <a class="reference internal" href="DiCE_with_private_data.html"><span class="doc">notebook</span></a> for advanced examples).</p>
-<div class="section" id="Loading-dataset">
-<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this headline">¶</a></h2>
+<section id="Loading-dataset">
+<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this headline"></a></h2>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as described in <strong>dice_ml.utils.helpers</strong> module.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -488,8 +398,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -596,8 +505,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># description of transformed features</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># description of transformed features</span>
 <span class="n">adult_info</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_data_info</span><span class="p">()</span>
 <span class="n">adult_info</span>
 </pre></div>
@@ -625,23 +533,21 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span>
                  <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">,</span> <span class="n">data_name</span><span class="o">=</span><span class="s1">&#39;adult&#39;</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Loading-the-ML-model">
-<h2>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="Loading-the-ML-model">
+<h2>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Permalink to this headline"></a></h2>
 <p>Below, we use a pre-trained ML model which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package.</p>
 <p>Note that we need to specify the explainer in the model backend. This is because both model and explainer need to be using the same backend library (pytorch or tensorflow).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">backend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;pytorch_model.PyTorchModel&#39;</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;pytorch_model.PyTorchModel&#39;</span><span class="p">,</span>
            <span class="s1">&#39;explainer&#39;</span><span class="p">:</span> <span class="s1">&#39;feasible_base_vae.FeasibleBaseVAE&#39;</span><span class="p">}</span>
 <span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">&#39;PYT&#39;</span><span class="p">)</span>
 <span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">ML_modelpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_2nodes.pth&#39;</span>
@@ -650,6 +556,15 @@ div.rendered_html tbody tr:hover {
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ML Model&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/mnt/c/Users/amshar/code/dice/dice_ml/model.py:34: UserWarning: {&#39;model&#39;: &#39;pytorch_model.PyTorchModel&#39;, &#39;explainer&#39;: &#39;feasible_base_vae.FeasibleBaseVAE&#39;} backend not in supported backends sklearn,TF1,TF2,PYT
+  warnings.warn(&#39;{0} backend not in supported backends {1}&#39;.format(
+</pre></div></div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
@@ -669,27 +584,26 @@ ML Model Sequential(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="Generate-counterfactuals-using-a-VAE-model">
-<h2>Generate counterfactuals using a VAE model<a class="headerlink" href="#Generate-counterfactuals-using-a-VAE-model" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="Generate-counterfactuals-using-a-VAE-model">
+<h2>Generate counterfactuals using a VAE model<a class="headerlink" href="#Generate-counterfactuals-using-a-VAE-model" title="Permalink to this headline"></a></h2>
 <p>Based on the data object <em>d</em> and the model object <em>m</em>, we can now instantiate the DiCE class for generating explanations. We present the variational inference based approach towards generating counterfactuals, where we first train an encoder-decoder framework to generate counterfactuals.</p>
 <p>FeasibleBaseVAE class has an method <code class="docutils literal notranslate"><span class="pre">train()</span></code>, which would train the Variational Encoder Decoder framework on the input dataframe. It has another arugment, <code class="docutils literal notranslate"><span class="pre">pre_trained</span></code>, which if set to 0 would re-train the framework each time while generating CFs. Else, it can be set to 1 to avoid repeated training of the framework and would load the latest fitted VAE model.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># initiate DiCE</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiCE</span>
 <span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">encoded_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
                    <span class="n">batch_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">validity_reg</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="mf">0.165</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
                    <span class="n">wm1</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">wm2</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">wm3</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
@@ -722,8 +636,7 @@ Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># query instance in the form of a dictionary; keys: feature name, values: feature value</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># query instance in the form of a dictionary; keys: feature name, values: feature value</span>
 <span class="n">query_instance</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span>
                   <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="s1">&#39;Private&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="s1">&#39;HS-grad&#39;</span><span class="p">,</span>
@@ -740,8 +653,7 @@ Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># generate counterfactuals</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
 <span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
 <span class="c1"># visualize the results</span>
 <span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -761,9 +673,9 @@ Query instance (original outcome : 0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/nn/modules/container.py:117: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/nn/modules/container.py:139: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
   input = module(input)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   c = torch.tensor(c).float()
 </pre></div></div>
 </div>
@@ -862,7 +774,7 @@ Counterfactual set (new outcome: 1.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>42.0</td>
+      <td>-</td>
       <td>-</td>
       <td>Doctorate</td>
       <td>Married</td>
@@ -886,7 +798,7 @@ Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>2</th>
-      <td>42.0</td>
+      <td>40.0</td>
       <td>-</td>
       <td>Doctorate</td>
       <td>Married</td>
@@ -898,7 +810,7 @@ Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>3</th>
-      <td>-</td>
+      <td>38.0</td>
       <td>-</td>
       <td>Doctorate</td>
       <td>Married</td>
@@ -910,7 +822,7 @@ Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>4</th>
-      <td>37.0</td>
+      <td>38.0</td>
       <td>-</td>
       <td>Doctorate</td>
       <td>Married</td>
@@ -925,14 +837,14 @@ Counterfactual set (new outcome: 1.0)
 </div></div>
 </div>
 <p>That’s it! You can try generating counterfactual explanations for other examples using the same code. You can compare the running time of this VAE-based to DiCE’s default method: VAE-based method is super fast!</p>
-</div>
-</div>
-<div class="section" id="Adding-feasibility-constraints">
-<h1>Adding feasibility constraints<a class="headerlink" href="#Adding-feasibility-constraints" title="Permalink to this headline">¶</a></h1>
+</section>
+</section>
+<section id="Adding-feasibility-constraints">
+<h1>Adding feasibility constraints<a class="headerlink" href="#Adding-feasibility-constraints" title="Permalink to this headline"></a></h1>
 <p>However, you might notice that for some examples, the above method can still return infeasible counterfactuals. This requires our base framework to be adpated for prodcuing feasible counterfactuals. A detailed description of how we adapt the method under different assumptions is provided in <a class="reference external" href="https://arxiv.org/pdf/1912.03277">this paper</a>.</p>
 <p>In the section below, we show an adaptation our base approach for preserving the Age-Ed constraint: Age and Education can never decrease and increasing Education implies increase in Age. This approach is called <strong>ModelApprox</strong>, where we adapt our base approach for simple unary and binary constraints.</p>
-<div class="section" id="ModelApprox">
-<h2>ModelApprox<a class="headerlink" href="#ModelApprox" title="Permalink to this headline">¶</a></h2>
+<section id="ModelApprox">
+<h2>ModelApprox<a class="headerlink" href="#ModelApprox" title="Permalink to this headline"></a></h2>
 <p>Similar to the FeasibleBaseVAE class above, FeasibleModelApprox class has a method <code class="docutils literal notranslate"><span class="pre">train()</span></code> with argument <code class="docutils literal notranslate"><span class="pre">pre_trained</span></code>, which determines whether to train the framework again or load the latest optimal model. However, there are additional arguments to the <code class="docutils literal notranslate"><span class="pre">train()</span></code> method:</p>
 <ol class="arabic simple">
 <li><p>The first arugment determines whether the constraint to be preserved is unary or monotonic</p></li>
@@ -940,15 +852,14 @@ Counterfactual set (new outcome: 1.0)
 <li><p>The third argument provides the intended direction of change for the constrained variables: Value of 1 means that we allow for only increase in the constrained variable on the change from data point to its counterfactual and vice versa.</p></li>
 <li><p>The fourth argument refers to the penalty weight for infeasibility under given constraint.</p></li>
 </ol>
-</div>
-<div class="section" id="Initilize-the-Model-and-Explainer-for-FeasibleModelApprox">
-<h2>Initilize the Model and Explainer for FeasibleModelApprox<a class="headerlink" href="#Initilize-the-Model-and-Explainer-for-FeasibleModelApprox" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="Initilize-the-Model-and-Explainer-for-FeasibleModelApprox">
+<h2>Initilize the Model and Explainer for FeasibleModelApprox<a class="headerlink" href="#Initilize-the-Model-and-Explainer-for-FeasibleModelApprox" title="Permalink to this headline"></a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">backend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;pytorch_model.PyTorchModel&#39;</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;pytorch_model.PyTorchModel&#39;</span><span class="p">,</span>
            <span class="s1">&#39;explainer&#39;</span><span class="p">:</span> <span class="s1">&#39;feasible_model_approx.FeasibleModelApprox&#39;</span><span class="p">}</span>
 <span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
 <span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">ML_modelpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_2nodes.pth&#39;</span>
@@ -976,13 +887,15 @@ ML Model Sequential(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/mnt/c/Users/amshar/code/dice/dice_ml/model.py:34: UserWarning: {&#39;model&#39;: &#39;pytorch_model.PyTorchModel&#39;, &#39;explainer&#39;: &#39;feasible_model_approx.FeasibleModelApprox&#39;} backend not in supported backends sklearn,TF1,TF2,PYT
+  warnings.warn(&#39;{0} backend not in supported backends {1}&#39;.format(
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/serialization.py:658: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
 </pre></div></div>
 </div>
@@ -990,8 +903,7 @@ ML Model Sequential(
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># initiate DiCE</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiCE</span>
 <span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">encoded_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
                    <span class="n">validity_reg</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="mf">0.344</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
                    <span class="n">wm1</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">wm2</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">wm3</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
@@ -1023,8 +935,7 @@ Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># generate counterfactuals</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
 <span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
 <span class="c1"># visualize the results</span>
 <span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1044,9 +955,9 @@ Query instance (original outcome : 0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/torch/nn/modules/container.py:117: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/nn/modules/container.py:139: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
   input = module(input)
-/home/amit/py-envs/env3.8/lib/python3.8/site-packages/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   c = torch.tensor(c).float()
 </pre></div></div>
 </div>
@@ -1145,42 +1056,6 @@ Counterfactual set (new outcome: 1.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>37.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>43.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>43.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
       <td>45.0</td>
       <td>-</td>
       <td>Doctorate</td>
@@ -1192,8 +1067,44 @@ Counterfactual set (new outcome: 1.0)
       <td>1</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>1</th>
+      <td>40.0</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>40.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>42.0</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>40.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
       <td>44.0</td>
+      <td>-</td>
+      <td>Doctorate</td>
+      <td>Married</td>
+      <td>White-Collar</td>
+      <td>-</td>
+      <td>Male</td>
+      <td>40.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>42.0</td>
       <td>-</td>
       <td>Doctorate</td>
       <td>Married</td>
@@ -1209,63 +1120,38 @@ Counterfactual set (new outcome: 1.0)
 </div>
 <p>The results for ModelApprox show that the Age is also increased with increase in Education in counterfactual explanations unlike the BaseVAE method. You can try to experiment with ModelApprox to preserve unary and monotonic constraints for other datasets too. Examples for even more advanced approaches like <strong>SCMGenCF</strong>,<strong>OracleGenCF</strong> would be included soon to this repository, where we learn to generate feasible counterfactuals for complex feasiblity constraints. More details can be found in
 <a class="reference external" href="https://arxiv.org/pdf/1912.03277">our paper</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../dice_ml.html" class="btn btn-neutral float-right" title="dice_ml package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="DiCE_with_advanced_options.html" class="btn btn-neutral float-left" title="Advanced options to customize Counterfactual Explanations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DiCE_with_advanced_options.html" class="btn btn-neutral float-left" title="Advanced options to customize Counterfactual Explanations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../dice_ml.html" class="btn btn-neutral float-right" title="dice_ml package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2020, Ramaravind, Amit, Chenhao
-
-    </p>
+    <p>&#169; Copyright 2020, Ramaravind, Amit, Chenhao.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

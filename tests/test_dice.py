@@ -54,8 +54,8 @@ class TestBaseExplainerLoader:
         pytest.importorskip('sklearn')
         backend = 'sklearn'
         exp = self._get_exp(backend)
+        query_instances = helpers.load_adult_income_dataset().drop("income", axis=1)[0:1]
         with pytest.raises(UserConfigValidationException):
-            query_instances = helpers.load_adult_income_dataset().drop("income", axis=1)[0:1]
             exp.global_feature_importance(query_instances)
 
     def test_unsupported_sampling_strategy(self):

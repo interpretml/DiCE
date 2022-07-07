@@ -30,3 +30,10 @@ class _SchemaVersions:
     CURRENT_VERSION = V2
 
     ALL_VERSIONS = [V1, V2]
+
+
+class _PostHocSparsityTypes:
+    LINEAR = 'linear'
+    BINARY = 'binary'
+
+    ALL = [LINEAR, BINARY]

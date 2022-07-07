@@ -263,7 +263,10 @@ class DiceGenetic(ExplainerBase):
 
         # Prepares user defined query_instance for DiCE.
         query_instance_orig = query_instance
-        query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance)
+        query_instance_orig = self.data_interface.prepare_query_instance(
+                query_instance=query_instance_orig)
+        query_instance = self.data_interface.prepare_query_instance(
+                query_instance=query_instance)
         # number of output nodes of ML model
         self.num_output_nodes = None
         if self.model.model_type == ModelTypes.Classifier:
@@ -569,7 +572,7 @@ class DiceGenetic(ExplainerBase):
             if ret_df is None:
                 ret_df = df
             else:
-                ret_df = ret_df.append(df)
+                ret_df = pd.concat([ret_df, df])
         return ret_df
 
     def get_valid_feature_range(self, normalized=False):
