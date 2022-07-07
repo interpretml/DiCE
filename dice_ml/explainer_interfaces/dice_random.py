@@ -29,7 +29,6 @@ class DiceRandom(ExplainerBase):
         self.model.transformer.feed_data_params(data_interface)
         self.model.transformer.initialize_transform_func()
 
-
         self.precisions = self.data_interface.get_decimal_precisions(output_type="dict")
         if self.data_interface.outcome_name in self.precisions:
             self.outcome_precision = [self.precisions[self.data_interface.outcome_name]]

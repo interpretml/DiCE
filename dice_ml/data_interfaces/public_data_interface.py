@@ -338,7 +338,6 @@ class PublicData(_BaseData):
             # one-hot-encoded data is same as original data if there is no categorical features.
             self.ohe_encoded_feature_names = [feat for feat in self.feature_names]
 
-
     def get_data_params_for_gradient_dice(self):
         """Gets all data related params for DiCE."""
 
@@ -513,7 +512,6 @@ class PublicData(_BaseData):
                                         self.categorical_feature_names,
                                         self.continuous_feature_names)
         return test
-
 
     def get_ohe_min_max_normalized_data(self, query_instance):
         """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,

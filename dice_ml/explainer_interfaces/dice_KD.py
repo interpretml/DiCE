@@ -25,7 +25,6 @@ class DiceKD(ExplainerBase):
         self.total_random_inits = 0
         super().__init__(data_interface)  # initiating data related parameters
 
-
         # initializing model variables
         self.model = model_interface
         self.model.load_model()  # loading pickled trained model if applicable

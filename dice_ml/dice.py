@@ -74,18 +74,19 @@ def decide(model_interface, method):
             from dice_ml.explainer_interfaces.dice_pytorch import DicePyTorch
             return DicePyTorch
         else:
-            raise UserConfigValidationException("{0} is only supported for differentiable neural network models. "
-                                            "Please choose one of {1}, {2} or {3}".format(
-                                                method, SamplingStrategy.Random,
-                                                SamplingStrategy.Genetic,
-                                                SamplingStrategy.KdTree
-                                            ))
+            raise UserConfigValidationException(
+                    "{0} is only supported for differentiable neural network models. "
+                    "Please choose one of {1}, {2} or {3}".format(
+                        method, SamplingStrategy.Random,
+                        SamplingStrategy.Genetic,
+                        SamplingStrategy.KdTree
+                    ))
     elif method is None:
-            # all other backends
-            backend_dice = model_interface.backend['explainer']
-            module_name, class_name = backend_dice.split('.')
-            module = __import__("dice_ml.explainer_interfaces." + module_name, fromlist=[class_name])
-            return getattr(module, class_name)
+        # all other backends
+        backend_dice = model_interface.backend['explainer']
+        module_name, class_name = backend_dice.split('.')
+        module = __import__("dice_ml.explainer_interfaces." + module_name, fromlist=[class_name])
+        return getattr(module, class_name)
     else:
         raise UserConfigValidationException("Unsupported sample strategy {0} provided. "
                                             "Please choose one of {1}, {2} or {3}".format(

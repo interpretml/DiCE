@@ -221,8 +221,10 @@ def ohe_min_max_transformation(data, data_interface):
     """the data is one-hot-encoded and min-max normalized and fed to the ML model"""
     return data_interface.get_ohe_min_max_normalized_data(data)
 
+
 def inverse_ohe_min_max_transformation(data, data_interface):
     return data_interface.get_inverse_ohe_min_max_normalized_data(data)
+
 
 class DataTransfomer:
     """A class to transform data based on user-defined function to get predicted outcomes.

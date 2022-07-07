@@ -94,7 +94,6 @@ class ExplainerBase(ABC):
                 raise UserConfigValidationException(
                     "The range provided in desired_range should be in ascending order.")
 
-
     def generate_counterfactuals(self, query_instances, total_CFs,
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
@@ -488,7 +487,7 @@ class ExplainerBase(ABC):
 
         preds = self.model.get_output(input_instance)
         if self.model.model_type == ModelTypes.Classifier and \
-           len(preds.shape) == 1: # from deep learning predictors
+           len(preds.shape) == 1:  # from deep learning predictors
             preds = np.column_stack([1 - preds, preds])
         return preds
 
@@ -671,7 +670,7 @@ class ExplainerBase(ABC):
                     original_pred_1 = original_pred
                 target_class = int(1 - original_pred_1)
                 return target_class
-            elif num_output_nodes == 1: # only for pytorch DL model
+            elif num_output_nodes == 1:  # only for pytorch DL model
                 original_pred_1 = np.round(original_pred)
                 target_class = int(1-original_pred_1)
                 return target_class
@@ -704,7 +703,7 @@ class ExplainerBase(ABC):
         for i in range(len(model_outputs)):
             pred = model_outputs[i]
             if self.model.model_type == ModelTypes.Classifier:
-                if self.num_output_nodes in (1,2):  # binary
+                if self.num_output_nodes in (1, 2):  # binary
                     if self.num_output_nodes == 2:
                         pred_1 = pred[self.num_output_nodes-1]
                     else:
@@ -769,7 +768,7 @@ class ExplainerBase(ABC):
                         model_output[i] = np.argmax(model_scores[i])
                     else:
                         model_output[i] = np.round(model_scores[i])[0]
-                else: # 1-D input
+                else:  # 1-D input
                     model_output[i] = np.round(model_scores[i])
             elif self.model.model_type == ModelTypes.Regressor:
                 model_output[i] = model_scores[i]

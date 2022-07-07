@@ -106,7 +106,7 @@ class TestCommonDataMethods:
         d = self.d[0]
         temp_ohe_data = d.get_ohe_min_max_normalized_data(d.data_df.iloc[[0]])
         d.create_ohe_params(temp_ohe_data)
-        #d.create_ohe_params()
+        # d.create_ohe_params()
         # d.categorical_feature_names = ['cat1', 'cat2']
         # d.encoded_feature_names = ['cat2_cont1', 'cont2', 'cat1_val1', 'cat1_val2', 'cat2_val1', 'cat2_val2']
         # d.continuous_feature_names = ['cat2_cont1', 'cont2']

@@ -27,7 +27,7 @@ class PyTorchModel(BaseModel):
             self.model = torch.load(self.model_path)
 
     def get_output(self, input_instance, model_score=True,
-            transform_data=False, out_tensor=False):
+                   transform_data=False, out_tensor=False):
         """returns prediction probabilities
 
         :param input_tensor: test input.
@@ -42,7 +42,7 @@ class PyTorchModel(BaseModel):
         if not out_tensor:
             out = out.data.numpy()
         if model_score is False and self.model_type == ModelTypes.Classifier:
-            out = np.round(out) # TODO need to generalize for n-class classifier
+            out = np.round(out)  # TODO need to generalize for n-class classifier
         return out
 
     def set_eval_mode(self):

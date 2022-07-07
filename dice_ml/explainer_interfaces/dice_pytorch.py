@@ -9,7 +9,6 @@ import numpy as np
 import torch
 
 from dice_ml import diverse_counterfactuals as exp
-from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
@@ -46,14 +45,14 @@ class DicePyTorch(ExplainerBase):
         self.optimizer_weights = []  # optimizer, learning_rate
 
     def _generate_counterfactuals(self, query_instance, total_CFs,
-                                 desired_class="opposite", desired_range=None,
-                                 proximity_weight=0.5,
-                                 diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all",
-                                 permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
-                                 feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500,
-                                 max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
-                                 init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
-                                 posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", limit_steps_ls=10000):
+                                  desired_class="opposite", desired_range=None,
+                                  proximity_weight=0.5,
+                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all",
+                                  permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
+                                  feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500,
+                                  max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
+                                  init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
+                                  posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", limit_steps_ls=10000):
         """Generates diverse counterfactual explanations.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe
@@ -135,9 +134,10 @@ class DicePyTorch(ExplainerBase):
             desired_class=desired_class)
 
     def get_model_output(self, input_instance,
-            transform_data=False, out_tensor=True):
+                         transform_data=False, out_tensor=True):
         """get output probability of ML model"""
-        return self.model.get_output(input_instance,
+        return self.model.get_output(
+                input_instance,
                 transform_data=transform_data,
                 out_tensor=out_tensor)[(self.num_output_nodes-1):]
 
@@ -145,8 +145,8 @@ class DicePyTorch(ExplainerBase):
         """prediction function"""
         if not torch.is_tensor(input_instance):
             input_instance = torch.tensor(input_instance).float()
-        return self.get_model_output(input_instance,
-                transform_data=False, out_tensor=False)
+        return self.get_model_output(
+                input_instance, transform_data=False, out_tensor=False)
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
