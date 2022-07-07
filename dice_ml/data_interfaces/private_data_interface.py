@@ -1,6 +1,7 @@
 """Module containing meta data information about private data."""
 
 import collections
+from collections import defaultdict
 import logging
 import sys
 
@@ -265,16 +266,22 @@ class PrivateData(_BaseData):
             out.drop(cols, axis=1, inplace=True)
         return out
 
-    def get_decimal_precisions(self):
+    def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
+        precisions_dict = defaultdict(int)
         precisions = [0]*len(self.continuous_feature_names)
         for ix, feature_name in enumerate(self.continuous_feature_names):
             type_prec = self.type_and_precision[feature_name]
             if type_prec == 'int':
-                precisions[ix] = 0
+                prec = 0
             else:
-                precisions[ix] = self.type_and_precision[feature_name][1]
-        return precisions
+                prec = self.type_and_precision[feature_name][1]
+            precisions[ix] = prec
+            precisions_dict[feature_name] = prec
+        if output_type == "list":
+            return precisions
+        elif output_type == "dict":
+            return precisions_dict
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""
