@@ -62,9 +62,8 @@ class TestKerasModelMethods:
     @pytest.mark.parametrize("prediction", [0.747])
     def test_model_output(self, sample_adultincome_query, public_data_object, prediction):
         # Initializing data and model objects
-        public_data_object.create_ohe_params()
         self.m.load_model()
-        # initializing data transormation required for ML model
+        # initializing data transformation required for ML model
         self.m.transformer = DataTransfomer(func='ohe-min-max', kw_args=None)
         self.m.transformer.feed_data_params(public_data_object)
         self.m.transformer.initialize_transform_func()
