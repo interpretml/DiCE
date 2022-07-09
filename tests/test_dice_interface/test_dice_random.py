@@ -5,37 +5,53 @@ from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.utils.neuralnetworks import FFNetwork
+
+BACKENDS = ['sklearn', 'PYT']
 
 
-@pytest.fixture()
-def random_binary_classification_exp_object():
-    backend = 'sklearn'
+@pytest.fixture(scope="module", params=BACKENDS)
+def random_binary_classification_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
     exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 
-@pytest.fixture()
-def random_multi_classification_exp_object():
-    backend = 'sklearn'
+#TODO multiclass is not currently supported for neural networks
+@pytest.fixture(scope="module", params=['sklearn'])
+def random_multi_classification_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_multiclass()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
     exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 
-@pytest.fixture()
-def random_regression_exp_object():
-    backend = 'sklearn'
+@pytest.fixture(scope="module", params=BACKENDS)
+def random_regression_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_regression()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
+    if backend == "PYT":
+        net = FFNetwork(4, is_classifier=False)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
+    else:
+        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
     exp = dice_ml.Dice(d, m, method='random')
     return exp
 
@@ -46,7 +62,9 @@ class TestDiceRandomBinaryClassificationMethods:
         self.exp = random_binary_classification_exp_object  # explainer object
 
     @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 1)])
-    def test_random_counterfactual_explanations_output(self, desired_class, sample_custom_query_1, total_CFs):
+    def test_random_counterfactual_explanations_output(
+            self,
+            desired_class, sample_custom_query_1, total_CFs):
         counterfactual_explanations = self.exp.generate_counterfactuals(
             query_instances=sample_custom_query_1, desired_class=desired_class,
             total_CFs=total_CFs)

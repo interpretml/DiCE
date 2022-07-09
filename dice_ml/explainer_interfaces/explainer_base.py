@@ -678,7 +678,13 @@ class ExplainerBase(ABC):
                 raise UserConfigValidationException(
                     "Desired class cannot be opposite if the number of classes is more than 2.")
         elif isinstance(desired_class_input, int):
-            if desired_class_input >= 0 and desired_class_input < num_output_nodes:
+            if num_output_nodes == 1:   # for DL models
+                if desired_class_input in (0, 1):
+                    target_class = desired_class_input
+                    return target_class
+                else:
+                    raise UserConfigValidationException("Only 0 and 1 are supported as desired class for binary classification!")
+            elif desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
                 return target_class
             else:
