@@ -25,7 +25,7 @@ def random_binary_classification_exp_object(request):
     return exp
 
 
-#TODO multiclass is not currently supported for neural networks
+# TODO multiclass is not currently supported for neural networks
 @pytest.fixture(scope="module", params=['sklearn'])
 def random_multi_classification_exp_object(request):
     backend = request.param

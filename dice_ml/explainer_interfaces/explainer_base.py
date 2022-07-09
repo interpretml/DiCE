@@ -683,7 +683,7 @@ class ExplainerBase(ABC):
                     target_class = desired_class_input
                     return target_class
                 else:
-                    raise UserConfigValidationException("Only 0 and 1 are supported as desired class for binary classification!")
+                    raise UserConfigValidationException("Only 0, 1 are supported as desired class for binary classification!")
             elif desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
                 return target_class

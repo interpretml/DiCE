@@ -1,9 +1,9 @@
 """Module containing meta data information about private data."""
 
 import collections
-from collections import defaultdict
 import logging
 import sys
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
