@@ -104,7 +104,7 @@ class CounterfactualExamples:
                                   is_notebook_console=is_notebook_console)
             elif not hasattr(self.data_interface, 'data_df'):  # for private data
                 print('\nDiverse Counterfactual set without sparsity correction since only metadata about each',
-                      ' feature is available (new outcome: ', self.new_outcome)
+                      ' feature is available (new outcome: %i)' % (self.new_outcome))
                 self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
                                   is_notebook_console=is_notebook_console)
             else:

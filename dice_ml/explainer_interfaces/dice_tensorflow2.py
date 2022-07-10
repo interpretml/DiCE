@@ -29,7 +29,10 @@ class DiceTensorFlow2(ExplainerBase):
         self.model.transformer.feed_data_params(data_interface)
         self.model.transformer.initialize_transform_func()
         # temp data to create some attributes like encoded feature names
-        temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        if hasattr(self.data_interface, "data_df"):
+            temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        else:
+            temp_ohe_data = None
         self.data_interface.create_ohe_params(temp_ohe_data)
         self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
             self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()

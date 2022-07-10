@@ -101,22 +101,6 @@ class PublicData(_BaseData):
         else:
             self.continuous_features_precision = None
 
-    def _validate_and_set_permitted_range(self, params):
-        """Validate and set the dictionary of permitted ranges for continuous features."""
-        input_permitted_range = None
-        if 'permitted_range' in params:
-            input_permitted_range = params['permitted_range']
-
-            if not hasattr(self, 'feature_names'):
-                raise SystemException('Feature names not correctly set in public data interface')
-
-            for input_permitted_range_feature_name in input_permitted_range:
-                if input_permitted_range_feature_name not in self.feature_names:
-                    raise UserConfigValidationException(
-                        "permitted_range contains some feature names which are not part of columns in dataframe"
-                    )
-        self.permitted_range, _ = self.get_features_range(input_permitted_range)
-
     def _set_feature_dtypes(self, data_df, categorical_feature_names,
                             continuous_feature_names):
         """Set the correct type of each feature column."""
@@ -136,38 +120,7 @@ class PublicData(_BaseData):
                         np.int32)
         return data_df
 
-    def check_features_to_vary(self, features_to_vary):
-        if features_to_vary is not None and features_to_vary != 'all':
-            not_training_features = set(features_to_vary) - set(self.feature_names)
-            if len(not_training_features) > 0:
-                raise UserConfigValidationException("Got features {0} which are not present in training data".format(
-                    not_training_features))
-
-    def check_permitted_range(self, permitted_range):
-        if permitted_range is not None:
-            permitted_range_features = list(permitted_range)
-            not_training_features = set(permitted_range_features) - set(self.feature_names)
-            if len(not_training_features) > 0:
-                raise UserConfigValidationException("Got features {0} which are not present in training data".format(
-                    not_training_features))
-
-            for feature in permitted_range_features:
-                if feature in self.categorical_feature_names:
-                    train_categories = self.permitted_range[feature]
-                    for test_category in permitted_range[feature]:
-                        if test_category not in train_categories:
-                            raise UserConfigValidationException(
-                                'The category {0} does not occur in the training data for feature {1}.'
-                                ' Allowed categories are {2}'.format(test_category, feature, train_categories))
-
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings.
-           TODO: add comments as to where this is used if this function is necessary, else remove.
-        """
-        if feature_weights == "inverse_mad":
-            self.get_valid_mads(display_warnings=True, return_mads=False)
-
-    def get_features_range(self, permitted_range_input=None):
+    def get_features_range(self, permitted_range_input=None, features_dict=None):
         ranges = {}
         # Getting default ranges based on the dataset
         for feature_name in self.continuous_feature_names:
