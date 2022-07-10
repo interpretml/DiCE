@@ -71,7 +71,6 @@ class PrivateData(_BaseData):
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
 
-
         self._validate_and_set_data_name(params=params)
 
     def _validate_and_set_type_and_precision(self, params):
