@@ -1,7 +1,9 @@
 """Module containing base class for data interfaces for dice-ml."""
 
 from abc import ABC, abstractmethod
-from dice_ml.utils.exception import SystemException, UserConfigValidationException
+
+from dice_ml.utils.exception import (SystemException,
+                                     UserConfigValidationException)
 
 
 class _BaseData(ABC):

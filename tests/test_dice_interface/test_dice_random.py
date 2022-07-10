@@ -1,4 +1,5 @@
 import pytest
+import torch
 
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
@@ -16,6 +17,7 @@ def random_binary_classification_exp_object(request):
     dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     if backend == "PYT":
+        torch.manual_seed(1)
         net = FFNetwork(4)
         m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
     else:
