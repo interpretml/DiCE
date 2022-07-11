@@ -3,22 +3,29 @@ import pytest
 import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
+from dice_ml.utils.neuralnetworks import FFNetwork
+
+BACKENDS = ['sklearn', 'PYT']
 
 
-@pytest.fixture()
-def genetic_binary_classification_exp_object():
-    backend = 'sklearn'
+@pytest.fixture(scope="module", params=['sklearn'])
+def genetic_binary_classification_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
 
 
-@pytest.fixture()
-def genetic_multi_classification_exp_object():
-    backend = 'sklearn'
+@pytest.fixture(scope="module", params=['sklearn'])
+def genetic_multi_classification_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_multiclass()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
@@ -27,13 +34,17 @@ def genetic_multi_classification_exp_object():
     return exp
 
 
-@pytest.fixture()
-def genetic_regression_exp_object():
-    backend = 'sklearn'
+@pytest.fixture(scope="module", params=BACKENDS)
+def genetic_regression_exp_object(request):
+    backend = request.param
     dataset = helpers.load_custom_testing_dataset_regression()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
+    if backend == "PYT":
+        net = FFNetwork(4, is_classifier=False)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
+    else:
+        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
 
@@ -136,6 +147,7 @@ class TestDiceGeneticBinaryClassificationMethods:
         self.exp.yloss_type = 'hinge_loss'
         mocker.patch('dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.label_decode', return_value=None)
         mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
+        mocker.patch('dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output', return_value=[[0, 0.5, 0.5]])
         custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
         assert custom_preds[0] == desired_class
 

@@ -9,7 +9,6 @@ import numpy as np
 import torch
 
 from dice_ml import diverse_counterfactuals as exp
-from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
@@ -23,20 +22,17 @@ class DicePyTorch(ExplainerBase):
         """
         # initiating data related parameters
         super().__init__(data_interface)
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
-            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
-
         # initializing model related variables
         self.model = model_interface
         self.model.load_model()  # loading trained model
-        if self.model.transformer.func is not None:  # TODO: this error is probably too big - need to change it.
-            raise ValueError("Gradient-based DiCE currently "
-                             "(1) accepts the data only in raw categorical and continuous formats, "
-                             "(2) does one-hot-encoding and min-max-normalization internally, "
-                             "(3) expects the ML model the accept the data in this same format. "
-                             "If your problem supports this, please initialize model class again "
-                             "with no custom transformation function.")
-        # number of output nodes of ML model
+        self.model.transformer.feed_data_params(data_interface)
+        self.model.transformer.initialize_transform_func()
+        # temp data to create some attributes like encoded feature names
+        temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        self.data_interface.create_ohe_params(temp_ohe_data)
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
+            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
+
         self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names)).shape[1]
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
@@ -48,19 +44,22 @@ class DicePyTorch(ExplainerBase):
         self.hyperparameters = [1, 1, 1]  # proximity_weight, diversity_weight, categorical_penalty
         self.optimizer_weights = []  # optimizer, learning_rate
 
-    def generate_counterfactuals(self, query_instance, total_CFs, desired_class="opposite", proximity_weight=0.5,
-                                 diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all",
-                                 permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
-                                 feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500,
-                                 max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
-                                 init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
-                                 posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
+    def _generate_counterfactuals(self, query_instance, total_CFs,
+                                  desired_class="opposite", desired_range=None,
+                                  proximity_weight=0.5,
+                                  diversity_weight=1.0, categorical_penalty=0.1, algorithm="DiverseCF", features_to_vary="all",
+                                  permitted_range=None, yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
+                                  feature_weights="inverse_mad", optimizer="pytorch:adam", learning_rate=0.05, min_iter=500,
+                                  max_iter=5000, project_iter=0, loss_diff_thres=1e-5, loss_converge_maxiter=1, verbose=False,
+                                  init_near_query_instance=True, tie_random=False, stopping_threshold=0.5,
+                                  posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear", limit_steps_ls=10000):
         """Generates diverse counterfactual explanations.
 
         :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe
         :param total_CFs: Total number of counterfactuals required.
         :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is "opposite" to the outcome class
                               of query_instance for binary classification.
+        :param desired_range: Not supported currently.
         :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the
                                  query_instance.
         :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.
@@ -94,6 +93,7 @@ class DicePyTorch(ExplainerBase):
                                            Prefer binary search when a feature range is large
                                            (for instance, income varying from 10k to 1000k) and only if the features
                                            share a monotonic relationship with predicted outcome in the model.
+        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement
 
         :return: A CounterfactualExamples object to store and visualize the resulting
                  counterfactual explanations (see diverse_counterfactuals.py).
@@ -104,10 +104,6 @@ class DicePyTorch(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            # if not self.data_interface.check_features_range(permitted_range):
-            #     raise ValueError(
-            #         "permitted range of features should be within their original range")
-            # else:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
             self.cont_minx = []
@@ -127,9 +123,9 @@ class DicePyTorch(ExplainerBase):
             self.find_counterfactuals(
                 query_instance, desired_class, optimizer, learning_rate, min_iter, max_iter,
                 project_iter, loss_diff_thres, loss_converge_maxiter, verbose, init_near_query_instance,
-                tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+                tie_random, stopping_threshold, posthoc_sparsity_param, posthoc_sparsity_algorithm, limit_steps_ls)
 
-        counterfactual_explanations = exp.CounterfactualExamples(
+        return exp.CounterfactualExamples(
             data_interface=self.data_interface,
             final_cfs_df=final_cfs_df,
             test_instance_df=test_instance_df,
@@ -137,21 +133,24 @@ class DicePyTorch(ExplainerBase):
             posthoc_sparsity_param=posthoc_sparsity_param,
             desired_class=desired_class)
 
-        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
-
-    def get_model_output(self, input_instance):
+    def get_model_output(self, input_instance,
+                         transform_data=False, out_tensor=True):
         """get output probability of ML model"""
-        return self.model.get_output(input_instance)[(self.num_output_nodes-1):]
+        return self.model.get_output(
+                input_instance,
+                transform_data=transform_data,
+                out_tensor=out_tensor)[(self.num_output_nodes-1):]
 
     def predict_fn(self, input_instance):
         """prediction function"""
         if not torch.is_tensor(input_instance):
             input_instance = torch.tensor(input_instance).float()
-        return self.get_model_output(input_instance).data.numpy()
+        return self.get_model_output(
+                input_instance, transform_data=False, out_tensor=False)
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance).iloc[0].values
+        input_instance = self.model.transformer.transform(input_instance).to_numpy()[0]
         return self.predict_fn(torch.tensor(input_instance).float())
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
@@ -417,13 +416,9 @@ class DicePyTorch(ExplainerBase):
     def find_counterfactuals(self, query_instance, desired_class, optimizer, learning_rate, min_iter,
                              max_iter, project_iter, loss_diff_thres, loss_converge_maxiter, verbose,
                              init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param,
-                             posthoc_sparsity_algorithm):
+                             posthoc_sparsity_algorithm, limit_steps_ls):
         """Finds counterfactuals by gradient-descent."""
-
-        # Prepares user defined query_instance for DiCE.
-        # query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        # query_instance = query_instance.iloc[0].values
-        query_instance = self.data_interface.get_ohe_min_max_normalized_data(query_instance).iloc[0].values
+        query_instance = self.model.transformer.transform(query_instance).to_numpy()[0]
         self.x1 = torch.tensor(query_instance)
 
         # find the predicted value of query_instance
@@ -562,19 +557,25 @@ class DicePyTorch(ExplainerBase):
 
         # do inverse transform of CFs to original user-fed format
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
-        final_cfs_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(cfs)
+        final_cfs_df = self.model.transformer.inverse_transform(
+                self.data_interface.get_decoded_data(cfs))
+        # rounding off to 3 decimal places
         cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds]
         cfs_preds = [item for sublist in cfs_preds for item in sublist]
         final_cfs_df[self.data_interface.outcome_name] = np.array(cfs_preds)
 
-        test_instance_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(query_instance)
+        test_instance_df = self.model.transformer.inverse_transform(
+                self.data_interface.get_decoded_data(query_instance))
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data
         if posthoc_sparsity_param is not None and posthoc_sparsity_param > 0 and 'data_df' in self.data_interface.__dict__:
             final_cfs_df_sparse = final_cfs_df.copy()
-            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(
-                final_cfs_df_sparse, test_instance_df, posthoc_sparsity_param, posthoc_sparsity_algorithm)
+            final_cfs_df_sparse = self.do_posthoc_sparsity_enhancement(final_cfs_df_sparse,
+                                                                       test_instance_df,
+                                                                       posthoc_sparsity_param,
+                                                                       posthoc_sparsity_algorithm,
+                                                                       limit_steps_ls)
         else:
             final_cfs_df_sparse = None
 

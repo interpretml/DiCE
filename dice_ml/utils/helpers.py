@@ -219,7 +219,11 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
 def ohe_min_max_transformation(data, data_interface):
     """the data is one-hot-encoded and min-max normalized and fed to the ML model"""
-    return data_interface.get_ohe_min_max_normalized_data(data).values
+    return data_interface.get_ohe_min_max_normalized_data(data)
+
+
+def inverse_ohe_min_max_transformation(data, data_interface):
+    return data_interface.get_inverse_ohe_min_max_normalized_data(data)
 
 
 class DataTransfomer:
@@ -239,7 +243,13 @@ class DataTransfomer:
 
     def initialize_transform_func(self):
         if self.func == 'ohe-min-max':
-            self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args, validate=False)
+            self.data_transformer = FunctionTransformer(
+                    func=ohe_min_max_transformation,
+                    inverse_func=inverse_ohe_min_max_transformation,
+                    check_inverse=False,
+                    validate=False,
+                    kw_args=self.kw_args,
+                    inv_kw_args=self.kw_args)
         elif self.func is None:
             # identity transformation
             # add more ready-to-use transformers (such as label-encoding) in elif loops.

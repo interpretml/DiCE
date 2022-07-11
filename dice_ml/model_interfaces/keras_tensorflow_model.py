@@ -19,7 +19,7 @@ class KerasTensorFlowModel(BaseModel):
                         dictionary of kw_args, by default.
         """
 
-        super().__init__(model, model_path, backend)
+        super().__init__(model, model_path, backend, func, kw_args)
 
     def load_model(self):
         if self.model_path != '':
@@ -32,9 +32,8 @@ class KerasTensorFlowModel(BaseModel):
         :param training: to determine training mode in TF2.
         :param transform_data: boolean to indicate if data transformation is required.
         """
-        if transform_data:
-            input_tensor = tf.constant(self.transformer.transform(input_tensor), dtype=tf.float32)
-
+        if transform_data or not tf.is_tensor(input_tensor):
+            input_tensor = tf.constant(self.transformer.transform(input_tensor).to_numpy(), dtype=tf.float32)
         if self.backend == 'TF2':
             return self.model(input_tensor, training=training)
         else:
