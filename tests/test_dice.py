@@ -70,5 +70,5 @@ class TestBaseExplainerLoader:
         with pytest.raises(UserConfigValidationException) as ucve:
             self._get_exp(backend, method='kdtree', is_public_data_interface=False)
 
-        assert 'Private data interface is not supported with sklearn kdtree explainer' + \
+        assert 'Private data interface is not supported with kdtree explainer' + \
                ' since kdtree explainer needs access to entire training data' in str(ucve)

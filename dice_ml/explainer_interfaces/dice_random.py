@@ -173,6 +173,8 @@ class DiceRandom(ExplainerBase):
                                                                        posthoc_sparsity_param,
                                                                        posthoc_sparsity_algorithm,
                                                                        limit_steps_ls)
+        elif self.final_cfs is not None:
+            final_cfs_df_sparse = final_cfs_df.copy()
         else:
             final_cfs_df_sparse = None
 

@@ -177,6 +177,8 @@ class PrivateData(_BaseData):
             return mads
 
     def get_features_range(self, permitted_range_input=None, features_dict=None):
+        if features_dict is None:
+            features_dict = self.permitted_range
         ranges = {}
         # Getting default ranges based on the dataset
         for feature in features_dict:
@@ -380,7 +382,7 @@ class PrivateData(_BaseData):
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
         # returns a pandas dataframe
-        return self.normalize_data(temp)
+        return self.normalize_data(temp).apply(pd.to_numeric)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
