@@ -205,10 +205,6 @@ class DiceRandom(ExplainerBase):
         # first get required parameters
         precisions = self.data_interface.get_decimal_precisions(output_type="dict")
 
-        categorical_features_frequencies = {}
-        for feature in self.data_interface.categorical_feature_names:
-            categorical_features_frequencies[feature] = len(self.data_interface.data_df[feature].value_counts())
-
         if sampling_random_seed is not None:
             random.seed(sampling_random_seed)
 

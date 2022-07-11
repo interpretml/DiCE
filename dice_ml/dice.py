@@ -25,7 +25,7 @@ class Dice(ExplainerBase):
         if model_interface.backend == BackEndTypes.Sklearn:
             if method == SamplingStrategy.KdTree and isinstance(data_interface, PrivateData):
                 raise UserConfigValidationException(
-                    'Private data interface is not supported with sklearn kdtree explainer'
+                    'Private data interface is not supported with kdtree explainer'
                     ' since kdtree explainer needs access to entire training data')
         self.__class__ = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
