@@ -1,3 +1,5 @@
+from itertools import product
+
 import pytest
 import torch
 
@@ -7,7 +9,6 @@ from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
 from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.utils.neuralnetworks import FFNetwork
-from itertools import product
 
 BACKENDS = ['sklearn', 'PYT']
 DATA_INTERFACES = ['private', 'public']
