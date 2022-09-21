@@ -166,7 +166,7 @@ class CounterfactualExplanations:
                 combined_test_instance_list.append(serialized_cf_examples[
                     _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST])
                 combined_final_cfs_list.append(serialized_cf_examples[
-                    _DiverseCFV2SchemaConstants.FIANL_CFS_LIST])
+                    _DiverseCFV2SchemaConstants.FINAL_CFS_LIST])
                 data_interface = serialized_cf_examples[
                     _DiverseCFV2SchemaConstants.DATA_INTERFACE]
                 feature_names = serialized_cf_examples[
@@ -252,7 +252,7 @@ class CounterfactualExplanations:
                     # counterfactual example.
                     cf_examples_str = json.dumps(
                         {
-                            _DiverseCFV2SchemaConstants.FIANL_CFS_LIST: json_dict[
+                            _DiverseCFV2SchemaConstants.FINAL_CFS_LIST: json_dict[
                                 _CounterfactualExpV2SchemaConstants.CFS_LIST][index],
                             _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST: json_dict[
                                 _CounterfactualExpV2SchemaConstants.TEST_DATA][index],
