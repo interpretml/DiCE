@@ -24,7 +24,7 @@ class _DiverseCFV2SchemaConstants:
     FEATURE_NAMES_INCLUDING_TARGET = 'feature_names_including_target'
     FEATURE_NAMES = 'feature_names'
     TEST_INSTANCE_LIST = 'test_instance_list'
-    FIANL_CFS_LIST = 'final_cfs_list'
+    FINAL_CFS_LIST = 'final_cfs_list'
 
 
 def json_converter(obj):
@@ -199,7 +199,7 @@ class CounterfactualExamples:
 
             alternate_obj = {
                 _DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST: test_instance_df_as_list,
-                _DiverseCFV2SchemaConstants.FIANL_CFS_LIST: final_cfs_df_as_as_list,
+                _DiverseCFV2SchemaConstants.FINAL_CFS_LIST: final_cfs_df_as_as_list,
                 _DiverseCFV2SchemaConstants.DATA_INTERFACE: dummy_data_interface_dict,
                 _DiverseCFV2SchemaConstants.FEATURE_NAMES: feature_names,
                 _DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET: feature_names_including_target,
@@ -231,7 +231,7 @@ class CounterfactualExamples:
                                           desired_range=cf_example_dict[_DiverseCFV1SchemaConstants.DESIRED_RANGE],
                                           model_type=cf_example_dict[_DiverseCFV1SchemaConstants.MODEL_TYPE])
         else:
-            final_cfs_list = cf_example_dict[_DiverseCFV2SchemaConstants.FIANL_CFS_LIST]
+            final_cfs_list = cf_example_dict[_DiverseCFV2SchemaConstants.FINAL_CFS_LIST]
             test_instance_list = cf_example_dict[_DiverseCFV2SchemaConstants.TEST_INSTANCE_LIST]
             feature_names_including_target = cf_example_dict[_DiverseCFV2SchemaConstants.FEATURE_NAMES_INCLUDING_TARGET]
 
