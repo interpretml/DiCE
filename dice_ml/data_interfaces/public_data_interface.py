@@ -212,10 +212,6 @@ class PublicData(_BaseData):
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
 
-    def one_hot_encode_data(self, data):
-        """One-hot-encodes the data."""
-        return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
-
     def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
@@ -444,27 +440,6 @@ class PublicData(_BaseData):
                 out[c] = self.labelencoder[self.feature_names[c]].inverse_transform([round(out[c])])[0]
             return out
 
-    def from_dummies(self, data, prefix_sep='_'):
-        """Gets the original data from dummy encoded data with k levels."""
-        out = data.copy()
-        for feat in self.categorical_feature_names:
-            # first, derive column names in the one-hot-encoded data from the original data
-            cat_col_values = []
-            for val in list(self.data_df[feat].unique()):
-                cat_col_values.append(feat + prefix_sep + str(
-                    val))  # join original feature name and its unique values , ex: education_school
-            match_cols = [c for c in data.columns if
-                          c in cat_col_values]  # check for the above matching columns in the encoded data
-
-            # then, recreate original data by removing the suffixes - based on the GitHub issue comment:
-            # https://github.com/pandas-dev/pandas/issues/8745#issuecomment-417861271
-            cols, labs = [[c.replace(
-                x, "") for c in match_cols] for x in ["", feat + prefix_sep]]
-            out[feat] = pd.Categorical(
-                np.array(labs)[np.argmax(data[cols].values, axis=1)])
-            out.drop(cols, axis=1, inplace=True)
-        return out
-
     def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the
@@ -488,27 +463,6 @@ class PublicData(_BaseData):
             return precisions
         elif output_type == "dict":
             return precisions_dict
-
-    def get_decoded_data(self, data, encoding='one-hot'):
-        """Gets the original data from encoded data."""
-        if len(data) == 0:
-            return data
-
-        index = [i for i in range(0, len(data))]
-        if encoding == 'one-hot':
-            if isinstance(data, pd.DataFrame):
-                return self.from_dummies(data)
-            elif isinstance(data, np.ndarray):
-                data = pd.DataFrame(data=data, index=index,
-                                    columns=self.ohe_encoded_feature_names)
-                return self.from_dummies(data)
-            else:
-                raise ValueError("data should be a pandas dataframe or a numpy array")
-
-        elif encoding == 'label':
-            data = pd.DataFrame(data=data, index=index,
-                                columns=self.feature_names)
-            return data
 
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
