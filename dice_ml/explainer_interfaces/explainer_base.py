@@ -156,7 +156,6 @@ class ExplainerBase(ABC):
                 query_instances_list.append(query_instances[ix:(ix+1)])
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
-
         for query_instance in tqdm(query_instances_list):
             self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
@@ -171,7 +170,6 @@ class ExplainerBase(ABC):
                 verbose=verbose,
                 **kwargs)
             cf_examples_arr.append(res)
-
         self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
 
         return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
@@ -227,9 +225,6 @@ class ExplainerBase(ABC):
 
         self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
 
-        # check feature MAD validity and throw warnings
-        self.data_interface.check_mad_validity(feature_weights)
-
         return features_to_vary
 
     def check_query_instance_validity(self, features_to_vary, permitted_range, query_instance, feature_ranges_orig):
@@ -239,7 +234,6 @@ class ExplainerBase(ABC):
 
             if feature not in self.data_interface.feature_names:
                 raise ValueError("Feature", feature, "not present in training data!")
-
         for feature in self.data_interface.categorical_feature_names:
             if query_instance[feature].values[0] not in feature_ranges_orig[feature] and \
                     str(query_instance[feature].values[0]) not in feature_ranges_orig[feature]:
@@ -486,7 +480,12 @@ class ExplainerBase(ABC):
 
     def predict_fn(self, input_instance):
         """prediction function"""
-        return self.model.get_output(input_instance)
+
+        preds = self.model.get_output(input_instance)
+        if self.model.model_type == ModelTypes.Classifier and \
+           len(preds.shape) == 1:  # from deep learning predictors
+            preds = np.column_stack([1 - preds, preds])
+        return preds
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
@@ -544,8 +543,7 @@ class ExplainerBase(ABC):
                             diff, decimal_prec, query_instance, cf_ix, feature, final_cfs_sparse, current_pred)
 
             temp_preds = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
-            cfs_preds_sparse.append(temp_preds)
-
+            cfs_preds_sparse.append(temp_preds[0])
         final_cfs_sparse[self.data_interface.outcome_name] = self.get_model_output_from_scores(cfs_preds_sparse)
         # final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)
         return final_cfs_sparse
@@ -668,11 +666,21 @@ class ExplainerBase(ABC):
                     original_pred_1 = original_pred
                 target_class = int(1 - original_pred_1)
                 return target_class
+            elif num_output_nodes == 1:  # only for pytorch DL model
+                original_pred_1 = np.round(original_pred)
+                target_class = int(1-original_pred_1)
+                return target_class
             elif num_output_nodes > 2:
                 raise UserConfigValidationException(
                     "Desired class cannot be opposite if the number of classes is more than 2.")
         elif isinstance(desired_class_input, int):
-            if desired_class_input >= 0 and desired_class_input < num_output_nodes:
+            if num_output_nodes == 1:   # for DL models
+                if desired_class_input in (0, 1):
+                    target_class = desired_class_input
+                    return target_class
+                else:
+                    raise UserConfigValidationException("Only 0, 1 are supported as desired class for binary classification!")
+            elif desired_class_input >= 0 and desired_class_input < num_output_nodes:
                 target_class = desired_class_input
                 return target_class
             else:
@@ -697,11 +705,15 @@ class ExplainerBase(ABC):
         for i in range(len(model_outputs)):
             pred = model_outputs[i]
             if self.model.model_type == ModelTypes.Classifier:
-                if self.num_output_nodes == 2:  # binary
-                    pred_1 = pred[self.num_output_nodes-1]
+                if self.num_output_nodes in (1, 2):  # binary
+                    if self.num_output_nodes == 2:
+                        pred_1 = pred[self.num_output_nodes-1]
+                    else:
+                        pred_1 = pred[0]
                     validity[i] = 1 if \
                         ((self.target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
                          (self.target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else 0
+
                 else:  # multiclass
                     if np.argmax(pred) == self.target_cf_class:
                         validity[i] = 1
@@ -728,14 +740,14 @@ class ExplainerBase(ABC):
                     target_cf_class = self.target_cf_class[0][0]
             target_cf_class = int(target_cf_class)
 
-            if self.num_output_nodes == 1:  # for tensorflow/pytorch models
+            if len(model_score) == 1:  # for tensorflow/pytorch models
                 pred_1 = model_score[0]
                 validity = True if \
                     ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
                      (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
                 return validity
-            if self.num_output_nodes == 2:  # binary
-                pred_1 = model_score[self.num_output_nodes-1]
+            elif len(model_score) == 2:  # binary
+                pred_1 = model_score[1]
                 validity = True if \
                     ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
                      (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
@@ -753,7 +765,13 @@ class ExplainerBase(ABC):
         model_output = np.zeros(len(model_scores), dtype=output_type)
         for i in range(len(model_scores)):
             if self.model.model_type == ModelTypes.Classifier:
-                model_output[i] = np.argmax(model_scores[i])
+                if hasattr(model_scores[i], "shape") and len(model_scores[i].shape) > 0:
+                    if model_scores[i].shape[0] > 1:
+                        model_output[i] = np.argmax(model_scores[i])
+                    else:
+                        model_output[i] = np.round(model_scores[i])[0]
+                else:  # 1-D input
+                    model_output[i] = np.round(model_scores[i])
             elif self.model.model_type == ModelTypes.Regressor:
                 model_output[i] = model_scores[i]
         return model_output
@@ -784,7 +802,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.model.model.predict(dataset_instance)
+        predictions = self.model.get_output(dataset_instance, model_score=False).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 

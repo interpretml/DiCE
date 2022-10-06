@@ -23,20 +23,20 @@ class DiceTensorFlow2(ExplainerBase):
         """
         # initiating data related parameters
         super().__init__(data_interface)
-        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
-            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
-
         # initializing model related variables
         self.model = model_interface
         self.model.load_model()  # loading trained model
-        # TODO: this error is probably too big - need to change it.
-        if self.model.transformer.func is not None:
-            raise ValueError("Gradient-based DiCE currently "
-                             "(1) accepts the data only in raw categorical and continuous formats, "
-                             "(2) does one-hot-encoding and min-max-normalization internally, "
-                             "(3) expects the ML model the accept the data in this same format. "
-                             "If your problem supports this, please initialize model class again "
-                             "with no custom transformation function.")
+        self.model.transformer.feed_data_params(data_interface)
+        self.model.transformer.initialize_transform_func()
+        # temp data to create some attributes like encoded feature names
+        if hasattr(self.data_interface, "data_df"):
+            temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        else:
+            temp_ohe_data = None
+        self.data_interface.create_ohe_params(temp_ohe_data)
+        self.minx, self.maxx, self.encoded_categorical_feature_indexes, self.encoded_continuous_feature_indexes, \
+            self.cont_minx, self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
+
         # number of output nodes of ML model
         self.num_output_nodes = self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names)).shape[1]
 
@@ -153,7 +153,7 @@ class DiceTensorFlow2(ExplainerBase):
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance).values
+        input_instance = self.model.transformer.transform(input_instance).to_numpy()
         return self.predict_fn(tf.constant(input_instance, dtype=tf.float32))
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
@@ -424,10 +424,7 @@ class DiceTensorFlow2(ExplainerBase):
                              posthoc_sparsity_algorithm, limit_steps_ls):
         """Finds counterfactuals by gradient-descent."""
 
-        # Prepares user defined query_instance for DiCE.
-        # query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        # query_instance = np.array([query_instance.iloc[0].values])
-        query_instance = self.data_interface.get_ohe_min_max_normalized_data(query_instance).values
+        query_instance = self.model.transformer.transform(query_instance).to_numpy()
         self.x1 = tf.constant(query_instance, dtype=tf.float32)
 
         # find the predicted value of query_instance
@@ -539,8 +536,7 @@ class DiceTensorFlow2(ExplainerBase):
             self.max_iterations_run = iterations
 
         self.elapsed = timeit.default_timer() - start_time
-
-        self.cfs_preds = [self.predict_fn(cfs) for cfs in self.final_cfs]
+        self.cfs_preds = [self.predict_fn(tf.constant(cfs, dtype=tf.float32)) for cfs in self.final_cfs]
 
         # update final_cfs from backed up CFs if valid CFs are not found
         if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or
@@ -553,12 +549,14 @@ class DiceTensorFlow2(ExplainerBase):
 
         # do inverse transform of CFs to original user-fed format
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
-        final_cfs_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(cfs)
+        final_cfs_df = self.model.transformer.inverse_transform(
+               self.data_interface.get_decoded_data(cfs))
         cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds]
         cfs_preds = [item for sublist in cfs_preds for item in sublist]
         final_cfs_df[self.data_interface.outcome_name] = np.array(cfs_preds)
 
-        test_instance_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(query_instance)
+        test_instance_df = self.model.transformer.inverse_transform(
+                self.data_interface.get_decoded_data(query_instance))
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data

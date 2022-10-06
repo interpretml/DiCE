@@ -3,6 +3,7 @@
 import collections
 import logging
 import sys
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -46,21 +47,18 @@ class PrivateData(_BaseData):
         self._validate_and_set_type_and_precision(params=params)
 
         self.continuous_feature_names = []
-        self.permitted_range = {}
         self.categorical_feature_names = []
         self.categorical_levels = {}
 
         for feature in features_dict:
             if type(features_dict[feature][0]) is int:  # continuous feature
                 self.continuous_feature_names.append(feature)
-                self.permitted_range[feature] = features_dict[feature]
             else:
                 self.categorical_feature_names.append(feature)
                 self.categorical_levels[feature] = features_dict[feature]
 
         self._validate_and_set_mad(params=params)
-
-        # self.continuous_feature_names + self.categorical_feature_names
+        self._validate_and_set_permitted_range(params=params, features_dict=features_dict)
         self.feature_names = list(features_dict.keys())
 
         self.continuous_feature_indexes = [list(features_dict.keys()).index(
@@ -72,20 +70,6 @@ class PrivateData(_BaseData):
         for feature_name in self.continuous_feature_names:
             if feature_name not in self.type_and_precision:
                 self.type_and_precision[feature_name] = 'int'
-
-                # # Initializing a label encoder to obtain label-encoded values for categorical variables
-                # self.labelencoder = {}
-                #
-                # self.label_encoded_data = {}
-                #
-                # for column in self.categorical_feature_names:
-                #     self.labelencoder[column] = LabelEncoder()
-                #     self.label_encoded_data[column] = \
-                #           self.labelencoder[column].fit_transform(self.categorical_levels[column])
-
-                # self.max_range = -np.inf
-                # for feature in self.continuous_feature_names:
-                #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
 
         self._validate_and_set_data_name(params=params)
 
@@ -176,7 +160,22 @@ class PrivateData(_BaseData):
         if return_mads:
             return mads
 
-    def create_ohe_params(self):
+    def get_features_range(self, permitted_range_input=None, features_dict=None):
+        ranges = {}
+        # Getting default ranges based on the dataset
+        for feature in features_dict:
+            if type(features_dict[feature][0]) is int:  # continuous feature
+                ranges[feature] = features_dict[feature]
+            else:
+                ranges[feature] = features_dict[feature]
+        feature_ranges_orig = ranges.copy()
+        # Overwriting the ranges for a feature if input provided
+        if permitted_range_input is not None:
+            for feature_name, feature_range in permitted_range_input.items():
+                ranges[feature_name] = feature_range
+        return ranges, feature_ranges_orig
+
+    def create_ohe_params(self, one_hot_encoded_data=None):
         if len(self.categorical_feature_names) > 0:
             # simulating sklearn's one-hot-encoding
             # continuous features on the left
@@ -265,16 +264,22 @@ class PrivateData(_BaseData):
             out.drop(cols, axis=1, inplace=True)
         return out
 
-    def get_decimal_precisions(self):
+    def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
+        precisions_dict = defaultdict(int)
         precisions = [0]*len(self.continuous_feature_names)
         for ix, feature_name in enumerate(self.continuous_feature_names):
             type_prec = self.type_and_precision[feature_name]
             if type_prec == 'int':
-                precisions[ix] = 0
+                prec = 0
             else:
-                precisions[ix] = self.type_and_precision[feature_name][1]
-        return precisions
+                prec = self.type_and_precision[feature_name][1]
+            precisions[ix] = prec
+            precisions_dict[feature_name] = prec
+        if output_type == "list":
+            return precisions
+        elif output_type == "dict":
+            return precisions_dict
 
     def get_decoded_data(self, data, encoding='one-hot'):
         """Gets the original data from encoded data."""
@@ -284,11 +289,11 @@ class PrivateData(_BaseData):
         index = [i for i in range(0, len(data))]
         if encoding == 'one-hot':
             if isinstance(data, pd.DataFrame):
-                return self.from_dummies(data)
+                return data
             elif isinstance(data, np.ndarray):
                 data = pd.DataFrame(data=data, index=index,
                                     columns=self.ohe_encoded_feature_names)
-                return self.from_dummies(data)
+                return data
             else:
                 raise ValueError("data should be a pandas dataframe or a numpy array")
 
@@ -347,7 +352,8 @@ class PrivateData(_BaseData):
         """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
            a dataframe, a list, or a list of dicts"""
         query_instance = self.prepare_query_instance(query_instance)
-        temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
+        ohe_base_df = self.prepare_df_for_ohe_encoding()
+        temp = ohe_base_df.append(query_instance, ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
         # returns a pandas dataframe
@@ -356,7 +362,7 @@ class PrivateData(_BaseData):
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
            should be a dataframe or an array"""
-        raw_data = self.get_decoded_data(transformed_data, encoding='one-hot')
+        raw_data = self.from_dummies(transformed_data)
         raw_data = self.de_normalize_data(raw_data)
         precisions = self.get_decimal_precisions()
         for ix, feature in enumerate(self.continuous_feature_names):

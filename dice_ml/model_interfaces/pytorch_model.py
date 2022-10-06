@@ -1,7 +1,9 @@
 """Module containing an interface to trained PyTorch model."""
 
+import numpy as np
 import torch
 
+from dice_ml.constants import ModelTypes
 from dice_ml.model_interfaces.base_model import BaseModel
 
 
@@ -18,22 +20,30 @@ class PyTorchModel(BaseModel):
                         dictionary of kw_args, by default.
         """
 
-        super().__init__(model, model_path, backend)
+        super().__init__(model, model_path, backend, func, kw_args)
 
     def load_model(self):
         if self.model_path != '':
             self.model = torch.load(self.model_path)
 
-    def get_output(self, input_tensor, transform_data=False):
+    def get_output(self, input_instance, model_score=True,
+                   transform_data=False, out_tensor=False):
         """returns prediction probabilities
 
         :param input_tensor: test input.
         :param transform_data: boolean to indicate if data transformation is required.
         """
+        input_tensor = input_instance
         if transform_data:
-            input_tensor = torch.tensor(self.transformer.transform(input_tensor)).float()
-
-        return self.model(input_tensor).float()
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
+        if not torch.is_tensor(input_instance):
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
+        out = self.model(input_tensor).float()
+        if not out_tensor:
+            out = out.data.numpy()
+        if model_score is False and self.model_type == ModelTypes.Classifier:
+            out = np.round(out)  # TODO need to generalize for n-class classifier
+        return out
 
     def set_eval_mode(self):
         self.model.eval()

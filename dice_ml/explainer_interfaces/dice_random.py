@@ -24,7 +24,6 @@ class DiceRandom(ExplainerBase):
         """
         super().__init__(data_interface)  # initiating data related parameters
 
-        self.data_interface.create_ohe_params()
         self.model = model_interface
         self.model.load_model()  # loading pickled trained model if applicable
         self.model.transformer.feed_data_params(data_interface)
@@ -77,7 +76,6 @@ class DiceRandom(ExplainerBase):
         # Do predictions once on the query_instance and reuse across to reduce the number
         # inferences.
         model_predictions = self.predict_fn(query_instance)
-
         # number of output nodes of ML model
         self.num_output_nodes = None
         if self.model.model_type == ModelTypes.Classifier:

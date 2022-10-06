@@ -25,6 +25,14 @@ class DiceTensorFlow1(ExplainerBase):
         """
         # initiating data related parameters
         super().__init__(data_interface)
+        # initializing model related variables
+        self.model = model_interface
+        self.model.load_model()  # loading trained model
+        self.model.transformer.feed_data_params(data_interface)
+        self.model.transformer.initialize_transform_func()
+        # temp data to create some attributes like encoded feature names
+        temp_ohe_data = self.model.transformer.transform(self.data_interface.data_df.iloc[[0]])
+        self.data_interface.create_ohe_params(temp_ohe_data)
         self.minx, self.maxx, self.encoded_categorical_feature_indexes, \
             self.encoded_continuous_feature_indexes, self.cont_minx, \
             self.cont_maxx, self.cont_precisions = self.data_interface.get_data_params_for_gradient_dice()
@@ -35,18 +43,8 @@ class DiceTensorFlow1(ExplainerBase):
         else:
             self.dice_sess = tf.InteractiveSession()
 
-        # initializing model related variables
-        self.model = model_interface
-        self.model.load_model()  # loading trained model
         self.input_tensor = tf.Variable(self.minx, dtype=tf.float32)  # placeholder variables for model predictions
         self.output_tensor = self.model.get_output(self.input_tensor)
-        if self.model.transformer.func is not None:  # TODO: this error is probably too big - need to change it.
-            raise ValueError("Gradient-based DiCE currently "
-                             "(1) accepts the data only in raw categorical and continuous formats, "
-                             "(2) does one-hot-encoding and min-max-normalization internally, "
-                             "(3) expects the ML model the accept the data in this same format. "
-                             "If your problem supports this, please initialize model class again "
-                             "with no custom transformation function.")
         # number of output nodes of ML model
         self.num_output_nodes = self.dice_sess.run(
             self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names))).shape[1]
@@ -127,10 +125,6 @@ class DiceTensorFlow1(ExplainerBase):
 
         # check permitted range for continuous features
         if permitted_range is not None:
-            # if not self.data_interface.check_features_range(permitted_range):
-            #     raise ValueError(
-            #         "permitted range of features should be within their original range")
-            # else:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
             self.cont_minx = []
@@ -231,7 +225,7 @@ class DiceTensorFlow1(ExplainerBase):
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        input_instance = self.data_interface.get_ohe_min_max_normalized_data(input_instance).values
+        input_instance = self.model.transformer.transform(input_instance).to_numpy()
         return self.predict_fn(input_instance)
 
     def compute_yloss(self, method):
@@ -528,13 +522,10 @@ class DiceTensorFlow1(ExplainerBase):
                              stopping_threshold=0.5, posthoc_sparsity_param=0.1, posthoc_sparsity_algorithm="linear"):
         """Finds counterfactuals by gradient-descent."""
 
-        # Prepares user defined query_instance for DiCE.
-        # query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding='one-hot')
-        # query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)
-        query_instance = self.data_interface.get_ohe_min_max_normalized_data(query_instance).values
+        query_instance = self.model.transformer.transform(query_instance).to_numpy()
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0][0]
+        test_pred = self.predict_fn(tf.constant(query_instance, dtype=tf.float32))[0][0]
         if desired_class == "opposite":
             desired_class = 1.0 - round(test_pred)
         self.target_cf_class = np.array([[desired_class]])
@@ -653,12 +644,14 @@ class DiceTensorFlow1(ExplainerBase):
 
         # do inverse transform of CFs to original user-fed format
         cfs = np.array([self.final_cfs[i][0] for i in range(len(self.final_cfs))])
-        final_cfs_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(cfs)
+        final_cfs_df = self.model.transformer.inverse_transform(
+               self.data_interface.get_decoded_data(cfs))
         cfs_preds = [np.round(preds.flatten().tolist(), 3) for preds in self.cfs_preds]
         cfs_preds = [item for sublist in cfs_preds for item in sublist]
         final_cfs_df[self.data_interface.outcome_name] = np.array(cfs_preds)
 
-        test_instance_df = self.data_interface.get_inverse_ohe_min_max_normalized_data(query_instance)
+        test_instance_df = self.model.transformer.inverse_transform(
+                self.data_interface.get_decoded_data(query_instance))
         test_instance_df[self.data_interface.outcome_name] = np.array(np.round(test_pred, 3))
 
         # post-hoc operation on continuous features to enhance sparsity - only for public data

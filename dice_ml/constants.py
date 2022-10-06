@@ -14,6 +14,7 @@ class SamplingStrategy:
     Random = 'random'
     Genetic = 'genetic'
     KdTree = 'kdtree'
+    Gradient = 'gradient'
 
 
 class ModelTypes:
