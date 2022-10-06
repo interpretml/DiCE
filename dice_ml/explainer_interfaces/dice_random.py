@@ -173,6 +173,8 @@ class DiceRandom(ExplainerBase):
                                                                        posthoc_sparsity_param,
                                                                        posthoc_sparsity_algorithm,
                                                                        limit_steps_ls)
+        elif self.final_cfs is not None:
+            final_cfs_df_sparse = final_cfs_df.copy()
         else:
             final_cfs_df_sparse = None
 
@@ -204,10 +206,6 @@ class DiceRandom(ExplainerBase):
 
         # first get required parameters
         precisions = self.data_interface.get_decimal_precisions(output_type="dict")
-
-        categorical_features_frequencies = {}
-        for feature in self.data_interface.categorical_feature_names:
-            categorical_features_frequencies[feature] = len(self.data_interface.data_df[feature].value_counts())
 
         if sampling_random_seed is not None:
             random.seed(sampling_random_seed)

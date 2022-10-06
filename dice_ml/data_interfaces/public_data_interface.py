@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 from dice_ml.data_interfaces.base_data_interface import _BaseData
 from dice_ml.utils.exception import (SystemException,
@@ -338,6 +339,13 @@ class PublicData(_BaseData):
                     ixs.append(colidx)
             return ixs
 
+    def fit_label_encoders(self):
+        labelencoders = {}
+        for column in self.categorical_feature_names:
+            labelencoders[column] = LabelEncoder()
+            labelencoders[column] = labelencoders[column].fit(self.data_df[column])
+        return labelencoders
+
     def from_label(self, data):
         """Transforms label encoded data back to categorical values"""
         out = data.copy()
@@ -488,3 +496,6 @@ class PublicData(_BaseData):
         raw_data = raw_data[self.feature_names]
         # returns a pandas dataframe
         return raw_data
+
+    def get_all_dummy_colnames(self):
+        return pd.get_dummies(self.data_df[self.feature_names]).columns

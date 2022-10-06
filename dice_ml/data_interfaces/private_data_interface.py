@@ -7,6 +7,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 from dice_ml.data_interfaces.base_data_interface import _BaseData
 
@@ -60,6 +61,7 @@ class PrivateData(_BaseData):
         self._validate_and_set_mad(params=params)
         self._validate_and_set_permitted_range(params=params, features_dict=features_dict)
         self.feature_names = list(features_dict.keys())
+        self.number_of_features = len(self.feature_names)
 
         self.continuous_feature_indexes = [list(features_dict.keys()).index(
             name) for name in self.continuous_feature_names if name in features_dict]
@@ -91,20 +93,34 @@ class PrivateData(_BaseData):
         """One-hot-encodes the data."""
         return pd.get_dummies(data, drop_first=False, columns=self.categorical_feature_names)
 
-    def normalize_data(self, df, encoding='one-hot'):
+    def normalize_data(self, df):
         """Normalizes continuous features to make them fall in the range [0,1]."""
         result = df.copy()
-        for feature_name in self.continuous_feature_names:
-            max_value = self.permitted_range[feature_name][1]
-            min_value = self.permitted_range[feature_name][0]
-            result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
-
-        # if encoding == 'label': # need not do this if not required
-        #     for ix in self.categorical_feature_indexes:
-        #         feature_name = self.feature_names[ix]
-        #         max_value = len(self.categorical_levels[feature_name])-1
-        #         min_value = 0
-        #         result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        if isinstance(df, pd.DataFrame) or isinstance(df, dict):
+            for feature_name in self.continuous_feature_names:
+                max_value = self.permitted_range[feature_name][1]
+                min_value = self.permitted_range[feature_name][0]
+                if min_value == max_value:
+                    result[feature_name] = 0
+                else:
+                    result[feature_name] = (df[feature_name] - min_value) / (max_value - min_value)
+        else:
+            result = result.astype('float')
+            for feature_index in self.continuous_feature_indexes:
+                feature_name = self.feature_names[feature_index]
+                max_value = self.permitted_range[feature_name][1]
+                min_value = self.permitted_range[feature_name][0]
+                if len(df.shape) == 1:
+                    if min_value == max_value:
+                        value = 0
+                    else:
+                        value = (df[feature_index] - min_value) / (max_value - min_value)
+                    result[feature_index] = value
+                else:
+                    if min_value == max_value:
+                        result[:, feature_index] = np.zeros(len(df[:, feature_index]))
+                    else:
+                        result[:, feature_index] = (df[:, feature_index] - min_value) / (max_value - min_value)
         return result
 
     def de_normalize_data(self, df):
@@ -161,6 +177,9 @@ class PrivateData(_BaseData):
             return mads
 
     def get_features_range(self, permitted_range_input=None, features_dict=None):
+        if features_dict is None:
+            features_dict = self.permitted_range
+
         ranges = {}
         # Getting default ranges based on the dataset
         for feature in features_dict:
@@ -241,6 +260,13 @@ class PrivateData(_BaseData):
                     ixs.append(colidx)
             return ixs
 
+    def fit_label_encoders(self):
+        labelencoders = {}
+        for column in self.categorical_feature_names:
+            labelencoders[column] = LabelEncoder()
+            labelencoders[column].fit(self.permitted_range[column])
+        return labelencoders
+
     def from_label(self, data):
         """Transforms label encoded data back to categorical values"""
         out = data.copy()
@@ -267,7 +293,7 @@ class PrivateData(_BaseData):
     def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
         precisions_dict = defaultdict(int)
-        precisions = [0]*len(self.continuous_feature_names)
+        precisions = [0]*len(self.feature_names)
         for ix, feature_name in enumerate(self.continuous_feature_names):
             type_prec = self.type_and_precision[feature_name]
             if type_prec == 'int':
@@ -357,7 +383,7 @@ class PrivateData(_BaseData):
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
         # returns a pandas dataframe
-        return self.normalize_data(temp)
+        return self.normalize_data(temp).apply(pd.to_numeric)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
@@ -370,3 +396,21 @@ class PrivateData(_BaseData):
         raw_data = raw_data[self.feature_names]
         # returns a pandas dataframe
         return raw_data
+
+    def get_all_dummy_colnames(self):
+        max_vals = max([len(val) for col, val in self.permitted_range.items()])
+        sample_data_dict = {col: np.resize(val, max_vals) for col, val in self.permitted_range.items()}
+        sample_df = pd.DataFrame(sample_data_dict)
+        return pd.get_dummies(sample_df).columns
+
+    def get_valid_feature_range(self, feature_range_input, normalized=True):
+        """Gets the min/max value of features in normalized or de-normalized
+        form. Assumes that all features are already encoded to numerical form
+        such that the number of features remains the same.
+
+        # TODO needs work adhere to label encoded max and to support permitted_range for
+        both continuous and discrete when provided in _generate_counterfactuals.
+        """
+        if normalized:
+            raise NotImplementedError("Normalized feature range not supported for private data interface")
+        return feature_range_input
