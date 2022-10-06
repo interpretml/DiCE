@@ -11,6 +11,7 @@ from dice_ml.utils.exception import UserConfigValidationException
 from dice_ml.utils.neuralnetworks import FFNetwork
 
 BACKENDS = ['sklearn', 'PYT']
+
 DATA_INTERFACES = ['private', 'public']
 
 

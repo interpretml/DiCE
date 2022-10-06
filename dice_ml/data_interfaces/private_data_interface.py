@@ -179,6 +179,7 @@ class PrivateData(_BaseData):
     def get_features_range(self, permitted_range_input=None, features_dict=None):
         if features_dict is None:
             features_dict = self.permitted_range
+
         ranges = {}
         # Getting default ranges based on the dataset
         for feature in features_dict:

@@ -269,16 +269,13 @@ class DiceGenetic(ExplainerBase):
         if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(query_instance)
 
-        # number of output nodes of ML model
-        if self.model.model_type == ModelTypes.Classifier:
-            self.num_output_nodes = self.model.get_num_output_nodes2(query_instance)
-
         query_instance = self.label_encode(query_instance)
         query_instance = np.array(query_instance.values[0])
         self.x1 = query_instance
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
+
         self.test_pred = test_pred
 
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
