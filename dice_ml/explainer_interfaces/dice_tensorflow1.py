@@ -346,7 +346,7 @@ class DiceTensorFlow1(ExplainerBase):
                 feature_weights[feature] = round(1/normalized_mads[feature], 2)
 
         feature_weights_list = []
-        for feature in self.data_interface.encoded_feature_names:
+        for feature in self.data_interface.ohe_encoded_feature_names:
             if feature in feature_weights:
                 feature_weights_list.append(feature_weights[feature])
             else:
