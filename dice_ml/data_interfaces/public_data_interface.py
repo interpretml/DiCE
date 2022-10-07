@@ -479,7 +479,7 @@ class PublicData(_BaseData):
            a dataframe, a list, or a list of dicts"""
         query_instance = self.prepare_query_instance(query_instance)
         ohe_base_df = self.prepare_df_for_ohe_encoding()
-        temp = ohe_base_df.append(query_instance, ignore_index=True, sort=False)
+        temp = pd.concat([ohe_base_df, query_instance], ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
         # returns a pandas dataframe with all numeric values
