@@ -5,9 +5,9 @@ name: Python package test
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   schedule:
     - cron:  '30 5 * * *'
 
