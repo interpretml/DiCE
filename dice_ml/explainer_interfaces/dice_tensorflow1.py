@@ -50,12 +50,9 @@ class DiceTensorFlow1(ExplainerBase):
             self.model.get_num_output_nodes(len(self.data_interface.ohe_encoded_feature_names))).shape[1]
 
         # hyperparameter initializations
-        self.weights = []
+        self.weights = [tf.Variable(1.0, dtype=tf.float32) for i in range(3)]
         self.weights_inits = tf.placeholder(tf.float32, shape=())
-        self.weights_assign = []
-        for i in range(3):
-            self.weights.append(tf.Variable(1.0, dtype=tf.float32))
-            self.weights_assign.append(tf.assign(self.weights[i], self.weights_inits))
+        self.weights_assign = [tf.assign(self.weights[i], self.weights_inits) for i in range(3)]
         self.hyperparameters = []  # proximity_weight, diversity_weight, categorical_penalty
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
@@ -127,11 +124,8 @@ class DiceTensorFlow1(ExplainerBase):
         if permitted_range is not None:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-            self.cont_minx = []
-            self.cont_maxx = []
-            for feature in self.data_interface.continuous_feature_names:
-                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+            self.cont_minx = [self.data_interface.permitted_range[feature][0] for feature in self.data_interface.continuous_feature_names]
+            self.cont_maxx = [self.data_interface.permitted_range[feature][1] for feature in self.data_interface.continuous_feature_names]
 
         if ([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer] !=
                 (self.cf_init_weights + self.loss_weights + self.optimizer_weights)):
@@ -192,13 +186,10 @@ class DiceTensorFlow1(ExplainerBase):
         self.learning_rate = tf.placeholder(tf.float32, ())
 
         # CF initializations
-        self.cfs = []
+        self.cfs = [tf.Variable(self.minx, dtype=tf.float32) for i in range(self.total_CFs)]
         self.cf_init = tf.placeholder(
             tf.float32, shape=(1, self.minx.shape[1]))
-        self.cf_assign = []
-        for i in range(self.total_CFs):
-            self.cfs.append(tf.Variable(self.minx, dtype=tf.float32))
-            self.cf_assign.append(tf.assign(self.cfs[i], self.cf_init))
+        self.cf_assign = [tf.assign(self.cfs[i], self.cf_init) for i in range(self.total_CFs)]
 
         # freezing those columns that need to be fixed
         self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)

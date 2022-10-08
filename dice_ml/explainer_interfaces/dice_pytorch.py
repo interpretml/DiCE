@@ -106,11 +106,8 @@ class DicePyTorch(ExplainerBase):
         if permitted_range is not None:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-            self.cont_minx = []
-            self.cont_maxx = []
-            for feature in self.data_interface.continuous_feature_names:
-                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+            self.cont_minx = [self.data_interface.permitted_range[feature][0] for feature in self.data_interface.continuous_feature_names]
+            self.cont_maxx = [self.data_interface.permitted_range[feature][1] for feature in self.data_interface.continuous_feature_names]
 
         if [total_CFs, algorithm, features_to_vary] != self.cf_init_weights:
             self.do_cf_initializations(total_CFs, algorithm, features_to_vary)
@@ -175,9 +172,7 @@ class DicePyTorch(ExplainerBase):
         if len(self.cfs) != self.total_CFs:
             self.cfs = []
             for ix in range(self.total_CFs):
-                one_init = []
-                for jx in range(self.minx.shape[1]):
-                    one_init.append(np.random.uniform(self.minx[0][jx], self.maxx[0][jx]))
+                one_init = [np.random.uniform(self.minx[0][jx], self.maxx[0][jx]) for jx in range(self.minx.shape[1])]
                 self.cfs.append(torch.tensor(one_init).float())
                 self.cfs[ix].requires_grad = True
 
@@ -199,12 +194,7 @@ class DicePyTorch(ExplainerBase):
                 for feature in normalized_mads:
                     feature_weights[feature] = round(1/normalized_mads[feature], 2)
 
-            feature_weights_list = []
-            for feature in self.data_interface.ohe_encoded_feature_names:
-                if feature in feature_weights:
-                    feature_weights_list.append(feature_weights[feature])
-                else:
-                    feature_weights_list.append(1.0)
+            feature_weights_list = [feature_weights[feature] if feature in feature_weights else 1.0 for feature in self.data_interface.ohe_encoded_feature_names]
             self.feature_weights_list = torch.tensor(feature_weights_list)
 
         # define different parts of loss function

@@ -76,12 +76,7 @@ class CounterfactualExplanations:
     @property
     def local_importance(self):
         if isinstance(self._local_importance, list):
-            sorted_local_importance = []
-            for local_importance_instance in self._local_importance:
-                local_importance_instance = \
-                    dict(sorted(local_importance_instance.items(),
-                                key=lambda x: x[1], reverse=True))
-                sorted_local_importance.append(local_importance_instance)
+            sorted_local_importance = [dict(sorted(local_importance_instance.items(), key=lambda x: x[1], reverse=True)) for local_importance_instance in self._local_importance]
             self._local_importance = sorted_local_importance
         return self._local_importance
 
@@ -134,11 +129,7 @@ class CounterfactualExplanations:
         """
         serialization_version = self.metadata['version']
         if serialization_version == _SchemaVersions.V1:
-            cf_examples_str_list = []
-            for cf_examples in self.cf_examples_list:
-                cf_examples_str = cf_examples.to_json(
-                    serialization_version=serialization_version)
-                cf_examples_str_list.append(cf_examples_str)
+            cf_examples_str_list = [cf_examples.to_json(serialization_version=serialization_version) for cf_examples in self.cf_examples_list]
             entire_dict = {
                 _CounterfactualExpV1SchemaConstants.CF_EXAMPLES_LIST: cf_examples_str_list,
                 _CounterfactualExpV1SchemaConstants.LOCAL_IMPORTANCE: self.local_importance,
@@ -184,16 +175,12 @@ class CounterfactualExplanations:
             if self.local_importance is not None:
                 local_importance_matrix = []
                 for local_importance_dict in self.local_importance:
-                    local_importance_list = []
-                    for feature_name in feature_names:
-                        local_importance_list.append(local_importance_dict.get(feature_name))
+                    local_importance_list = [local_importance_dict.get(feature_name) for feature_name in feature_names]
                     local_importance_matrix.append(local_importance_list)
 
             summary_importance_list = None
             if self.summary_importance is not None:
-                summary_importance_list = []
-                for feature_name in feature_names:
-                    summary_importance_list.append(self.summary_importance.get(feature_name))
+                summary_importance_list = [self.summary_importance.get(feature_name) for feature_name in feature_names]
 
             entire_dict = {
                 _CounterfactualExpV2SchemaConstants.TEST_DATA: combined_test_instance_list,
@@ -234,9 +221,7 @@ class CounterfactualExplanations:
             if version == _SchemaVersions.V1:
                 CounterfactualExplanations._check_cf_exp_output_against_json_schema(
                     json_dict, version=version)
-                cf_examples_list = []
-                for cf_examples_str in json_dict[_CounterfactualExpV1SchemaConstants.CF_EXAMPLES_LIST]:
-                    cf_examples_list.append(CounterfactualExamples.from_json(cf_examples_str))
+                cf_examples_list = [CounterfactualExamples.from_json(cf_examples_str) for cf_examples_str in json_dict[_CounterfactualExpV1SchemaConstants.CF_EXAMPLES_LIST]]
 
                 return CounterfactualExplanations(
                         cf_examples_list=cf_examples_list,
@@ -282,7 +267,6 @@ class CounterfactualExplanations:
                         for index in range(0, len(local_importance_instance)):
                             local_importance_dict[feature_names[index]] = local_importance_instance[index]
                         local_importance_list.append(local_importance_dict)
-
                 summary_importance_dict = None
                 if json_dict[_CounterfactualExpV2SchemaConstants.SUMMARY_IMPORTANCE] is not None:
                     summary_importance_dict = {}

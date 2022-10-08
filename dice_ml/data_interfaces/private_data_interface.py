@@ -47,15 +47,13 @@ class PrivateData(_BaseData):
         self._validate_and_set_outcome_name(params=params)
         self._validate_and_set_type_and_precision(params=params)
 
-        self.continuous_feature_names = []
-        self.categorical_feature_names = []
+        # continuous feature
+        self.continuous_feature_names = [feature for feature in features_dict if isinstance(features_dict[feature][0], int)]
+        self.categorical_feature_names = [feature for feature in features_dict if not isinstance(features_dict[feature][0], int)]
         self.categorical_levels = {}
 
         for feature in features_dict:
-            if isinstance(features_dict[feature][0], int):  # continuous feature
-                self.continuous_feature_names.append(feature)
-            else:
-                self.categorical_feature_names.append(feature)
+            if not isinstance(features_dict[feature][0], int):  # continuous feature
                 self.categorical_levels[feature] = features_dict[feature]
 
         self._validate_and_set_mad(params=params)
@@ -330,10 +328,8 @@ class PrivateData(_BaseData):
 
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
-        levels = []
         colnames = [feat for feat in self.categorical_feature_names]
-        for cat_feature in colnames:
-            levels.append(self.categorical_levels[cat_feature])
+        levels = [self.categorical_levels[cat_feature] for cat_feature in colnames]
 
         if len(colnames) > 0:
             df = pd.DataFrame({colnames[0]: levels[0]})

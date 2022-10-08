@@ -207,9 +207,7 @@ class DiceKD(ExplainerBase):
             self.final_cfs = cfs.iloc[final_indices]
             self.final_cfs = self.final_cfs.drop([self.predicted_outcome_name], axis=1)
             # Finding the predicted outcome for each cf
-            for i in range(total_cfs_found):
-                cfs_preds.append(
-                    self.dataset_with_predictions.iloc[final_indices[i]][self.predicted_outcome_name])
+            cfs_preds = [self.dataset_with_predictions.iloc[final_indices[i]][self.predicted_outcome_name] for i in range(total_cfs_found)]
 
         return self.final_cfs[:total_CFs], cfs_preds
 

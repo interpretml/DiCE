@@ -152,8 +152,7 @@ class ExplainerBase(ABC):
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
-            for ix in range(query_instances.shape[0]):
-                query_instances_list.append(query_instances[ix:(ix+1)])
+            query_instances_list = [query_instances[ix:(ix+1)] for ix in range(query_instances.shape[0])]
         elif isinstance(query_instances, Iterable):
             query_instances_list = query_instances
         for query_instance in tqdm(query_instances_list):
@@ -787,11 +786,8 @@ class ExplainerBase(ABC):
             # else:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-            self.cont_minx = []
-            self.cont_maxx = []
-            for feature in self.data_interface.continuous_feature_names:
-                self.cont_minx.append(self.data_interface.permitted_range[feature][0])
-                self.cont_maxx.append(self.data_interface.permitted_range[feature][1])
+            self.cont_minx = [self.data_interface.permitted_range[feature][0] for feature in self.data_interface.continuous_feature_names]
+            self.cont_maxx = [self.data_interface.permitted_range[feature][1] for feature in self.data_interface.continuous_feature_names]
 
     def sigmoid(self, z):
         """This is used in VAE-based CF explainers."""

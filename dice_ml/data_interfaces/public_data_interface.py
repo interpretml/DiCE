@@ -363,10 +363,8 @@ class PublicData(_BaseData):
         out = data.copy()
         for feat in self.categorical_feature_names:
             # first, derive column names in the one-hot-encoded data from the original data
-            cat_col_values = []
-            for val in list(self.data_df[feat].unique()):
-                cat_col_values.append(feat + prefix_sep + str(
-                    val))  # join original feature name and its unique values , ex: education_school
+            # join original feature name and its unique values , ex: education_school
+            cat_col_values = [feat + prefix_sep + str(val) for val in list(self.data_df[feat].unique())]
             match_cols = [c for c in data.columns if
                           c in cat_col_values]  # check for the above matching columns in the encoded data
 
@@ -426,10 +424,8 @@ class PublicData(_BaseData):
 
     def prepare_df_for_ohe_encoding(self):
         """Create base dataframe to do OHE for a single instance or a set of instances"""
-        levels = []
         colnames = [feat for feat in self.categorical_feature_names]
-        for cat_feature in colnames:
-            levels.append(self.data_df[cat_feature].cat.categories.tolist())
+        levels = [self.data_df[cat_feature].cat.categories.tolist() for cat_feature in colnames]
 
         if len(colnames) > 0:
             df = pd.DataFrame({colnames[0]: levels[0]})
