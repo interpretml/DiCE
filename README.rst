@@ -98,7 +98,8 @@ mode and then invoke DiCE to generate counterfactual examples for any input.
                      continuous_features=['age', 'hours_per_week'],
                      outcome_name='income')
     # Pre-trained ML model
-    m = dice_ml.Model(model_path=dice_ml.utils.helpers.get_adult_income_modelpath())
+    m = dice_ml.Model(model_path=dice_ml.utils.helpers.get_adult_income_modelpath(),
+                      backend='TF2')
     # DiCE explanation instance
     exp = dice_ml.Dice(d,m)
 
