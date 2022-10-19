@@ -73,55 +73,43 @@ If you face any problems, try installing dependencies manually.
     # For running unit tests
     pip install -r requirements-test.txt
 
-DiCE requires the following packages:
-
-* jsonschema
-* numpy
-* scikit-learn
-* pandas
-* h5py
-* tqdm
-* [optional] tensorflow/pytorch (works with Tensorflow>=1.13)
-
 
 Getting started with DiCE
 -------------------------
-With DiCE, generating explanations is a simple three-step  process: train
-mode and then invoke DiCE to generate counterfactual examples for any input.
+With DiCE, generating explanations is a simple three-step  process: set up a dataset, train a model, and then invoke DiCE to generate counterfactual examples for any input. DiCE can also work with pre-trained models, with or without their original training data. 
+
 
 .. code:: python
 
     import dice_ml
     from dice_ml.utils import helpers # helper functions
+    from sklearn.model_selection import train_test_split
+
+    dataset = helpers.load_adult_income_dataset()
+    target = dataset["income"] # outcome variable 
+    train_dataset, test_dataset, _, _ = train_test_split(dataset,
+                                                         target,
+                                                         test_size=0.2,
+                                                         random_state=0,
+                                                         stratify=target)
     # Dataset for training an ML model
-    d = dice_ml.Data(dataframe=helpers.load_adult_income_dataset(),
+    d = dice_ml.Data(dataframe=train_dataset,
                      continuous_features=['age', 'hours_per_week'],
                      outcome_name='income')
+    
     # Pre-trained ML model
     m = dice_ml.Model(model_path=dice_ml.utils.helpers.get_adult_income_modelpath(),
-                      backend='TF2')
+                      backend='TF2', func="ohe-min-max")
     # DiCE explanation instance
     exp = dice_ml.Dice(d,m)
 
 For any given input, we can now generate counterfactual explanations. For
-example, the following input leads to class 0 (low income).
+example, the following input leads to class 0 (low income) and we would like to know what minimal changes would lead to a prediction of 1 (high income).
 
 .. code:: python
-
-    query_instance = {'age':22,
-        'workclass':'Private',
-        'education':'HS-grad',
-        'marital_status':'Single',
-        'occupation':'Service',
-        'race': 'White',
-        'gender':'Female',
-        'hours_per_week': 45}
-
-Using DiCE, we can now generate examples that would have been classified as class 1 (high income).
-
-.. code:: python
-
+    
     # Generate counterfactual examples
+    query_instance = test_dataset.drop(columns="income")[0:1]
     dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
     # Visualize counterfactual explanation
     dice_exp.visualize_as_dataframe()
@@ -130,14 +118,10 @@ Using DiCE, we can now generate examples that would have been classified as clas
   :width: 400
   :alt: List of counterfactual examples
 
-You can save the generated counterfactual examples in the following way:-
+You can save the generated counterfactual examples in the following way.
 
 .. code:: python
 
-    # Generate counterfactual examples
-    dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class="opposite")
-    # Visualize counterfactual explanation
-    dice_exp.visualize_as_dataframe()
     # Save generated counterfactual examples to disk
     dice_exp.cf_examples_list[0].final_cfs_df.to_csv(path_or_buf='counterfactuals.csv', index=False)
 
