@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.8 documentation</title>
+  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -48,7 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -106,9 +108,9 @@
     text-align: unset;
 }
 </style>
-<p><a class="reference external" href="https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22"><img alt="BuildStatus" src="https://github.com/interpretml/dice/workflows/Python%20package/badge.svg" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PyPiVersion" src="https://img.shields.io/pypi/v/dice-ml" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PythonSupport" src="https://img.shields.io/pypi/pyversions/dice-ml" /></a></p>
+<p><a class="reference external" href="https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22"><img alt="BuildStatus" src="https://github.com/interpretml/dice/workflows/Python%20package/badge.svg" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PyPiVersion" src="https://img.shields.io/pypi/v/dice-ml" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PythonSupport" src="https://img.shields.io/pypi/pyversions/dice-ml" /></a> <a class="reference external" href="https://anaconda.org/conda-forge/dice-ml"><img alt="CondaVersion" src="https://anaconda.org/conda-forge/dice-ml/badges/version.svg" /></a></p>
 <section id="diverse-counterfactual-explanations-dice-for-ml">
-<h1>Diverse Counterfactual Explanations (DiCE) for ML<a class="headerlink" href="#diverse-counterfactual-explanations-dice-for-ml" title="Permalink to this headline"></a></h1>
+<h1>Diverse Counterfactual Explanations (DiCE) for ML<a class="headerlink" href="#diverse-counterfactual-explanations-dice-for-ml" title="Permalink to this heading"></a></h1>
 <p><em>How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?</em></p>
 <p><a class="reference external" href="https://raam93.github.io/">Ramaravind K. Mothilal</a>, <a class="reference external" href="http://www.amitsharma.in/">Amit Sharma</a>, <a class="reference external" href="https://chenhaot.com/">Chenhao Tan</a></p>
 <p><a class="reference external" href="https://arxiv.org/abs/1905.07697">FAT* ‘20 paper</a> | <a class="reference external" href="https://interpretml.github.io/DiCE/">Docs</a> | <a class="reference external" href="https://github.com/interpretml/DiCE/tree/master/docs/source/notebooks">Example Notebooks</a> | Live Jupyter notebook <a class="reference external" href="https://mybinder.org/v2/gh/interpretML/DiCE/master?filepath=docs/source/notebooks"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
@@ -124,9 +126,13 @@ consider a person who applied for a loan and was rejected by the loan distributi
 <p>DiCE implements <a class="reference external" href="https://arxiv.org/abs/1711.00399">counterfactual (CF) explanations</a>  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., <code class="docutils literal notranslate"><span class="pre">you</span> <span class="pre">would</span> <span class="pre">have</span> <span class="pre">received</span> <span class="pre">the</span> <span class="pre">loan</span> <span class="pre">if</span> <span class="pre">your</span> <span class="pre">income</span> <span class="pre">was</span> <span class="pre">higher</span> <span class="pre">by</span> <span class="pre">$10,000</span></code>. In other words, it provides “what-if” explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers.</p>
 <p>Barring simple linear models, however, it is difficult to generate CF examples that work for any machine learning model. DiCE is based on <a class="reference external" href="https://arxiv.org/abs/1905.07697">recent research</a> that generates CF explanations for any ML model. The core idea is to setup finding such explanations as an optimization problem, similar to finding adversarial examples. The critical difference is that for explanations, we need perturbations that change the output of a machine learning model, but are also diverse and feasible to change. Therefore, DiCE supports generating a set of counterfactual explanations  and has tunable parameters for diversity and proximity of the explanations to the original input. It also supports simple constraints on features to ensure feasibility of the generated counterfactual examples.</p>
 <section id="installing-dice">
-<h2>Installing DICE<a class="headerlink" href="#installing-dice" title="Permalink to this headline"></a></h2>
+<h2>Installing DICE<a class="headerlink" href="#installing-dice" title="Permalink to this heading"></a></h2>
 <p>DiCE supports Python 3+. The stable version of DiCE is available on <a class="reference external" href="https://pypi.org/project/dice-ml/">PyPI</a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install dice-ml
+</pre></div>
+</div>
+<p>DiCE is also available on <a class="reference external" href="https://anaconda.org/conda-forge/dice-ml">conda-forge</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge dice-ml
 </pre></div>
 </div>
 <p>To install the latest (dev) version of DiCE and its dependencies, clone this repo and run <cite>pip install</cite> from the top-most folder of the repo:</p>
@@ -153,7 +159,7 @@ pip install -r requirements-test.txt
 </ul>
 </section>
 <section id="getting-started-with-dice">
-<h2>Getting started with DiCE<a class="headerlink" href="#getting-started-with-dice" title="Permalink to this headline"></a></h2>
+<h2>Getting started with DiCE<a class="headerlink" href="#getting-started-with-dice" title="Permalink to this heading"></a></h2>
 <p>With DiCE, generating explanations is a simple three-step  process: train
 mode and then invoke DiCE to generate counterfactual examples for any input.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
@@ -206,7 +212,7 @@ example, the following input leads to class 0 (low income).</p>
 </ul>
 </section>
 <section id="supported-methods-for-generating-counterfactuals">
-<h2>Supported methods for generating counterfactuals<a class="headerlink" href="#supported-methods-for-generating-counterfactuals" title="Permalink to this headline"></a></h2>
+<h2>Supported methods for generating counterfactuals<a class="headerlink" href="#supported-methods-for-generating-counterfactuals" title="Permalink to this heading"></a></h2>
 <p>DiCE can generate counterfactual examples using the following methods.</p>
 <p><strong>Model-agnostic methods</strong></p>
 <ul class="simple">
@@ -223,7 +229,7 @@ example, the following input leads to class 0 (low income).</p>
 <p>The last two methods require a differentiable model, such as a neural network. If you are interested in a specific method, do raise an issue <a class="reference external" href="https://github.com/interpretml/DiCE/issues">here</a>.</p>
 </section>
 <section id="supported-use-cases">
-<h2>Supported use-cases<a class="headerlink" href="#supported-use-cases" title="Permalink to this headline"></a></h2>
+<h2>Supported use-cases<a class="headerlink" href="#supported-use-cases" title="Permalink to this heading"></a></h2>
 <p><strong>Data</strong></p>
 <p>DiCE does not need access to the full dataset. It only requires metadata properties for each feature (min, max for continuous features and levels for categorical features). Thus, for sensitive data, the dataset can be provided as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">features</span><span class="o">=</span><span class="p">{</span>
@@ -261,7 +267,7 @@ example, the following input leads to class 0 (low income).</p>
 <p>We visualize explanations through a table highlighting the change in features. We plan to support an English language explanation too!</p>
 </section>
 <section id="feasibility-of-counterfactual-explanations">
-<h2>Feasibility of counterfactual explanations<a class="headerlink" href="#feasibility-of-counterfactual-explanations" title="Permalink to this headline"></a></h2>
+<h2>Feasibility of counterfactual explanations<a class="headerlink" href="#feasibility-of-counterfactual-explanations" title="Permalink to this heading"></a></h2>
 <p>We acknowledge that not all counterfactual explanations may be feasible for a
 user. In general, counterfactuals closer to an individual’s profile will be
 more feasible. Diversity is also important to help an individual choose between
@@ -296,7 +302,7 @@ should be between 10 and 50 using the <code class="docutils literal notranslate"
 <p>For more details, check out <a class="reference external" href="https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_model_agnostic_CFs.ipynb">this</a> notebook.</p>
 </section>
 <section id="the-promise-of-counterfactual-explanations">
-<h2>The promise of counterfactual explanations<a class="headerlink" href="#the-promise-of-counterfactual-explanations" title="Permalink to this headline"></a></h2>
+<h2>The promise of counterfactual explanations<a class="headerlink" href="#the-promise-of-counterfactual-explanations" title="Permalink to this heading"></a></h2>
 <p>Being truthful to the model, counterfactual explanations can be useful to all stakeholders for a decision made by a machine learning model that makes decisions.</p>
 <ul class="simple">
 <li><p><strong>Decision subjects</strong>: Counterfactual explanations can be used to explore actionable recourse for a person based on a decision received by a ML model. DiCE shows decision outcomes with <em>actionable</em> alternative profiles, to help people understand what they could have done to change their model outcome.</p></li>
@@ -309,7 +315,7 @@ properties of an ML model. We plan to add support for this in the future.</p></l
 </ul>
 </section>
 <section id="roadmap">
-<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline"></a></h2>
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this heading"></a></h2>
 <p>Ideally, counterfactual explanations should balance between a wide range of suggested changes (<em>diversity</em>), and the relative ease of adopting those changes (<em>proximity</em> to the original input), and also follow the causal laws of the world, e.g., one can hardly lower their educational degree or change their race.</p>
 <p>We are working on adding the following features to DiCE:</p>
 <ul class="simple">
@@ -321,7 +327,7 @@ properties of an ML model. We plan to add support for this in the future.</p></l
 </ul>
 </section>
 <section id="citing">
-<h2>Citing<a class="headerlink" href="#citing" title="Permalink to this headline"></a></h2>
+<h2>Citing<a class="headerlink" href="#citing" title="Permalink to this heading"></a></h2>
 <p>If you find DiCE useful for your research work, please cite it as follows.</p>
 <p>Ramaravind K. Mothilal, Amit Sharma, and Chenhao Tan (2020). <strong>Explaining machine learning classifiers through diverse counterfactual explanations</strong>. <em>Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency</em>.</p>
 <p>Bibtex:</p>
@@ -336,7 +342,7 @@ properties of an ML model. We plan to add support for this in the future.</p></l
 </div>
 </section>
 <section id="contributing">
-<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline"></a></h2>
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading"></a></h2>
 <p>This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit <a class="reference external" href="https://cla.microsoft.com">https://cla.microsoft.com</a>.</p>
@@ -371,7 +377,7 @@ contact <a class="reference external" href="mailto:opencode&#37;&#52;&#48;micros
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started.html#Generating-counterfactual-examples-using-DiCE">Generating counterfactual examples using DiCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started.html#Generating-feature-attributions-(local-and-global)-using-DiCE">Generating feature attributions (local and global) using DiCE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started.html#Working-with-deep-learning-models-(TensorFlow-and-PyTorch)">Working with deep learning models (TensorFlow and PyTorch)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started.html#More-resources:-What's-next?">More resources: What’s next?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started.html#More-resources:-What’s-next?">More resources: What’s next?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a><ul>
@@ -393,10 +399,10 @@ contact <a class="reference external" href="mailto:opencode&#37;&#52;&#48;micros
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html#3.-Querying-a-KD-Tree">3. Querying a KD Tree</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Defining-meta-data">Defining meta data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Loading-trained-ML-model">Loading trained ML model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_private_data.html#id1">Generate diverse counterfactuals</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a><ul>
@@ -440,7 +446,7 @@ contact <a class="reference external" href="mailto:opencode&#37;&#52;&#48;micros
 </section>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

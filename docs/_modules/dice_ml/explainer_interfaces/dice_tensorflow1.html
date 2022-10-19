@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.8 documentation</title>
+  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,9 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -46,7 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -108,6 +110,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># initiating data related parameters</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>
+        <span class="c1"># initializing model related variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_interface</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>  <span class="c1"># loading trained model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">feed_data_params</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">initialize_transform_func</span><span class="p">()</span>
+        <span class="c1"># temp data to create some attributes like encoded feature names</span>
+        <span class="n">temp_ohe_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">create_ohe_params</span><span class="p">(</span><span class="n">temp_ohe_data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_categorical_feature_indexes</span><span class="p">,</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">encoded_continuous_feature_indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="p">,</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cont_precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_data_params_for_gradient_dice</span><span class="p">()</span>
@@ -118,18 +128,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
 
-        <span class="c1"># initializing model related variables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_interface</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>  <span class="c1"># loading trained model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># placeholder variables for model predictions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># TODO: this error is probably too big - need to change it.</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Gradient-based DiCE currently &quot;</span>
-                             <span class="s2">&quot;(1) accepts the data only in raw categorical and continuous formats, &quot;</span>
-                             <span class="s2">&quot;(2) does one-hot-encoding and min-max-normalization internally, &quot;</span>
-                             <span class="s2">&quot;(3) expects the ML model the accept the data in this same format. &quot;</span>
-                             <span class="s2">&quot;If your problem supports this, please initialize model class again &quot;</span>
-                             <span class="s2">&quot;with no custom transformation function.&quot;</span><span class="p">)</span>
         <span class="c1"># number of output nodes of ML model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_num_output_nodes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">ohe_encoded_feature_names</span><span class="p">)))</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -153,7 +153,7 @@
                                  <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;tensorflow:adam&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
                                  <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                  <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                                 <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">):</span>
+                                 <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates diverse counterfactual explanations</span>
 
 <span class="sd">        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.</span>
@@ -196,6 +196,8 @@
 <span class="sd">                                           Prefer binary search when a feature range is large</span>
 <span class="sd">                                           (for instance, income varying from 10k to 1000k) and only if the features</span>
 <span class="sd">                                           share a monotonic relationship with predicted outcome in the model.</span>
+<span class="sd">        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement</span>
+
 
 <span class="sd">        :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations</span>
 <span class="sd">                 (see diverse_counterfactuals.py).</span>
@@ -208,10 +210,6 @@
 
         <span class="c1"># check permitted range for continuous features</span>
         <span class="k">if</span> <span class="n">permitted_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># if not self.data_interface.check_features_range(permitted_range):</span>
-            <span class="c1">#     raise ValueError(</span>
-            <span class="c1">#         &quot;permitted range of features should be within their original range&quot;)</span>
-            <span class="c1"># else:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span> <span class="o">=</span> <span class="n">permitted_range</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_minx_maxx</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span> <span class="o">=</span> <span class="p">[]</span>
@@ -242,7 +240,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">update_hyperparameters</span><span class="p">(</span><span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">)</span>
 
         <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_counterfactuals</span><span class="p">(</span>
-            <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">min_iter</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">project_iter</span><span class="p">,</span>
+            <span class="n">query_instance</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">min_iter</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">project_iter</span><span class="p">,</span>
             <span class="n">loss_diff_thres</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="p">,</span> <span class="n">tie_random</span><span class="p">,</span>
             <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
 
@@ -312,7 +310,7 @@
 
 <div class="viewcode-block" id="DiceTensorFlow1.predict_fn_for_sparsity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;prediction function for sparsity correction&quot;&quot;&quot;</span>
-        <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DiceTensorFlow1.compute_yloss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_yloss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_yloss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
@@ -433,7 +431,7 @@
                 <span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">normalized_mads</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="n">feature_weights_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">encoded_feature_names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">ohe_encoded_feature_names</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">feature_weights</span><span class="p">:</span>
                 <span class="n">feature_weights_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
@@ -603,19 +601,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">loss_converge_iter</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.find_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">find_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<div class="viewcode-block" id="DiceTensorFlow1.find_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">find_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
                              <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                              <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                              <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Finds counterfactuals by gradient-descent.&quot;&quot;&quot;</span>
 
-        <span class="c1"># Prepares user defined query_instance for DiCE.</span>
-        <span class="c1"># query_instance = self.data_interface.prepare_query_instance(query_instance=query_instance, encoding=&#39;one-hot&#39;)</span>
-        <span class="c1"># query_instance = np.array([query_instance.iloc[0].values], dtype=np.float32)</span>
-        <span class="n">query_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">query_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
         <span class="c1"># find the predicted value of query_instance</span>
-        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">desired_class</span> <span class="o">==</span> <span class="s2">&quot;opposite&quot;</span><span class="p">:</span>
             <span class="n">desired_class</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">test_pred</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">desired_class</span><span class="p">]])</span>
@@ -734,19 +729,24 @@
 
         <span class="c1"># do inverse transform of CFs to original user-fed format</span>
         <span class="n">cfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">))])</span>
-        <span class="n">final_cfs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_inverse_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">final_cfs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decoded_data</span><span class="p">(</span><span class="n">cfs</span><span class="p">))</span>
         <span class="n">cfs_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span><span class="p">]</span>
         <span class="n">cfs_preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">cfs_preds</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
         <span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cfs_preds</span><span class="p">)</span>
 
-        <span class="n">test_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_inverse_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">test_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decoded_data</span><span class="p">(</span><span class="n">query_instance</span><span class="p">))</span>
         <span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">test_pred</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
         <span class="c1"># post-hoc operation on continuous features to enhance sparsity - only for public data</span>
         <span class="k">if</span> <span class="n">posthoc_sparsity_param</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posthoc_sparsity_param</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span>
-                <span class="n">final_cfs_df_sparse</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span>
+                                                                       <span class="n">test_instance_df</span><span class="p">,</span>
+                                                                       <span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                                                                       <span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                                                                       <span class="n">limit_steps_ls</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="kc">None</span>
 
