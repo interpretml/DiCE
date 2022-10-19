@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.8 documentation</title>
+  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -49,7 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -298,6 +300,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -306,10 +309,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -321,12 +328,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -354,7 +364,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Benchmarking-different-CF-explanation-methods">
-<h1>Benchmarking different CF explanation methods<a class="headerlink" href="#Benchmarking-different-CF-explanation-methods" title="Permalink to this headline"></a></h1>
+<h1>Benchmarking different CF explanation methods<a class="headerlink" href="#Benchmarking-different-CF-explanation-methods" title="Permalink to this heading"></a></h1>
 <p>In this notebook, we show runtimes of different model-agnostic explanation methods. Currently, we support three model-agnostic explanation methods: 1. Random-Sampling 2. Genetic Algorithm 3. Querying a KD tree</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -386,15 +396,65 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <section id="Loading-dataset">
-<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this headline"></a></h2>
+<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this heading"></a></h2>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as described in dice_ml.utils.helpers module.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">FileNotFoundError</span>                         Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [3]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> dataset <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">helpers</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">load_adult_income_dataset</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/utils/helpers.py:25</span>, in <span class="ansi-cyan-fg">load_adult_income_dataset</span><span class="ansi-blue-fg">(only_train)</span>
+<span class="ansi-green-intense-fg ansi-bold">     19</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">load_adult_income_dataset</span>(only_train<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>):
+<span class="ansi-green-intense-fg ansi-bold">     20</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares</span>
+<span class="ansi-green-intense-fg ansi-bold">     21</span> <span style="color: rgb(175,0,0)">       the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
+<span class="ansi-green-intense-fg ansi-bold">     22</span>
+<span class="ansi-green-intense-fg ansi-bold">     23</span> <span style="color: rgb(175,0,0)">    :return adult_data: returns preprocessed adult income dataset.</span>
+<span class="ansi-green-intense-fg ansi-bold">     24</span> <span style="color: rgb(175,0,0)">    &#34;&#34;&#34;</span>
+<span class="ansi-green-fg">---&gt; 25</span>     raw_data <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">np</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">genfromtxt</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span> <span class="ansi-yellow-bg">                             </span><span class="ansi-yellow-bg">delimiter</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">, </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">dtype</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">str</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">invalid_raise</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">False</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     28</span>     <span style="color: rgb(95,135,135)">#  column names from &#34;https://archive.ics.uci.edu/ml/datasets/Adult&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     29</span>     column_names <span style="color: rgb(98,98,98)">=</span> [<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">age</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">workclass</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">fnlwgt</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">education</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">educational-num</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">marital-status</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">occupation</span><span style="color: rgb(175,0,0)">&#39;</span>,
+<span class="ansi-green-intense-fg ansi-bold">     30</span>                     <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">relationship</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">race</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">gender</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">capital-gain</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">capital-loss</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">hours-per-week</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">native-country</span><span style="color: rgb(175,0,0)">&#39;</span>,
+<span class="ansi-green-intense-fg ansi-bold">     31</span>                     <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#39;</span>]
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/npyio.py:1934</span>, in <span class="ansi-cyan-fg">genfromtxt</span><span class="ansi-blue-fg">(fname, dtype, comments, delimiter, skip_header, skip_footer, converters, missing_values, filling_values, usecols, names, excludelist, deletechars, replace_space, autostrip, case_sensitive, defaultfmt, unpack, usemask, loose, invalid_raise, max_rows, encoding, ndmin, like)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1932</span>     fname <span style="color: rgb(98,98,98)">=</span> os_fspath(fname)
+<span class="ansi-green-intense-fg ansi-bold">   1933</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">isinstance</span>(fname, <span style="color: rgb(0,135,0)">str</span>):
+<span class="ansi-green-fg">-&gt; 1934</span>     fid <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">np</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">lib</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_datasource</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">fname</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">rt</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1935</span>     fid_ctx <span style="color: rgb(98,98,98)">=</span> contextlib<span style="color: rgb(98,98,98)">.</span>closing(fid)
+<span class="ansi-green-intense-fg ansi-bold">   1936</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:193</span>, in <span class="ansi-cyan-fg">open</span><span class="ansi-blue-fg">(path, mode, destpath, encoding, newline)</span>
+<span class="ansi-green-intense-fg ansi-bold">    156</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    157</span> <span style="color: rgb(175,0,0)">Open `path` with `mode` and return the file object.</span>
+<span class="ansi-green-intense-fg ansi-bold">    158</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">    189</span>
+<span class="ansi-green-intense-fg ansi-bold">    190</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    192</span> ds <span style="color: rgb(98,98,98)">=</span> DataSource(destpath)
+<span class="ansi-green-fg">--&gt; 193</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">ds</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">path</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">newline</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">newline</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:533</span>, in <span class="ansi-cyan-fg">DataSource.open</span><span class="ansi-blue-fg">(self, path, mode, encoding, newline)</span>
+<span class="ansi-green-intense-fg ansi-bold">    530</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> _file_openers[ext](found, mode<span style="color: rgb(98,98,98)">=</span>mode,
+<span class="ansi-green-intense-fg ansi-bold">    531</span>                               encoding<span style="color: rgb(98,98,98)">=</span>encoding, newline<span style="color: rgb(98,98,98)">=</span>newline)
+<span class="ansi-green-intense-fg ansi-bold">    532</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 533</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">FileNotFoundError</span>(<span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>path<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> not found.</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">FileNotFoundError</span>: https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data not found.
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -405,105 +465,19 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [4]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">dataset</span><span style="color: rgb(98,98,98)">.</span>head()
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>28</td>
-      <td>Private</td>
-      <td>Bachelors</td>
-      <td>Single</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>60</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>30</td>
-      <td>Self-Employed</td>
-      <td>Assoc</td>
-      <td>Married</td>
-      <td>Professional</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>65</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>32</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>20</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Single</td>
-      <td>Service</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>35</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>41</td>
-      <td>Self-Employed</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<span class="ansi-red-fg">NameError</span>: name &#39;dataset&#39; is not defined
+</pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
@@ -512,11 +486,25 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [5]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> d <span style="color: rgb(98,98,98)">=</span> dice_ml<span style="color: rgb(98,98,98)">.</span>Data(dataframe<span style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">dataset</span>,
+<span class="ansi-green-intense-fg ansi-bold">      2</span>                  continuous_features<span style="color: rgb(98,98,98)">=</span>[<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">age</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">hours_per_week</span><span style="color: rgb(175,0,0)">&#39;</span>], outcome_name<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#39;</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;dataset&#39; is not defined
+</pre></div></div>
+</div>
 </section>
 <section id="Training-the-ML-model">
-<h2>Training the ML model<a class="headerlink" href="#Training-the-ML-model" title="Permalink to this headline"></a></h2>
+<h2>Training the ML model<a class="headerlink" href="#Training-the-ML-model" title="Permalink to this heading"></a></h2>
 <p>Currently, the genetic algorithm &amp; KD tree methods work with scikit-learn models. Support for Tensorflow 1&amp;2 and Pytorch will be implemented soon.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
@@ -553,7 +541,22 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [6]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> target <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">dataset</span>[<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#34;</span>]
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span style="color: rgb(95,135,135)"># Split data into train and test</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> datasetX <span style="color: rgb(98,98,98)">=</span> dataset<span style="color: rgb(98,98,98)">.</span>drop(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#34;</span>, axis<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;dataset&#39; is not defined
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
@@ -561,11 +564,24 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [7]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> m <span style="color: rgb(98,98,98)">=</span> dice_ml<span style="color: rgb(98,98,98)">.</span>Model(model<span style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">model</span>, backend<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">sklearn</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;model&#39; is not defined
+</pre></div></div>
+</div>
 </section>
 <section id="Initialize-counterfactual-generation-methods">
-<h2>Initialize counterfactual generation methods<a class="headerlink" href="#Initialize-counterfactual-generation-methods" title="Permalink to this headline"></a></h2>
+<h2>Initialize counterfactual generation methods<a class="headerlink" href="#Initialize-counterfactual-generation-methods" title="Permalink to this heading"></a></h2>
 <p>We now initialize all three counterfactuals generation methods</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
@@ -573,7 +589,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [8]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> exp_random <span style="color: rgb(98,98,98)">=</span> Dice(<span class="ansi-yellow-bg">d</span>, m, method<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">random</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;d&#39; is not defined
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
@@ -581,7 +610,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [9]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> exp_genetic <span style="color: rgb(98,98,98)">=</span> Dice(<span class="ansi-yellow-bg">d</span>, m, method<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">genetic</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;d&#39; is not defined
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
@@ -589,13 +631,39 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [10]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> exp_KD <span style="color: rgb(98,98,98)">=</span> Dice(<span class="ansi-yellow-bg">d</span>, m, method<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">kdtree</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;d&#39; is not defined
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [11]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> query_instances <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">x_train</span>[<span style="color: rgb(98,98,98)">4</span>:<span style="color: rgb(98,98,98)">7</span>]
+
+<span class="ansi-red-fg">NameError</span>: name &#39;x_train&#39; is not defined
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -606,79 +674,21 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [12]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">query_instances</span>
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>9608</th>
-      <td>27</td>
-      <td>Private</td>
-      <td>School</td>
-      <td>Single</td>
-      <td>Blue-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>40</td>
-    </tr>
-    <tr>
-      <th>22027</th>
-      <td>31</td>
-      <td>Self-Employed</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>Sales</td>
-      <td>Other</td>
-      <td>Male</td>
-      <td>60</td>
-    </tr>
-    <tr>
-      <th>14296</th>
-      <td>26</td>
-      <td>Private</td>
-      <td>HS-grad</td>
-      <td>Married</td>
-      <td>Blue-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<span class="ansi-red-fg">NameError</span>: name &#39;query_instances&#39; is not defined
+</pre></div></div>
 </div>
 </section>
 <section id="Generate-Counterfactuals">
-<h2>Generate Counterfactuals<a class="headerlink" href="#Generate-Counterfactuals" title="Permalink to this headline"></a></h2>
+<h2>Generate Counterfactuals<a class="headerlink" href="#Generate-Counterfactuals" title="Permalink to this heading"></a></h2>
 <p>We now generate counterfactuals of desired_class=0 using all three different methods and check the runtime. You can modify the number of loops (<code class="docutils literal notranslate"><span class="pre">num_loops</span></code>), and the number of diverse counterfactuals to generate (<code class="docutils literal notranslate"><span class="pre">k</span></code>).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -735,59 +745,22 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/pandas/core/indexing.py:1676: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  self._setitem_single_column(ilocs[0], value, pi)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/pandas/core/indexing.py:1738: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  self._setitem_single_column(loc, value[:, i].tolist(), pi)
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:00&lt;00:00,  4.75it/s]
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.08s/it]
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.14it/s]
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/pandas/core/indexing.py:1676: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  self._setitem_single_column(ilocs[0], value, pi)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/pandas/core/indexing.py:1738: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  self._setitem_single_column(loc, value[:, i].tolist(), pi)
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:00&lt;00:00,  4.73it/s]
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.08s/it]
-100%|███████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.10it/s]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-For Independent random sampling of features: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 01 sec
-For querying from a KD tree: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 05 sec
-For genetic algorithm: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 06 sec
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [14]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 5&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> elapsed_genetic <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(98,98,98)">0</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> _ <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">range</span>(num_loops):
+<span class="ansi-green-fg">----&gt; 6</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> q <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span class="ansi-yellow-bg">query_instances</span>:
+<span class="ansi-green-intense-fg ansi-bold">      7</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> q <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> d<span style="color: rgb(98,98,98)">.</span>categorical_feature_names:
+<span class="ansi-green-intense-fg ansi-bold">      8</span>             query_instances<span style="color: rgb(98,98,98)">.</span>loc[:, q] <span style="color: rgb(98,98,98)">=</span> \
+<span class="ansi-green-intense-fg ansi-bold">      9</span>                 [np<span style="color: rgb(98,98,98)">.</span>unique(random<span style="color: rgb(98,98,98)">.</span>choice(dataset[q]<span style="color: rgb(98,98,98)">.</span>values)) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> _ <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> query_instances<span style="color: rgb(98,98,98)">.</span>index]
 
+<span class="ansi-red-fg">NameError</span>: name &#39;query_instances&#39; is not defined
 </pre></div></div>
 </div>
 </section>

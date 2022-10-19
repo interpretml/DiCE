@@ -28,6 +28,14 @@ dice\_ml.utils.helpers module
    :undoc-members:
    :show-inheritance:
 
+dice\_ml.utils.neuralnetworks module
+------------------------------------
+
+.. automodule:: dice_ml.utils.neuralnetworks
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.utils.serialize module
 -------------------------------
 

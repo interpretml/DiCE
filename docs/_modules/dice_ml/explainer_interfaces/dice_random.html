@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.dice_random &mdash; DiCE 0.8 documentation</title>
+  <title>dice_ml.explainer_interfaces.dice_random &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,9 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -46,7 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -107,7 +109,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>  <span class="c1"># initiating data related parameters</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">create_ohe_params</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model_interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>  <span class="c1"># loading pickled trained model if applicable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">feed_data_params</span><span class="p">(</span><span class="n">data_interface</span><span class="p">)</span>
@@ -122,7 +123,8 @@
     <span class="k">def</span> <span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                                  <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                                  <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">limit_steps_ls</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate counterfactuals by randomly sampling features.</span>
 
 <span class="sd">        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.</span>
@@ -142,6 +144,7 @@
 <span class="sd">                                           share a monotonic relationship with predicted outcome in the model.</span>
 <span class="sd">        :param sample_size: Sampling size</span>
 <span class="sd">        :param random_seed: Random seed for reproducibility</span>
+<span class="sd">        :param limit_steps_ls: Defines an upper limit for the linear search step in the posthoc_sparsity_enhancement</span>
 
 <span class="sd">        :returns: A CounterfactualExamples object that contains the dataframe of generated counterfactuals as an attribute.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -158,7 +161,6 @@
         <span class="c1"># Do predictions once on the query_instance and reuse across to reduce the number</span>
         <span class="c1"># inferences.</span>
         <span class="n">model_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
-
         <span class="c1"># number of output nodes of ML model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
@@ -251,8 +253,13 @@
         <span class="k">if</span> <span class="n">posthoc_sparsity_param</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posthoc_sparsity_param</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;data_df&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span>
-                <span class="n">final_cfs_df_sparse</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span>
+                                                                       <span class="n">test_instance_df</span><span class="p">,</span>
+                                                                       <span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+                                                                       <span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
+                                                                       <span class="n">limit_steps_ls</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -284,10 +291,6 @@
 
         <span class="c1"># first get required parameters</span>
         <span class="n">precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;dict&quot;</span><span class="p">)</span>
-
-        <span class="n">categorical_features_frequencies</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
-            <span class="n">categorical_features_frequencies</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="n">sampling_random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">sampling_random_seed</span><span class="p">)</span>
