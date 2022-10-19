@@ -76,8 +76,8 @@ If you face any problems, try installing dependencies manually.
 
 Getting started with DiCE
 -------------------------
-With DiCE, generating explanations is a simple three-step  process: train
-mode and then invoke DiCE to generate counterfactual examples for any input.
+With DiCE, generating explanations is a simple three-step  process: set up a dataset, train a model, and then invoke DiCE to generate counterfactual examples for any input. DiCE can also work with pre-trained models, with or without their original training data. 
+
 
 .. code:: python
 
