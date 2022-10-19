@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generate feasible counterfactual explanations using a VAE &mdash; DiCE 0.8 documentation</title>
+  <title>Generate feasible counterfactual explanations using a VAE &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -51,7 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Generate feasible counterfactual explanations using a VAE</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Loading-dataset">Loading dataset</a></li>
@@ -310,6 +312,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -318,10 +321,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -333,12 +340,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -366,7 +376,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Generate-feasible-counterfactual-explanations-using-a-VAE">
-<h1>Generate feasible counterfactual explanations using a VAE<a class="headerlink" href="#Generate-feasible-counterfactual-explanations-using-a-VAE" title="Permalink to this headline"></a></h1>
+<h1>Generate feasible counterfactual explanations using a VAE<a class="headerlink" href="#Generate-feasible-counterfactual-explanations-using-a-VAE" title="Permalink to this heading"></a></h1>
 <p>This presents the variational inference based approach for generating feasible counterfactuals, where we first train an encoder-decoder framework to generate counterfactuals. More details about our framework can be found here: <a class="reference external" href="https://arxiv.org/abs/1912.03277">https://arxiv.org/abs/1912.03277</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -383,15 +393,143 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>DiCE requires two inputs: a training dataset and a pre-trained ML model. It can also work without access to the full dataset (see this <a class="reference internal" href="DiCE_with_private_data.html"><span class="doc">notebook</span></a> for advanced examples).</p>
 <section id="Loading-dataset">
-<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this headline"></a></h2>
+<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this heading"></a></h2>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as described in <strong>dice_ml.utils.helpers</strong> module.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">RemoteDisconnected</span>                        Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [2]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> dataset <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">helpers</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">load_adult_income_dataset</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/utils/helpers.py:25</span>, in <span class="ansi-cyan-fg">load_adult_income_dataset</span><span class="ansi-blue-fg">(only_train)</span>
+<span class="ansi-green-intense-fg ansi-bold">     19</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">load_adult_income_dataset</span>(only_train<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>):
+<span class="ansi-green-intense-fg ansi-bold">     20</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares</span>
+<span class="ansi-green-intense-fg ansi-bold">     21</span> <span style="color: rgb(175,0,0)">       the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
+<span class="ansi-green-intense-fg ansi-bold">     22</span>
+<span class="ansi-green-intense-fg ansi-bold">     23</span> <span style="color: rgb(175,0,0)">    :return adult_data: returns preprocessed adult income dataset.</span>
+<span class="ansi-green-intense-fg ansi-bold">     24</span> <span style="color: rgb(175,0,0)">    &#34;&#34;&#34;</span>
+<span class="ansi-green-fg">---&gt; 25</span>     raw_data <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">np</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">genfromtxt</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span> <span class="ansi-yellow-bg">                             </span><span class="ansi-yellow-bg">delimiter</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">, </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">dtype</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">str</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">invalid_raise</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">False</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     28</span>     <span style="color: rgb(95,135,135)">#  column names from &#34;https://archive.ics.uci.edu/ml/datasets/Adult&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">     29</span>     column_names <span style="color: rgb(98,98,98)">=</span> [<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">age</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">workclass</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">fnlwgt</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">education</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">educational-num</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">marital-status</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">occupation</span><span style="color: rgb(175,0,0)">&#39;</span>,
+<span class="ansi-green-intense-fg ansi-bold">     30</span>                     <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">relationship</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">race</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">gender</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">capital-gain</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">capital-loss</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">hours-per-week</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">native-country</span><span style="color: rgb(175,0,0)">&#39;</span>,
+<span class="ansi-green-intense-fg ansi-bold">     31</span>                     <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#39;</span>]
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/npyio.py:1934</span>, in <span class="ansi-cyan-fg">genfromtxt</span><span class="ansi-blue-fg">(fname, dtype, comments, delimiter, skip_header, skip_footer, converters, missing_values, filling_values, usecols, names, excludelist, deletechars, replace_space, autostrip, case_sensitive, defaultfmt, unpack, usemask, loose, invalid_raise, max_rows, encoding, ndmin, like)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1932</span>     fname <span style="color: rgb(98,98,98)">=</span> os_fspath(fname)
+<span class="ansi-green-intense-fg ansi-bold">   1933</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">isinstance</span>(fname, <span style="color: rgb(0,135,0)">str</span>):
+<span class="ansi-green-fg">-&gt; 1934</span>     fid <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">np</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">lib</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_datasource</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">fname</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">rt</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1935</span>     fid_ctx <span style="color: rgb(98,98,98)">=</span> contextlib<span style="color: rgb(98,98,98)">.</span>closing(fid)
+<span class="ansi-green-intense-fg ansi-bold">   1936</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:193</span>, in <span class="ansi-cyan-fg">open</span><span class="ansi-blue-fg">(path, mode, destpath, encoding, newline)</span>
+<span class="ansi-green-intense-fg ansi-bold">    156</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    157</span> <span style="color: rgb(175,0,0)">Open `path` with `mode` and return the file object.</span>
+<span class="ansi-green-intense-fg ansi-bold">    158</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">    189</span>
+<span class="ansi-green-intense-fg ansi-bold">    190</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    192</span> ds <span style="color: rgb(98,98,98)">=</span> DataSource(destpath)
+<span class="ansi-green-fg">--&gt; 193</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">ds</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">path</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">newline</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">newline</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:525</span>, in <span class="ansi-cyan-fg">DataSource.open</span><span class="ansi-blue-fg">(self, path, mode, encoding, newline)</span>
+<span class="ansi-green-intense-fg ansi-bold">    522</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ValueError</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">URLs are not writeable</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">    524</span> <span style="color: rgb(95,135,135)"># NOTE: _findfile will fail on a new file opened for writing.</span>
+<span class="ansi-green-fg">--&gt; 525</span> found <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_findfile</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">path</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    526</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> found:
+<span class="ansi-green-intense-fg ansi-bold">    527</span>     _fname, ext <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_splitzipext(found)
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:369</span>, in <span class="ansi-cyan-fg">DataSource._findfile</span><span class="ansi-blue-fg">(self, path)</span>
+<span class="ansi-green-intense-fg ansi-bold">    366</span>     filelist <span style="color: rgb(98,98,98)">=</span> filelist <span style="color: rgb(98,98,98)">+</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_possible_names(path)
+<span class="ansi-green-intense-fg ansi-bold">    368</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> filelist:
+<span class="ansi-green-fg">--&gt; 369</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">exists</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">name</span><span class="ansi-yellow-bg">)</span>:
+<span class="ansi-green-intense-fg ansi-bold">    370</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_isurl(name):
+<span class="ansi-green-intense-fg ansi-bold">    371</span>             name <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_cache(name)
+
+File <span class="ansi-green-fg">~/python-envs/v3.8dowhy/lib/python3.8/site-packages/numpy/lib/_datasource.py:479</span>, in <span class="ansi-cyan-fg">DataSource.exists</span><span class="ansi-blue-fg">(self, path)</span>
+<span class="ansi-green-intense-fg ansi-bold">    477</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_isurl(path):
+<span class="ansi-green-intense-fg ansi-bold">    478</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 479</span>         netfile <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">urlopen</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">path</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    480</span>         netfile<span style="color: rgb(98,98,98)">.</span>close()
+<span class="ansi-green-intense-fg ansi-bold">    481</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">del</span>(netfile)
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:222</span>, in <span class="ansi-cyan-fg">urlopen</span><span class="ansi-blue-fg">(url, data, timeout, cafile, capath, cadefault, context)</span>
+<span class="ansi-green-intense-fg ansi-bold">    220</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">    221</span>     opener <span style="color: rgb(98,98,98)">=</span> _opener
+<span class="ansi-green-fg">--&gt; 222</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">opener</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">url</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">data</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">timeout</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:525</span>, in <span class="ansi-cyan-fg">OpenerDirector.open</span><span class="ansi-blue-fg">(self, fullurl, data, timeout)</span>
+<span class="ansi-green-intense-fg ansi-bold">    522</span>     req <span style="color: rgb(98,98,98)">=</span> meth(req)
+<span class="ansi-green-intense-fg ansi-bold">    524</span> sys<span style="color: rgb(98,98,98)">.</span>audit(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">urllib.Request</span><span style="color: rgb(175,0,0)">&#39;</span>, req<span style="color: rgb(98,98,98)">.</span>full_url, req<span style="color: rgb(98,98,98)">.</span>data, req<span style="color: rgb(98,98,98)">.</span>headers, req<span style="color: rgb(98,98,98)">.</span>get_method())
+<span class="ansi-green-fg">--&gt; 525</span> response <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">req</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">data</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    527</span> <span style="color: rgb(95,135,135)"># post-process response</span>
+<span class="ansi-green-intense-fg ansi-bold">    528</span> meth_name <span style="color: rgb(98,98,98)">=</span> protocol<span style="color: rgb(98,98,98)">+</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">_response</span><span style="color: rgb(175,0,0)">&#34;</span>
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:542</span>, in <span class="ansi-cyan-fg">OpenerDirector._open</span><span class="ansi-blue-fg">(self, req, data)</span>
+<span class="ansi-green-intense-fg ansi-bold">    539</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> result
+<span class="ansi-green-intense-fg ansi-bold">    541</span> protocol <span style="color: rgb(98,98,98)">=</span> req<span style="color: rgb(98,98,98)">.</span>type
+<span class="ansi-green-fg">--&gt; 542</span> result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_call_chain</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">handle_open</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">protocol</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">protocol</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">+</span>
+<span class="ansi-green-intense-fg ansi-bold">    543</span> <span class="ansi-yellow-bg">                          </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">_open</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">req</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    544</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> result:
+<span class="ansi-green-intense-fg ansi-bold">    545</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> result
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:502</span>, in <span class="ansi-cyan-fg">OpenerDirector._call_chain</span><span class="ansi-blue-fg">(self, chain, kind, meth_name, *args)</span>
+<span class="ansi-green-intense-fg ansi-bold">    500</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> handler <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> handlers:
+<span class="ansi-green-intense-fg ansi-bold">    501</span>     func <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">getattr</span>(handler, meth_name)
+<span class="ansi-green-fg">--&gt; 502</span>     result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">func</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    503</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> result <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-intense-fg ansi-bold">    504</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> result
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:1397</span>, in <span class="ansi-cyan-fg">HTTPSHandler.https_open</span><span class="ansi-blue-fg">(self, req)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1396</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">https_open</span>(<span style="color: rgb(0,135,0)">self</span>, req):
+<span class="ansi-green-fg">-&gt; 1397</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">do_open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">http</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">client</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">HTTPSConnection</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">req</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1398</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">context</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_context</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">check_hostname</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_check_hostname</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/urllib/request.py:1358</span>, in <span class="ansi-cyan-fg">AbstractHTTPHandler.do_open</span><span class="ansi-blue-fg">(self, http_class, req, **http_conn_args)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1356</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">OSError</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> err: <span style="color: rgb(95,135,135)"># timeout error</span>
+<span class="ansi-green-intense-fg ansi-bold">   1357</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> URLError(err)
+<span class="ansi-green-fg">-&gt; 1358</span>     r <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">h</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">getresponse</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1359</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span>:
+<span class="ansi-green-intense-fg ansi-bold">   1360</span>     h<span style="color: rgb(98,98,98)">.</span>close()
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/http/client.py:1348</span>, in <span class="ansi-cyan-fg">HTTPConnection.getresponse</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1346</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-intense-fg ansi-bold">   1347</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">-&gt; 1348</span>         <span class="ansi-yellow-bg">response</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">begin</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1349</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ConnectionError</span>:
+<span class="ansi-green-intense-fg ansi-bold">   1350</span>         <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>close()
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/http/client.py:316</span>, in <span class="ansi-cyan-fg">HTTPResponse.begin</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    314</span> <span style="color: rgb(95,135,135)"># read until we get a non-100 response</span>
+<span class="ansi-green-intense-fg ansi-bold">    315</span> <span class="ansi-bold" style="color: rgb(0,135,0)">while</span> <span class="ansi-bold" style="color: rgb(0,135,0)">True</span>:
+<span class="ansi-green-fg">--&gt; 316</span>     version, status, reason <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_read_status</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    317</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> status <span style="color: rgb(98,98,98)">!=</span> CONTINUE:
+<span class="ansi-green-intense-fg ansi-bold">    318</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">break</span>
+
+File <span class="ansi-green-fg">/usr/lib/python3.8/http/client.py:285</span>, in <span class="ansi-cyan-fg">HTTPResponse._read_status</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    281</span>     <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">reply:</span><span style="color: rgb(175,0,0)">&#34;</span>, <span style="color: rgb(0,135,0)">repr</span>(line))
+<span class="ansi-green-intense-fg ansi-bold">    282</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> line:
+<span class="ansi-green-intense-fg ansi-bold">    283</span>     <span style="color: rgb(95,135,135)"># Presumably, the server closed the connection before</span>
+<span class="ansi-green-intense-fg ansi-bold">    284</span>     <span style="color: rgb(95,135,135)"># sending a valid response.</span>
+<span class="ansi-green-fg">--&gt; 285</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> RemoteDisconnected(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Remote end closed connection without</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    286</span>                              <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)"> response</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">    287</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-intense-fg ansi-bold">    288</span>     version, status, reason <span style="color: rgb(98,98,98)">=</span> line<span style="color: rgb(98,98,98)">.</span>split(<span class="ansi-bold" style="color: rgb(0,135,0)">None</span>, <span style="color: rgb(98,98,98)">2</span>)
+
+<span class="ansi-red-fg">RemoteDisconnected</span>: Remote end closed connection without response
+</pre></div></div>
 </div>
 <p>This dataset has 8 features. The outcome is income which is binarized to 0 (low-income, &lt;=50K) or 1 (high-income, &gt;50K).</p>
 <div class="nbinput docutils container">
@@ -403,103 +541,17 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [3]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">dataset</span><span style="color: rgb(98,98,98)">.</span>head()
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>28</td>
-      <td>Private</td>
-      <td>Bachelors</td>
-      <td>Single</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>60</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>30</td>
-      <td>Self-Employed</td>
-      <td>Assoc</td>
-      <td>Married</td>
-      <td>Professional</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>65</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>32</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>20</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Single</td>
-      <td>Service</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>35</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>41</td>
-      <td>Self-Employed</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<span class="ansi-red-fg">NameError</span>: name &#39;dataset&#39; is not defined
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -529,7 +581,7 @@ div.rendered_html tbody tr:hover {
 </pre></div></div>
 </div>
 <p>Given this dataset, we construct a data object for DiCE. Since continuous and discrete features have different ways of perturbation, we need to specify the names of the continuous features. DiCE also requires the name of the output variable that the ML model will predict.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
@@ -538,9 +590,23 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [5]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 1&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">----&gt; 1</span> d <span style="color: rgb(98,98,98)">=</span> dice_ml<span style="color: rgb(98,98,98)">.</span>Data(dataframe<span style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">dataset</span>, continuous_features<span style="color: rgb(98,98,98)">=</span>[<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">age</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">hours_per_week</span><span style="color: rgb(175,0,0)">&#39;</span>],
+<span class="ansi-green-intense-fg ansi-bold">      2</span>                  outcome_name<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">income</span><span style="color: rgb(175,0,0)">&#39;</span>, data_name<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">adult</span><span style="color: rgb(175,0,0)">&#39;</span>, test_size<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">0.1</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;dataset&#39; is not defined
+</pre></div></div>
+</div>
 </section>
 <section id="Loading-the-ML-model">
-<h2>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Permalink to this headline"></a></h2>
+<h2>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Permalink to this heading"></a></h2>
 <p>Below, we use a pre-trained ML model which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package.</p>
 <p>Note that we need to specify the explainer in the model backend. This is because both model and explainer need to be using the same backend library (pytorch or tensorflow).</p>
 <div class="nbinput docutils container">
@@ -584,19 +650,19 @@ ML Model Sequential(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-envs/v3.8dowhy/lib/python3.8/site-packages/torch/serialization.py:786: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-envs/v3.8dowhy/lib/python3.8/site-packages/torch/serialization.py:786: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-envs/v3.8dowhy/lib/python3.8/site-packages/torch/serialization.py:786: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+/home/amshar/python-envs/v3.8dowhy/lib/python3.8/site-packages/torch/serialization.py:786: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   warnings.warn(msg, SourceChangeWarning)
 </pre></div></div>
 </div>
 </section>
 <section id="Generate-counterfactuals-using-a-VAE-model">
-<h2>Generate counterfactuals using a VAE model<a class="headerlink" href="#Generate-counterfactuals-using-a-VAE-model" title="Permalink to this headline"></a></h2>
+<h2>Generate counterfactuals using a VAE model<a class="headerlink" href="#Generate-counterfactuals-using-a-VAE-model" title="Permalink to this heading"></a></h2>
 <p>Based on the data object <em>d</em> and the model object <em>m</em>, we can now instantiate the DiCE class for generating explanations. We present the variational inference based approach towards generating counterfactuals, where we first train an encoder-decoder framework to generate counterfactuals.</p>
 <p>FeasibleBaseVAE class has an method <code class="docutils literal notranslate"><span class="pre">train()</span></code>, which would train the Variational Encoder Decoder framework on the input dataframe. It has another arugment, <code class="docutils literal notranslate"><span class="pre">pre_trained</span></code>, which if set to 0 would re-train the framework each time while generating CFs. Else, it can be set to 1 to avoid repeated training of the framework and would load the latest fitted VAE model.</p>
 <div class="nbinput docutils container">
@@ -616,19 +682,16 @@ ML Model Sequential(
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Dataset Shape: (26048, 30)
-Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass_Government&#39;,
-       &#39;workclass_Other/Unknown&#39;, &#39;workclass_Private&#39;,
-       &#39;workclass_Self-Employed&#39;, &#39;education_Assoc&#39;, &#39;education_Bachelors&#39;,
-       &#39;education_Doctorate&#39;, &#39;education_HS-grad&#39;, &#39;education_Masters&#39;,
-       &#39;education_Prof-school&#39;, &#39;education_School&#39;, &#39;education_Some-college&#39;,
-       &#39;marital_status_Divorced&#39;, &#39;marital_status_Married&#39;,
-       &#39;marital_status_Separated&#39;, &#39;marital_status_Single&#39;,
-       &#39;marital_status_Widowed&#39;, &#39;occupation_Blue-Collar&#39;,
-       &#39;occupation_Other/Unknown&#39;, &#39;occupation_Professional&#39;,
-       &#39;occupation_Sales&#39;, &#39;occupation_Service&#39;, &#39;occupation_White-Collar&#39;,
-       &#39;race_Other&#39;, &#39;race_White&#39;, &#39;gender_Female&#39;, &#39;gender_Male&#39;, &#39;income&#39;],
-      dtype=&#39;object&#39;)
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [7]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># initiate DiCE</span>
+<span class="ansi-green-fg">----&gt; 2</span> exp <span style="color: rgb(98,98,98)">=</span> dice_ml<span style="color: rgb(98,98,98)">.</span>Dice(<span class="ansi-yellow-bg">d</span>, m, encoded_size<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">10</span>, lr<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>,
+<span class="ansi-green-intense-fg ansi-bold">      3</span>                    batch_size<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">2048</span>, validity_reg<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">42.0</span>, margin<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">0.165</span>, epochs<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">25</span>,
+<span class="ansi-green-intense-fg ansi-bold">      4</span>                    wm1<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>, wm2<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>, wm3<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>)
+<span class="ansi-green-intense-fg ansi-bold">      5</span> exp<span style="color: rgb(98,98,98)">.</span>train(pre_trained<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;d&#39; is not defined
 </pre></div></div>
 </div>
 <p>DiCE is a form of a local explanation and requires an query input whose outcome needs to be explained. Below we provide a sample input whose outcome is 0 (low-income) as per the ML model object <em>m</em>.</p>
@@ -660,191 +723,31 @@ Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Query instance (original outcome : 0)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/nn/modules/container.py:139: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
-  input = module(input)
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  c = torch.tensor(c).float()
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>41.0</td>
-      <td>Private</td>
-      <td>HS-grad</td>
-      <td>Single</td>
-      <td>Service</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>45.0</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-Counterfactual set (new outcome: 1.0)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [9]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># generate counterfactuals</span>
+<span class="ansi-green-fg">----&gt; 2</span> dice_exp <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">exp</span><span style="color: rgb(98,98,98)">.</span>generate_counterfactuals(query_instance, total_CFs<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">5</span>, desired_class<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">opposite</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span style="color: rgb(95,135,135)"># visualize the results</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> dice_exp<span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>40.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>40.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>38.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>38.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<span class="ansi-red-fg">NameError</span>: name &#39;exp&#39; is not defined
+</pre></div></div>
 </div>
 <p>That’s it! You can try generating counterfactual explanations for other examples using the same code. You can compare the running time of this VAE-based to DiCE’s default method: VAE-based method is super fast!</p>
 </section>
 </section>
 <section id="Adding-feasibility-constraints">
-<h1>Adding feasibility constraints<a class="headerlink" href="#Adding-feasibility-constraints" title="Permalink to this headline"></a></h1>
+<h1>Adding feasibility constraints<a class="headerlink" href="#Adding-feasibility-constraints" title="Permalink to this heading"></a></h1>
 <p>However, you might notice that for some examples, the above method can still return infeasible counterfactuals. This requires our base framework to be adpated for prodcuing feasible counterfactuals. A detailed description of how we adapt the method under different assumptions is provided in <a class="reference external" href="https://arxiv.org/pdf/1912.03277">this paper</a>.</p>
 <p>In the section below, we show an adaptation our base approach for preserving the Age-Ed constraint: Age and Education can never decrease and increasing Education implies increase in Age. This approach is called <strong>ModelApprox</strong>, where we adapt our base approach for simple unary and binary constraints.</p>
 <section id="ModelApprox">
-<h2>ModelApprox<a class="headerlink" href="#ModelApprox" title="Permalink to this headline"></a></h2>
+<h2>ModelApprox<a class="headerlink" href="#ModelApprox" title="Permalink to this heading"></a></h2>
 <p>Similar to the FeasibleBaseVAE class above, FeasibleModelApprox class has a method <code class="docutils literal notranslate"><span class="pre">train()</span></code> with argument <code class="docutils literal notranslate"><span class="pre">pre_trained</span></code>, which determines whether to train the framework again or load the latest optimal model. However, there are additional arguments to the <code class="docutils literal notranslate"><span class="pre">train()</span></code> method:</p>
 <ol class="arabic simple">
 <li><p>The first arugment determines whether the constraint to be preserved is unary or monotonic</p></li>
@@ -854,7 +757,7 @@ Counterfactual set (new outcome: 1.0)
 </ol>
 </section>
 <section id="Initilize-the-Model-and-Explainer-for-FeasibleModelApprox">
-<h2>Initilize the Model and Explainer for FeasibleModelApprox<a class="headerlink" href="#Initilize-the-Model-and-Explainer-for-FeasibleModelApprox" title="Permalink to this headline"></a></h2>
+<h2>Initilize the Model and Explainer for FeasibleModelApprox<a class="headerlink" href="#Initilize-the-Model-and-Explainer-for-FeasibleModelApprox" title="Permalink to this heading"></a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -889,14 +792,6 @@ ML Model Sequential(
 <div class="highlight"><pre>
 /mnt/c/Users/amshar/code/dice/dice_ml/model.py:34: UserWarning: {&#39;model&#39;: &#39;pytorch_model.PyTorchModel&#39;, &#39;explainer&#39;: &#39;feasible_model_approx.FeasibleModelApprox&#39;} backend not in supported backends sklearn,TF1,TF2,PYT
   warnings.warn(&#39;{0} backend not in supported backends {1}&#39;.format(
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.container.Sequential&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
-  warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.linear.Linear&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
-  warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.ReLU&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
-  warnings.warn(msg, SourceChangeWarning)
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/serialization.py:671: SourceChangeWarning: source code of class &#39;torch.nn.modules.activation.Softmax&#39; has changed. you can retrieve the original source code by accessing the object&#39;s source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
-  warnings.warn(msg, SourceChangeWarning)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -916,19 +811,16 @@ ML Model Sequential(
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Dataset Shape: (26048, 30)
-Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass_Government&#39;,
-       &#39;workclass_Other/Unknown&#39;, &#39;workclass_Private&#39;,
-       &#39;workclass_Self-Employed&#39;, &#39;education_Assoc&#39;, &#39;education_Bachelors&#39;,
-       &#39;education_Doctorate&#39;, &#39;education_HS-grad&#39;, &#39;education_Masters&#39;,
-       &#39;education_Prof-school&#39;, &#39;education_School&#39;, &#39;education_Some-college&#39;,
-       &#39;marital_status_Divorced&#39;, &#39;marital_status_Married&#39;,
-       &#39;marital_status_Separated&#39;, &#39;marital_status_Single&#39;,
-       &#39;marital_status_Widowed&#39;, &#39;occupation_Blue-Collar&#39;,
-       &#39;occupation_Other/Unknown&#39;, &#39;occupation_Professional&#39;,
-       &#39;occupation_Sales&#39;, &#39;occupation_Service&#39;, &#39;occupation_White-Collar&#39;,
-       &#39;race_Other&#39;, &#39;race_White&#39;, &#39;gender_Female&#39;, &#39;gender_Male&#39;, &#39;income&#39;],
-      dtype=&#39;object&#39;)
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [11]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># initiate DiCE</span>
+<span class="ansi-green-fg">----&gt; 2</span> exp <span style="color: rgb(98,98,98)">=</span> dice_ml<span style="color: rgb(98,98,98)">.</span>Dice(<span class="ansi-yellow-bg">d</span>, m, encoded_size<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">10</span>, lr<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>, batch_size<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">2048</span>,
+<span class="ansi-green-intense-fg ansi-bold">      3</span>                    validity_reg<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">76.0</span>, margin<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">0.344</span>, epochs<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">25</span>,
+<span class="ansi-green-intense-fg ansi-bold">      4</span>                    wm1<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>, wm2<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>, wm3<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1e-2</span>)
+<span class="ansi-green-intense-fg ansi-bold">      5</span> exp<span style="color: rgb(98,98,98)">.</span>train(<span style="color: rgb(98,98,98)">1</span>, [[<span style="color: rgb(98,98,98)">0</span>]], <span style="color: rgb(98,98,98)">1</span>, <span style="color: rgb(98,98,98)">87</span>, pre_trained<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">1</span>)
+
+<span class="ansi-red-fg">NameError</span>: name &#39;d&#39; is not defined
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -942,181 +834,21 @@ Datasets Columns: Index([&#39;age&#39;, &#39;hours_per_week&#39;, &#39;workclass
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Query instance (original outcome : 0)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/home/amshar/python-environments/vpy38/lib/python3.8/site-packages/torch/nn/modules/container.py:139: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
-  input = module(input)
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/sample_architecture/vae_model.py:121: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  c = torch.tensor(c).float()
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>41.0</td>
-      <td>Private</td>
-      <td>HS-grad</td>
-      <td>Single</td>
-      <td>Service</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>45.0</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-Counterfactual set (new outcome: 1.0)
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Input <span class="ansi-green-fg">In [12]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># generate counterfactuals</span>
+<span class="ansi-green-fg">----&gt; 2</span> dice_exp <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">exp</span><span style="color: rgb(98,98,98)">.</span>generate_counterfactuals(query_instance, total_CFs<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">5</span>, desired_class<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">opposite</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span style="color: rgb(95,135,135)"># visualize the results</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> dice_exp<span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>45.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>40.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>42.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>44.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>42.0</td>
-      <td>-</td>
-      <td>Doctorate</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>-</td>
-      <td>Male</td>
-      <td>40.0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<span class="ansi-red-fg">NameError</span>: name &#39;exp&#39; is not defined
+</pre></div></div>
 </div>
 <p>The results for ModelApprox show that the Age is also increased with increase in Education in counterfactual explanations unlike the BaseVAE method. You can try to experiment with ModelApprox to preserve unary and monotonic constraints for other datasets too. Examples for even more advanced approaches like <strong>SCMGenCF</strong>,<strong>OracleGenCF</strong> would be included soon to this repository, where we learn to generate feasible counterfactuals for complex feasiblity constraints. More details can be found in
 <a class="reference external" href="https://arxiv.org/pdf/1912.03277">our paper</a>.</p>

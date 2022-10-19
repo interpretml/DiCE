@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../../"))
-
+nbsphinx_allow_errors = True
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +23,7 @@ copyright = '2020, Ramaravind, Amit, Chenhao'  # noqa: A001
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.8'
+release = '0.9'
 
 
 # -- General configuration ---------------------------------------------------

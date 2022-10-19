@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.8 documentation</title>
+  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -46,7 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -107,7 +109,7 @@
     <span class="n">FEATURE_NAMES_INCLUDING_TARGET</span> <span class="o">=</span> <span class="s1">&#39;feature_names_including_target&#39;</span>
     <span class="n">FEATURE_NAMES</span> <span class="o">=</span> <span class="s1">&#39;feature_names&#39;</span>
     <span class="n">TEST_INSTANCE_LIST</span> <span class="o">=</span> <span class="s1">&#39;test_instance_list&#39;</span>
-    <span class="n">FIANL_CFS_LIST</span> <span class="o">=</span> <span class="s1">&#39;final_cfs_list&#39;</span>
+    <span class="n">FINAL_CFS_LIST</span> <span class="o">=</span> <span class="s1">&#39;final_cfs_list&#39;</span>
 
 
 <div class="viewcode-block" id="json_converter"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.json_converter">[docs]</a><span class="k">def</span> <span class="nf">json_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -187,7 +189,7 @@
                                   <span class="n">is_notebook_console</span><span class="o">=</span><span class="n">is_notebook_console</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span> <span class="s1">&#39;data_df&#39;</span><span class="p">):</span>  <span class="c1"># for private data</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Diverse Counterfactual set without sparsity correction since only metadata about each&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39; feature is available (new outcome: &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_outcome</span><span class="p">)</span>
+                      <span class="s1">&#39; feature is available (new outcome: </span><span class="si">%i</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_outcome</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dump_output</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">,</span>
                                   <span class="n">is_notebook_console</span><span class="o">=</span><span class="n">is_notebook_console</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -282,7 +284,7 @@
 
             <span class="n">alternate_obj</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">TEST_INSTANCE_LIST</span><span class="p">:</span> <span class="n">test_instance_df_as_list</span><span class="p">,</span>
-                <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FIANL_CFS_LIST</span><span class="p">:</span> <span class="n">final_cfs_df_as_as_list</span><span class="p">,</span>
+                <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FINAL_CFS_LIST</span><span class="p">:</span> <span class="n">final_cfs_df_as_as_list</span><span class="p">,</span>
                 <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">DATA_INTERFACE</span><span class="p">:</span> <span class="n">dummy_data_interface_dict</span><span class="p">,</span>
                 <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FEATURE_NAMES</span><span class="p">:</span> <span class="n">feature_names</span><span class="p">,</span>
                 <span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FEATURE_NAMES_INCLUDING_TARGET</span><span class="p">:</span> <span class="n">feature_names_including_target</span><span class="p">,</span>
@@ -314,7 +316,7 @@
                                           <span class="n">desired_range</span><span class="o">=</span><span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV1SchemaConstants</span><span class="o">.</span><span class="n">DESIRED_RANGE</span><span class="p">],</span>
                                           <span class="n">model_type</span><span class="o">=</span><span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV1SchemaConstants</span><span class="o">.</span><span class="n">MODEL_TYPE</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">final_cfs_list</span> <span class="o">=</span> <span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FIANL_CFS_LIST</span><span class="p">]</span>
+            <span class="n">final_cfs_list</span> <span class="o">=</span> <span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FINAL_CFS_LIST</span><span class="p">]</span>
             <span class="n">test_instance_list</span> <span class="o">=</span> <span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">TEST_INSTANCE_LIST</span><span class="p">]</span>
             <span class="n">feature_names_including_target</span> <span class="o">=</span> <span class="n">cf_example_dict</span><span class="p">[</span><span class="n">_DiverseCFV2SchemaConstants</span><span class="o">.</span><span class="n">FEATURE_NAMES_INCLUDING_TARGET</span><span class="p">]</span>
 

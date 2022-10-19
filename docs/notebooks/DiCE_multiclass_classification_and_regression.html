@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.8 documentation</title>
+  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -54,7 +56,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -304,6 +306,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -312,10 +315,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -327,12 +334,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -360,7 +370,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
-<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this headline"></a></h1>
+<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this heading"></a></h1>
 <p>This notebook will demonstrate how the DiCE library can be used for multiclass classification and regression for scikit-learn models. You can use any method (“random”, “kdtree”, “genetic”), just specific it in the method argument in the initialization step. The rest of the code is completely identical. For demonstration, we will be using the genetic algorithm for CFs.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -391,7 +401,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>We will use sklearn’s internal datasets to demonstrate DiCE’s features in this notebook</p>
 <section id="Multiclass-Classification">
-<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this headline"></a></h2>
+<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this heading"></a></h2>
 <p>For multiclass classification, we will use sklearn’s Iris dataset. This data set consists of 3 different types of irises’ (Setosa, Versicolour, and Virginica) petal and sepal length. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -586,7 +596,7 @@ memory usage: 6.0 KB
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.15s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  1.39it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -704,42 +714,42 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
-      <td>5.0</td>
-      <td>3.7</td>
-      <td>5.7</td>
-      <td>2.1</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>5.0</td>
-      <td>4.1</td>
-      <td>6.1</td>
-      <td>1.7</td>
+      <td>4.7</td>
+      <td>3.8</td>
+      <td>6.6</td>
+      <td>2.3</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
       <td>4.9</td>
-      <td>3.5</td>
-      <td>5.0</td>
-      <td>1.9</td>
+      <td>3.3</td>
+      <td>6.0</td>
+      <td>1.7</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>4.3</td>
-      <td>3.7</td>
-      <td>5.3</td>
-      <td>2.1</td>
+      <td>5.5</td>
+      <td>3.0</td>
+      <td>6.5</td>
+      <td>0.8</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>7.0</td>
+      <td>6.4</td>
+      <td>3.4</td>
+      <td>6.4</td>
+      <td>1.2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>6.1</td>
       <td>3.8</td>
-      <td>6.2</td>
-      <td>1.4</td>
+      <td>6.6</td>
+      <td>2.3</td>
       <td>2</td>
     </tr>
   </tbody>
@@ -762,7 +772,7 @@ Diverse Counterfactual set (new outcome: 2)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.42s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.83it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -904,10 +914,10 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
-      <td>6.7</td>
-      <td>3.3</td>
-      <td>5.7</td>
-      <td>2.1</td>
+      <td>6.3</td>
+      <td>3.1</td>
+      <td>1.0</td>
+      <td>1.8</td>
       <td>2.0</td>
     </tr>
     <tr>
@@ -915,7 +925,7 @@ Diverse Counterfactual set (new outcome: 2)
       <td>6.7</td>
       <td>3.3</td>
       <td>5.7</td>
-      <td>2.5</td>
+      <td>2.1</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1023,14 +1033,6 @@ Diverse Counterfactual set (new outcome: 2)
       <th>0</th>
       <td>6.5</td>
       <td>3.2</td>
-      <td>5.0</td>
-      <td>2.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.5</td>
-      <td>3.2</td>
       <td>5.1</td>
       <td>2.0</td>
       <td>2.0</td>
@@ -1061,10 +1063,18 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
-      <td>6.4</td>
-      <td>3.2</td>
-      <td>5.3</td>
-      <td>0.1</td>
+      <td>6.1</td>
+      <td>2.6</td>
+      <td>5.6</td>
+      <td>1.4</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>2.5</td>
+      <td>2.7</td>
+      <td>2.0</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1074,7 +1084,7 @@ Diverse Counterfactual set (new outcome: 2)
 </section>
 </section>
 <section id="Regression">
-<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline"></a></h1>
+<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this heading"></a></h1>
 <p>For regression, we will use sklearn’s California Housing dataset. This dataset contains California house prices. More information at <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html">https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
@@ -1296,7 +1306,7 @@ memory usage: 1.4 MB
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.50it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.49it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1359,7 +1369,7 @@ Query instance (original outcome : 1)
       <td>2.910112</td>
       <td>38.650002</td>
       <td>-121.839996</td>
-      <td>1.44691</td>
+      <td>1.49846</td>
     </tr>
   </tbody>
 </table>
@@ -1418,7 +1428,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.7</td>
       <td>34.45</td>
       <td>-119.81</td>
-      <td>3.3564200999999985</td>
+      <td>3.4537603999999984</td>
     </tr>
     <tr>
       <th>0</th>
@@ -1430,7 +1440,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.7</td>
       <td>34.24</td>
       <td>-118.28</td>
-      <td>3.0918301</td>
+      <td>3.126689999999999</td>
     </tr>
   </tbody>
 </table>
@@ -1488,7 +1498,7 @@ Query instance (original outcome : 1)
       <td>2.746479</td>
       <td>33.200001</td>
       <td>-115.599998</td>
-      <td>0.88245</td>
+      <td>0.91159</td>
     </tr>
   </tbody>
 </table>
@@ -1547,7 +1557,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.6</td>
       <td>33.61</td>
       <td>-117.92</td>
-      <td>4.96489929999999</td>
+      <td>4.98180959999999</td>
     </tr>
     <tr>
       <th>0</th>
@@ -1556,10 +1566,10 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>4.6</td>
       <td>1.2</td>
       <td>393.0</td>
-      <td>1.6</td>
-      <td>34.01</td>
+      <td>1.2</td>
+      <td>33.97</td>
       <td>-118.47</td>
-      <td>4.039710699999995</td>
+      <td>3.890800399999997</td>
     </tr>
   </tbody>
 </table>
