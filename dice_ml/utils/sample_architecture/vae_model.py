@@ -143,7 +143,7 @@ class AutoEncoder(nn.Module):
 
         self.encoded_continuous_feature_indexes = []
         for i in range(self.data_size):
-            if not any([i in v for v in self.encoded_categorical_feature_indexes)
+            if not any([(i in v) for v in self.encoded_categorical_feature_indexes]):
                 self.encoded_continuous_feature_indexes.append(i)
 
         self.encoded_start_cat = len(self.encoded_continuous_feature_indexes)
