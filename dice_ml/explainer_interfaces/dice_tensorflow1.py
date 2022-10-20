@@ -124,8 +124,14 @@ class DiceTensorFlow1(ExplainerBase):
         if permitted_range is not None:
             self.data_interface.permitted_range = permitted_range
             self.minx, self.maxx = self.data_interface.get_minx_maxx(normalized=True)
-            self.cont_minx = [self.data_interface.permitted_range[feature][0] for feature in self.data_interface.continuous_feature_names]
-            self.cont_maxx = [self.data_interface.permitted_range[feature][1] for feature in self.data_interface.continuous_feature_names]
+            self.cont_minx = [
+                self.data_interface.permitted_range[feature][0]
+                for feature in self.data_interface.continuous_feature_names
+            ]
+            self.cont_maxx = [
+                self.data_interface.permitted_range[feature][1]
+                for feature in self.data_interface.continuous_feature_names
+            ]
 
         if ([total_CFs, algorithm, features_to_vary, yloss_type, diversity_loss_type, feature_weights, optimizer] !=
                 (self.cf_init_weights + self.loss_weights + self.optimizer_weights)):
@@ -186,10 +192,16 @@ class DiceTensorFlow1(ExplainerBase):
         self.learning_rate = tf.placeholder(tf.float32, ())
 
         # CF initializations
-        self.cfs = [tf.Variable(self.minx, dtype=tf.float32) for i in range(self.total_CFs)]
+        self.cfs = [
+            tf.Variable(self.minx, dtype=tf.float32)
+            for i in range(self.total_CFs)
+        ]
         self.cf_init = tf.placeholder(
             tf.float32, shape=(1, self.minx.shape[1]))
-        self.cf_assign = [tf.assign(self.cfs[i], self.cf_init) for i in range(self.total_CFs)]
+        self.cf_assign = [
+            tf.assign(self.cfs[i], self.cf_init)
+            for i in range(self.total_CFs)
+        ]
 
         # freezing those columns that need to be fixed
         self.feat_to_vary_idxs = self.data_interface.get_indexes_of_features_to_vary(features_to_vary=features_to_vary)

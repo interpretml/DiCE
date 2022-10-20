@@ -65,10 +65,17 @@ class DiceGenetic(ExplainerBase):
 
             feature_weights_list = []
             if encoding == 'one-hot':
-                feature_weights_list = [feature_weights[feature] if feature in feature_weights else 1.0 for feature in self.data_interface.encoded_feature_names]
+                feature_weights_list = [
+                    feature_weights[feature] if feature in feature_weights else 1.0
+                    for feature in self.data_interface.encoded_feature_names
+                ]
             elif encoding == 'label':
                 # the weight is inversely proportional to max value
-                feature_weights_list = [feature_weights[feature] if feature in feature_weights else round(1 / self.feature_range[feature].max(), 2) for feature in self.data_interface.feature_names]
+                feature_weights_list = [
+                    feature_weights[feature] if feature in feature_weights else round(
+                        1 / self.feature_range[feature].max(), 2)
+                    for feature in self.data_interface.feature_names
+                ]
             self.feature_weights_list = [feature_weights_list]
 
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):

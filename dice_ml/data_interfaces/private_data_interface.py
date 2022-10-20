@@ -48,8 +48,12 @@ class PrivateData(_BaseData):
         self._validate_and_set_type_and_precision(params=params)
 
         # continuous feature
-        self.continuous_feature_names = [feature for feature in features_dict if isinstance(features_dict[feature][0], int)]
-        self.categorical_feature_names = [feature for feature in features_dict if not isinstance(features_dict[feature][0], int)]
+        self.continuous_feature_names = [
+            feature for feature in features_dict if isinstance(features_dict[feature][0], int)
+        ]
+        self.categorical_feature_names = [
+            feature for feature in features_dict if not isinstance(features_dict[feature][0], int)
+        ]
         self.categorical_levels = {}
 
         for feature in features_dict:
