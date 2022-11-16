@@ -163,7 +163,7 @@ class DiceKD(ExplainerBase):
 
         # TODO: this should be a user-specified parameter
         num_queries = min(len(self.dataset_with_predictions), total_CFs * 10)
-        cfs = []
+        cfs = pd.DataFrame()
 
         if self.KD_tree is not None and num_queries > 0:
             KD_tree_output = self.KD_tree.query(KD_query_instance, num_queries)

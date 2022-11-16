@@ -4,6 +4,7 @@ Module to generate diverse counterfactual explanations based on PyTorch framewor
 import copy
 import random
 import timeit
+from typing import Any, Optional, Type, Union
 
 import numpy as np
 import torch
@@ -223,6 +224,7 @@ class DicePyTorch(ExplainerBase):
         opt_method = optimizer.split(':')[1]
 
         # optimizater initialization
+        self.optimizer: Optional[Union[torch.optim.Adam, torch.optim.RMSprop]] = None
         if opt_method == "adam":
             self.optimizer = torch.optim.Adam(self.cfs, lr=learning_rate)
         elif opt_method == "rmsprop":
@@ -230,7 +232,8 @@ class DicePyTorch(ExplainerBase):
 
     def compute_yloss(self):
         """Computes the first part (y-loss) of the loss function."""
-        yloss = 0.0
+        yloss: Any = 0.0
+        criterion: Optional[Union[torch.nn.BCEWithLogitsLoss, torch.nn.ReLU]] = None
         for i in range(self.total_CFs):
             if self.yloss_type == "l2_loss":
                 temp_loss = torch.pow((self.get_model_output(self.cfs[i]) - self.target_cf_class), 2)[0]
@@ -307,7 +310,7 @@ class DicePyTorch(ExplainerBase):
     def compute_regularization_loss(self):
         """Adds a linear equality constraints to the loss functions -
            to ensure all levels of a categorical variable sums to one"""
-        regularization_loss = 0.0
+        regularization_loss: Any = 0.0
         for i in range(self.total_CFs):
             for v in self.encoded_categorical_feature_indexes:
                 regularization_loss += torch.pow((torch.sum(self.cfs[i][v[0]:v[-1]+1]) - 1.0), 2)
@@ -425,7 +428,7 @@ class DicePyTorch(ExplainerBase):
         test_pred = self.predict_fn(torch.tensor(query_instance).float())[0]
         if desired_class == "opposite":
             desired_class = 1.0 - np.round(test_pred)
-        self.target_cf_class = torch.tensor(desired_class).float()
+        self.target_cf_class: Any = torch.tensor(desired_class).float()
 
         self.min_iter = min_iter
         self.max_iter = max_iter

@@ -5,6 +5,7 @@
 import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -152,10 +153,9 @@ class ExplainerBase(ABC):
         cf_examples_arr = []
         query_instances_list = []
         if isinstance(query_instances, pd.DataFrame):
-            for ix in range(query_instances.shape[0]):
-                query_instances_list.append(query_instances[ix:(ix+1)])
+            query_instances_list = [query_instances[ix:(ix+1)] for ix in range(query_instances.shape[0])]
         elif isinstance(query_instances, Iterable):
-            query_instances_list = query_instances
+            query_instances_list = [query_instance for query_instance in query_instances]
         for query_instance in tqdm(query_instances_list):
             self.data_interface.set_continuous_feature_indexes(query_instance)
             res = self._generate_counterfactuals(
@@ -416,7 +416,7 @@ class ExplainerBase(ABC):
                 posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
                 **kwargs).cf_examples_list
         allcols = self.data_interface.categorical_feature_names + self.data_interface.continuous_feature_names
-        summary_importance = None
+        summary_importance: Optional[Union[Dict[int, float]]] = None
         local_importances = None
         if global_importance:
             summary_importance = {}
@@ -532,7 +532,7 @@ class ExplainerBase(ABC):
             for feature in features_sorted:
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
-                diff = query_instance[feature].iat[0] - final_cfs_sparse.at[cf_ix, feature]
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
                 if(abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
@@ -561,16 +561,17 @@ class ExplainerBase(ABC):
             while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and
                   self.is_cf_valid(current_pred)) and (count_steps < limit_steps_ls):
 
-                old_val = final_cfs_sparse.at[cf_ix, feature]
+                old_val = int(final_cfs_sparse.at[cf_ix, feature])
                 final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
                 old_diff = diff
 
                 if not self.is_cf_valid(current_pred):
                     final_cfs_sparse.at[cf_ix, feature] = old_val
+                    diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
                     return final_cfs_sparse
 
-                diff = query_instance[feature].iat[0] - final_cfs_sparse.at[cf_ix, feature]
+                diff = query_instance[feature].iat[0] - int(final_cfs_sparse.at[cf_ix, feature])
 
                 count_steps += 1
 
@@ -580,7 +581,7 @@ class ExplainerBase(ABC):
         """Performs a binary search between continuous features of a CF and corresponding values
            in query_instance until the prediction class changes."""
 
-        old_val = final_cfs_sparse.at[cf_ix, feature]
+        old_val = int(final_cfs_sparse.at[cf_ix, feature])
         final_cfs_sparse.at[cf_ix, feature] = query_instance[feature].iat[0]
         # Prediction of the query instance
         current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
@@ -593,7 +594,7 @@ class ExplainerBase(ABC):
 
         # move the CF values towards the query_instance
         if diff > 0:
-            left = final_cfs_sparse.at[cf_ix, feature]
+            left = int(final_cfs_sparse.at[cf_ix, feature])
             right = query_instance[feature].iat[0]
 
             while left <= right:
@@ -613,7 +614,7 @@ class ExplainerBase(ABC):
 
         else:
             left = query_instance[feature].iat[0]
-            right = final_cfs_sparse.at[cf_ix, feature]
+            right = int(final_cfs_sparse.at[cf_ix, feature])
 
             while right >= left:
                 current_val = right - ((right - left)/2)
@@ -731,13 +732,16 @@ class ExplainerBase(ABC):
             model_score = model_score[0]
         # Converting target_cf_class to a scalar (tf/torch have it as (1,1) shape)
         if self.model.model_type == ModelTypes.Classifier:
-            target_cf_class = self.target_cf_class
             if hasattr(self.target_cf_class, "shape"):
                 if len(self.target_cf_class.shape) == 1:
-                    target_cf_class = self.target_cf_class[0]
+                    temp_target_cf_class = self.target_cf_class[0]
                 elif len(self.target_cf_class.shape) == 2:
-                    target_cf_class = self.target_cf_class[0][0]
-            target_cf_class = int(target_cf_class)
+                    temp_target_cf_class = self.target_cf_class[0][0]
+                else:
+                    temp_target_cf_class = int(self.target_cf_class)
+            else:
+                temp_target_cf_class = int(self.target_cf_class)
+            target_cf_class = temp_target_cf_class
 
             if len(model_score) == 1:  # for tensorflow/pytorch models
                 pred_1 = model_score[0]
@@ -757,6 +761,7 @@ class ExplainerBase(ABC):
             return self.target_cf_range[0] <= model_score and model_score <= self.target_cf_range[1]
 
     def get_model_output_from_scores(self, model_scores):
+        output_type: Any = None
         if self.model.model_type == ModelTypes.Classifier:
             output_type = np.int32
         else:
@@ -806,7 +811,6 @@ class ExplainerBase(ABC):
         data_df_copy[predicted_outcome_name] = predictions
 
         # segmenting the dataset according to outcome
-        dataset_with_predictions = None
         if self.model.model_type == ModelTypes.Classifier:
             dataset_with_predictions = data_df_copy.loc[[i == desired_class for i in predictions]].copy()
 
@@ -814,9 +818,12 @@ class ExplainerBase(ABC):
             dataset_with_predictions = data_df_copy.loc[
                 [desired_range[0] <= pred <= desired_range[1] for pred in predictions]].copy()
 
+        else:
+            dataset_with_predictions = None
+
         KD_tree = None
         # Prepares the KD trees for DiCE
-        if len(dataset_with_predictions) > 0:
+        if dataset_with_predictions is not None and len(dataset_with_predictions) > 0:
             dummies = pd.get_dummies(dataset_with_predictions[self.data_interface.feature_names])
             KD_tree = KDTree(dummies)
 
