@@ -4,7 +4,7 @@ Module to generate diverse counterfactual explanations based on PyTorch framewor
 import copy
 import random
 import timeit
-from typing import Any, Optional, Type, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import torch

@@ -5,7 +5,6 @@ A simple implementation.
 """
 import random
 import timeit
-from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd

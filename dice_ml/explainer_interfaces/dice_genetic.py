@@ -5,7 +5,7 @@ This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time'
 import copy
 import random
 import timeit
-from typing import Any, List, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd

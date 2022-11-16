@@ -137,7 +137,7 @@ class FeasibleBaseVAE(ExplainerBase):
             train_size = 0
 
             train_dataset = torch.utils.data.DataLoader(
-                torch.tensor(self.vae_train_feat).float(), # type: ignore
+                torch.tensor(self.vae_train_feat).float(),  # type: ignore
                 batch_size=self.batch_size, shuffle=True)
             for train in enumerate(train_dataset):
                 self.cf_vae_optimizer.zero_grad()
