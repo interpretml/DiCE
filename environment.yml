@@ -4,6 +4,5 @@ dependencies:
   - numpy
   - scikit-learn
   - pandas
-  - h5py
   - jsonschema
   - tqdm
