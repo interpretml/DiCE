@@ -1,4 +1,5 @@
 """Exceptions for the package."""
+import warnings
 
 
 class UserConfigValidationException(Exception):
@@ -8,6 +9,8 @@ class UserConfigValidationException(Exception):
     :type exception_message: str
     """
     _error_code = "Invalid Configuration"
+    warnings.warn("UserConfigValidationException will be deprecated from dice_ml.utils. "
+                  "Please import UserConfigValidationException from raiutils.exceptions.")
 
 
 class SystemException(Exception):
