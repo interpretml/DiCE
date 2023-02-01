@@ -1,8 +1,8 @@
 import pytest
+from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class TestBaseExplainerLoader:

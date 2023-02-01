@@ -5,8 +5,9 @@ frameworks such as Tensorflow or PyTorch.
 """
 import warnings
 
+from raiutils.exceptions import UserConfigValidationException
+
 from dice_ml.constants import BackEndTypes, ModelTypes
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class Model:

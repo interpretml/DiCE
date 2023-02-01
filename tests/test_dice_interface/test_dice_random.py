@@ -1,10 +1,10 @@
 import pytest
+from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.fixture()
