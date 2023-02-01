@@ -23,14 +23,14 @@ class TestBaseExplainerLoader:
                 'hours_per_week': [1, 99]},
                             outcome_name='income')
         ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+        m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func="ohe-min-max")
         exp = dice_ml.Dice(d, m, method=method)
         return exp
 
     def test_tf(self):
         tf = pytest.importorskip("tensorflow")
         backend = 'TF'+tf.__version__[0]
-        exp = self._get_exp(backend)
+        exp = self._get_exp(backend, method="gradient")
         assert issubclass(type(exp), dice_ml.explainer_interfaces.explainer_base.ExplainerBase)
         assert isinstance(exp, dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2) or \
             isinstance(exp, dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1)
@@ -38,7 +38,7 @@ class TestBaseExplainerLoader:
     def test_pyt(self):
         pytest.importorskip("torch")
         backend = 'PYT'
-        exp = self._get_exp(backend)
+        exp = self._get_exp(backend, method="gradient")
         assert issubclass(type(exp), dice_ml.explainer_interfaces.explainer_base.ExplainerBase)
         assert isinstance(exp, dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch)
 
@@ -70,5 +70,5 @@ class TestBaseExplainerLoader:
         with pytest.raises(UserConfigValidationException) as ucve:
             self._get_exp(backend, method='kdtree', is_public_data_interface=False)
 
-        assert 'Private data interface is not supported with sklearn kdtree explainer' + \
+        assert 'Private data interface is not supported with kdtree explainer' + \
                ' since kdtree explainer needs access to entire training data' in str(ucve)

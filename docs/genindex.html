@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; DiCE 0.8 documentation</title>
+  <title>Index &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -46,7 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -142,16 +144,8 @@
 </li>
       <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE">CF_VAE (class in dice_ml.utils.sample_architecture.vae_model)</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.check_features_to_vary">check_features_to_vary() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">check_permitted_range() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.check_mad_validity">check_mad_validity() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
-</li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.check_permitted_range">check_permitted_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
-
-      <ul>
-        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">(dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
-</li>
-      </ul></li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity">check_query_instance_validity() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
 </li>
       <li><a href="dice_ml.html#dice_ml.constants.ModelTypes.Classifier">Classifier (dice_ml.constants.ModelTypes attribute)</a>
@@ -490,6 +484,13 @@
 </li>
       </ul></li>
       <li>
+    dice_ml.utils.neuralnetworks
+
+      <ul>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.neuralnetworks">module</a>
+</li>
+      </ul></li>
+      <li>
     dice_ml.utils.sample_architecture
 
       <ul>
@@ -608,6 +609,8 @@
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.feed_data_params">feed_data_params() (dice_ml.utils.helpers.DataTransfomer method)</a>
 </li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.FFNetwork">FFNetwork (class in dice_ml.utils.neuralnetworks)</a>
+</li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.find_counterfactuals">find_counterfactuals() (dice_ml.explainer_interfaces.dice_genetic.DiceGenetic method)</a>
 
       <ul>
@@ -622,9 +625,17 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward">forward() (dice_ml.utils.sample_architecture.vae_model.AutoEncoder method)</a>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders">fit_label_encoders() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
+        <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.fit_label_encoders">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.FFNetwork.forward">forward() (dice_ml.utils.neuralnetworks.FFNetwork method)</a>
+
+      <ul>
+        <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward">(dice_ml.utils.sample_architecture.vae_model.AutoEncoder method)</a>
+</li>
         <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.forward">(dice_ml.utils.sample_architecture.vae_model.CF_VAE method)</a>
 </li>
       </ul></li>
@@ -652,11 +663,9 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch.generate_counterfactuals">generate_counterfactuals() (dice_ml.explainer_interfaces.dice_pytorch.DicePyTorch method)</a>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals">generate_counterfactuals() (dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 
       <ul>
-        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals">(dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
-</li>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.generate_counterfactuals">(dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">(dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
@@ -670,6 +679,12 @@
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">get_adult_income_modelpath() (in module dice_ml.utils.helpers)</a>
 </li>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames">get_all_dummy_colnames() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_all_dummy_colnames">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+</li>
+      </ul></li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.get_base_gen_cf_initialization">get_base_gen_cf_initialization() (in module dice_ml.utils.helpers)</a>
 </li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_continuous_samples">get_continuous_samples() (dice_ml.explainer_interfaces.dice_random.DiceRandom method)</a>
@@ -710,8 +725,12 @@
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">get_features_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range">get_features_range() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
+
+      <ul>
+        <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
+      </ul></li>
       <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.base_model.BaseModel.get_gradient">get_gradient() (dice_ml.model_interfaces.base_model.BaseModel method)</a>
 
       <ul>
@@ -778,9 +797,11 @@
 </li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom.get_samples">get_samples() (dice_ml.explainer_interfaces.dice_random.DiceRandom method)</a>
 </li>
-      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_feature_range">get_valid_feature_range() (dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range">get_valid_feature_range() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
+        <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_feature_range">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
+</li>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.get_valid_feature_range">(dice_ml.explainer_interfaces.dice_genetic.DiceGenetic method)</a>
 </li>
       </ul></li>
@@ -791,6 +812,8 @@
 </li>
       </ul></li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance">global_feature_importance() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
+</li>
+      <li><a href="dice_ml.html#dice_ml.constants.SamplingStrategy.Gradient">Gradient (dice_ml.constants.SamplingStrategy attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -813,6 +836,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.initialize_transform_func">initialize_transform_func() (dice_ml.utils.helpers.DataTransfomer method)</a>
+</li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.inverse_ohe_min_max_transformation">inverse_ohe_min_max_transformation() (in module dice_ml.utils.helpers)</a>
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.inverse_transform">inverse_transform() (dice_ml.utils.helpers.DataTransfomer method)</a>
 </li>
@@ -960,6 +985,8 @@
 </li>
         <li><a href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers</a>
 </li>
+        <li><a href="dice_ml.utils.html#module-dice_ml.utils.neuralnetworks">dice_ml.utils.neuralnetworks</a>
+</li>
         <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture">dice_ml.utils.sample_architecture</a>
 </li>
         <li><a href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture.vae_model">dice_ml.utils.sample_architecture.vae_model</a>
@@ -1095,16 +1122,18 @@
       </ul></li>
       <li><a href="dice_ml.html#dice_ml.constants.SamplingStrategy">SamplingStrategy (class in dice_ml.constants)</a>
 </li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.save_adult_income_model">save_adult_income_model() (in module dice_ml.utils.helpers)</a>
+</li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.scipy_optimizers">scipy_optimizers() (dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1 method)</a>
 </li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.serialize_explainer">serialize_explainer() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
 </li>
       <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.set_eval_mode">set_eval_mode() (dice_ml.model_interfaces.pytorch_model.PyTorchModel method)</a>
 </li>
-      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">setup() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">setup() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
+</li>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid">sigmoid() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
 </li>
       <li><a href="dice_ml.html#dice_ml.constants.BackEndTypes.Sklearn">Sklearn (dice_ml.constants.BackEndTypes attribute)</a>
@@ -1147,6 +1176,12 @@
 
       <ul>
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox.train">(dice_ml.explainer_interfaces.feasible_model_approx.FeasibleModelApprox method)</a>
+</li>
+      </ul></li>
+      <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.training">training (dice_ml.utils.sample_architecture.vae_model.AutoEncoder attribute)</a>
+
+      <ul>
+        <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.training">(dice_ml.utils.sample_architecture.vae_model.CF_VAE attribute)</a>
 </li>
       </ul></li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.transform">transform() (dice_ml.utils.helpers.DataTransfomer method)</a>

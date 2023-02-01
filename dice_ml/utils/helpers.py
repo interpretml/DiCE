@@ -2,12 +2,16 @@
 This module containts helper functions to load data and get meta deta.
 """
 import os
+import pickle
 import shutil
 
 import numpy as np
 import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder
 
 import dice_ml
 
@@ -84,6 +88,31 @@ def load_adult_income_dataset(only_train=True):
     return adult_data
 
 
+def save_adult_income_model(modelpath, test_fraction=0.2, random_state=0):
+    dataset = load_adult_income_dataset()
+    target = dataset["income"]
+    train_dataset, x, y_train, y = train_test_split(dataset,
+                                                    target,
+                                                    test_size=test_fraction,
+                                                    random_state=random_state,
+                                                    stratify=target)
+    x_train = train_dataset.drop('income', axis=1)
+    numerical = ["age", "hours_per_week"]
+    categorical = x_train.columns.difference(numerical)
+
+    categorical_transformer = Pipeline(steps=[
+        ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+
+    transformations = ColumnTransformer(
+        transformers=[
+            ('cat', categorical_transformer, categorical)])
+
+    clf = Pipeline(steps=[('preprocessor', transformations),
+                          ('classifier', RandomForestClassifier())])
+    model = clf.fit(x_train, y_train)
+    pickle.dump(model, open(modelpath, 'wb'))
+
+
 def load_custom_testing_dataset():
     data = [['a', 10, 0], ['b', 10000, 0], ['c', 14, 0], ['a', 88, 0], ['c', 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
@@ -116,7 +145,7 @@ def load_custom_testing_dataset_regression():
 
 def get_adult_income_modelpath(backend='TF1'):
     pkg_path = dice_ml.__path__[0]
-    model_ext = '.h5' if 'TF' in backend else '.pth'
+    model_ext = '.h5' if 'TF' in backend else ('.pth' if backend == 'PYT' else '.pkl')
     modelpath = os.path.join(pkg_path, 'utils', 'sample_trained_models', 'adult'+model_ext)
     return modelpath
 
@@ -219,7 +248,11 @@ def get_base_gen_cf_initialization(data_interface, encoded_size, cont_minx, cont
 
 def ohe_min_max_transformation(data, data_interface):
     """the data is one-hot-encoded and min-max normalized and fed to the ML model"""
-    return data_interface.get_ohe_min_max_normalized_data(data).values
+    return data_interface.get_ohe_min_max_normalized_data(data)
+
+
+def inverse_ohe_min_max_transformation(data, data_interface):
+    return data_interface.get_inverse_ohe_min_max_normalized_data(data)
 
 
 class DataTransfomer:
@@ -239,7 +272,13 @@ class DataTransfomer:
 
     def initialize_transform_func(self):
         if self.func == 'ohe-min-max':
-            self.data_transformer = FunctionTransformer(func=ohe_min_max_transformation, kw_args=self.kw_args, validate=False)
+            self.data_transformer = FunctionTransformer(
+                    func=ohe_min_max_transformation,
+                    inverse_func=inverse_ohe_min_max_transformation,
+                    check_inverse=False,
+                    validate=False,
+                    kw_args=self.kw_args,
+                    inv_kw_args=self.kw_args)
         elif self.func is None:
             # identity transformation
             # add more ready-to-use transformers (such as label-encoding) in elif loops.

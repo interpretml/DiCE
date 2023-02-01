@@ -227,8 +227,11 @@ def sample_adultincome_query():
     """
     Returns a sample query instance for adult income dataset
     """
-    return {'age': 22, 'workclass': 'Private', 'education': 'HS-grad', 'marital_status': 'Single', 'occupation': 'Service',
-            'race': 'White', 'gender': 'Female', 'hours_per_week': 45}
+    return pd.DataFrame({
+        'age': 22, 'workclass': 'Private', 'education': 'HS-grad',
+        'marital_status': 'Single', 'occupation': 'Service',
+        'race': 'White', 'gender': 'Female', 'hours_per_week': 45},
+        index=[0])
 
 
 @pytest.fixture()

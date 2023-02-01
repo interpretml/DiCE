@@ -83,10 +83,10 @@ class FeasibleModelApprox(FeasibleBaseVAE, ExplainerBase):
 
             train_dataset = torch.tensor(self.vae_train_feat).float()
             train_dataset = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
-            for train_x in enumerate(train_dataset):
+            for train in enumerate(train_dataset):
                 self.cf_vae_optimizer.zero_grad()
 
-                train_x = train_x[1]
+                train_x = train[1]
                 train_y = 1.0-torch.argmax(self.pred_model(train_x), dim=1)
                 train_size += train_x.shape[0]
 

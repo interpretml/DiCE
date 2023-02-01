@@ -5,6 +5,7 @@ include requirements-linting.txt
 include environment.yml
 include environment-deeplearning.yml
 include LICENSE
+include CODEOWNERS
 recursive-include docs *
 recursive-include tests *.py
 include dice_ml/utils/sample_trained_models/*

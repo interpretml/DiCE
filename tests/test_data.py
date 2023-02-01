@@ -71,7 +71,6 @@ class TestCommonDataMethods:
         output_query = [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]
         d = self.d[0]
-        d.create_ohe_params()
         prepared_query = d.get_ohe_min_max_normalized_data(query_instance=sample_adultincome_query).iloc[0].tolist()
         assert output_query == pytest.approx(prepared_query, abs=1e-3)
 
@@ -88,7 +87,8 @@ class TestCommonDataMethods:
         #     d.continuous_feature_names = ['cat2_cont1', 'cont2']
         #     d.encoded_feature_names = ['cat2_cont1', 'cont2', 'cat1_val1', 'cat1_val2', 'cat2_val1', 'cat2_val2']
         print(d.data_df)
-        d.create_ohe_params()
+        temp_ohe_data = d.get_ohe_min_max_normalized_data(d.data_df.iloc[[0]])
+        d.create_ohe_params(temp_ohe_data)
         res.append(d.get_encoded_categorical_feature_indexes())
         assert [2, 3, 4, 5] == res[0][0]  # there are 4 types of workclass
         assert len(res[0][1]) == 8  # eight types of education
@@ -104,7 +104,9 @@ class TestCommonDataMethods:
         """
         res = []
         d = self.d[0]
-        d.create_ohe_params()
+        temp_ohe_data = d.get_ohe_min_max_normalized_data(d.data_df.iloc[[0]])
+        d.create_ohe_params(temp_ohe_data)
+        # d.create_ohe_params()
         # d.categorical_feature_names = ['cat1', 'cat2']
         # d.encoded_feature_names = ['cat2_cont1', 'cont2', 'cat1_val1', 'cat1_val2', 'cat2_val1', 'cat2_val2']
         # d.continuous_feature_names = ['cat2_cont1', 'cont2']

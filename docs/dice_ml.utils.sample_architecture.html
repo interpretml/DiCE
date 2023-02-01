@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils.sample_architecture package &mdash; DiCE 0.8 documentation</title>
+  <title>dice_ml.utils.sample_architecture package &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -48,7 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -66,6 +68,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.exception">dice_ml.utils.exception module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.neuralnetworks">dice_ml.utils.neuralnetworks module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.serialize">dice_ml.utils.serialize module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils">Module contents</a></li>
 </ul>
@@ -135,16 +138,16 @@
 }
 </style>
 <section id="dice-ml-utils-sample-architecture-package">
-<h1>dice_ml.utils.sample_architecture package<a class="headerlink" href="#dice-ml-utils-sample-architecture-package" title="Permalink to this headline"></a></h1>
+<h1>dice_ml.utils.sample_architecture package<a class="headerlink" href="#dice-ml-utils-sample-architecture-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-dice_ml.utils.sample_architecture.vae_model">
-<span id="dice-ml-utils-sample-architecture-vae-model-module"></span><h2>dice_ml.utils.sample_architecture.vae_model module<a class="headerlink" href="#module-dice_ml.utils.sample_architecture.vae_model" title="Permalink to this headline"></a></h2>
+<span id="dice-ml-utils-sample-architecture-vae-model-module"></span><h2>dice_ml.utils.sample_architecture.vae_model module<a class="headerlink" href="#module-dice_ml.utils.sample_architecture.vae_model" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.AutoEncoder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.sample_architecture.vae_model.</span></span><span class="sig-name descname"><span class="pre">AutoEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#AutoEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.sample_architecture.vae_model.</span></span><span class="sig-name descname"><span class="pre">AutoEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoded_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#AutoEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.AutoEncoder.decoder">
 <span class="sig-name descname"><span class="pre">decoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#AutoEncoder.decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.decoder" title="Permalink to this definition"></a></dt>
@@ -158,7 +161,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#AutoEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.AutoEncoder.normal_likelihood">
@@ -170,12 +182,17 @@
 <span class="sig-name descname"><span class="pre">sample_latent_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#AutoEncoder.sample_latent_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.sample_latent_code" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.AutoEncoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.CF_VAE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.sample_architecture.vae_model.</span></span><span class="sig-name descname"><span class="pre">CF_VAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#CF_VAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.sample_architecture.vae_model.</span></span><span class="sig-name descname"><span class="pre">CF_VAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoded_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#CF_VAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.CF_VAE.compute_elbo">
 <span class="sig-name descname"><span class="pre">compute_elbo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#CF_VAE.compute_elbo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE.compute_elbo" title="Permalink to this definition"></a></dt>
@@ -194,7 +211,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.CF_VAE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#CF_VAE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.CF_VAE.normal_likelihood">
@@ -206,11 +232,16 @@
 <span class="sig-name descname"><span class="pre">sample_latent_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/sample_architecture/vae_model.html#CF_VAE.sample_latent_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE.sample_latent_code" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dice_ml.utils.sample_architecture.vae_model.CF_VAE.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#dice_ml.utils.sample_architecture.vae_model.CF_VAE.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
 <section id="module-dice_ml.utils.sample_architecture">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.utils.sample_architecture" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.utils.sample_architecture" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 

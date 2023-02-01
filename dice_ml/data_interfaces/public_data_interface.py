@@ -7,6 +7,7 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 from raiutils.exceptions import UserConfigValidationException
+from sklearn.preprocessing import LabelEncoder
 
 from dice_ml.data_interfaces.base_data_interface import _BaseData
 from dice_ml.utils.exception import SystemException
@@ -54,28 +55,7 @@ class PublicData(_BaseData):
                 self.categorical_feature_names,
                 self.continuous_feature_names)
 
-        # should move the below snippet to gradient based dice interfaces
-        # self.one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
-        # self.ohe_encoded_feature_names = [x for x in self.one_hot_encoded_data.columns.tolist(
-        #     ) if x not in np.array([self.outcome_name])]
-
-        # should move the below snippet to model agnostic dice interfaces
-        # # Initializing a label encoder to obtain label-encoded values for categorical variables
-        # self.labelencoder = {}
-        #
-        # self.label_encoded_data = self.data_df.copy()
-        #
-        # for column in self.categorical_feature_names:
-        #     self.labelencoder[column] = LabelEncoder()
-        #     self.label_encoded_data[column] = self.labelencoder[column].fit_transform(self.data_df[column])
-
         self._validate_and_set_permitted_range(params=params)
-
-        # should move the below snippet to model agnostic dice interfaces
-        # self.max_range = -np.inf
-        # for feature in self.continuous_feature_names:
-        #     self.max_range = max(self.max_range, self.permitted_range[feature][1])
-
         self._validate_and_set_data_name(params=params)
 
     def _validate_and_set_dataframe(self, params):
@@ -100,7 +80,7 @@ class PublicData(_BaseData):
         if 'continuous_features' not in params:
             raise ValueError('continuous_features should be provided')
 
-        if type(params['continuous_features']) is list:
+        if isinstance(params['continuous_features'], list):
             self.continuous_feature_names = params['continuous_features']
         else:
             raise ValueError(
@@ -122,22 +102,6 @@ class PublicData(_BaseData):
         else:
             self.continuous_features_precision = None
 
-    def _validate_and_set_permitted_range(self, params):
-        """Validate and set the dictionary of permitted ranges for continuous features."""
-        input_permitted_range = None
-        if 'permitted_range' in params:
-            input_permitted_range = params['permitted_range']
-
-            if not hasattr(self, 'feature_names'):
-                raise SystemException('Feature names not correctly set in public data interface')
-
-            for input_permitted_range_feature_name in input_permitted_range:
-                if input_permitted_range_feature_name not in self.feature_names:
-                    raise UserConfigValidationException(
-                        "permitted_range contains some feature names which are not part of columns in dataframe"
-                    )
-        self.permitted_range, _ = self.get_features_range(input_permitted_range)
-
     def _set_feature_dtypes(self, data_df, categorical_feature_names,
                             continuous_feature_names):
         """Set the correct type of each feature column."""
@@ -157,38 +121,7 @@ class PublicData(_BaseData):
                         np.int32)
         return data_df
 
-    def check_features_to_vary(self, features_to_vary):
-        if features_to_vary is not None and features_to_vary != 'all':
-            not_training_features = set(features_to_vary) - set(self.feature_names)
-            if len(not_training_features) > 0:
-                raise UserConfigValidationException("Got features {0} which are not present in training data".format(
-                    not_training_features))
-
-    def check_permitted_range(self, permitted_range):
-        if permitted_range is not None:
-            permitted_range_features = list(permitted_range)
-            not_training_features = set(permitted_range_features) - set(self.feature_names)
-            if len(not_training_features) > 0:
-                raise UserConfigValidationException("Got features {0} which are not present in training data".format(
-                    not_training_features))
-
-            for feature in permitted_range_features:
-                if feature in self.categorical_feature_names:
-                    train_categories = self.permitted_range[feature]
-                    for test_category in permitted_range[feature]:
-                        if test_category not in train_categories:
-                            raise UserConfigValidationException(
-                                'The category {0} does not occur in the training data for feature {1}.'
-                                ' Allowed categories are {2}'.format(test_category, feature, train_categories))
-
-    def check_mad_validity(self, feature_weights):
-        """checks feature MAD validity and throw warnings.
-           TODO: add comments as to where this is used if this function is necessary, else remove.
-        """
-        if feature_weights == "inverse_mad":
-            self.get_valid_mads(display_warnings=True, return_mads=False)
-
-    def get_features_range(self, permitted_range_input=None):
+    def get_features_range(self, permitted_range_input=None, features_dict=None):
         ranges = {}
         # Getting default ranges based on the dataset
         for feature_name in self.continuous_feature_names:
@@ -307,25 +240,6 @@ class PublicData(_BaseData):
                 minx[0][idx] = self.permitted_range[feature_name][0]
                 maxx[0][idx] = self.permitted_range[feature_name][1]
         return minx, maxx
-        # if encoding=='one-hot':
-        #    minx = np.array([[0.0] * len(self.ohe_encoded_feature_names)])
-        #    maxx = np.array([[1.0] * len(self.ohe_encoded_feature_names)])
-
-        #    for idx, feature_name in enumerate(self.continuous_feature_names):
-        #        max_value = self.train_df[feature_name].max()
-        #        min_value = self.train_df[feature_name].min()
-
-        #        if normalized:
-        #            minx[0][idx] = (self.permitted_range[feature_name]
-        #                            [0] - min_value) / (max_value - min_value)
-        #            maxx[0][idx] = (self.permitted_range[feature_name]
-        #                            [1] - min_value) / (max_value - min_value)
-        #        else:
-        #            minx[0][idx] = self.permitted_range[feature_name][0]
-        #            maxx[0][idx] = self.permitted_range[feature_name][1]
-        # else:
-        #    minx = np.array([[0.0] * len(self.feature_names)])
-        #    maxx = np.array([[1.0] * len(self.feature_names)])
 
     def get_mads(self, normalized=False):
         """Computes Median Absolute Deviation of features."""
@@ -370,24 +284,17 @@ class PublicData(_BaseData):
                         list(set(normalized_train_df[feature].tolist())))), quantile)
         return quantiles
 
-    def create_ohe_params(self):
+    def create_ohe_params(self, one_hot_encoded_data):
         if len(self.categorical_feature_names) > 0:
-            one_hot_encoded_data = self.one_hot_encode_data(self.data_df)
             self.ohe_encoded_feature_names = [x for x in one_hot_encoded_data.columns.tolist(
                 ) if x not in np.array([self.outcome_name])]
         else:
             # one-hot-encoded data is same as original data if there is no categorical features.
             self.ohe_encoded_feature_names = [feat for feat in self.feature_names]
 
-        # base dataframe for doing one-hot-encoding
-        # ohe_encoded_feature_names and ohe_base_df are created (and stored as data class's parameters)
-        # when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers
-        self.ohe_base_df = self.prepare_df_for_ohe_encoding()
-
     def get_data_params_for_gradient_dice(self):
         """Gets all data related params for DiCE."""
 
-        self.create_ohe_params()
         minx, maxx = self.get_minx_maxx(normalized=True)
 
         # get the column indexes of categorical and continuous features after one-hot-encoding
@@ -431,6 +338,13 @@ class PublicData(_BaseData):
                 elif colidx not in encoded_cats_ixs and col in features_to_vary:
                     ixs.append(colidx)
             return ixs
+
+    def fit_label_encoders(self):
+        labelencoders = {}
+        for column in self.categorical_feature_names:
+            labelencoders[column] = LabelEncoder()
+            labelencoders[column] = labelencoders[column].fit(self.data_df[column])
+        return labelencoders
 
     def from_label(self, data):
         """Transforms label encoded data back to categorical values"""
@@ -497,11 +411,11 @@ class PublicData(_BaseData):
         index = [i for i in range(0, len(data))]
         if encoding == 'one-hot':
             if isinstance(data, pd.DataFrame):
-                return self.from_dummies(data)
+                return data
             elif isinstance(data, np.ndarray):
                 data = pd.DataFrame(data=data, index=index,
                                     columns=self.ohe_encoded_feature_names)
-                return self.from_dummies(data)
+                return data
             else:
                 raise ValueError("data should be a pandas dataframe or a numpy array")
 
@@ -560,35 +474,21 @@ class PublicData(_BaseData):
                                         self.continuous_feature_names)
         return test
 
-        # TODO: create a new method, get_LE_min_max_normalized_data() to get label-encoded and normalized data. Keep this
-        #       method only for converting query_instance to pd.DataFrame
-        # if encoding == 'label':
-        #     for column in self.categorical_feature_names:
-        #         test[column] = self.labelencoder[column].transform(test[column])
-        #     return self.normalize_data(test, encoding)
-        #
-        # elif encoding == 'one-hot':
-        #     temp = self.prepare_df_for_encoding()
-        #     temp = temp.append(test, ignore_index=True, sort=False)
-        #     temp = self.one_hot_encode_data(temp)
-        #     temp = self.normalize_data(temp)
-        #
-        #     return temp.tail(test.shape[0]).reset_index(drop=True)
-
     def get_ohe_min_max_normalized_data(self, query_instance):
         """Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
            a dataframe, a list, or a list of dicts"""
         query_instance = self.prepare_query_instance(query_instance)
-        temp = self.ohe_base_df.append(query_instance, ignore_index=True, sort=False)
+        ohe_base_df = self.prepare_df_for_ohe_encoding()
+        temp = pd.concat([ohe_base_df, query_instance], ignore_index=True, sort=False)
         temp = self.one_hot_encode_data(temp)
         temp = temp.tail(query_instance.shape[0]).reset_index(drop=True)
-        # returns a pandas dataframe
-        return self.normalize_data(temp)
+        # returns a pandas dataframe with all numeric values
+        return self.normalize_data(temp).apply(pd.to_numeric)
 
     def get_inverse_ohe_min_max_normalized_data(self, transformed_data):
         """Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
            should be a dataframe or an array"""
-        raw_data = self.get_decoded_data(transformed_data, encoding='one-hot')
+        raw_data = self.from_dummies(transformed_data)
         raw_data = self.de_normalize_data(raw_data)
         precisions = self.get_decimal_precisions()
         for ix, feature in enumerate(self.continuous_feature_names):
@@ -596,3 +496,6 @@ class PublicData(_BaseData):
         raw_data = raw_data[self.feature_names]
         # returns a pandas dataframe
         return raw_data
+
+    def get_all_dummy_colnames(self):
+        return pd.get_dummies(self.data_df[self.feature_names]).columns

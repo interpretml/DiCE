@@ -8,11 +8,11 @@ import timeit
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class DiceGenetic(ExplainerBase):
@@ -24,11 +24,7 @@ class DiceGenetic(ExplainerBase):
         :param model_interface: an interface class to access trained ML model.
         """
         super().__init__(data_interface, model_interface)  # initiating data related parameters
-
-        # number of output nodes of ML model
-        if self.model.model_type == ModelTypes.Classifier:
-            self.num_output_nodes = self.model.get_num_output_nodes2(
-                self.data_interface.data_df[0:1][self.data_interface.feature_names])
+        self.num_output_nodes = None
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
         self.cfs = []
@@ -38,15 +34,7 @@ class DiceGenetic(ExplainerBase):
         self.feature_weights_input = ''
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
-        self.labelencoder = {}
-
-        self.label_encoded_data = self.data_interface.data_df.copy()
-
-        for column in self.data_interface.categorical_feature_names:
-            self.labelencoder[column] = LabelEncoder()
-            self.label_encoded_data[column] = self.labelencoder[column].fit_transform(
-                self.data_interface.data_df[column])
-
+        self.labelencoder = self.data_interface.fit_label_encoders()
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
     def update_hyperparameters(self, proximity_weight, sparsity_weight,
@@ -66,7 +54,6 @@ class DiceGenetic(ExplainerBase):
         # define the loss parts
         self.yloss_type = yloss_type
         self.diversity_loss_type = diversity_loss_type
-
         # define feature weights
         if feature_weights != self.feature_weights_input:
             self.feature_weights_input = feature_weights
@@ -88,8 +75,8 @@ class DiceGenetic(ExplainerBase):
                     if feature in feature_weights:
                         feature_weights_list.append(feature_weights[feature])
                     else:
-                        # TODO: why is the weight the max value of the encoded feature
-                        feature_weights_list.append(self.label_encoded_data[feature].max())
+                        # the weight is inversely proportional to max value
+                        feature_weights_list.append(round(1 / self.feature_range[feature].max(), 2))
             self.feature_weights_list = [feature_weights_list]
 
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
@@ -260,6 +247,11 @@ class DiceGenetic(ExplainerBase):
                  (see diverse_counterfactuals.py).
         """
 
+        if not hasattr(self.data_interface, 'data_df') and initialization == "kdtree":
+            raise UserConfigValidationException(
+                    "kd-tree initialization is not supported for private data"
+                    " interface because training data to build kd-tree is not available.")
+
         self.population_size = 10 * total_CFs
 
         self.start_time = timeit.default_timer()
@@ -272,18 +264,24 @@ class DiceGenetic(ExplainerBase):
                 query_instance=query_instance_orig)
         query_instance = self.data_interface.prepare_query_instance(
                 query_instance=query_instance)
+        # number of output nodes of ML model
+        self.num_output_nodes = None
+        if self.model.model_type == ModelTypes.Classifier:
+            self.num_output_nodes = self.model.get_num_output_nodes2(query_instance)
+
         query_instance = self.label_encode(query_instance)
         query_instance = np.array(query_instance.values[0])
         self.x1 = query_instance
 
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
+
         self.test_pred = test_pred
 
         desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
 
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
-        for col in pd.get_dummies(self.data_interface.data_df[self.data_interface.feature_names]).columns:
+        for col in self.data_interface.get_all_dummy_colnames():
             if col not in query_instance_df_dummies.columns:
                 query_instance_df_dummies[col] = 0
 
@@ -307,12 +305,17 @@ class DiceGenetic(ExplainerBase):
     def predict_fn_scores(self, input_instance):
         """Returns prediction scores."""
         input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance)
+        out = self.model.get_output(input_instance)
+        if self.model.model_type == ModelTypes.Classifier and out.shape[1] == 1:
+            # DL models return only 1 for binary classification
+            out = np.hstack((1-out, out))
+        return out
 
     def predict_fn(self, input_instance):
         """Returns actual prediction."""
         input_instance = self.label_decode(input_instance)
-        return self.model.get_output(input_instance, model_score=False)
+        preds = self.model.get_output(input_instance, model_score=False)
+        return preds
 
     def _predict_fn_custom(self, input_instance, desired_class):
         """Checks that the maximum predicted score lies in the desired class."""
@@ -324,6 +327,9 @@ class DiceGenetic(ExplainerBase):
 
         input_instance = self.label_decode(input_instance)
         output = self.model.get_output(input_instance, model_score=True)
+        if self.model.model_type == ModelTypes.Classifier and np.array(output).shape[1] == 1:
+            # DL models return only 1 for binary classification
+            output = np.hstack((1-output, output))
         desired_class = int(desired_class)
         maxvalues = np.max(output, 1)
         predicted_values = np.argmax(output, 1)

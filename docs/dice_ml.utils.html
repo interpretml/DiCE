@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils package &mdash; DiCE 0.8 documentation</title>
+  <title>dice_ml.utils package &mdash; DiCE 0.9 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -49,7 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html">Generating counterfactuals for multi-class classification and regression models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_multiclass_classification_and_regression.html#Regression">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating Counterfactual Explanations without access to training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
@@ -67,6 +69,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.exception">dice_ml.utils.exception module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.neuralnetworks">dice_ml.utils.neuralnetworks module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils.serialize">dice_ml.utils.serialize module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-dice_ml.utils">Module contents</a></li>
 </ul>
@@ -135,14 +138,35 @@
 }
 </style>
 <section id="dice-ml-utils-package">
-<h1>dice_ml.utils package<a class="headerlink" href="#dice-ml-utils-package" title="Permalink to this headline"></a></h1>
+<h1>dice_ml.utils package<a class="headerlink" href="#dice-ml-utils-package" title="Permalink to this heading"></a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline"></a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dice_ml.utils.sample_architecture.html">dice_ml.utils.sample_architecture package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture.vae_model">dice_ml.utils.sample_architecture.vae_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture.vae_model">dice_ml.utils.sample_architecture.vae_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder"><code class="docutils literal notranslate"><span class="pre">AutoEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.decoder"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.decoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.encoder"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.encoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.normal_likelihood"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.normal_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.sample_latent_code"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.sample_latent_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.training"><code class="docutils literal notranslate"><span class="pre">AutoEncoder.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE"><code class="docutils literal notranslate"><span class="pre">CF_VAE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.compute_elbo"><code class="docutils literal notranslate"><span class="pre">CF_VAE.compute_elbo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.decoder"><code class="docutils literal notranslate"><span class="pre">CF_VAE.decoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.encoder"><code class="docutils literal notranslate"><span class="pre">CF_VAE.encoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.forward"><code class="docutils literal notranslate"><span class="pre">CF_VAE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.normal_likelihood"><code class="docutils literal notranslate"><span class="pre">CF_VAE.normal_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.sample_latent_code"><code class="docutils literal notranslate"><span class="pre">CF_VAE.sample_latent_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.training"><code class="docutils literal notranslate"><span class="pre">CF_VAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.sample_architecture.html#module-dice_ml.utils.sample_architecture">Module contents</a></li>
 </ul>
 </li>
@@ -150,10 +174,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-dice_ml.utils.exception">
-<span id="dice-ml-utils-exception-module"></span><h2>dice_ml.utils.exception module<a class="headerlink" href="#module-dice_ml.utils.exception" title="Permalink to this headline"></a></h2>
+<span id="dice-ml-utils-exception-module"></span><h2>dice_ml.utils.exception module<a class="headerlink" href="#module-dice_ml.utils.exception" title="Permalink to this heading"></a></h2>
 <p>Exceptions for the package.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="dice_ml.utils.exception.SystemException">
@@ -181,7 +205,7 @@
 
 </section>
 <section id="module-dice_ml.utils.helpers">
-<span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this headline"></a></h2>
+<span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this heading"></a></h2>
 <p>This module containts helper functions to load data and get meta deta.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.utils.helpers.DataTransfomer">
@@ -253,6 +277,11 @@ This class calls FunctionTransformer of scikit-learn internally
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dice_ml.utils.helpers.inverse_ohe_min_max_transformation">
+<span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">inverse_ohe_min_max_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_interface</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#inverse_ohe_min_max_transformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.inverse_ohe_min_max_transformation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dice_ml.utils.helpers.load_adult_income_dataset">
 <span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">load_adult_income_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">only_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_adult_income_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_adult_income_dataset" title="Permalink to this definition"></a></dt>
 <dd><dl class="simple">
@@ -302,9 +331,28 @@ This class calls FunctionTransformer of scikit-learn internally
 <dd><p>the data is one-hot-encoded and min-max normalized and fed to the ML model</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="dice_ml.utils.helpers.save_adult_income_model">
+<span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">save_adult_income_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#save_adult_income_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.save_adult_income_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dice_ml.utils.neuralnetworks">
+<span id="dice-ml-utils-neuralnetworks-module"></span><h2>dice_ml.utils.neuralnetworks module<a class="headerlink" href="#module-dice_ml.utils.neuralnetworks" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dice_ml.utils.neuralnetworks.FFNetwork">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.neuralnetworks.</span></span><span class="sig-name descname"><span class="pre">FFNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/neuralnetworks.html#FFNetwork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.neuralnetworks.FFNetwork" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dice_ml.utils.neuralnetworks.FFNetwork.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/neuralnetworks.html#FFNetwork.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.neuralnetworks.FFNetwork.forward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-dice_ml.utils.serialize">
-<span id="dice-ml-utils-serialize-module"></span><h2>dice_ml.utils.serialize module<a class="headerlink" href="#module-dice_ml.utils.serialize" title="Permalink to this headline"></a></h2>
+<span id="dice-ml-utils-serialize-module"></span><h2>dice_ml.utils.serialize module<a class="headerlink" href="#module-dice_ml.utils.serialize" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.utils.serialize.DummyDataInterface">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.serialize.</span></span><span class="sig-name descname"><span class="pre">DummyDataInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outcome_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/serialize.html#DummyDataInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.serialize.DummyDataInterface" title="Permalink to this definition"></a></dt>
@@ -318,7 +366,7 @@ This class calls FunctionTransformer of scikit-learn internally
 
 </section>
 <section id="module-dice_ml.utils">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.utils" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.utils" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
