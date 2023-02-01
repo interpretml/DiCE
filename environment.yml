@@ -6,3 +6,4 @@ dependencies:
   - pandas
   - jsonschema
   - tqdm
+  - raiutils>=0.3.0
