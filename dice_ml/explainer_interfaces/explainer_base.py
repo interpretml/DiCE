@@ -8,12 +8,12 @@ from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
+from raiutils.exceptions import UserConfigValidationException
 from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
 from dice_ml.constants import ModelTypes, _PostHocSparsityTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class ExplainerBase(ABC):

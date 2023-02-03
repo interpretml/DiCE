@@ -3,11 +3,11 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 import pytest
+from raiutils.exceptions import UserConfigValidationException
 from sklearn.datasets import load_iris
 
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 @pytest.fixture()

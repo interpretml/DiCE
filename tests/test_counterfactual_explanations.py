@@ -1,11 +1,11 @@
 import json
 
 import pytest
+from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class TestCounterfactualExplanations:

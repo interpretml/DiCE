@@ -8,11 +8,11 @@ import timeit
 
 import numpy as np
 import pandas as pd
+from raiutils.exceptions import UserConfigValidationException
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class DiceGenetic(ExplainerBase):
