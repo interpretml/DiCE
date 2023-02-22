@@ -2,8 +2,9 @@
 
 from abc import ABC, abstractmethod
 
-from dice_ml.utils.exception import (SystemException,
-                                     UserConfigValidationException)
+from raiutils.exceptions import UserConfigValidationException
+
+from dice_ml.utils.exception import SystemException
 
 
 class _BaseData(ABC):
