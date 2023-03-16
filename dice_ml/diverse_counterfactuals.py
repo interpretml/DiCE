@@ -1,9 +1,8 @@
 import copy
 import json
+import math
 
 import pandas as pd
-
-import math
 
 from dice_ml.constants import ModelTypes, _SchemaVersions
 from dice_ml.utils.serialize import DummyDataInterface
