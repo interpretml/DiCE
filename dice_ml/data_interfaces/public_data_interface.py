@@ -138,9 +138,11 @@ class PublicData(_BaseData):
 
     def get_data_type(self, col):
         """Infers data type of a continuous feature from the training data."""
-        if (self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32):
+        if (self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32) or \
+                (self.data_df[col].dtype == np.int16) or (self.data_df[col].dtype == np.int8):
             return 'int'
-        elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32):
+        elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32) or \
+                (self.data_df[col].dtype == np.float16) or (self.data_df[col].dtype == np.float128):
             return 'float'
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
