@@ -1,6 +1,6 @@
 ipython
 jupyter
-nbformat
+nbformat<5.8.0
 pytest
 pytest-cov
 twine
