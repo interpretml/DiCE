@@ -801,7 +801,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.model.get_output(dataset_instance, model_score=False).flatten()
+        predictions = np.argmax(self.model.get_output(dataset_instance, model_score=False), axis=1).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 
