@@ -93,7 +93,7 @@ for nb in notebooks_list:
 
 
 @pytest.mark.parametrize("notebook_filename", parameter_list)
-@pytest.mark.notebook_tests
+@pytest.mark.notebook_tests()
 def test_notebook(notebook_filename):
     _check_notebook_cell_outputs(NOTEBOOKS_PATH + notebook_filename)
     nb, errors = _notebook_run(NOTEBOOKS_PATH + notebook_filename)
