@@ -142,7 +142,7 @@ class PublicData(_BaseData):
                 (self.data_df[col].dtype == np.int16) or (self.data_df[col].dtype == np.int8):
             return 'int'
         elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32) or \
-                (self.data_df[col].dtype == np.float16) or (self.data_df[col].dtype == np.float128):
+                (self.data_df[col].dtype == np.float16):
             return 'float'
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)
