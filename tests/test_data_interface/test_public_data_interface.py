@@ -220,6 +220,37 @@ class TestChecksPublicDataInterface:
         assert 'The category {0} does not occur in the training data for feature {1}. Allowed categories are {2}'.format(
             'unknown_category', 'new_feature', ['known_category']) in str(ucve)
 
+    @pytest.mark.parametrize('new_float_data_type', [np.float64, np.float32, np.float16])
+    @pytest.mark.parametrize('new_int_data_type', [np.int64, np.int32, np.int16, np.int8])
+    def test_get_data_type_success(self, new_float_data_type, new_int_data_type):
+        iris = load_iris(as_frame=True)
+
+        iris.frame['sepal length (cm)'] = iris.frame['sepal length (cm)'].astype(new_float_data_type)
+        iris.frame['target'] = iris.frame['target'].astype(new_int_data_type)
+        feature_names = iris.feature_names
+        dataset = iris.frame
+
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                                 outcome_name='target')
+
+        assert dice_data.get_data_type('sepal length (cm)') == 'float'
+        assert dice_data.get_data_type('target') == 'int'
+
+    def test_get_data_type_failure(self):
+        iris = load_iris(as_frame=True)
+
+        iris.frame['target'] = iris.frame['target'].astype(bool)
+        feature_names = iris.feature_names
+        dataset = iris.frame
+
+        dice_data = dice_ml.Data(dataframe=dataset, continuous_features=feature_names,
+                                 outcome_name='target')
+
+        with pytest.raises(
+                ValueError,
+                match="Unknown data type of feature %s: must be int or float" % 'target'):
+            dice_data.get_data_type('target')
+
 
 class TestUserDataCorruption:
 
