@@ -1,5 +1,6 @@
 ipython
 jupyter
+nbconvert<7.3.0
 pytest
 pytest-cov
 twine
