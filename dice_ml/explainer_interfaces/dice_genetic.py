@@ -507,7 +507,7 @@ class DiceGenetic(ExplainerBase):
 
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
-        query_instance_df[self.data_interface.outcome_name] = np.argmax(self.test_pred[0])
+        query_instance_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.test_pred)
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 
