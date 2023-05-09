@@ -1,10 +1,13 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |CondaVersion|_
+|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
 
-.. |BuildStatus| image:: https://github.com/interpretml/dice/workflows/Python%20package/badge.svg
-.. _BuildStatus: https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22
+.. |BuildStatus| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
+.. _BuildStatus: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/dice-ml
 .. _PyPiVersion: https://pypi.org/project/dice-ml/
+
+.. |Downloads| image:: https://static.pepy.tech/personalized-badge/dice-ml?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads
+.. _Downloads: https://pepy.tech/project/dice-ml
 
 .. |PythonSupport| image:: https://img.shields.io/pypi/pyversions/dice-ml
 .. _PythonSupport: https://pypi.org/project/dice-ml/
