@@ -22,6 +22,7 @@ def load_adult_income_dataset(only_train=True):
 
     :return adult_data: returns preprocessed adult income dataset.
     """
+    # some test
     raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',
                              delimiter=', ', dtype=str, invalid_raise=False)
 
