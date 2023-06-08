@@ -4,6 +4,8 @@ This module containts helper functions to load data and get meta deta.
 import os
 import pickle
 import shutil
+import zipfile
+from urllib.request import urlretrieve
 
 import numpy as np
 import pandas as pd
@@ -22,8 +24,14 @@ def load_adult_income_dataset(only_train=True):
 
     :return adult_data: returns preprocessed adult income dataset.
     """
-    # some test
-    raw_data = np.genfromtxt('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',
+    # Download the adult dataset from https://archive.ics.uci.edu/static/public/2/adult.zip as a zip folder
+    outdirname = 'adult'
+    zipfilename = outdirname + '.zip'
+    urlretrieve('https://archive.ics.uci.edu/static/public/2/adult.zip', zipfilename)
+    with zipfile.ZipFile(zipfilename, 'r') as unzip:
+        unzip.extractall(outdirname)
+
+    raw_data = np.genfromtxt(outdirname + '/adult.data',
                              delimiter=', ', dtype=str, invalid_raise=False)
 
     #  column names from "https://archive.ics.uci.edu/ml/datasets/Adult"
@@ -82,8 +90,8 @@ def load_adult_income_dataset(only_train=True):
         adult_data = train.reset_index(drop=True)
 
     # Remove the downloaded dataset
-    if os.path.isdir('archive.ics.uci.edu'):
-        entire_path = os.path.abspath('archive.ics.uci.edu')
+    if os.path.isdir(outdirname):
+        entire_path = os.path.abspath(outdirname)
         shutil.rmtree(entire_path)
 
     return adult_data
