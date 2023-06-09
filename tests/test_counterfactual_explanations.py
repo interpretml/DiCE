@@ -109,7 +109,7 @@ class TestCounterfactualExplanations:
                 list(counterfactual_explanations.local_importance[index].keys())
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def random_binary_classification_exp_object():
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
