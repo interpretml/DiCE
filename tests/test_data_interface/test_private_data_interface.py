@@ -5,7 +5,7 @@ import pytest
 import dice_ml
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def data_object():
     features_dict = OrderedDict(
         [('age', [17, 90]),

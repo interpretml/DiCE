@@ -10,7 +10,7 @@ import dice_ml
 from dice_ml.utils import helpers
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def data_object():
     dataset = helpers.load_adult_income_dataset()
     return dice_ml.Data(dataframe=dataset, continuous_features=['age', 'hours_per_week'],
