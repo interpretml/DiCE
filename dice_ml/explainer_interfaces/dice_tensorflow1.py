@@ -167,7 +167,7 @@ class DiceTensorFlow1(ExplainerBase):
             posthoc_sparsity_param=posthoc_sparsity_param,
             desired_class=desired_class)
 
-        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
+        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations], predict_fn=self.predict_fn)
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
         """Intializes TF variables required for CF generation."""

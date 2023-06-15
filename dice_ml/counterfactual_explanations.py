@@ -1,8 +1,12 @@
 import json
 import os
 
+
 import jsonschema
+import numpy as np
+import pandas as pd
 from raiutils.exceptions import UserConfigValidationException
+from counterplots import CreatePlot
 
 from dice_ml.constants import _SchemaVersions
 from dice_ml.diverse_counterfactuals import (CounterfactualExamples,
@@ -52,11 +56,12 @@ class CounterfactualExplanations:
         based on the input set of CounterfactualExamples instances
 
     """
-    def __init__(self, cf_examples_list,
+    def __init__(self, cf_examples_list, predict_fn,
                  local_importance=None,
                  summary_importance=None,
                  version=None):
         self._cf_examples_list = cf_examples_list
+        self._predict_fn = predict_fn
         self._local_importance = local_importance
         self._summary_importance = summary_importance
         self._metadata = {'version': version if version is not None else _SchemaVersions.CURRENT_VERSION}
@@ -300,3 +305,38 @@ class CounterfactualExplanations:
                         version=version)
         else:
             return json_dict
+
+    def generete_counterplots(self):
+        cf_data = json.loads(self.to_json())
+        factual = self.cf_examples_list[0].test_instance_df.to_numpy()[0][:-1]
+        feature_names = list(self.cf_examples_list[0].test_instance_df.columns)[:-1]
+        df_structure = self.cf_examples_list[0].test_instance_df[:0].loc[:, feature_names]
+        data_types = df_structure.dtypes.apply(lambda x: x.name).to_dict()
+
+        factual_class_name = str(self.cf_examples_list[0].test_pred)
+        cf_class_name = str(self.cf_examples_list[0].new_outcome)
+
+        def adjust_types(x):
+            for i in range(x.shape[1]):
+                if 'int' in list(data_types.values())[i]:
+                    x[:, i] = int(float(x[:, i]))
+            return x
+
+        def model_pred(x):
+            scores = self._predict_fn(df_structure.append(pd.DataFrame(x, columns=feature_names))).numpy()
+            return np.concatenate((1 - scores, scores), axis=1)
+
+        out_exp = []
+
+        for raw_cf in cf_data['cfs_list'][0]:
+            cf = adjust_types(np.array([raw_cf[:-1]]))[0]
+
+            out_exp.append(CreatePlot(
+                factual=np.array(factual),
+                cf=np.array(cf),
+                model_pred=model_pred,
+                feature_names=feature_names,
+                class_names={0: factual_class_name, 1: cf_class_name}))
+
+        return out_exp
+

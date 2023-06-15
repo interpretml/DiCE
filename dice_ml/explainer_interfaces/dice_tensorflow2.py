@@ -144,7 +144,7 @@ class DiceTensorFlow2(ExplainerBase):
             posthoc_sparsity_param=posthoc_sparsity_param,
             desired_class=desired_class)
 
-        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations])
+        return CounterfactualExplanations(cf_examples_list=[counterfactual_explanations], predict_fn=self.predict_fn)
 
     def predict_fn(self, input_instance):
         """prediction function"""

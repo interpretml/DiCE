@@ -172,7 +172,7 @@ class ExplainerBase(ABC):
             cf_examples_arr.append(res)
         self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
 
-        return CounterfactualExplanations(cf_examples_list=cf_examples_arr)
+        return CounterfactualExplanations(cf_examples_list=cf_examples_arr, predict_fn=self.predict_fn)
 
     @abstractmethod
     def _generate_counterfactuals(self, query_instance, total_CFs,
