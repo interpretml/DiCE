@@ -245,6 +245,7 @@ class CounterfactualExplanations:
 
                 return CounterfactualExplanations(
                         cf_examples_list=cf_examples_list,
+                        predict_fn=None,
                         local_importance=json_dict[_CounterfactualExpV1SchemaConstants.LOCAL_IMPORTANCE],
                         summary_importance=json_dict[_CounterfactualExpV1SchemaConstants.SUMMARY_IMPORTANCE],
                         version=version)
@@ -300,13 +301,20 @@ class CounterfactualExplanations:
 
                 return CounterfactualExplanations(
                         cf_examples_list=cf_examples_list,
+                        predict_fn=None,
                         local_importance=local_importance_list,
                         summary_importance=summary_importance_dict,
                         version=version)
         else:
             return json_dict
 
-    def generete_counterplots(self):
+    def generete_counterplots(self, predict_fn=None):
+
+        if self._predict_fn is None and predict_fn is None:
+            raise ValueError("predict_fn is required to generate counterplots")
+        elif predict_fn is not None:
+            self._predict_fn = predict_fn
+
         cf_data = json.loads(self.to_json())
         factual = self.cf_examples_list[0].test_instance_df.to_numpy()[0][:-1]
         feature_names = list(self.cf_examples_list[0].test_instance_df.columns)[:-1]

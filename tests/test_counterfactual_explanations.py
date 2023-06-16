@@ -3,12 +3,17 @@ import json
 import pytest
 from raiutils.exceptions import UserConfigValidationException
 
+import numpy as np
+
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.utils import helpers
 
 
 class TestCounterfactualExplanations:
+
+    def __init__(self):
+        self.predict_fn = lambda x: np.array([1.0 for _ in range(np.array(x).shape[0])])
 
     def test_sorted_summary_importance_counterfactual_explanations(self):
 
@@ -36,6 +41,7 @@ class TestCounterfactualExplanations:
 
         counterfactual_explanations = CounterfactualExplanations(
             cf_examples_list=[],
+            predict_fn=self.predict_fn,
             local_importance=None,
             summary_importance=unsorted_summary_importance)
 
@@ -96,6 +102,7 @@ class TestCounterfactualExplanations:
         counterfactual_explanations = CounterfactualExplanations(
             cf_examples_list=[],
             local_importance=unsorted_local_importance,
+            predict_fn=self.predict_fn,
             summary_importance=None)
 
         for index in range(0, len(unsorted_local_importance)):
@@ -121,6 +128,10 @@ def random_binary_classification_exp_object():
 
 
 class TestSerializationCounterfactualExplanations:
+
+    def __init__(self):
+        self.predict_fn = lambda x: np.array([1.0 for _ in range(np.array(x).shape[0])])
+
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, random_binary_classification_exp_object):
         self.exp = random_binary_classification_exp_object  # explainer object
@@ -224,6 +235,7 @@ class TestSerializationCounterfactualExplanations:
 
         counterfactual_explanations = CounterfactualExplanations(
             cf_examples_list=[],
+            predict_fn=self.predict_fn,
             local_importance=None,
             summary_importance=None,
             version=version)
@@ -324,6 +336,7 @@ class TestSerializationCounterfactualExplanations:
     def test_unsupported_versions_to_json(self, unsupported_version):
         counterfactual_explanations = CounterfactualExplanations(
             cf_examples_list=[],
+            predict_fn=self.predict_fn,
             local_importance=None,
             summary_importance=None,
             version=unsupported_version)

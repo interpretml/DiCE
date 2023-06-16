@@ -475,6 +475,7 @@ class ExplainerBase(ABC):
 
         return CounterfactualExplanations(
             cf_examples_list,
+            predict_fn=self.predict_fn,
             local_importance=local_importances,
             summary_importance=summary_importance)
 
