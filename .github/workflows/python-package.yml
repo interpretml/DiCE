@@ -33,7 +33,7 @@ jobs:
         python -m pip install --upgrade pip
     - name: Install core dependencies
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements.txt --no-cache-dir
     - name: Install deep learning dependencies
       run: |
         pip install -r requirements-deeplearning.txt
