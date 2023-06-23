@@ -17,8 +17,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest, macos-latest]
+        exclude:
+          - os: macos-latest
+            python-version: "3.7"
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.os }}
@@ -30,13 +33,13 @@ jobs:
         python -m pip install --upgrade pip
     - name: Install core dependencies
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements.txt --no-cache-dir
     - name: Install deep learning dependencies
       run: |
-        pip install -r requirements-deeplearning.txt
+        pip install -r requirements-deeplearning.txt --no-cache-dir
     - name: Install test dependencies
       run: |
-        pip install -r requirements-test.txt
+        pip install -r requirements-test.txt --no-cache-dir
     - name: Test with pytest
       run: |
         # pytest
