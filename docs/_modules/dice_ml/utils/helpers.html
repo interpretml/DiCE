@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils.helpers &mdash; DiCE 0.9 documentation</title>
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.10 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -50,8 +50,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -89,6 +87,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -102,12 +102,19 @@
 
 
 <div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">only_train</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares</span>
 <span class="sd">       the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
 
 <span class="sd">    :return adult_data: returns preprocessed adult income dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&#39;</span><span class="p">,</span>
+    <span class="c1"># Download the adult dataset from https://archive.ics.uci.edu/static/public/2/adult.zip as a zip folder</span>
+    <span class="n">outdirname</span> <span class="o">=</span> <span class="s1">&#39;adult&#39;</span>
+    <span class="n">zipfilename</span> <span class="o">=</span> <span class="n">outdirname</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span>
+    <span class="n">urlretrieve</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/static/public/2/adult.zip&#39;</span><span class="p">,</span> <span class="n">zipfilename</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zipfilename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">unzip</span><span class="p">:</span>
+        <span class="n">unzip</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">outdirname</span><span class="p">)</span>
+
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">outdirname</span> <span class="o">+</span> <span class="s1">&#39;/adult.data&#39;</span><span class="p">,</span>
                              <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">invalid_raise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1">#  column names from &quot;https://archive.ics.uci.edu/ml/datasets/Adult&quot;</span>
@@ -166,8 +173,8 @@
         <span class="n">adult_data</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># Remove the downloaded dataset</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s1">&#39;archive.ics.uci.edu&#39;</span><span class="p">):</span>
-        <span class="n">entire_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;archive.ics.uci.edu&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">outdirname</span><span class="p">):</span>
+        <span class="n">entire_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">outdirname</span><span class="p">)</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">entire_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">adult_data</span></div>
@@ -332,7 +339,7 @@
 
 
 <div class="viewcode-block" id="ohe_min_max_transformation"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.ohe_min_max_transformation">[docs]</a><span class="k">def</span> <span class="nf">ohe_min_max_transformation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;the data is one-hot-encoded and min-max normalized and fed to the ML model&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;the data is one-hot-encoded and min-max normalized and fed to the ML model&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">data_interface</span><span class="o">.</span><span class="n">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
@@ -341,7 +348,7 @@
 
 
 <div class="viewcode-block" id="DataTransfomer"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer">[docs]</a><span class="k">class</span> <span class="nc">DataTransfomer</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A class to transform data based on user-defined function to get predicted outcomes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to transform data based on user-defined function to get predicted outcomes.</span>
 <span class="sd">       This class calls FunctionTransformer of scikit-learn internally</span>
 <span class="sd">       (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html).&quot;&quot;&quot;</span>
 
