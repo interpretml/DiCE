@@ -17,8 +17,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10"]
-        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        exclude:
+          - os: macos-latest
+            python-version: "3.7"
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.os }}
@@ -30,24 +33,24 @@ jobs:
         python -m pip install --upgrade pip
     - name: Install core dependencies
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements.txt --no-cache-dir
     - name: Install deep learning dependencies
       run: |
-        pip install -r requirements-deeplearning.txt
+        pip install -r requirements-deeplearning.txt --no-cache-dir
     - name: Install test dependencies
       run: |
-        pip install -r requirements-test.txt
+        pip install -r requirements-test.txt --no-cache-dir
     - name: Test with pytest
       run: |
         # pytest
-        pytest tests/ --durations=10 --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
+        pytest tests/ -m "not notebook_tests" --durations=10 --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
       with:
         files: junit/test-results.xml
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

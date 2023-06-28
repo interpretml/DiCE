@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.9 documentation</title>
+  <title>Diverse Counterfactual Explanations (DiCE) for ML &mdash; DiCE 0.10 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -52,8 +52,6 @@
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -108,7 +106,7 @@
     text-align: unset;
 }
 </style>
-<p><a class="reference external" href="https://github.com/interpretml/dice/actions?query=workflow%3A%22Python+package%22"><img alt="BuildStatus" src="https://github.com/interpretml/dice/workflows/Python%20package/badge.svg" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PyPiVersion" src="https://img.shields.io/pypi/v/dice-ml" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PythonSupport" src="https://img.shields.io/pypi/pyversions/dice-ml" /></a> <a class="reference external" href="https://anaconda.org/conda-forge/dice-ml"><img alt="CondaVersion" src="https://anaconda.org/conda-forge/dice-ml/badges/version.svg" /></a></p>
+<p><a class="reference external" href="https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22"><img alt="BuildStatus" src="https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PyPiVersion" src="https://img.shields.io/pypi/v/dice-ml" /></a> <a class="reference external" href="https://pypi.org/project/dice-ml/"><img alt="PythonSupport" src="https://img.shields.io/pypi/pyversions/dice-ml" /></a> <a class="reference external" href="https://pepy.tech/project/dice-ml"><img alt="Downloads" src="https://static.pepy.tech/personalized-badge/dice-ml?period=total&amp;units=international_system&amp;left_color=grey&amp;right_color=orange&amp;left_text=Downloads" /></a> <a class="reference external" href="https://anaconda.org/conda-forge/dice-ml"><img alt="CondaVersion" src="https://anaconda.org/conda-forge/dice-ml/badges/version.svg" /></a></p>
 <section id="diverse-counterfactual-explanations-dice-for-ml">
 <h1>Diverse Counterfactual Explanations (DiCE) for ML<a class="headerlink" href="#diverse-counterfactual-explanations-dice-for-ml" title="Permalink to this heading"></a></h1>
 <p><em>How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people?</em></p>
@@ -128,78 +126,64 @@ consider a person who applied for a loan and was rejected by the loan distributi
 <section id="installing-dice">
 <h2>Installing DICE<a class="headerlink" href="#installing-dice" title="Permalink to this heading"></a></h2>
 <p>DiCE supports Python 3+. The stable version of DiCE is available on <a class="reference external" href="https://pypi.org/project/dice-ml/">PyPI</a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install dice-ml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>dice-ml
 </pre></div>
 </div>
 <p>DiCE is also available on <a class="reference external" href="https://anaconda.org/conda-forge/dice-ml">conda-forge</a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge dice-ml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>dice-ml
 </pre></div>
 </div>
 <p>To install the latest (dev) version of DiCE and its dependencies, clone this repo and run <cite>pip install</cite> from the top-most folder of the repo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e .
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 <p>If you face any problems, try installing dependencies manually.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 <span class="c1"># Additional dependendies for deep learning models</span>
-pip install -r requirements-deeplearning.txt
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-deeplearning.txt
 <span class="c1"># For running unit tests</span>
-pip install -r requirements-test.txt
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-test.txt
 </pre></div>
 </div>
-<p>DiCE requires the following packages:</p>
-<ul class="simple">
-<li><p>jsonschema</p></li>
-<li><p>numpy</p></li>
-<li><p>scikit-learn</p></li>
-<li><p>pandas</p></li>
-<li><p>h5py</p></li>
-<li><p>tqdm</p></li>
-<li><p>[optional] tensorflow/pytorch (works with Tensorflow&gt;=1.13)</p></li>
-</ul>
 </section>
 <section id="getting-started-with-dice">
 <h2>Getting started with DiCE<a class="headerlink" href="#getting-started-with-dice" title="Permalink to this heading"></a></h2>
-<p>With DiCE, generating explanations is a simple three-step  process: train
-mode and then invoke DiCE to generate counterfactual examples for any input.</p>
+<p>With DiCE, generating explanations is a simple three-step  process: set up a dataset, train a model, and then invoke DiCE to generate counterfactual examples for any input. DiCE can also work with pre-trained models, with or without their original training data.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dice_ml</span>
 <span class="kn">from</span> <span class="nn">dice_ml.utils</span> <span class="kn">import</span> <span class="n">helpers</span> <span class="c1"># helper functions</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span> <span class="c1"># outcome variable</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                                                     <span class="n">target</span><span class="p">,</span>
+                                                     <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                     <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                     <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 <span class="c1"># Dataset for training an ML model</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">(),</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
                  <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span>
                  <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+
 <span class="c1"># Pre-trained ML model</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">dice_ml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">())</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">dice_ml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(),</span>
+                  <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF2&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
 <span class="c1"># DiCE explanation instance</span>
 <span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For any given input, we can now generate counterfactual explanations. For
-example, the following input leads to class 0 (low income).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query_instance</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span>
-    <span class="s1">&#39;workclass&#39;</span><span class="p">:</span><span class="s1">&#39;Private&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;education&#39;</span><span class="p">:</span><span class="s1">&#39;HS-grad&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span><span class="s1">&#39;Single&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;occupation&#39;</span><span class="p">:</span><span class="s1">&#39;Service&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="s1">&#39;White&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;gender&#39;</span><span class="p">:</span><span class="s1">&#39;Female&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="mi">45</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>Using DiCE, we can now generate examples that would have been classified as class 1 (high income).</p>
+example, the following input leads to class 0 (low income) and we would like to know what minimal changes would lead to a prediction of 1 (high income).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate counterfactual examples</span>
+<span class="n">query_instance</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;income&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
 <span class="c1"># Visualize counterfactual explanation</span>
 <span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png"><img alt="List of counterfactual examples" src="https://raw.githubusercontent.com/interpretml/DiCE/master/docs/_static/getting_started_updated.png" style="width: 400px;" /></a>
-<p>You can save the generated counterfactual examples in the following way:-</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate counterfactual examples</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-<span class="c1"># Visualize counterfactual explanation</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
-<span class="c1"># Save generated counterfactual examples to disk</span>
+<p>You can save the generated counterfactual examples in the following way.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save generated counterfactual examples to disk</span>
 <span class="n">dice_exp</span><span class="o">.</span><span class="n">cf_examples_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="s1">&#39;counterfactuals.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -411,17 +395,6 @@ contact <a class="reference external" href="mailto:opencode&#37;&#52;&#48;micros
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html#Generate-diverse-counterfactuals">Generate diverse counterfactuals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html#2.-Changing-feature-weights">2. Changing feature weights</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_with_advanced_options.html#3.-Trading-off-between-proximity-and-diversity-goals">3. Trading off between proximity and diversity goals</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Loading-dataset">Loading dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Loading-the-ML-model">Loading the ML model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Generate-counterfactuals-using-a-VAE-model">Generate counterfactuals using a VAE model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#ModelApprox">ModelApprox</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/DiCE_getting_started_feasible.html#Initilize-the-Model-and-Explainer-for-FeasibleModelApprox">Initilize the Model and Explainer for FeasibleModelApprox</a></li>
 </ul>
 </li>
 </ul>

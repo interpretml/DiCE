@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.9 documentation</title>
+  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.10 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -74,8 +74,6 @@
 <li class="toctree-l1"><a class="reference internal" href="DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -410,29 +408,38 @@ the counterfactuals and consequently, the local importance score. Given a set of
 </ul>
 <p><img alt="DiCE API" src="../_images/dice_getting_started_api.png" /></p>
 <p>DiCE requires two inputs: a training dataset and a pre-trained ML model. When the training dataset is unknown (e.g., for privacy reasons), it can also work without access to the full dataset (see this <a class="reference internal" href="DiCE_with_private_data.html"><span class="doc">notebook</span></a> for an example). Below we show a simple example.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sklearn imports</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Sklearn imports
+from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.ensemble import RandomForestClassifier
 
-<span class="c1"># DiCE imports</span>
-<span class="kn">import</span> <span class="nn">dice_ml</span>
-<span class="kn">from</span> <span class="nn">dice_ml.utils</span> <span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
+# DiCE imports
+import dice_ml
+from dice_ml.utils import helpers  # helper functions
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/exception.py:12: UserWarning: UserConfigValidationException will be deprecated from dice_ml.utils. Please import UserConfigValidationException from raiutils.exceptions.
+  warnings.warn(&#34;UserConfigValidationException will be deprecated from dice_ml.utils. &#34;
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
 </pre></div>
 </div>
 </div>
@@ -445,7 +452,7 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset = helpers.load_adult_income_dataset()
 </pre></div>
 </div>
 </div>
@@ -454,7 +461,7 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset.head()
 </pre></div>
 </div>
 </div>
@@ -561,9 +568,9 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># description of transformed features</span>
-<span class="n">adult_info</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_data_info</span><span class="p">()</span>
-<span class="n">adult_info</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># description of transformed features
+adult_info = helpers.get_adult_data_info()
+adult_info
 </pre></div>
 </div>
 </div>
@@ -589,14 +596,14 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
-<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
-                                                                <span class="n">target</span><span class="p">,</span>
-                                                                <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-                                                                <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                                                                <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
-<span class="n">x_train</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;income&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">x_test</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;income&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>target = dataset[&quot;income&quot;]
+train_dataset, test_dataset, y_train, y_test = train_test_split(dataset,
+                                                                target,
+                                                                test_size=0.2,
+                                                                random_state=0,
+                                                                stratify=target)
+x_train = train_dataset.drop(&#39;income&#39;, axis=1)
+x_test = test_dataset.drop(&#39;income&#39;, axis=1)
 </pre></div>
 </div>
 </div>
@@ -605,8 +612,8 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 1: dice_ml.Data</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Step 1: dice_ml.Data
+d = dice_ml.Data(dataframe=train_dataset, continuous_features=[&#39;age&#39;, &#39;hours_per_week&#39;], outcome_name=&#39;income&#39;)
 </pre></div>
 </div>
 </div>
@@ -620,21 +627,21 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">numerical</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours_per_week&quot;</span><span class="p">]</span>
-<span class="n">categorical</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>numerical = [&quot;age&quot;, &quot;hours_per_week&quot;]
+categorical = x_train.columns.difference(numerical)
 
-<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
+categorical_transformer = Pipeline(steps=[
+    (&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
 
-<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
-    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical</span><span class="p">)])</span>
+transformations = ColumnTransformer(
+    transformers=[
+        (&#39;cat&#39;, categorical_transformer, categorical)])
 
-<span class="c1"># Append classifier to preprocessing pipeline.</span>
-<span class="c1"># Now we have a full prediction pipeline.</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
-                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+# Append classifier to preprocessing pipeline.
+# Now we have a full prediction pipeline.
+clf = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
+                      (&#39;classifier&#39;, RandomForestClassifier())])
+model = clf.fit(x_train, y_train)
 </pre></div>
 </div>
 </div>
@@ -647,10 +654,10 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using sklearn backend</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">)</span>
-<span class="c1"># Using method=random for generating CFs</span>
-<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Using sklearn backend
+m = dice_ml.Model(model=model, backend=&quot;sklearn&quot;)
+# Using method=random for generating CFs
+exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
 </pre></div>
 </div>
 </div>
@@ -661,8 +668,8 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-<span class="n">e1</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>e1 = exp.generate_counterfactuals(x_test[0:1], total_CFs=2, desired_class=&quot;opposite&quot;)
+e1.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -671,7 +678,7 @@ the counterfactuals and consequently, the local importance score. Given a set of
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  9.38it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.17it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -786,10 +793,10 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>Government</td>
-      <td>Assoc</td>
       <td>-</td>
+      <td>Bachelors</td>
       <td>-</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -798,8 +805,8 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>1</th>
       <td>-</td>
-      <td>Self-Employed</td>
       <td>-</td>
+      <td>Assoc</td>
       <td>-</td>
       <td>White-Collar</td>
       <td>-</td>
@@ -816,7 +823,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>e1.visualize_as_dataframe(show_only_changes=False)
 </pre></div>
 </div>
 </div>
@@ -924,10 +931,10 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>0</th>
       <td>29</td>
-      <td>Government</td>
-      <td>Assoc</td>
+      <td>Private</td>
+      <td>Bachelors</td>
       <td>Married</td>
-      <td>Blue-Collar</td>
+      <td>Professional</td>
       <td>White</td>
       <td>Female</td>
       <td>38</td>
@@ -936,8 +943,8 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>1</th>
       <td>29</td>
-      <td>Self-Employed</td>
-      <td>HS-grad</td>
+      <td>Private</td>
+      <td>Assoc</td>
       <td>Married</td>
       <td>White-Collar</td>
       <td>White</td>
@@ -954,13 +961,13 @@ Diverse Counterfactual set (new outcome: 1.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Changing only age and education</span>
-<span class="n">e2</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span>
-                                  <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
-                                  <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;education&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">]</span>
-                                  <span class="p">)</span>
-<span class="n">e2</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Changing only age and education
+e2 = exp.generate_counterfactuals(x_test[0:1],
+                                  total_CFs=2,
+                                  desired_class=&quot;opposite&quot;,
+                                  features_to_vary=[&quot;education&quot;, &quot;occupation&quot;]
+                                  )
+e2.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -969,7 +976,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00, 10.58it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.89it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1085,9 +1092,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Masters</td>
+      <td>Bachelors</td>
       <td>-</td>
-      <td>Sales</td>
+      <td>Other/Unknown</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1097,9 +1104,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>1</th>
       <td>-</td>
       <td>-</td>
-      <td>Prof-school</td>
+      <td>Assoc</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1113,12 +1120,12 @@ Diverse Counterfactual set (new outcome: 1.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Restricting age to be between [20,30] and Education to be either {&#39;Doctorate&#39;, &#39;Prof-school&#39;}.</span>
-<span class="n">e3</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span>
-                                  <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
-                                  <span class="n">permitted_range</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Doctorate&#39;</span><span class="p">,</span> <span class="s1">&#39;Prof-school&#39;</span><span class="p">]})</span>
-<span class="n">e3</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Restricting age to be between [20,30] and Education to be either {&#39;Doctorate&#39;, &#39;Prof-school&#39;}.
+e3 = exp.generate_counterfactuals(x_test[0:1],
+                                  total_CFs=2,
+                                  desired_class=&quot;opposite&quot;,
+                                  permitted_range={&#39;age&#39;: [20, 30], &#39;education&#39;: [&#39;Doctorate&#39;, &#39;Prof-school&#39;]})
+e3.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -1127,7 +1134,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  9.72it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.66it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1242,10 +1249,10 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>Self-Employed</td>
       <td>-</td>
+      <td>Prof-school</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1279,9 +1286,9 @@ Diverse Counterfactual set (new outcome: 1.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instance</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">local_feature_importance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">local_importance</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instance = x_test[0:1]
+imp = exp.local_feature_importance(query_instance, total_CFs=10)
+print(imp.local_importance)
 </pre></div>
 </div>
 </div>
@@ -1290,7 +1297,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  5.12it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  1.37it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1298,7 +1305,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[{&#39;education&#39;: 0.8, &#39;occupation&#39;: 0.6, &#39;workclass&#39;: 0.3, &#39;gender&#39;: 0.2, &#39;marital_status&#39;: 0.1, &#39;race&#39;: 0.0, &#39;age&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
+[{&#39;education&#39;: 0.7, &#39;occupation&#39;: 0.7, &#39;workclass&#39;: 0.4, &#39;marital_status&#39;: 0.1, &#39;gender&#39;: 0.1, &#39;race&#39;: 0.0, &#39;age&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1318,9 +1325,9 @@ Diverse Counterfactual set (new outcome: 1.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
-<span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">global_feature_importance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">summary_importance</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instances = x_test[0:20]
+imp = exp.global_feature_importance(query_instances)
+print(imp.summary_importance)
 </pre></div>
 </div>
 </div>
@@ -1329,7 +1336,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████████████████| 20/20 [00:04&lt;00:00,  4.83it/s]
+100%|███████████████████████████████████████████████████████████████████████████████████| 20/20 [00:12&lt;00:00,  1.66it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1337,7 +1344,7 @@ Diverse Counterfactual set (new outcome: 1.0)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;education&#39;: 0.68, &#39;occupation&#39;: 0.32, &#39;marital_status&#39;: 0.275, &#39;hours_per_week&#39;: 0.235, &#39;workclass&#39;: 0.2, &#39;age&#39;: 0.175, &#39;race&#39;: 0.155, &#39;gender&#39;: 0.09}
+{&#39;education&#39;: 0.56, &#39;marital_status&#39;: 0.32, &#39;occupation&#39;: 0.275, &#39;hours_per_week&#39;: 0.25, &#39;age&#39;: 0.23, &#39;workclass&#39;: 0.19, &#39;race&#39;: 0.12, &#39;gender&#39;: 0.095}
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1361,10 +1368,10 @@ the paper, <a class="reference external" href="https://arxiv.org/abs/1905.07697"
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;TF2&#39;</span>  <span class="c1"># needs tensorflow installed</span>
-<span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
-<span class="c1"># Step 2: dice_ml.Model</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>backend = &#39;TF2&#39;  # needs tensorflow installed
+ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
+# Step 2: dice_ml.Model
+m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-max&quot;)
 </pre></div>
 </div>
 </div>
@@ -1373,9 +1380,9 @@ the paper, <a class="reference external" href="https://arxiv.org/abs/1905.07697"
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2022-10-19 14:51:46.694158: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2022-10-19 14:51:46.698027: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2022-10-19 14:51:46.698044: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2023-06-26 19:18:40.752470: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-06-26 19:18:40.756608: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2023-06-26 19:18:40.756625: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 </pre></div></div>
 </div>
 <p>We want to note that the time required to find counterfactuals with Tensorflow 2.x’s eager style of execution is significantly greater than that with TensorFlow 1.x’s graph execution.</p>
@@ -1384,8 +1391,8 @@ the paper, <a class="reference external" href="https://arxiv.org/abs/1905.07697"
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 3: initiate DiCE</span>
-<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;gradient&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Step 3: initiate DiCE
+exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
 </pre></div>
 </div>
 </div>
@@ -1394,10 +1401,10 @@ the paper, <a class="reference external" href="https://arxiv.org/abs/1905.07697"
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2022-10-19 14:51:49.357741: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-2022-10-19 14:51:49.357797: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-2022-10-19 14:51:49.357820: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
-2022-10-19 14:51:49.358100: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+2023-06-26 19:18:43.948236: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+2023-06-26 19:18:43.948388: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+2023-06-26 19:18:43.948454: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
+2023-06-26 19:18:43.948952: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
 </pre></div></div>
 </div>
@@ -1406,10 +1413,10 @@ To enable them in other operations, rebuild TensorFlow with the appropriate comp
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-<span class="c1"># visualize the result, highlight only the changes</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
+dice_exp = exp.generate_counterfactuals(x_test[1:2], total_CFs=4, desired_class=&quot;opposite&quot;)
+# visualize the result, highlight only the changes
+dice_exp.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -1418,7 +1425,7 @@ To enable them in other operations, rebuild TensorFlow with the appropriate comp
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 34 sec
+Diverse Counterfactuals found! total time taken: 01 min 11 sec
 Query instance (original outcome : 1)
 </pre></div></div>
 </div>
@@ -1577,9 +1584,9 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;PYT&#39;</span>  <span class="c1"># needs pytorch installed</span>
-<span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>  <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>backend = &#39;PYT&#39;  # needs pytorch installed
+ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
+m = dice_ml.Model(model_path=ML_modelpath, backend=backend,  func=&quot;ohe-min-max&quot;)
 </pre></div>
 </div>
 </div>
@@ -1588,7 +1595,7 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;gradient&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
 </pre></div>
 </div>
 </div>
@@ -1596,10 +1603,10 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-<span class="c1"># highlight only the changes</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
+dice_exp = exp.generate_counterfactuals(x_test[1:3], total_CFs=4, desired_class=&quot;opposite&quot;)
+# highlight only the changes
+dice_exp.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -1608,7 +1615,7 @@ Diverse Counterfactual set (new outcome: 0.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 50%|████████████████████████████████████████▌                                        | 1/2 [00:03&lt;00:03,  3.37s/it]
+ 50%|██████████████████████████████████████████▌                                          | 1/2 [00:08&lt;00:08,  8.31s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1616,7 +1623,7 @@ Diverse Counterfactual set (new outcome: 0.0)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 03 sec
+Diverse Counterfactuals found! total time taken: 00 min 07 sec
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1624,7 +1631,7 @@ Diverse Counterfactuals found! total time taken: 00 min 03 sec
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 2/2 [00:07&lt;00:00,  3.69s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:17&lt;00:00,  8.87s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1632,7 +1639,7 @@ Diverse Counterfactuals found! total time taken: 00 min 03 sec
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 03 sec
+Diverse Counterfactuals found! total time taken: 00 min 09 sec
 Query instance (original outcome : 1)
 </pre></div></div>
 </div>
@@ -1947,8 +1954,8 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
-<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-max&quot;)
+exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
 </pre></div>
 </div>
 </div>
@@ -1956,10 +1963,10 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-<span class="c1"># highlight only the changes</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
+dice_exp = exp.generate_counterfactuals(x_test[1:3], total_CFs=4, desired_class=&quot;opposite&quot;)
+# highlight only the changes
+dice_exp.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
 </div>
@@ -1968,7 +1975,7 @@ Diverse Counterfactual set (new outcome: 0.0)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  4.35it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.44it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2082,7 +2089,7 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>63.0</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2094,14 +2101,14 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>1</th>
-      <td>19.0</td>
-      <td>-</td>
-      <td>-</td>
-      <td>Single</td>
+      <td>68.0</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>18.0</td>
       <td>0</td>
     </tr>
     <tr>
@@ -2109,22 +2116,22 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>Single</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Female</td>
-      <td>-</td>
+      <td>7.0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>65.0</td>
+      <td>83.0</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
+      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
@@ -2235,11 +2242,11 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>17.0</td>
       <td>-</td>
       <td>-</td>
-      <td>Divorced</td>
       <td>-</td>
+      <td>Separated</td>
+      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2250,8 +2257,8 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Separated</td>
-      <td>Sales</td>
+      <td>Divorced</td>
+      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2259,10 +2266,10 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>2</th>
-      <td>65.0</td>
+      <td>23.0</td>
       <td>-</td>
+      <td>Some-college</td>
       <td>-</td>
-      <td>Separated</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2274,11 +2281,11 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Separated</td>
+      <td>Single</td>
+      <td>-</td>
+      <td>Other</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>18.0</td>
       <td>0</td>
     </tr>
   </tbody>
