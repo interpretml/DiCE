@@ -13,7 +13,7 @@ from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
 
-class DiceKD(ExplainerBase):
+class DiceBall(ExplainerBase):
 
     def __init__(self, data_interface, model_interface):
         """Init method
@@ -38,7 +38,6 @@ class DiceKD(ExplainerBase):
 
         # loading trained model
         self.model.load_model()
-
         # number of output nodes of ML model
         if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(
@@ -107,8 +106,8 @@ class DiceKD(ExplainerBase):
             raise ValueError("Desired class should be within 0 and num_classes-1.")
 
         # Partitioned dataset and KD Tree for each class (binary) of the dataset
-        self.dataset_with_predictions, self.KD_tree, self.predictions = \
-            self.build_KD_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
+        self.dataset_with_predictions, self.Ball_tree, self.predictions = \
+            self.build_Ball_tree(data_df_copy, desired_range, desired_class, self.predicted_outcome_name)
         query_instance, cfs_preds = self.find_counterfactuals(data_df_copy,
                                                               query_instance, query_instance_orig,
                                                               desired_range,
@@ -135,7 +134,6 @@ class DiceKD(ExplainerBase):
     def predict_fn(self, input_instance):
         """returns predictions"""
         return self.model.get_output(input_instance, model_score=False)
-        return self.model.get_output(input_instance, model_score=False)
 
     def do_sparsity_check(self, cfs, query_instance, sparsity_weight):
         cfs = cfs.assign(sparsity=np.nan, distancesparsity=np.nan)
@@ -158,7 +156,7 @@ class DiceKD(ExplainerBase):
 
         return cfs
 
-    def vary_valid(self, KD_query_instance, total_CFs, features_to_vary, permitted_range, query_instance,
+    def vary_valid(self, Ball_tree_query_instance, total_CFs, features_to_vary, permitted_range, query_instance,
                    sparsity_weight):
         """This function ensures that we only vary features_to_vary when generating counterfactuals"""
 
@@ -166,10 +164,10 @@ class DiceKD(ExplainerBase):
         num_queries = min(len(self.dataset_with_predictions), total_CFs * 10)
         cfs = []
 
-        if self.KD_tree is not None and num_queries > 0:
-            KD_tree_output = self.KD_tree.query(KD_query_instance, num_queries)
-            distances = KD_tree_output[0][0]
-            indices = KD_tree_output[1][0]
+        if self.Ball_tree is not None and num_queries > 0:
+            Ball_tree_output = self.Ball_tree.query(Ball_tree_query_instance, num_queries)
+            distances = Ball_tree_output[0][0]
+            indices = Ball_tree_output[1][0]
 
             cfs = self.dataset_with_predictions.iloc[indices].copy()
             cfs['distance'] = distances
@@ -182,7 +180,7 @@ class DiceKD(ExplainerBase):
         total_cfs_found = 0
 
         # Iterating through the closest points from the KD tree and checking if any of these are valid
-        if self.KD_tree is not None and total_CFs > 0:
+        if self.Ball_tree is not None and total_CFs > 0:
             for i in range(len(cfs)):
                 if total_cfs_found == total_CFs:
                     break
