@@ -2,17 +2,16 @@
    frameworks such as Tensorflow or PyTorch or sklearn, and different methods
    such as RandomSampling, DiCEKD or DiCEGenetic"""
 
-from raiutils.exceptions import UserConfigValidationException
-
 from dice_ml.constants import BackEndTypes, SamplingStrategy
 from dice_ml.data_interfaces.private_data_interface import PrivateData
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.utils.exception import UserConfigValidationException
 
 
 class Dice(ExplainerBase):
     """An interface class to different DiCE implementations."""
 
-    def __init__(self, data_interface, model_interface, method="random",  **kwargs):
+    def __init__(self, data_interface, model_interface,method,encoder,  **kwargs):
         """Init method
 
         :param data_interface: an interface to access data related params.
@@ -28,10 +27,14 @@ class Dice(ExplainerBase):
                 raise UserConfigValidationException(
                     'Private data interface is not supported with kdtree explainer'
                     ' since kdtree explainer needs access to entire training data')
+        if method == SamplingStrategy.BallTree and isinstance(data_interface, PrivateData):
+                raise UserConfigValidationException(
+                    'Private data interface is not supported with balltree explainer'
+                    ' since kdtree explainer needs access to entire training data')
         self.__class__ = decide(model_interface, method)
         self.__init__(data_interface, model_interface, **kwargs)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs,
+    def _generate_counterfactuals(self, query_instance, total_CFs,encoder,
                                   desired_class="opposite", desired_range=None,
                                   permitted_range=None, features_to_vary="all",
                                   stopping_threshold=0.5, posthoc_sparsity_param=0.1,
@@ -54,9 +57,16 @@ def decide(model_interface, method):
     elif method == SamplingStrategy.Genetic:
         from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
         return DiceGenetic
+    elif method == SamplingStrategy.Genetic_Conformance:
+        from dice_ml.explainer_interfaces.dice_genetic_conformance import DiceGeneticConformance
+        return DiceGeneticConformance
     elif method == SamplingStrategy.KdTree:
         from dice_ml.explainer_interfaces.dice_KD import DiceKD
         return DiceKD
+    elif method == SamplingStrategy.BallTree:
+        from dice_ml.explainer_interfaces.dice_Ball import DiceBall
+        return DiceBall
+
     elif method == SamplingStrategy.Gradient:
         if model_interface.backend == BackEndTypes.Tensorflow1:
             # pretrained Keras Sequential model with Tensorflow 1.x backend

@@ -1,4 +1,4 @@
-"""Constants for dice-ml package."""
+"""Constants for DiCE package."""
 
 
 class BackEndTypes:
@@ -13,7 +13,9 @@ class BackEndTypes:
 class SamplingStrategy:
     Random = 'random'
     Genetic = 'genetic'
+    Genetic_Conformance = 'genetic_conformance'
     KdTree = 'kdtree'
+    BallTree = 'balltree'
     Gradient = 'gradient'
 
 
