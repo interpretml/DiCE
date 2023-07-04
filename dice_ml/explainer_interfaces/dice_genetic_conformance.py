@@ -596,12 +596,14 @@ class DiceGeneticConformance(ExplainerBase):
             population = np.unique(tuple(map(tuple, population)), axis=0)
             ##TODO: Add conformance checking here before computing fitness
             if optimization == 'filtering':
+                '''
                 if iterations == 1:
                     self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
                         query_instance, population, encoder, dataset, d4py
                     )
                     population = population[np.where(self.conformance_score > 0.85)]
-                if iterations == 2:
+                '''
+                if iterations % 2 == 0:
                     self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
                         query_instance, population, encoder, dataset, d4py
                     )

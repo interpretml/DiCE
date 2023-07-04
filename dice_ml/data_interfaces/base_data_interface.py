@@ -1,10 +1,10 @@
-"""Module containing base class for data interfaces for dice-ml."""
+"""Module containing base class for data interfaces for DiCE."""
 
 from abc import ABC, abstractmethod
 
 from raiutils.exceptions import UserConfigValidationException
 
-from dice_ml.utils.exception import SystemException
+from DiCE.dice_ml.utils.exception import SystemException
 
 
 class _BaseData(ABC):
