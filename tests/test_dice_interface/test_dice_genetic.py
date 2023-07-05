@@ -1,5 +1,5 @@
 import pytest
-import sklearn 
+import sklearn
 from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
