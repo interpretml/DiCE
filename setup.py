@@ -29,7 +29,7 @@ setuptools.setup(
     url="https://github.com/interpretml/DiCE",
     download_url="https://github.com/interpretml/DiCE/archive/v"+VERSION_STR+".tar.gz",
     python_requires='>=3.6',
-    packages=setuptools.find_packages(setuptools.find_packages(exclude=['tests*']),
+    packages=setuptools.find_packages(exclude=['tests*']),
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
