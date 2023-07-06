@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from raiutils.exceptions import UserConfigValidationException
 
-from DiCE.dice_ml.utils.exception import SystemException
+from dice_ml.utils.exception import SystemException
 
 
 class _BaseData(ABC):

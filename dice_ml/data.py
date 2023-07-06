@@ -6,7 +6,7 @@ private data whose meta data are only available (such as the feature names and
 range/levels of different features) by specifying appropriate parameters.
 """
 
-from DiCE.dice_ml.data_interfaces.base_data_interface import _BaseData
+from dice_ml.data_interfaces.base_data_interface import _BaseData
 
 
 class Data(_BaseData):
