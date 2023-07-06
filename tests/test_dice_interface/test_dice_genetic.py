@@ -1,9 +1,10 @@
 import pytest
+import sklearn
 from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.neuralnetworks import FFNetwork
+from dice_ml.utils.neuralnetworks import FFNetwork, MulticlassNetwork
 
 BACKENDS = ['sklearn', 'PYT']
 
@@ -177,6 +178,33 @@ class TestDiceGeneticMultiClassificationMethods:
         mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
         custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
         assert custom_preds[0] == desired_class
+
+    # Testing if the shapes of the predictions are correct for multiclass classification
+    @pytest.mark.parametrize(("desired_class", "method"), [(1, "genetic")])
+    def test_multiclass_nn(self, desired_class, method):
+        backend = "PYT"
+        dataset = helpers.load_custom_testing_dataset_multiclass()
+
+        # Transform the categorical data to numbers to test the neural network
+        label_enc = sklearn.preprocessing.LabelEncoder()
+        dataset['Categorical'] = label_enc.fit_transform(dataset['Categorical'])
+
+        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical', 'Categorical'], outcome_name='Outcome')
+
+        # Load the neural network for multiclass classification and generate an explainer
+        df = d.data_df
+        num_class = len(df['Outcome'].unique())
+        model = MulticlassNetwork(input_size=df.drop("Outcome", axis=1).shape[1], num_class=num_class)
+        m = dice_ml.Model(model=model, backend=backend)
+        exp = dice_ml.Dice(d, m, method=method)
+
+        # Test the function that returns the predictions
+        _, _, preds = exp.build_KD_tree(
+            df.copy(), desired_range=None, desired_class=desired_class,
+            predicted_outcome_name=d.outcome_name + '_pred'
+        )
+        assert hasattr(preds, "shape"), "The object that contains the predictions doesn't have a 'shape' attribute."
+        assert preds.shape[0] == df.shape[0], "The number of predictions differs from the number of elements in the dataset."
 
 
 class TestDiceGeneticRegressionMethods:

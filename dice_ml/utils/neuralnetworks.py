@@ -19,3 +19,21 @@ class FFNetwork(nn.Module):
         if not self.is_classifier:
             out = 3 * out  # output between 0 and 3
         return out
+
+
+class MulticlassNetwork(nn.Module):
+    def __init__(self, input_size: int, num_class: int):
+        super(MulticlassNetwork, self).__init__()
+
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, 16),
+            nn.ReLU(),
+            nn.Linear(16, num_class)
+        )
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        x = self.linear_relu_stack(x)
+        out = self.softmax(x)
+
+        return out
