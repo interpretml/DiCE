@@ -178,7 +178,7 @@ class TestDiceGeneticMultiClassificationMethods:
         mocker.patch('dice_ml.model_interfaces.base_model.BaseModel.get_output', return_value=[[0, 0.5, 0.5]])
         custom_preds = self.exp._predict_fn_custom(sample_custom_query_2, desired_class)
         assert custom_preds[0] == desired_class
-    
+
     # Testing if the shapes of the predictions are correct for multiclass classification
     @pytest.mark.parametrize(("desired_class", "method"), [(1, "genetic")])
     def test_multiclass_nn(self, desired_class, method):
@@ -200,12 +200,12 @@ class TestDiceGeneticMultiClassificationMethods:
 
         # Test the function that returns the predictions
         _, _, preds = exp.build_KD_tree(
-            df.copy(), desired_range=None, desired_class=desired_class, 
+            df.copy(), desired_range=None, desired_class=desired_class,
             predicted_outcome_name=d.outcome_name + '_pred'
         )
         assert hasattr(preds, "shape"), "The object that contains the predictions doesn't have a 'shape' attribute."
-        assert preds.shape[0] == df.shape[0], f"The number of predictions differ from the number of elements in the passed dataset."
-   
+        assert preds.shape[0] == df.shape[0], "The number of predictions differs from the number of elements in the dataset."
+
 
 class TestDiceGeneticRegressionMethods:
     @pytest.fixture(autouse=True)
