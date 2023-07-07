@@ -10,7 +10,6 @@ import tempfile
 import nbformat
 import pytest
 
-
 NOTEBOOKS_PATH = "docs/source/notebooks/"
 
 # Adding the dice root folder to the python path so that jupyter notebooks
