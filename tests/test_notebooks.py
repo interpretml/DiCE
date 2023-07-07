@@ -10,24 +10,47 @@ import tempfile
 import nbformat
 import pytest
 
+
 NOTEBOOKS_PATH = "docs/source/notebooks/"
-notebooks_list = [f.name for f in os.scandir(NOTEBOOKS_PATH) if f.name.endswith(".ipynb")]
-# notebooks that should not be run
-advanced_notebooks = [
-        "DiCE_with_advanced_options.ipynb",  # requires tensorflow 1.x
-        "DiCE_getting_started_feasible.ipynb",  # needs changes after latest refactor
-        "Benchmarking_different_CF_explanation_methods.ipynb"
-]
-# notebooks that don't need to run on python 3.10
-torch_notebooks_not_3_10 = [
-    "DiCE_getting_started.ipynb"
-]
 
 # Adding the dice root folder to the python path so that jupyter notebooks
 if 'PYTHONPATH' not in os.environ:
     os.environ['PYTHONPATH'] = os.getcwd()
 elif os.getcwd() not in os.environ['PYTHONPATH'].split(os.pathsep):
     os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + os.pathsep + os.getcwd()
+
+
+def get_notebook_parameter_list():
+    notebooks_list = [f.name for f in os.scandir(NOTEBOOKS_PATH) if f.name.endswith(".ipynb")]
+    # notebooks that should not be run
+    advanced_notebooks = [
+            "DiCE_with_advanced_options.ipynb",  # requires tensorflow 1.x
+            "DiCE_getting_started_feasible.ipynb",  # needs changes after latest refactor
+            "Benchmarking_different_CF_explanation_methods.ipynb"
+    ]
+    # notebooks that don't need to run on python 3.10
+    torch_notebooks_not_3_10 = [
+        "DiCE_getting_started.ipynb"
+    ]
+
+    # Creating the list of notebooks to run
+    parameter_list = []
+    for nb in notebooks_list:
+        if nb in advanced_notebooks:
+            param = pytest.param(
+                nb,
+                marks=[pytest.mark.skip, pytest.mark.advanced],
+                id=nb)
+        elif sys.version_info >= (3, 10) and nb in torch_notebooks_not_3_10:
+            param = pytest.param(
+                nb,
+                marks=[pytest.mark.skip, pytest.mark.advanced],
+                id=nb)
+        else:
+            param = pytest.param(nb, id=nb)
+        parameter_list.append(param)
+
+    return parameter_list
 
 
 def _check_notebook_cell_outputs(filepath):
@@ -74,25 +97,7 @@ def _notebook_run(filepath):
     return errors
 
 
-# Creating the list of notebooks to run
-parameter_list = []
-for nb in notebooks_list:
-    if nb in advanced_notebooks:
-        param = pytest.param(
-            nb,
-            marks=[pytest.mark.skip, pytest.mark.advanced],
-            id=nb)
-    elif sys.version_info >= (3, 10) and nb in torch_notebooks_not_3_10:
-        param = pytest.param(
-            nb,
-            marks=[pytest.mark.skip, pytest.mark.advanced],
-            id=nb)
-    else:
-        param = pytest.param(nb, id=nb)
-    parameter_list.append(param)
-
-
-@pytest.mark.parametrize("notebook_filename", parameter_list)
+@pytest.mark.parametrize("notebook_filename", get_notebook_parameter_list())
 @pytest.mark.notebook_tests()
 def test_notebook(notebook_filename):
     _check_notebook_cell_outputs(NOTEBOOKS_PATH + notebook_filename)
