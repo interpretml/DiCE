@@ -8,7 +8,6 @@ import timeit
 import numpy as np
 import pandas as pd
 import os
-from src.encoding.common import get_encoded_df, EncodingType
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
