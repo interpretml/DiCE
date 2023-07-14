@@ -471,20 +471,18 @@ class DiceGeneticConformance(ExplainerBase):
         '''
         filter_query = original_query_df[original_query_df.isin(activities)]
         child = filter_query[filter_query.notnull()]
-        child = [
-        k1df[j][0] if k1df[j][0] in targets else k1df[j][0] if k1df[j][0] in targets
-        else np.random.choice([x for x in encoder._label_dict[j].keys() if x not in activations])
-        if ('prefix' in j) and (child[j].isnull().values == True)
-        else child[j][0]
-        for j in self.data_interface.feature_names
-        ]
-        child = pd.DataFrame([child], columns=self.data_interface.feature_names)
-        encoder.encode(child)
         child = child.to_numpy().reshape(-1)
-        child = np.array(child)
+
         for j in range(self.data_interface.number_of_features):
             feat_name = self.data_interface.feature_names[j]
-            if 'prefix' not in feat_name:
+            if 'prefix' in feat_name:
+                if k1df[feat_name][0] in targets:
+                    child[j] = k1df[feat_name][0]
+                elif k2df[feat_name][0] in targets:
+                    child[j] = k2df[feat_name][0]
+                else:
+                    child[j] = np.random.choice([x for x in encoder._label_dict[feat_name].keys() if x not in activations])
+            elif 'prefix' not in feat_name:
                 gp1 = k1[j]
                 gp2 = k2[j]
                 if prob < 0.40:
@@ -505,7 +503,11 @@ class DiceGeneticConformance(ExplainerBase):
                         child[j] = query_instance[j]
             else:
                 pass
+        
+        child = pd.DataFrame([child], columns=self.data_interface.feature_names)
+        encoder.encode(child)
         return child
+    
     #mate_1 represents the first heuristic where we do not use the activities again, no matter whether they are a target or not
     def mate_1(self, k1, k2, features_to_vary, query_instance, encoder, d4py, activities, activations, targets):
         """Performs mating and produces new offsprings"""
@@ -530,20 +532,18 @@ class DiceGeneticConformance(ExplainerBase):
         '''
         filter_query = original_query_df[original_query_df.isin(activities)]
         child = filter_query[filter_query.notnull()]
-        child = [
-            k2df[j][0] if k1df[j][0] in activities else k1df[j][0] if k2df[j][0] in activities
-            else np.random.choice([x for x in encoder._label_dict[j].keys() if x not in activities])
-            if ('prefix' in j) and (child[j].isnull().values == True)
-            else child[j][0]
-            for j in self.data_interface.feature_names
-        ]
-        child = pd.DataFrame([child], columns=self.data_interface.feature_names)
-        encoder.encode(child)
         child = child.to_numpy().reshape(-1)
-        child = np.array(child)
+
         for j in range(self.data_interface.number_of_features):
             feat_name = self.data_interface.feature_names[j]
-            if 'prefix' not in feat_name:
+            if 'prefix' in feat_name:
+                if k1df[feat_name][0] in activities:
+                    child[j] = k2df[feat_name][0]
+                elif k2df[feat_name][0] in activities:
+                    child[j] = k1df[feat_name][0]
+                else:
+                    child[j] = np.random.choice([x for x in encoder._label_dict[feat_name].keys() if x not in activities])
+            elif 'prefix' not in feat_name:
                 gp1 = k1[j]
                 gp2 = k2[j]
                 if prob < 0.40:
@@ -564,7 +564,11 @@ class DiceGeneticConformance(ExplainerBase):
                         child[j] = query_instance[j]
             else:
                 pass
+
+        child = pd.DataFrame([child], columns=self.data_interface.feature_names)
+        encoder.encode(child)
         return child
+    
     def find_counterfactuals(self, query_instance, desired_range, desired_class,
                              features_to_vary, maxiterations, thresh, verbose,encoder,dataset,model_path,d4py,optimization,
                              heuristic,activities,activations,targets):
