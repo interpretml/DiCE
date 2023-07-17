@@ -302,8 +302,8 @@ class DiceGeneticConformance(ExplainerBase):
                                       yloss_type, diversity_loss_type, feature_weights, proximity_weight,
                                       sparsity_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose)
         d4py = Declare4Py()
-        #d4py.parse_decl_model(os.path.join(model_path,(dataset+'_'+str(encoder.prefix_length)+'.decl')))
-        d4py.parse_decl_model(os.path.join(model_path,(dataset+'.decl')))
+        d4py.parse_decl_model(os.path.join(model_path,(dataset+'_'+str(encoder.prefix_length)+'.decl')))
+        #d4py.parse_decl_model(os.path.join(model_path,(dataset+'.decl')))
         activities, activations, targets = self.get_constraint_activities(d4py)
         '''
         start_time = timeit.default_timer()
@@ -785,9 +785,9 @@ class DiceGeneticConformance(ExplainerBase):
         event_log = pm4py.convert_to_event_log(long_data_sorted)
         query_log = pm4py.convert_to_event_log(long_query_instance_sorted)
         d4py.load_xes_log(event_log)
-        model_check_res = d4py.conformance_checking(consider_vacuity=True)
+        model_check_res = d4py.conformance_checking(consider_vacuity=False)
         d4py.load_xes_log(query_log)
-        model_check_query = d4py.conformance_checking(consider_vacuity=True)
+        model_check_query = d4py.conformance_checking(consider_vacuity=False)
         query_patterns = {
             constraint
             for trace, patts in model_check_query.items()
