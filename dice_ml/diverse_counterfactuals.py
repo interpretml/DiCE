@@ -1,4 +1,3 @@
-import copy
 import json
 
 import pandas as pd
@@ -98,13 +97,12 @@ class CounterfactualExamples:
             elif hasattr(self.data_interface, 'data_df') and \
                     display_sparse_df is True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. ',
-                      'displaying Diverse Counterfactual set without sparsity correction (new outcome : %i)' %
-                      (self.new_outcome))
+                      'displaying Diverse Counterfactual set without sparsity correction (new outcome : {})'.format(self.new_outcome))
                 self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
                                   is_notebook_console=is_notebook_console)
             elif not hasattr(self.data_interface, 'data_df'):  # for private data
                 print('\nDiverse Counterfactual set without sparsity correction since only metadata about each',
-                      ' feature is available (new outcome: %i)' % (self.new_outcome))
+                      ' feature is available (new outcome: {}'.format(self.new_outcome))
                 self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
                                   is_notebook_console=is_notebook_console)
             else:
@@ -119,7 +117,7 @@ class CounterfactualExamples:
         from IPython.display import display
 
         # original instance
-        print('Query instance (original outcome : %i)' % round(self.test_pred))
+        print('Query instance (original outcome : {0})'.format(self.test_pred))
         display(self.test_instance_df)  # works only in Jupyter notebook
         self._visualize_internal(display_sparse_df=display_sparse_df,
                                  show_only_changes=show_only_changes,
@@ -142,7 +140,7 @@ class CounterfactualExamples:
 
     def visualize_as_list(self, display_sparse_df=True, show_only_changes=False):
         # original instance
-        print('Query instance (original outcome : %i)' % round(self.test_pred))
+        print('Query instance (original outcome : {})'.format(self.test_pred))
         print(self.test_instance_df.values.tolist()[0])
         self._visualize_internal(display_sparse_df=display_sparse_df,
                                  show_only_changes=show_only_changes,

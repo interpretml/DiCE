@@ -274,11 +274,10 @@ class DiceGenetic(ExplainerBase):
         self.x1 = query_instance
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)
+        test_pred = self.predict_fn_scores(query_instance)
 
         self.test_pred = test_pred
-
-        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
+        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred[0])
 
         query_instance_df_dummies = pd.get_dummies(query_instance_orig)
         for col in self.data_interface.get_all_dummy_colnames():
@@ -299,7 +298,7 @@ class DiceGenetic(ExplainerBase):
                                           final_cfs_df_sparse=self.final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
-                                          desired_class=desired_class,
+                                          desired_class=self.decode_model_output(pd.Series(self.target_cf_class[0]))[0],
                                           model_type=self.model.model_type)
 
     def predict_fn_scores(self, input_instance):
@@ -508,12 +507,15 @@ class DiceGenetic(ExplainerBase):
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
         query_instance_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.test_pred)
+        query_instance_df[self.data_interface.outcome_name] = self.decode_model_output(query_instance_df[self.data_interface.outcome_name])
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
+            self.final_cfs_df[self.data_interface.outcome_name] = self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
             self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.cfs_preds
+            self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
             self.round_to_precision()
 
         self.elapsed = timeit.default_timer() - self.start_time

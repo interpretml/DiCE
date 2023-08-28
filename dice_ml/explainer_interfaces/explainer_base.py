@@ -756,6 +756,13 @@ class ExplainerBase(ABC):
         else:
             return self.target_cf_range[0] <= model_score and model_score <= self.target_cf_range[1]
 
+    def decode_model_output(self, encoded_labels):
+        if self.model.model_type == ModelTypes.Classifier:
+            if hasattr(self.model.model, "classes_"): # sklearn model
+                label_dict = {idx: label for idx, label in enumerate(self.model.model.classes_)}
+                return encoded_labels.apply(lambda x: label_dict[x])
+        return encoded_labels # no op
+
     def get_model_output_from_scores(self, model_scores):
         if self.model.model_type == ModelTypes.Classifier:
             output_type = np.int32
@@ -801,7 +808,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.get_model_output_from_scores(self.model.get_output(dataset_instance, model_score=False)).flatten()
+        predictions = self.get_model_output_from_scores(self.model.get_output(dataset_instance, model_score=True)).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 
