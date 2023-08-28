@@ -758,10 +758,10 @@ class ExplainerBase(ABC):
 
     def decode_model_output(self, encoded_labels):
         if self.model.model_type == ModelTypes.Classifier:
-            if hasattr(self.model.model, "classes_"): # sklearn model
+            if hasattr(self.model.model, "classes_"):  # sklearn model
                 label_dict = {idx: label for idx, label in enumerate(self.model.model.classes_)}
                 return encoded_labels.apply(lambda x: label_dict[x])
-        return encoded_labels # no op
+        return encoded_labels  # no op
 
     def get_model_output_from_scores(self, model_scores):
         if self.model.model_type == ModelTypes.Classifier:

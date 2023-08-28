@@ -1,7 +1,7 @@
+import copy
 import json
 
 import pandas as pd
-
 from dice_ml.constants import ModelTypes, _SchemaVersions
 from dice_ml.utils.serialize import DummyDataInterface
 
@@ -97,7 +97,8 @@ class CounterfactualExamples:
             elif hasattr(self.data_interface, 'data_df') and \
                     display_sparse_df is True and self.final_cfs_df_sparse is None:
                 print('\nPlease specify a valid posthoc_sparsity_param to perform sparsity correction.. ',
-                      'displaying Diverse Counterfactual set without sparsity correction (new outcome : {})'.format(self.new_outcome))
+                      'displaying Diverse Counterfactual set without',
+                      'sparsity correction (new outcome : {})'.format(self.new_outcome))
                 self._dump_output(content=self.final_cfs_df, show_only_changes=show_only_changes,
                                   is_notebook_console=is_notebook_console)
             elif not hasattr(self.data_interface, 'data_df'):  # for private data

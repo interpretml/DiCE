@@ -122,11 +122,14 @@ class DiceKD(ExplainerBase):
                                                               limit_steps_ls)
         self.cfs_preds = cfs_preds
         # Decoding the output label back to original data type (e.g., str labels)
-        query_instance[self.data_interface.outcome_name] = self.decode_model_output(query_instance[self.data_interface.outcome_name])
+        query_instance[self.data_interface.outcome_name] = \
+            self.decode_model_output(query_instance[self.data_interface.outcome_name])
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-            self.final_cfs_df[self.data_interface.outcome_name] = self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
-            self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
+            self.final_cfs_df[self.data_interface.outcome_name] = \
+                self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
+            self.final_cfs_df_sparse[self.data_interface.outcome_name] = \
+                self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=self.final_cfs_df,
                                           test_instance_df=query_instance,
