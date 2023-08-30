@@ -6,4 +6,5 @@ twine
 pytest-mock
 torch
 # Pin scikit-learn
+cython<3.0.0
 scikit-learn<1.1.2
