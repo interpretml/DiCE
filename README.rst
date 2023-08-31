@@ -1,7 +1,10 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
+|BuildStatusTests|_ |BuildStatusNotebooks|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
 
-.. |BuildStatus| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
-.. _BuildStatus: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+.. |BuildStatusTests| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
+.. _BuildStatusTests: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+
+.. |BuildStatusNotebooks| image:: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml/badge.svg?branch=main
+.. _BuildStatusNotebooks: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml?query=workflow%3A%22Notebook+tests%22
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/dice-ml
 .. _PyPiVersion: https://pypi.org/project/dice-ml/
