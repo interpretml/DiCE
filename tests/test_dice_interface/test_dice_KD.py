@@ -190,8 +190,6 @@ class TestDiceKDBinaryVarsClassificationMethods:
         self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
-        import pdb
-        pdb.set_trace()
         assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[0])
         assert all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 
