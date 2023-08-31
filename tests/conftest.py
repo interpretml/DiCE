@@ -1,8 +1,13 @@
 import pickle
 from collections import OrderedDict
+from itertools import product
 
+import dice_ml
 import pandas as pd
 import pytest
+import torch
+from dice_ml.utils import helpers
+from dice_ml.utils.neuralnetworks import FFNetwork
 from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_california_housing, load_iris
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
@@ -10,13 +15,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-import dice_ml
-from dice_ml.utils import helpers
-from dice_ml.utils.neuralnetworks import FFNetwork
-import torch
-
-from itertools import product
 
 BACKENDS = ['sklearn', 'PYT']
 
@@ -132,7 +130,7 @@ def genetic_regression_exp_object(request):
 @pytest.fixture(scope='session')
 def KD_binary_classification_exp_object():
     backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset()
+    dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     model = _load_custom_testing_binary_model()
     m = dice_ml.Model(model=model, backend=backend)
@@ -141,9 +139,9 @@ def KD_binary_classification_exp_object():
 
 
 @pytest.fixture(scope='session')
-def KD_binary_vars_classification_exp_object(load_custom_vars_testing_dataset):
+def KD_binary_vars_classification_exp_object():
     backend = 'sklearn'
-    dataset = load_custom_vars_testing_dataset
+    dataset = load_custom_vars_testing_dataset()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     model = _load_custom_vars_dataset_model()
     m = dice_ml.Model(model=model, backend=backend)
@@ -361,7 +359,6 @@ def _load_custom_testing_regression_model():
     return model
 
 
-@pytest.fixture(scope='session')
 def load_custom_vars_testing_dataset():
     data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])

@@ -22,6 +22,7 @@ jobs:
         exclude:
           - os: macos-latest
             python-version: "3.7"
+        fail-fast: true
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.os }}

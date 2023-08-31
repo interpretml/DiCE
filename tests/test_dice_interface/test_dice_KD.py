@@ -1,7 +1,6 @@
+import dice_ml
 import numpy as np
 import pytest
-
-import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
@@ -191,6 +190,8 @@ class TestDiceKDBinaryVarsClassificationMethods:
         self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
+        import pdb
+        pdb.set_trace()
         assert all(self.exp.final_cfs_df.Numerical == expected_output.Numerical[0])
         assert all(self.exp.final_cfs_df.Categorical == expected_output.Categorical[0])
 

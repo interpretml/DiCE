@@ -1,10 +1,9 @@
+import dice_ml
 import pytest
 import sklearn
-from raiutils.exceptions import UserConfigValidationException
-
-import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.neuralnetworks import MulticlassNetwork
+from raiutils.exceptions import UserConfigValidationException
 
 
 class TestDiceGeneticBinaryClassificationMethods:
