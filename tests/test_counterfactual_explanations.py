@@ -109,17 +109,6 @@ class TestCounterfactualExplanations:
                 list(counterfactual_explanations.local_importance[index].keys())
 
 
-@pytest.fixture(scope='session')
-def random_binary_classification_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset_binary()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='random')
-    return exp
-
-
 class TestSerializationCounterfactualExplanations:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, random_binary_classification_exp_object):

@@ -4,50 +4,7 @@ from raiutils.exceptions import UserConfigValidationException
 
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.neuralnetworks import FFNetwork, MulticlassNetwork
-
-BACKENDS = ['sklearn', 'PYT']
-
-
-@pytest.fixture(scope="module", params=['sklearn'])
-def genetic_binary_classification_exp_object(request):
-    backend = request.param
-    dataset = helpers.load_custom_testing_dataset_binary()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    if backend == "PYT":
-        net = FFNetwork(4)
-        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
-    else:
-        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='genetic')
-    return exp
-
-
-@pytest.fixture(scope="module", params=['sklearn'])
-def genetic_multi_classification_exp_object(request):
-    backend = request.param
-    dataset = helpers.load_custom_testing_dataset_multiclass()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='genetic')
-    return exp
-
-
-@pytest.fixture(scope="module", params=BACKENDS)
-def genetic_regression_exp_object(request):
-    backend = request.param
-    dataset = helpers.load_custom_testing_dataset_regression()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    if backend == "PYT":
-        net = FFNetwork(4, is_classifier=False)
-        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
-    else:
-        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
-    exp = dice_ml.Dice(d, m, method='genetic')
-    return exp
+from dice_ml.utils.neuralnetworks import MulticlassNetwork
 
 
 class TestDiceGeneticBinaryClassificationMethods:

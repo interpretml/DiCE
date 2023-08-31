@@ -7,50 +7,6 @@ from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.utils import helpers
 
 
-@pytest.fixture(scope='session')
-def KD_binary_classification_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='kdtree')
-    return exp
-
-
-@pytest.fixture(scope='session')
-def KD_binary_vars_classification_exp_object(load_custom_vars_testing_dataset):
-    backend = 'sklearn'
-    dataset = load_custom_vars_testing_dataset
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_vars_dataset_modelpath_pipeline()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='kdtree')
-    return exp
-
-
-@pytest.fixture(scope='session')
-def KD_multi_classification_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset_multiclass()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='kdtree')
-    return exp
-
-
-@pytest.fixture(scope='session')
-def KD_regression_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset_regression()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
-    exp = dice_ml.Dice(d, m, method='kdtree')
-    return exp
-
-
 class TestDiceKDBinaryClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, KD_binary_classification_exp_object):
