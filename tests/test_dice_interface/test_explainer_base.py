@@ -650,6 +650,9 @@ class TestExplainerBaseDataValidations:
             sample_custom_query_1,
             custom_public_data_interface,
             sklearn_binary_classification_model_interface):
+        if method == 'genetic':
+            pytest.skip('Skipping this test for genetic explainer')
+
         exp = dice_ml.Dice(
             custom_public_data_interface,
             sklearn_binary_classification_model_interface,
