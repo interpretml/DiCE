@@ -1,13 +1,8 @@
-from itertools import product
-
-import dice_ml
 import pytest
-import torch
+from raiutils.exceptions import UserConfigValidationException
+
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
-from dice_ml.utils import helpers
-from dice_ml.utils.neuralnetworks import FFNetwork
-from raiutils.exceptions import UserConfigValidationException
 
 BACKENDS = ['sklearn', 'PYT']
 

@@ -1,10 +1,9 @@
 import json
 
-import dice_ml
 import pytest
-from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.utils import helpers
 from raiutils.exceptions import UserConfigValidationException
+
+from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 
 class TestCounterfactualExplanations:
@@ -110,8 +109,8 @@ class TestCounterfactualExplanations:
 
 class TestSerializationCounterfactualExplanations:
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, random_binary_classification_exp_object):
-        self.exp = random_binary_classification_exp_object  # explainer object
+    def _initiate_exp_object(self, binary_classification_exp_object):
+        self.exp = binary_classification_exp_object  # explainer object
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])

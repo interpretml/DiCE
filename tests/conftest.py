@@ -1,13 +1,9 @@
-import pickle
 from collections import OrderedDict
 from itertools import product
 
-import dice_ml
 import pandas as pd
 import pytest
 import torch
-from dice_ml.utils import helpers
-from dice_ml.utils.neuralnetworks import FFNetwork
 from sklearn.compose import ColumnTransformer
 from sklearn.datasets import fetch_california_housing, load_iris
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
@@ -16,12 +12,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+import dice_ml
+from dice_ml.utils import helpers
+from dice_ml.utils.neuralnetworks import FFNetwork
+
 BACKENDS = ['sklearn', 'PYT']
 
 DATA_INTERFACES = ['private', 'public']
 
 
-@pytest.fixture(scope="module", params=product(BACKENDS, DATA_INTERFACES))
+@pytest.fixture(scope="session", params=product(BACKENDS, DATA_INTERFACES))
 def random_binary_classification_exp_object(request):
     backend, dinterface = request.param
     if dinterface == "public":
@@ -168,17 +168,6 @@ def KD_regression_exp_object():
     model = _load_custom_testing_regression_model()
     m = dice_ml.Model(model=model, backend=backend, model_type='regressor')
     exp = dice_ml.Dice(d, m, method='kdtree')
-    return exp
-
-
-@pytest.fixture(scope='session')
-def random_binary_classification_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset_binary()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    model = _load_custom_testing_binary_model()
-    m = dice_ml.Model(model=model, backend=backend)
-    exp = dice_ml.Dice(d, m, method='random')
     return exp
 
 

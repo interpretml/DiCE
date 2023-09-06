@@ -1,9 +1,8 @@
-import dice_ml
 import numpy as np
 import pytest
+
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
-from dice_ml.utils import helpers
 
 
 class TestDiceKDBinaryClassificationMethods:
@@ -34,15 +33,6 @@ class TestDiceKDBinaryClassificationMethods:
                                            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
         self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         assert len(self.exp.final_cfs_df) == total_CFs
-        
-        # expected_output = self.exp.data_interface.data_df
-
-        # assert isinstance(self.exp.final_cfs_df.Numerical[
-        #     self.exp.final_cfs_df.Numerical.index[0]],
-        #     type(expected_output.Numerical[0]))
-        # assert isinstance(self.exp.final_cfs_df.Categorical[
-        #     self.exp.final_cfs_df.Categorical.index[0]],
-        #     type(expected_output.Categorical[0]))
 
     # Verifying the output of the KD tree
     @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 1)])
@@ -59,7 +49,7 @@ class TestDiceKDBinaryClassificationMethods:
     def test_features_to_vary(self, desired_class, sample_custom_query_2, total_CFs, features_to_vary):
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_2, desired_class=desired_class,
                                            total_CFs=total_CFs, features_to_vary=features_to_vary)
-        
+
         self.exp.final_cfs_df.Numerical = self.exp.final_cfs_df.Numerical.astype(int)
         expected_output = self.exp.data_interface.data_df
 
