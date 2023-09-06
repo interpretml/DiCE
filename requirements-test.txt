@@ -5,5 +5,3 @@ pytest-cov
 twine
 pytest-mock
 torch
-# Pin scikit-learn
-scikit-learn<1.1.2
