@@ -25,6 +25,7 @@ def get_notebook_parameter_list():
     advanced_notebooks = [
             "DiCE_with_advanced_options.ipynb",  # requires tensorflow 1.x
             "DiCE_getting_started_feasible.ipynb",  # needs changes after latest refactor
+            "DiCE_with_private_data.ipynb",  # needs compatible version of sklearn to load model
             "Benchmarking_different_CF_explanation_methods.ipynb"
     ]
     # notebooks that don't need to run on python 3.10
