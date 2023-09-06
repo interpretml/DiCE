@@ -70,7 +70,7 @@ class TestDiceGeneticBinaryClassificationMethods:
                                          permitted_range,
                                          initialization):
         if initialization == 'kdtree':
-            pytest.mark.skip("Need to fix this test")
+            pytest.skip("Need to fix this test")
         ans = self.exp.generate_counterfactuals(query_instances=sample_custom_query_2,
                                                 features_to_vary=features_to_vary, permitted_range=permitted_range,
                                                 total_CFs=total_CFs, desired_class=desired_class,
