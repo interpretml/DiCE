@@ -25,8 +25,8 @@ from pymoo.problems import get_problem
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
-from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling, \
-    MixedVariableDuplicateEliminationin
+from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling,\
+    MixedVariableDuplicateElimination
 from pymoo.algorithms.moo.age import AGEMOEA
 import itertools
 from datetime import datetime
@@ -762,7 +762,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
         problem = DiceGeneticProblem(self,vars,desired_range, desired_class, query_instance, features_to_vary, query_instance_normalized,encoder,d4py)
 
 
-        algorithm = AGEMOEA(pop_size=int(self.population_size*4),sampling=MixedVariableSampling( ),
+        algorithm = AGEMOEA(pop_size=int(self.population_size*3),sampling=MixedVariableSampling( ),
                   mating=MixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination()),
                   eliminate_duplicates=False,seed=1234,verbose=True)
         res = minimize(problem, algorithm,termination=('n_gen',30), seed=1234, verbose=True,save_history=True)
@@ -774,13 +774,13 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
         result = Evaluator().eval(problem, all_pop)
 
         population = []
+        results = []
         for inv in all_pop:
             population.append(list(inv.get('X').values()))
+            results.append(inv.get('F'))
         population = np.array(population)
-        '''
-        population = res.X[np.argsort(res.F[:, 3])]
-        population = np.array(pd.DataFrame(list(population), dtype='float64'))
-        '''
+        results = np.array(results)
+        population = population[np.argsort(results[:, 3])]
         self.cfs_preds = []
         self.final_cfs = []
         i = 0
