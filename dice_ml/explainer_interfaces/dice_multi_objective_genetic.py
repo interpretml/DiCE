@@ -26,7 +26,7 @@ from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
 from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling, \
-    MixedVariableDuplicateEliminationin
+    MixedVariableDuplicateElimination
 from pymoo.algorithms.moo.age import AGEMOEA
 import itertools
 from datetime import datetime
