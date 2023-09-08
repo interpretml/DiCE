@@ -14,6 +14,7 @@ class SamplingStrategy:
     Random = 'random'
     Genetic = 'genetic'
     Genetic_Conformance = 'genetic_conformance'
+    MultiObjectiveGenetic = 'multi_objective_genetic'
     KdTree = 'kdtree'
     BallTree = 'balltree'
     Gradient = 'gradient'
