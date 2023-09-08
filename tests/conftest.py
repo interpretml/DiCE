@@ -4,21 +4,14 @@ from itertools import product
 import pandas as pd
 import pytest
 import torch
-from sklearn.compose import ColumnTransformer
+from rai_test_utils.models.sklearn import (
+    create_complex_classification_pipeline, create_complex_regression_pipeline)
 from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import dice_ml
 from dice_ml.utils import helpers
 from dice_ml.utils.neuralnetworks import FFNetwork
-
-from rai_test_utils.models.sklearn import (
-    create_complex_classification_pipeline, create_complex_regression_pipeline)
-
 
 BACKENDS = ['sklearn', 'PYT']
 
