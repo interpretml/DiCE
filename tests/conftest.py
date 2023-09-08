@@ -4,13 +4,10 @@ from itertools import product
 import pandas as pd
 import pytest
 import torch
-from sklearn.compose import ColumnTransformer
+from rai_test_utils.models.sklearn import (
+    create_complex_classification_pipeline, create_complex_regression_pipeline)
 from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import dice_ml
 from dice_ml.utils import helpers
@@ -273,78 +270,46 @@ def private_data_object():
 
 
 def _load_custom_testing_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('classifier', RandomForestClassifier())])
     dataset = helpers.load_custom_testing_dataset()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
 
 def _load_custom_testing_binary_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('classifier', RandomForestClassifier())])
     dataset = helpers.load_custom_testing_dataset_binary()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
 
 def _load_custom_testing_multiclass_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestClassifier())])
     dataset = helpers.load_custom_testing_dataset_multiclass()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
 
 def _load_custom_testing_regression_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestRegressor())])
     dataset = helpers.load_custom_testing_dataset_regression()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_regression_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
 
@@ -354,21 +319,13 @@ def load_custom_vars_testing_dataset():
 
 
 def _load_custom_vars_dataset_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical', 'CategoricalNum'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestClassifier())])
     dataset = load_custom_vars_testing_dataset()
-    model = clf.fit(dataset[["Categorical", "CategoricalNum", "Numerical"]],
-                    dataset["Outcome"])
+    X_train = dataset[["Categorical", "CategoricalNum", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical", "CategoricalNum"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
 
