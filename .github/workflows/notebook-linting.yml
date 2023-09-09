@@ -1,0 +1,31 @@
+# This workflow will lint jupyter notebooks with flake8-nb.
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Notebook linting
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron:  '30 5 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8-nb==0.4.0
+    - name: Lint notebooks with flake8_nb
+      run: |
+        # stop the build if there are flake8 errors in notebooks
+        flake8_nb docs/source/notebooks/ --statistics --max-line-length=127
