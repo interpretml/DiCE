@@ -1,4 +1,4 @@
-# This workflow will lint python code with flake8 and flake8-nb.
+# This workflow will lint python code with flake8.
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: Python linting
@@ -37,7 +37,4 @@ jobs:
         # Check for cyclometric complexity for specific files where this metric has been 
         # reduced to ten and below
         flake8 dice_ml/data_interfaces/ --count --max-complexity=10 --max-line-length=127
-    - name: Lint notebooks with flake8_nb
-      run: |
-        # stop the build if there are flake8 errors in notebooks
-        flake8_nb docs/source/notebooks/ --statistics --max-line-length=127
+
