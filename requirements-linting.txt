@@ -4,7 +4,6 @@ flake8-blind-except
 flake8-breakpoint
 flake8-builtins
 flake8-logging-format
-flake8-nb
 flake8-pytest-style
 flake8-all-not-strings
 isort
