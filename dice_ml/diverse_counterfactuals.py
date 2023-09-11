@@ -135,7 +135,7 @@ class CounterfactualExamples:
             org = self.test_instance_df.values.tolist()[0]
             for ix in range(df.shape[0]):
                 for jx in range(len(org)):
-                    if math.isclose(newdf[ix][jx] == org[jx], rel_tol=org[jx]/10000):
+                    if math.isclose(newdf[ix][jx], org[jx], rel_tol=org[jx]/10000):
                         newdf[ix][jx] = '-'
                     else:
                         newdf[ix][jx] = str(newdf[ix][jx])
