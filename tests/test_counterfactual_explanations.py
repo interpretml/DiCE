@@ -1,12 +1,12 @@
 import json
-
-import pytest
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pandas as pd
+import pytest
 from raiutils.exceptions import UserConfigValidationException
 
-import pandas as pd
-import numpy as np
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 
 
