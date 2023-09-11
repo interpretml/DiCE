@@ -135,10 +135,16 @@ class CounterfactualExamples:
             org = self.test_instance_df.values.tolist()[0]
             for ix in range(df.shape[0]):
                 for jx in range(len(org)):
-                    if math.isclose(newdf[ix][jx], org[jx], rel_tol=abs(org[jx]/10000)):
-                        newdf[ix][jx] = '-'
+                    if not isinstance(newdf[ix][jx], str):
+                        if math.isclose(newdf[ix][jx], org[jx], rel_tol=abs(org[jx]/10000)):
+                            newdf[ix][jx] = '-'
+                        else:
+                            newdf[ix][jx] = str(newdf[ix][jx])
                     else:
-                        newdf[ix][jx] = str(newdf[ix][jx])
+                        if newdf[ix][jx] == org[jx]:
+                            newdf[ix][jx] = '-'
+                        else:
+                            newdf[ix][jx] = str(newdf[ix][jx])
             display(pd.DataFrame(newdf, columns=df.columns, index=df.index))  # works only in Jupyter notebook
 
     def visualize_as_list(self, display_sparse_df=True, show_only_changes=False):
