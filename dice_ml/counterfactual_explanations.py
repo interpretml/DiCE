@@ -2,9 +2,12 @@ import json
 import os
 
 import jsonschema
+import numpy as np
+import pandas as pd
+from counterplots import CreatePlot
 from raiutils.exceptions import UserConfigValidationException
 
-from dice_ml.constants import _SchemaVersions
+from dice_ml.constants import _SchemaVersions, BackEndTypes
 from dice_ml.diverse_counterfactuals import (CounterfactualExamples,
                                              _DiverseCFV2SchemaConstants)
 
@@ -110,6 +113,54 @@ class CounterfactualExplanations:
             cf_examples.visualize_as_list(
                     display_sparse_df=display_sparse_df,
                     show_only_changes=show_only_changes)
+
+    def plot_counterplots(self, dice_model):
+        """Plot counterfactual with CounterPlots package.
+
+        :param dice_model: DiCE's model object.
+        """
+        counterplots_out = []
+        for cf_examples in self.cf_examples_list:
+            features_names = list(cf_examples.test_instance_df.columns)[:-1]
+            features_dtypes = list(cf_examples.test_instance_df.dtypes)[:-1]
+            factual_instance = cf_examples.test_instance_df.to_numpy()[0][:-1]
+
+            def convert_data(x):
+                df_x = pd.DataFrame(data=x, columns=features_names)
+                # Transform each dtype according to features_dtypes
+                for feature_name, f_dtype in zip(features_names, features_dtypes):
+                    df_x[feature_name] = df_x[feature_name].astype(f_dtype)
+
+                return df_x
+
+            if dice_model.backend == BackEndTypes.Sklearn:
+                factual_class_idx = np.argmax(
+                    dice_model.model.predict_proba(convert_data([factual_instance])))
+                def model_pred(x):
+                    # Use one against all strategy
+                    pred_prob = dice_model.model.predict_proba(convert_data(x))
+                    class_f_proba = pred_prob[:, factual_class_idx]
+
+                    # Probability for all other classes (excluding class 0)
+                    not_class_f_proba = 1 - class_f_proba
+
+                    # Normalize to sum to 1
+                    class_f_proba = class_f_proba / (class_f_proba + not_class_f_proba)
+
+                    return class_f_proba
+            else:
+                def model_pred(x):
+                    return dice_model.model.predict(dice_model.transformer.transform(convert_data(x)))
+
+            for cf_instance in cf_examples.final_cfs_df.to_numpy():
+                counterplots_out.append(
+                    CreatePlot(
+                        factual=factual_instance,
+                        cf=cf_instance[:-1],
+                        model_pred=model_pred,
+                        feature_names=features_names,
+                    ))
+        return counterplots_out
 
     @staticmethod
     def _check_cf_exp_output_against_json_schema(
