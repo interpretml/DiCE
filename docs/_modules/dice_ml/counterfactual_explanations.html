@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.counterfactual_explanations &mdash; DiCE 0.9 documentation</title>
+  <title>dice_ml.counterfactual_explanations &mdash; DiCE 0.10 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -50,8 +50,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -87,11 +85,11 @@
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">from</span> <span class="nn">raiutils.exceptions</span> <span class="kn">import</span> <span class="n">UserConfigValidationException</span>
 
 <span class="kn">from</span> <span class="nn">dice_ml.constants</span> <span class="kn">import</span> <span class="n">_SchemaVersions</span>
 <span class="kn">from</span> <span class="nn">dice_ml.diverse_counterfactuals</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CounterfactualExamples</span><span class="p">,</span>
                                              <span class="n">_DiverseCFV2SchemaConstants</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dice_ml.utils.exception</span> <span class="kn">import</span> <span class="n">UserConfigValidationException</span>
 
 
 <span class="k">class</span> <span class="nc">_CommonSchemaConstants</span><span class="p">:</span>
@@ -126,7 +124,7 @@
 
 
 <div class="viewcode-block" id="CounterfactualExplanations"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations">[docs]</a><span class="k">class</span> <span class="nc">CounterfactualExplanations</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A class to store counterfactual examples for one or more inputs</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to store counterfactual examples for one or more inputs</span>
 <span class="sd">    and feature importance scores.</span>
 
 <span class="sd">    :param cf_examples_list: A list of CounterfactualExamples instances</span>
@@ -199,7 +197,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_check_cf_exp_output_against_json_schema</span><span class="p">(</span>
             <span class="n">cf_dict</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate the dictionary version of the counterfactual explanations.</span>
 
 <span class="sd">        :param cf_dict: Serialized version of the counterfactual explanations.</span>
@@ -215,7 +213,7 @@
         <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">cf_dict</span><span class="p">,</span> <span class="n">schema_json</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CounterfactualExplanations.to_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Serialize Explanations object to json.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Serialize Explanations object to json.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">serialization_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">serialization_version</span> <span class="o">==</span> <span class="n">_SchemaVersions</span><span class="o">.</span><span class="n">V1</span><span class="p">:</span>
@@ -309,7 +307,7 @@
 
 <div class="viewcode-block" id="CounterfactualExplanations.from_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.counterfactual_explanations.CounterfactualExplanations.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Deserialize json string to a CounterfactualExplanations object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Deserialize json string to a CounterfactualExplanations object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">json_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">_CommonSchemaConstants</span><span class="o">.</span><span class="n">METADATA</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">:</span>

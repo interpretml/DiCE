@@ -1,7 +1,10 @@
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
+|BuildStatusTests|_ |BuildStatusNotebooks|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
 
-.. |BuildStatus| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
-.. _BuildStatus: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+.. |BuildStatusTests| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
+.. _BuildStatusTests: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+
+.. |BuildStatusNotebooks| image:: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml/badge.svg?branch=main
+.. _BuildStatusNotebooks: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml?query=workflow%3A%22Notebook+tests%22
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/dice-ml
 .. _PyPiVersion: https://pypi.org/project/dice-ml/
@@ -38,7 +41,7 @@ Diverse Counterfactual Explanations (DiCE) for ML
 Explanations are critical for machine learning, especially as machine learning-based systems are being used to inform decisions in societally critical domains such as finance, healthcare, education, and criminal justice.
 However, most explanation methods depend on an approximation of the ML model to
 create an interpretable explanation. For example,
-consider a person who applied for a loan and was rejected by the loan distribution algorithm of a financial company. Typically, the company may provide an explanation on why the loan was rejected, for example, due to "poor credit history". However, such an explanation does not help the person decide *what they do should next* to improve their chances of being approved in the future. Critically, the most important feature may not be enough to flip the decision of the algorithm, and in practice, may not even be changeable such as gender and race.
+consider a person who applied for a loan and was rejected by the loan distribution algorithm of a financial company. Typically, the company may provide an explanation on why the loan was rejected, for example, due to "poor credit history". However, such an explanation does not help the person decide *what they should do next* to improve their chances of being approved in the future. Critically, the most important feature may not be enough to flip the decision of the algorithm, and in practice, may not even be changeable such as gender and race.
 
 
 DiCE implements `counterfactual (CF) explanations <https://arxiv.org/abs/1711.00399>`_  that provide this information by showing feature-perturbed versions of the same person who would have received the loan, e.g., ``you would have received the loan if your income was higher by $10,000``. In other words, it provides "what-if" explanations for model output and can be a useful complement to other explanation methods, both for end-users and model developers.

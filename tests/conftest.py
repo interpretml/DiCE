@@ -1,18 +1,171 @@
-import pickle
 from collections import OrderedDict
+from itertools import product
 
 import pandas as pd
 import pytest
-from sklearn.compose import ColumnTransformer
+import torch
+from rai_test_utils.models.sklearn import (
+    create_complex_classification_pipeline, create_complex_regression_pipeline)
 from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import dice_ml
 from dice_ml.utils import helpers
+from dice_ml.utils.neuralnetworks import FFNetwork
+
+BACKENDS = ['sklearn', 'PYT']
+
+DATA_INTERFACES = ['private', 'public']
+
+
+@pytest.fixture(scope="session", params=product(BACKENDS, DATA_INTERFACES))
+def random_binary_classification_exp_object(request):
+    backend, dinterface = request.param
+    if dinterface == "public":
+        dataset = helpers.load_custom_testing_dataset_binary()
+        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    else:
+        d = dice_ml.Data(features={
+                                   'Numerical': [0, 5],
+                                   'Categorical': ['a', 'b', 'c']},
+                         outcome_name="Outcome")
+    if backend == "PYT":
+        torch.manual_seed(1)
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        model = _load_custom_testing_binary_model()
+        m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='random')
+    return exp
+
+
+# TODO multiclass is not currently supported for neural networks
+@pytest.fixture(scope="module", params=product(['sklearn'], DATA_INTERFACES))
+def random_multi_classification_exp_object(request):
+    backend, dinterface = request.param
+    if dinterface == "public":
+        dataset = helpers.load_custom_testing_dataset_multiclass()
+        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    else:
+        d = dice_ml.Data(features={
+                                   'Numerical': [7, 23],
+                                   'Categorical': ['a', 'b', 'c']},
+                         outcome_name="Outcome")
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        model = _load_custom_testing_multiclass_model()
+        m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='random')
+    return exp
+
+
+@pytest.fixture(scope="module", params=product(BACKENDS, DATA_INTERFACES))
+def random_regression_exp_object(request):
+    backend, dinterface = request.param
+    if dinterface == 'public':
+        dataset = helpers.load_custom_testing_dataset_regression()
+        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    else:
+        d = dice_ml.Data(features={
+                                   'Numerical': [7, 23],
+                                   'Categorical': ['a', 'b', 'c']},
+                         outcome_name="Outcome")
+    if backend == "PYT":
+        net = FFNetwork(4, is_classifier=False)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
+    else:
+        model = _load_custom_testing_regression_model()
+        m = dice_ml.Model(model=model, backend=backend, model_type='regressor')
+    exp = dice_ml.Dice(d, m, method='random')
+    return exp
+
+
+@pytest.fixture(scope="module", params=['sklearn'])
+def genetic_binary_classification_exp_object(request):
+    backend = request.param
+    dataset = helpers.load_custom_testing_dataset_binary()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        model = _load_custom_testing_binary_model()
+        m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='genetic')
+    return exp
+
+
+@pytest.fixture(scope="module", params=['sklearn'])
+def genetic_multi_classification_exp_object(request):
+    backend = request.param
+    dataset = helpers.load_custom_testing_dataset_multiclass()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_testing_multiclass_model()
+    m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='genetic')
+    return exp
+
+
+@pytest.fixture(scope="module", params=BACKENDS)
+def genetic_regression_exp_object(request):
+    backend = request.param
+    dataset = helpers.load_custom_testing_dataset_regression()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    if backend == "PYT":
+        net = FFNetwork(4, is_classifier=False)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
+    else:
+        model = _load_custom_testing_regression_model()
+        m = dice_ml.Model(model=model, backend=backend, model_type='regressor')
+    exp = dice_ml.Dice(d, m, method='genetic')
+    return exp
+
+
+@pytest.fixture(scope='session')
+def KD_binary_classification_exp_object():
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_binary()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_testing_binary_model()
+    m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='kdtree')
+    return exp
+
+
+@pytest.fixture(scope='session')
+def KD_binary_vars_classification_exp_object():
+    backend = 'sklearn'
+    dataset = load_custom_vars_testing_dataset()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_vars_dataset_model()
+    m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='kdtree')
+    return exp
+
+
+@pytest.fixture(scope='session')
+def KD_multi_classification_exp_object():
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_multiclass()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_testing_multiclass_model()
+    m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='kdtree')
+    return exp
+
+
+@pytest.fixture(scope='session')
+def KD_regression_exp_object():
+    backend = 'sklearn'
+    dataset = helpers.load_custom_testing_dataset_regression()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_testing_regression_model()
+    m = dice_ml.Model(model=model, backend=backend, model_type='regressor')
+    exp = dice_ml.Dice(d, m, method='kdtree')
+    return exp
 
 
 @pytest.fixture(scope="session")
@@ -20,8 +173,8 @@ def binary_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    model = _load_custom_testing_binary_model()
+    m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method=method)
     return exp
 
@@ -31,8 +184,8 @@ def binary_classification_exp_object_out_of_order(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_outcome_not_last_column_dataset()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    model = _load_custom_testing_binary_model()
+    m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method=method)
     return exp
 
@@ -42,8 +195,8 @@ def multi_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
+    model = _load_custom_testing_multiclass_model()
+    m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method=method)
     return exp
 
@@ -53,8 +206,8 @@ def regression_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_regression()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
+    model = _load_custom_testing_regression_model()
+    m = dice_ml.Model(model=model, backend=backend, model_type='regressor')
     exp = dice_ml.Dice(d, m, method=method)
     return exp
 
@@ -68,22 +221,22 @@ def custom_public_data_interface():
 
 @pytest.fixture(scope='session')
 def sklearn_binary_classification_model_interface():
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    model = _load_custom_testing_binary_model()
+    m = dice_ml.Model(model=model, backend='sklearn', model_type='classifier')
     return m
 
 
 @pytest.fixture(scope='session')
 def sklearn_multiclass_classification_model_interface():
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='classifier')
+    model = _load_custom_testing_multiclass_model()
+    m = dice_ml.Model(model=model, backend='sklearn', model_type='classifier')
     return m
 
 
 @pytest.fixture(scope='session')
 def sklearn_regression_model_interface():
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    m = dice_ml.Model(model_path=ML_modelpath, backend='sklearn', model_type='regression')
+    model = _load_custom_testing_regression_model()
+    m = dice_ml.Model(model=model, backend='sklearn', model_type='regression')
     return m
 
 
@@ -116,110 +269,64 @@ def private_data_object():
     return dice_ml.Data(features=features_dict, outcome_name='income')
 
 
-def _save_custom_testing_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('classifier', RandomForestClassifier())])
+def _load_custom_testing_model():
     dataset = helpers.load_custom_testing_dataset()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = helpers.get_custom_dataset_modelpath_pipeline()
-    pickle.dump(model, open(modelpath, 'wb'))
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
 
 
-def _save_custom_testing_binary_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('classifier', RandomForestClassifier())])
+def _load_custom_testing_binary_model():
     dataset = helpers.load_custom_testing_dataset_binary()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    pickle.dump(model, open(modelpath, 'wb'))
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
 
 
-def _save_custom_testing_multiclass_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestClassifier())])
+def _load_custom_testing_multiclass_model():
     dataset = helpers.load_custom_testing_dataset_multiclass()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-    pickle.dump(model, open(modelpath, 'wb'))
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
 
 
-def _save_custom_testing_regression_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestRegressor())])
+def _load_custom_testing_regression_model():
     dataset = helpers.load_custom_testing_dataset_regression()
-    model = clf.fit(dataset[["Categorical", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-    pickle.dump(model, open(modelpath, 'wb'))
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_regression_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
 
 
-@pytest.fixture(scope='session')
 def load_custom_vars_testing_dataset():
     data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
 
 
-def _save_custom_vars_dataset_model():
-    numeric_trans = Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
-                                    ('scaler', StandardScaler())])
-    cat_trans = Pipeline(steps=[('imputer',
-                                SimpleImputer(fill_value='missing',
-                                              strategy='constant')),
-                                ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-    transformations = ColumnTransformer(transformers=[('num', numeric_trans,
-                                                      ['Numerical']),
-                                                      ('cat', cat_trans,
-                                                      pd.Index(['Categorical', 'CategoricalNum'], dtype='object'))])
-    clf = Pipeline(steps=[('preprocessor', transformations),
-                          ('regressor', RandomForestClassifier())])
+def _load_custom_vars_dataset_model():
     dataset = load_custom_vars_testing_dataset()
-    model = clf.fit(dataset[["Categorical", "CategoricalNum", "Numerical"]],
-                    dataset["Outcome"])
-    modelpath = helpers.get_custom_vars_dataset_modelpath_pipeline()
-    pickle.dump(model, open(modelpath, 'wb'))
+    X_train = dataset[["Categorical", "CategoricalNum", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical", "CategoricalNum"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
 
 
 @pytest.fixture(scope='session')

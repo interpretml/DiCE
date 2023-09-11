@@ -3,11 +3,10 @@ import json
 import pytest
 from raiutils.exceptions import UserConfigValidationException
 
-import numpy as np
 
+import numpy as np
 import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.utils import helpers
 
 
 class TestCounterfactualExplanations:
@@ -116,25 +115,14 @@ class TestCounterfactualExplanations:
                 list(counterfactual_explanations.local_importance[index].keys())
 
 
-@pytest.fixture(scope='session')
-def random_binary_classification_exp_object():
-    backend = 'sklearn'
-    dataset = helpers.load_custom_testing_dataset_binary()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-    m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='random')
-    return exp
-
-
 class TestSerializationCounterfactualExplanations:
 
     def __init__(self):
         self.predict_fn = lambda x: np.array([1.0 for _ in range(np.array(x).shape[0])])
 
     @pytest.fixture(autouse=True)
-    def _initiate_exp_object(self, random_binary_classification_exp_object):
-        self.exp = random_binary_classification_exp_object  # explainer object
+    def _initiate_exp_object(self, binary_classification_exp_object):
+        self.exp = binary_classification_exp_object  # explainer object
         self.data_df_copy = self.exp.data_interface.data_df.copy()
 
     @pytest.mark.parametrize("version", ['1.0', '2.0'])

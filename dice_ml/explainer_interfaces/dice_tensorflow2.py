@@ -515,7 +515,7 @@ class DiceTensorFlow2(ExplainerBase):
                 temp_cfs_stored = self.round_off_cfs(assign=False)
                 test_preds_stored = [self.predict_fn(tf.constant(cf, dtype=tf.float32)) for cf in temp_cfs_stored]
 
-                if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or
+                if ((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in test_preds_stored)) or
                    (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in test_preds_stored))):
                     avg_preds_dist = np.mean([abs(pred[0][0]-self.stopping_threshold) for pred in test_preds_stored])
                     if avg_preds_dist < self.min_dist_from_threshold[loop_ix]:
@@ -539,7 +539,7 @@ class DiceTensorFlow2(ExplainerBase):
         self.cfs_preds = [self.predict_fn(tf.constant(cfs, dtype=tf.float32)) for cfs in self.final_cfs]
 
         # update final_cfs from backed up CFs if valid CFs are not found
-        if((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or
+        if ((self.target_cf_class == 0 and any(i[0] > self.stopping_threshold for i in self.cfs_preds)) or
            (self.target_cf_class == 1 and any(i[0] < self.stopping_threshold for i in self.cfs_preds))):
             for loop_ix in range(loop_find_CFs):
                 if self.min_dist_from_threshold[loop_ix] != 100:
@@ -583,7 +583,7 @@ class DiceTensorFlow2(ExplainerBase):
         #     self.cfs_preds_sparse = None
 
         m, s = divmod(self.elapsed, 60)
-        if((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or
+        if ((self.target_cf_class == 0 and all(i <= self.stopping_threshold for i in self.cfs_preds)) or
            (self.target_cf_class == 1 and all(i >= self.stopping_threshold for i in self.cfs_preds))):
             self.total_CFs_found = max(loop_find_CFs, self.total_CFs)
             valid_ix = [ix for ix in range(max(loop_find_CFs, self.total_CFs))]  # indexes of valid CFs
@@ -593,7 +593,7 @@ class DiceTensorFlow2(ExplainerBase):
             self.total_CFs_found = 0
             valid_ix = []  # indexes of valid CFs
             for cf_ix, pred in enumerate(self.cfs_preds):
-                if((self.target_cf_class == 0 and pred < self.stopping_threshold) or
+                if ((self.target_cf_class == 0 and pred < self.stopping_threshold) or
                    (self.target_cf_class == 1 and pred > self.stopping_threshold)):
                     self.total_CFs_found += 1
                     valid_ix.append(cf_ix)

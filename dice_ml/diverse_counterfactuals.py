@@ -1,5 +1,6 @@
 import copy
 import json
+import math
 
 import pandas as pd
 
@@ -134,7 +135,7 @@ class CounterfactualExamples:
             org = self.test_instance_df.values.tolist()[0]
             for ix in range(df.shape[0]):
                 for jx in range(len(org)):
-                    if newdf[ix][jx] == org[jx]:
+                    if math.isclose(newdf[ix][jx] == org[jx], rel_tol=org[jx]/10000):
                         newdf[ix][jx] = '-'
                     else:
                         newdf[ix][jx] = str(newdf[ix][jx])
@@ -157,7 +158,7 @@ class CounterfactualExamples:
             org = self.test_instance_df.values.tolist()[0]
             for ix in range(len(newli)):
                 for jx in range(len(newli[ix])):
-                    if newli[ix][jx] == org[jx]:
+                    if math.isclose(newli[ix][jx], org[jx], rel_tol=org[jx]/10000):
                         newli[ix][jx] = '-'
                 print(newli[ix])
 
