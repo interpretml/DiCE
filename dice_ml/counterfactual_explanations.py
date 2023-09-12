@@ -134,12 +134,13 @@ class CounterfactualExplanations:
                 return df_x
 
             if dice_model.backend == BackEndTypes.Sklearn:
-                factual_class_idx = np.argmax(
+                self.factual_class_idx = np.argmax(
                     dice_model.model.predict_proba(convert_data([factual_instance])))
+
                 def model_pred(x):
                     # Use one against all strategy
                     pred_prob = dice_model.model.predict_proba(convert_data(x))
-                    class_f_proba = pred_prob[:, factual_class_idx]
+                    class_f_proba = pred_prob[:, self.factual_class_idx]
 
                     # Probability for all other classes (excluding class 0)
                     not_class_f_proba = 1 - class_f_proba

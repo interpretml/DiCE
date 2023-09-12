@@ -325,7 +325,7 @@ class TestSerializationCounterfactualExplanations:
         assert "Unsupported serialization version {}".format(unsupported_version) in str(ucve)
 
 
-class TestCounterfactualExplanations(unittest.TestCase):
+class TestCounterfactualExplanationsPlot(unittest.TestCase):
 
     @patch('dice_ml.counterfactual_explanations.CreatePlot', return_value="dummy_plot")
     def test_plot_counterplots_sklearn(self, mock_create_plot):
@@ -357,10 +357,10 @@ class TestCounterfactualExplanations(unittest.TestCase):
         result = counterfact.plot_counterplots(dummy_model)
 
         # Assert the CreatePlot was called twice (as there are 2 counterfactual instances)
-        self.assertEqual(mock_create_plot.call_count, 2)
+        assert mock_create_plot.call_count == 2
 
         # Assert that the result is as expected
-        self.assertEqual(result, ["dummy_plot", "dummy_plot"])
+        assert result == ["dummy_plot", "dummy_plot"]
 
     @patch('dice_ml.counterfactual_explanations.CreatePlot', return_value="dummy_plot")
     def test_plot_counterplots_non_sklearn(self, mock_create_plot):
@@ -394,7 +394,7 @@ class TestCounterfactualExplanations(unittest.TestCase):
         result = counterfact.plot_counterplots(dummy_model)
 
         # Assert the CreatePlot was called twice (as there are 2 counterfactual instances)
-        self.assertEqual(mock_create_plot.call_count, 2)
+        assert mock_create_plot.call_count == 2
 
         # Assert that the result is as expected
-        self.assertEqual(result, ["dummy_plot", "dummy_plot"])
+        assert result == ["dummy_plot", "dummy_plot"]
