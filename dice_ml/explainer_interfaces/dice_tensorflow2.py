@@ -341,8 +341,7 @@ class DiceTensorFlow2(ExplainerBase):
                         one_init.append(np.random.uniform(self.minx[0][i], self.maxx[0][i]))
                 else:
                     one_init.append(query_instance[0][i])
-            one_init = np.array([one_init], dtype=np.float32)
-            self.cfs[n].assign(one_init)
+            self.cfs[n].assign(np.array([one_init], dtype=np.float32))
 
     def round_off_cfs(self, assign=False):
         """function for intermediate projection of CFs."""

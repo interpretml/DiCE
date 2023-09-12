@@ -5,6 +5,7 @@ This code is similar to 'GeCo: Quality Counterfactual Explanations in Real Time'
 import copy
 import random
 import timeit
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -27,7 +28,7 @@ class DiceGenetic(ExplainerBase):
         self.num_output_nodes = None
 
         # variables required to generate CFs - see generate_counterfactuals() for more info
-        self.cfs = []
+        self.cfs = pd.DataFrame()
         self.features_to_vary = []
         self.cf_init_weights = []  # total_CFs, algorithm, features_to_vary
         self.loss_weights = []  # yloss_type, diversity_loss_type, feature_weights
@@ -343,12 +344,16 @@ class DiceGenetic(ExplainerBase):
 
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
-        yloss = 0.0
+        yloss: Any = 0.0
         if self.model.model_type == ModelTypes.Classifier:
             predicted_value = np.array(self.predict_fn_scores(cfs))
             if self.yloss_type == 'hinge_loss':
                 maxvalue = np.full((len(predicted_value)), -np.inf)
-                for c in range(self.num_output_nodes):
+                if self.num_output_nodes is None:
+                    num_output_nodes = 0
+                else:
+                    num_output_nodes = self.num_output_nodes
+                for c in range(num_output_nodes):
                     if c != desired_class:
                         maxvalue = np.maximum(maxvalue, predicted_value[:, c])
                 yloss = np.maximum(0, maxvalue - predicted_value[:, int(desired_class)])
@@ -429,7 +434,7 @@ class DiceGenetic(ExplainerBase):
     def find_counterfactuals(self, query_instance, desired_range, desired_class,
                              features_to_vary, maxiterations, thresh, verbose):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
-        population = self.cfs.copy()
+        population: Any = self.cfs.copy()
         iterations = 0
         previous_best_loss = -np.inf
         current_best_loss = np.inf

@@ -30,10 +30,9 @@ class DiceRandom(ExplainerBase):
         self.model.transformer.initialize_transform_func()
 
         self.precisions = self.data_interface.get_decimal_precisions(output_type="dict")
-        if self.data_interface.outcome_name in self.precisions:
-            self.outcome_precision = [self.precisions[self.data_interface.outcome_name]]
-        else:
-            self.outcome_precision = 0
+        self.outcome_precision = [
+            self.precisions[self.data_interface.outcome_name]
+        ] if self.data_interface.outcome_name in self.precisions else 0
 
     def _generate_counterfactuals(self, query_instance, total_CFs, desired_range=None,
                                   desired_class="opposite", permitted_range=None,

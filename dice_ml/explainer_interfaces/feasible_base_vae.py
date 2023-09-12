@@ -136,8 +136,9 @@ class FeasibleBaseVAE(ExplainerBase):
             train_loss = 0.0
             train_size = 0
 
-            train_dataset = torch.tensor(self.vae_train_feat).float()
-            train_dataset = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+            train_dataset = torch.utils.data.DataLoader(
+                torch.tensor(self.vae_train_feat).float(),  # type: ignore
+                batch_size=self.batch_size, shuffle=True)
             for train in enumerate(train_dataset):
                 self.cf_vae_optimizer.zero_grad()
 
@@ -178,8 +179,7 @@ class FeasibleBaseVAE(ExplainerBase):
         final_cf_pred = []
         final_test_pred = []
         for i in range(len(query_instance)):
-            train_x = test_dataset[i]
-            train_x = torch.tensor(train_x).float()
+            train_x = torch.tensor(test_dataset[i]).float()
             train_y = torch.argmax(self.pred_model(train_x), dim=1)
 
             curr_gen_cf = []
