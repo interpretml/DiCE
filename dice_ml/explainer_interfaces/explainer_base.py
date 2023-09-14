@@ -5,6 +5,7 @@
 import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
@@ -47,12 +48,36 @@ class ExplainerBase(ABC):
         # self.cont_precisions = \
         #   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
+    def _find_features_having_missing_values(
+            self, data: Any) -> List[str]:
+        """Return list of features which have missing values.
+
+        :param data: The dataset to check.
+        :type data: Any
+        :return: List of feature names which have missing values.
+        :rtype: List[str]
+        """
+        if not isinstance(data, pd.DataFrame):
+            return []
+
+        list_of_feature_having_missing_values = []
+        for feature in data.columns.tolist():
+            if np.any(data[feature].isnull()):
+                list_of_feature_having_missing_values.append(feature)
+        return list_of_feature_having_missing_values
+
     def _validate_counterfactual_configuration(
             self, query_instances, total_CFs,
             desired_class="opposite", desired_range=None,
             permitted_range=None, features_to_vary="all",
             stopping_threshold=0.5, posthoc_sparsity_param=0.1,
             posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+
+        if len(self._find_features_having_missing_values(query_instances)) > 0:
+            raise UserConfigValidationException(
+                "The query instance(s) should not have any missing values. "
+                "Please impute the missing values and try again."
+            )
 
         if total_CFs <= 0:
             raise UserConfigValidationException(
