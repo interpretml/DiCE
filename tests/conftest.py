@@ -6,8 +6,6 @@ import pytest
 import torch
 from rai_test_utils.models.sklearn import (
     create_complex_classification_pipeline, create_complex_regression_pipeline)
-from sklearn.datasets import fetch_california_housing, load_iris
-from sklearn.model_selection import train_test_split
 
 import dice_ml
 from dice_ml.utils import helpers
@@ -436,24 +434,3 @@ def sample_counterfactual_example_dummy():
                         1, 1, 1, 1, 1]
         }
     )
-
-
-@pytest.fixture(scope='session')
-def create_iris_data():
-    iris = load_iris()
-    x_train, x_test, y_train, y_test = train_test_split(
-        iris.data, iris.target, test_size=0.2, random_state=0)
-    feature_names = iris.feature_names
-    classes = iris.target_names
-    return x_train, x_test, y_train, y_test, feature_names, classes
-
-
-@pytest.fixture(scope='session')
-def create_housing_data():
-    housing = fetch_california_housing()
-    x_train, x_test, y_train, y_test = train_test_split(
-        housing.data, housing.target,
-        test_size=0.2, random_state=7)
-    x_train = pd.DataFrame(data=x_train, columns=housing.feature_names)
-    x_test = pd.DataFrame(data=x_test, columns=housing.feature_names)
-    return x_train, x_test, y_train, y_test, housing.feature_names

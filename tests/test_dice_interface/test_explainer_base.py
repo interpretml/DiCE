@@ -3,6 +3,7 @@ import re
 import numpy as np
 import pandas as pd
 import pytest
+from rai_test_utils.datasets.tabular import create_housing_data
 from raiutils.exceptions import UserConfigValidationException
 from sklearn.ensemble import RandomForestRegressor
 
@@ -443,9 +444,12 @@ class TestExplainerBaseRegression:
 
     @pytest.mark.parametrize(("desired_range", "method"),
                              [([3, 5], 'random')])
-    def test_numeric_categories(self, desired_range, method, create_housing_data):
+    def test_numeric_categories(self, desired_range, method):
         x_train, x_test, y_train, y_test, feature_names = \
-            create_housing_data
+            create_housing_data()
+
+        x_train = pd.DataFrame(data=x_train, columns=feature_names)
+        x_test = pd.DataFrame(data=x_test, columns=feature_names)
 
         rfc = RandomForestRegressor(n_estimators=10, max_depth=4,
                                     random_state=777)
