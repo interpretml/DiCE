@@ -1,6 +1,6 @@
 import setuptools
 
-VERSION_STR = "0.9"
+VERSION_STR = "0.10"
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
@@ -29,16 +29,16 @@ setuptools.setup(
     url="https://github.com/interpretml/DiCE",
     download_url="https://github.com/interpretml/DiCE/archive/v"+VERSION_STR+".tar.gz",
     python_requires='>=3.6',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['tests*']),
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],

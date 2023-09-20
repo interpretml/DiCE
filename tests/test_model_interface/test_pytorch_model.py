@@ -7,7 +7,7 @@ from dice_ml.utils.helpers import DataTransfomer
 pyt = pytest.importorskip("torch")
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def pyt_model_object():
     backend = 'PYT'
     ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)

@@ -1,10 +1,7 @@
 ipython
 jupyter
-nbformat
 pytest
 pytest-cov
 twine
 pytest-mock
-torch
-# Pin scikit-learn
-scikit-learn<1.1.2
+rai_test_utils

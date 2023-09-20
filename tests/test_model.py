@@ -1,9 +1,10 @@
 import pytest
+from rai_test_utils.datasets.tabular import create_iris_data
+from raiutils.exceptions import UserConfigValidationException
 from sklearn.ensemble import RandomForestClassifier
 
 import dice_ml
 from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class TestBaseModelLoader:
@@ -41,9 +42,9 @@ class TestModelUserValidations:
         model = rfc.fit(X, y)
         return model
 
-    def test_model_user_validation_model_type(self, create_iris_data):
+    def test_model_user_validation_model_type(self):
         x_train, x_test, y_train, y_test, feature_names, classes = \
-            create_iris_data
+            create_iris_data()
         trained_model = self.create_sklearn_random_forest_classifier(x_train, y_train)
 
         assert dice_ml.Model(model=trained_model, backend='sklearn', model_type='classifier') is not None

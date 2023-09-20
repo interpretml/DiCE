@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Advanced options to customize Counterfactual Explanations &mdash; DiCE 0.9 documentation</title>
+  <title>Advanced options to customize Counterfactual Explanations &mdash; DiCE 0.10 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Generate feasible counterfactual explanations using a VAE" href="DiCE_getting_started_feasible.html" />
+    <link rel="next" title="&lt;no title&gt;" href="DiCE_getting_started_feasible.html" />
     <link rel="prev" title="Generating counterfactual explanations without access to training data" href="DiCE_with_private_data.html" /> 
 </head>
 
@@ -62,8 +62,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#3.-Trading-off-between-proximity-and-diversity-goals">3. Trading off between proximity and diversity goals</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -382,159 +380,50 @@ div.rendered_html tbody tr:hover {
 <li><p>Trading off between proximity and diversity goals</p></li>
 <li><p>Selecting the features to change</p></li>
 </ul>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">seed</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from numpy.random import seed
 
-<span class="c1"># import DiCE</span>
-<span class="kn">import</span> <span class="nn">dice_ml</span>
-<span class="kn">from</span> <span class="nn">dice_ml.utils</span> <span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
+# import DiCE
+import dice_ml
+from dice_ml.utils import helpers  # helper functions
 
-<span class="c1"># Tensorflow libraries</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+# Tensorflow libraries
+import tensorflow as tf
 
-<span class="c1"># supress deprecation warnings from TF</span>
-<span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+# supress deprecation warnings from TF
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2022-10-19 14:55:55.631881: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2022-10-19 14:55:55.635417: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2022-10-19 14:55:55.635428: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
 </pre></div>
 </div>
 </div>
 <section id="Loading-dataset">
 <h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this heading"></a></h2>
 <p>We use “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as detailed in <strong>dice_ml.utils.helpers</strong> module.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
-<span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset = helpers.load_adult_income_dataset()
+dataset.head()
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>age</th>
-      <th>workclass</th>
-      <th>education</th>
-      <th>marital_status</th>
-      <th>occupation</th>
-      <th>race</th>
-      <th>gender</th>
-      <th>hours_per_week</th>
-      <th>income</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>28</td>
-      <td>Private</td>
-      <td>Bachelors</td>
-      <td>Single</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>60</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>30</td>
-      <td>Self-Employed</td>
-      <td>Assoc</td>
-      <td>Married</td>
-      <td>Professional</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>65</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>32</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>20</td>
-      <td>Private</td>
-      <td>Some-college</td>
-      <td>Single</td>
-      <td>Service</td>
-      <td>White</td>
-      <td>Female</td>
-      <td>35</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>41</td>
-      <td>Self-Employed</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>White-Collar</td>
-      <td>White</td>
-      <td>Male</td>
-      <td>50</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d = dice_ml.Data(dataframe=dataset, continuous_features=[&#39;age&#39;, &#39;hours_per_week&#39;], outcome_name=&#39;income&#39;)
 </pre></div>
 </div>
 </div>
@@ -543,146 +432,74 @@ div.rendered_html tbody tr:hover {
 <h2>1. Loading a custom ML model<a class="headerlink" href="#1.-Loading-a-custom-ML-model" title="Permalink to this heading"></a></h2>
 <p>Below, we use an Artificial Neural Network based on Tensorflow framework.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># seeding random numbers for reproducability</span>
-<span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="c1"># from tensorflow import set_random_seed; set_random_seed(2) # for tf1</span>
-<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># seeding random numbers for reproducability
+seed(1)
+# from tensorflow import set_random_seed; set_random_seed(2) # for tf1
+tf.random.set_seed(1)
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;TF&#39;</span><span class="o">+</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># TF1</span>
-<span class="c1"># provide the trained ML model to DiCE&#39;s model object</span>
-<span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
-<span class="c1"># Step 2: dice_ml.Model</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>backend = &#39;TF&#39;+tf.__version__[0]  # TF1
+# provide the trained ML model to DiCE&#39;s model object
+ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
+# Step 2: dice_ml.Model
+m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Generate-diverse-counterfactuals">
 <h2>Generate diverse counterfactuals<a class="headerlink" href="#Generate-diverse-counterfactuals" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiCE</span>
-<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># initiate DiCE
+exp = dice_ml.Dice(d, m)
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2022-10-19 14:56:14.394561: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-2022-10-19 14:56:14.394614: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-2022-10-19 14:56:14.394632: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
-2022-10-19 14:56:14.394838: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># query instance in the form of a dictionary; keys: feature name, values: feature value</span>
-<span class="n">query_instance</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
-                  <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="s1">&#39;Private&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="s1">&#39;HS-grad&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;marital_status&#39;</span><span class="p">:</span> <span class="s1">&#39;Single&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;occupation&#39;</span><span class="p">:</span> <span class="s1">&#39;Service&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;race&#39;</span><span class="p">:</span> <span class="s1">&#39;White&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;gender&#39;</span><span class="p">:</span> <span class="s1">&#39;Female&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="mi">45</span><span class="p">}</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># query instance in the form of a dictionary; keys: feature name, values: feature value
+query_instance = {&#39;age&#39;: 22,
+                  &#39;workclass&#39;: &#39;Private&#39;,
+                  &#39;education&#39;: &#39;HS-grad&#39;,
+                  &#39;marital_status&#39;: &#39;Single&#39;,
+                  &#39;occupation&#39;: &#39;Service&#39;,
+                  &#39;race&#39;: &#39;White&#39;,
+                  &#39;gender&#39;: &#39;Female&#39;,
+                  &#39;hours_per_week&#39;: 45}
 </pre></div>
 </div>
 </div>
 <p>We now generate counterfactuals for this input. This may take some time to run–the optimization takes more time in tensorflow2.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  0%|                                                                                         | 0/8 [00:00&lt;?, ?it/s]
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [9]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># generate counterfactuals</span>
-<span class="ansi-green-fg">----&gt; 2</span> dice_exp <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">exp</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">generate_counterfactuals</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">total_CFs</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">4</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">desired_class</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">opposite</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/explainer_interfaces/explainer_base.py:160</span>, in <span class="ansi-cyan-fg">ExplainerBase.generate_counterfactuals</span><span class="ansi-blue-fg">(self, query_instances, total_CFs, desired_class, desired_range, permitted_range, features_to_vary, stopping_threshold, posthoc_sparsity_param, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, posthoc_sparsity_algorithm, verbose, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    158</span>     query_instances_list <span style="color: rgb(98,98,98)">=</span> query_instances
-<span class="ansi-green-intense-fg ansi-bold">    159</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> query_instance <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> tqdm(query_instances_list):
-<span class="ansi-green-fg">--&gt; 160</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">data_interface</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">set_continuous_feature_indexes</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    161</span>     res <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_generate_counterfactuals(
-<span class="ansi-green-intense-fg ansi-bold">    162</span>         query_instance, total_CFs,
-<span class="ansi-green-intense-fg ansi-bold">    163</span>         desired_class<span style="color: rgb(98,98,98)">=</span>desired_class,
-<span class="ansi-green-fg">   (...)</span>
-<span class="ansi-green-intense-fg ansi-bold">    170</span>         verbose<span style="color: rgb(98,98,98)">=</span>verbose,
-<span class="ansi-green-intense-fg ansi-bold">    171</span>         <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)
-<span class="ansi-green-intense-fg ansi-bold">    172</span>     cf_examples_arr<span style="color: rgb(98,98,98)">.</span>append(res)
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">_BaseData.set_continuous_feature_indexes</span><span class="ansi-blue-fg">(self, query_instance)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [query_instance<span style="color: rgb(98,98,98)">.</span>columns<span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [<span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">columns</span><span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-<span class="ansi-red-fg">AttributeError</span>: &#39;str&#39; object has no attribute &#39;columns&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize the resutls</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
+dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=&quot;opposite&quot;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [10]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># visualize the resutls</span>
-<span class="ansi-green-fg">----&gt; 2</span> <span class="ansi-yellow-bg">dice_exp</span><span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;dice_exp&#39; is not defined
-</pre></div></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># visualize the resutls
+dice_exp.visualize_as_dataframe(show_only_changes=True)
+</pre></div>
+</div>
 </div>
 </section>
 <section id="2.-Changing-feature-weights">
@@ -690,119 +507,50 @@ Input <span class="ansi-green-fg">In [10]</span>, in <span class="ansi-cyan-fg">
 <p>It may be the case that some features are harder to change than others (e.g., education level is harder to change than working hours per week). DiCE allows input of relative difficulty in changing a feature through specifying <em>feature weights</em>. A higher feature weight means that the feature is harder to change than others. For instance, one way is to use the mean absolute deviation from the median as a measure of relative difficulty of changing a continuous feature.</p>
 <p>Median Absolute Deviation (MAD) of a continuous feature conveys the variability of the feature, and is more robust than standard deviation as is less affected by outliers and non-normality. The inverse of MAD would then imply the ease of varying the feature and is hence used as feature weights in our optimization to reflect the difficulty of changing a continuous feature. By default, DiCE computes this internally and divides the distance between continuous features by the MAD of the feature’s
 values in the training set. Let’s see what their values are by computing them below:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get MAD</span>
-<span class="n">mads</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get_mads</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># get MAD
+mads = d.get_mads(normalized=True)
 
-<span class="c1"># create feature weights</span>
-<span class="n">feature_weights</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">mads</span><span class="p">:</span>
-    <span class="n">feature_weights</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">mads</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">feature_weights</span><span class="p">)</span>
+# create feature weights
+feature_weights = {}
+for feature in mads:
+    feature_weights[feature] = round(1/mads[feature], 2)
+print(feature_weights)
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-{&#39;age&#39;: 7.3, &#39;hours_per_week&#39;: 24.5}
-</pre></div></div>
 </div>
 <p>The above feature weights encode that changing <em>age</em> is approximately seven times more difficult than changing categorical variables, and changing <em>hours_per_week</em> is approximately three times more difficult than changing <em>age</em>. Of course, this may sound odd, since a person cannot change their age. In this case, what it’s reflecting is that there is a higher diversity in age values than hours-per-week values. Below we show how to over-ride these weights to assign custom user-defined weights.</p>
 <p>Now, let’s try to assign unit weights to the continuous features and see how it affects the counterfactual generation. DiCE allows this through <em>feature_weights</em> parameter.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># assigning equal weights</span>
-<span class="n">feature_weights</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
-                                        <span class="n">feature_weights</span><span class="o">=</span><span class="n">feature_weights</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># assigning equal weights
+feature_weights = {&#39;age&#39;: 1, &#39;hours_per_week&#39;: 1}
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  0%|                                                                                         | 0/8 [00:00&lt;?, ?it/s]
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [13]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># generate counterfactuals</span>
-<span class="ansi-green-fg">----&gt; 2</span> dice_exp <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">exp</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">generate_counterfactuals</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">total_CFs</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">4</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">desired_class</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">opposite</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-yellow-bg">                                        </span><span class="ansi-yellow-bg">feature_weights</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">feature_weights</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/explainer_interfaces/explainer_base.py:160</span>, in <span class="ansi-cyan-fg">ExplainerBase.generate_counterfactuals</span><span class="ansi-blue-fg">(self, query_instances, total_CFs, desired_class, desired_range, permitted_range, features_to_vary, stopping_threshold, posthoc_sparsity_param, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, posthoc_sparsity_algorithm, verbose, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    158</span>     query_instances_list <span style="color: rgb(98,98,98)">=</span> query_instances
-<span class="ansi-green-intense-fg ansi-bold">    159</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> query_instance <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> tqdm(query_instances_list):
-<span class="ansi-green-fg">--&gt; 160</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">data_interface</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">set_continuous_feature_indexes</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    161</span>     res <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_generate_counterfactuals(
-<span class="ansi-green-intense-fg ansi-bold">    162</span>         query_instance, total_CFs,
-<span class="ansi-green-intense-fg ansi-bold">    163</span>         desired_class<span style="color: rgb(98,98,98)">=</span>desired_class,
-<span class="ansi-green-fg">   (...)</span>
-<span class="ansi-green-intense-fg ansi-bold">    170</span>         verbose<span style="color: rgb(98,98,98)">=</span>verbose,
-<span class="ansi-green-intense-fg ansi-bold">    171</span>         <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)
-<span class="ansi-green-intense-fg ansi-bold">    172</span>     cf_examples_arr<span style="color: rgb(98,98,98)">.</span>append(res)
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">_BaseData.set_continuous_feature_indexes</span><span class="ansi-blue-fg">(self, query_instance)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [query_instance<span style="color: rgb(98,98,98)">.</span>columns<span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [<span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">columns</span><span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-<span class="ansi-red-fg">AttributeError</span>: &#39;str&#39; object has no attribute &#39;columns&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize the resutls</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
+dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=&quot;opposite&quot;,
+                                        feature_weights=feature_weights)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [14]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># visualize the resutls</span>
-<span class="ansi-green-fg">----&gt; 2</span> <span class="ansi-yellow-bg">dice_exp</span><span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;dice_exp&#39; is not defined
-</pre></div></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># visualize the resutls
+dice_exp.visualize_as_dataframe(show_only_changes=True)
+</pre></div>
+</div>
 </div>
 <p>Note that we transform continuous features and one-hot-encode categorical features to fall between 0 and 1 in order to handle relative scale of features. However, this also means that the relative ease of changing continuous features is higher than categorical features when the total number of continuous features are very less compared to the total number of categories of all categorical variables combined. This is reflected in the above table where continuous features (<em>age</em> and
 <em>hours_per_week</em>) have been varied to reach their extreme values (<em>range of age: [17, 90]</em>; <em>range of hours_per_week: [1, 99]</em>) for most of the counterfactuals. This is the reason why the distances are divided by a scaling factor. Deviation from the median provides a robust measure of the variability of a feature’s values, and thus dividing by the MAD allows us to capture the relative prevalence of observing the feature at a particular value (see our
@@ -811,109 +559,34 @@ Input <span class="ansi-green-fg">In [14]</span>, in <span class="ansi-cyan-fg">
 <section id="3.-Trading-off-between-proximity-and-diversity-goals">
 <h2>3. Trading off between proximity and diversity goals<a class="headerlink" href="#3.-Trading-off-between-proximity-and-diversity-goals" title="Permalink to this heading"></a></h2>
 <p>We acknowledge that not all counterfactual explanations may be feasible for a user. In general, counterfactuals closer to an individual’s profile will be more feasible. Diversity is also important to help an individual choose between multiple possible options. DiCE allows tunable parameters <em>proximity_weight</em> (default: 0.5) and <em>diversity_weight</em> (default: 1.0) to handle proximity and diversity respectively. Below, we increase the proximity weight and see how the counterfactuals change.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># change proximity_weight from default value of 0.5 to 1.5</span>
-<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
-                                        <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  0%|                                                                                         | 0/8 [00:00&lt;?, ?it/s]
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [15]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># change proximity_weight from default value of 0.5 to 1.5</span>
-<span class="ansi-green-fg">----&gt; 2</span> dice_exp <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">exp</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">generate_counterfactuals</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">total_CFs</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">4</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">desired_class</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">opposite</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-yellow-bg">                                        </span><span class="ansi-yellow-bg">proximity_weight</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">1.5</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">diversity_weight</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">1.0</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/explainer_interfaces/explainer_base.py:160</span>, in <span class="ansi-cyan-fg">ExplainerBase.generate_counterfactuals</span><span class="ansi-blue-fg">(self, query_instances, total_CFs, desired_class, desired_range, permitted_range, features_to_vary, stopping_threshold, posthoc_sparsity_param, proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, posthoc_sparsity_algorithm, verbose, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    158</span>     query_instances_list <span style="color: rgb(98,98,98)">=</span> query_instances
-<span class="ansi-green-intense-fg ansi-bold">    159</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> query_instance <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> tqdm(query_instances_list):
-<span class="ansi-green-fg">--&gt; 160</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">data_interface</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">set_continuous_feature_indexes</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    161</span>     res <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_generate_counterfactuals(
-<span class="ansi-green-intense-fg ansi-bold">    162</span>         query_instance, total_CFs,
-<span class="ansi-green-intense-fg ansi-bold">    163</span>         desired_class<span style="color: rgb(98,98,98)">=</span>desired_class,
-<span class="ansi-green-fg">   (...)</span>
-<span class="ansi-green-intense-fg ansi-bold">    170</span>         verbose<span style="color: rgb(98,98,98)">=</span>verbose,
-<span class="ansi-green-intense-fg ansi-bold">    171</span>         <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)
-<span class="ansi-green-intense-fg ansi-bold">    172</span>     cf_examples_arr<span style="color: rgb(98,98,98)">.</span>append(res)
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">_BaseData.set_continuous_feature_indexes</span><span class="ansi-blue-fg">(self, query_instance)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [query_instance<span style="color: rgb(98,98,98)">.</span>columns<span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-File <span class="ansi-green-fg">/mnt/c/Users/amshar/code/dice/dice_ml/data_interfaces/base_data_interface.py:30</span>, in <span class="ansi-cyan-fg">&lt;listcomp&gt;</span><span class="ansi-blue-fg">(.0)</span>
-<span class="ansi-green-intense-fg ansi-bold">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">set_continuous_feature_indexes</span>(<span style="color: rgb(0,135,0)">self</span>, query_instance):
-<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Remaps continuous feature indices based on the query instance&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 30</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_indexes <span style="color: rgb(98,98,98)">=</span> [<span class="ansi-yellow-bg">query_instance</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">columns</span><span style="color: rgb(98,98,98)">.</span>get_loc(name) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> name <span class="ansi-bold" style="color: rgb(175,0,255)">in</span>
-<span class="ansi-green-intense-fg ansi-bold">     31</span>                                        <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>continuous_feature_names]
-
-<span class="ansi-red-fg">AttributeError</span>: &#39;str&#39; object has no attribute &#39;columns&#39;
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize the resutls</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># change proximity_weight from default value of 0.5 to 1.5
+dice_exp = exp.generate_counterfactuals(query_instance, total_CFs=4, desired_class=&quot;opposite&quot;,
+                                        proximity_weight=1.5, diversity_weight=1.0)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [16]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># visualize the resutls</span>
-<span class="ansi-green-fg">----&gt; 2</span> <span class="ansi-yellow-bg">dice_exp</span><span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;dice_exp&#39; is not defined
-</pre></div></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># visualize the resutls
+dice_exp.visualize_as_dataframe(show_only_changes=True)
+</pre></div>
+</div>
 </div>
 <p>As we see from above table, both continuous and categorical features are more closer to the original query instance and the counterfactuals are also less diverse than before.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize the resutls</span>
-<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># visualize the resutls
+dice_exp.visualize_as_dataframe(show_only_changes=True)
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Input <span class="ansi-green-fg">In [17]</span>, in <span class="ansi-cyan-fg">&lt;cell line: 2&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(95,135,135)"># visualize the resutls</span>
-<span class="ansi-green-fg">----&gt; 2</span> <span class="ansi-yellow-bg">dice_exp</span><span style="color: rgb(98,98,98)">.</span>visualize_as_dataframe(show_only_changes<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;dice_exp&#39; is not defined
-</pre></div></div>
 </div>
 </section>
 </section>
@@ -923,7 +596,7 @@ Input <span class="ansi-green-fg">In [17]</span>, in <span class="ansi-cyan-fg">
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="DiCE_with_private_data.html" class="btn btn-neutral float-left" title="Generating counterfactual explanations without access to training data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="DiCE_getting_started_feasible.html" class="btn btn-neutral float-right" title="Generate feasible counterfactual explanations using a VAE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="DiCE_getting_started_feasible.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -6,11 +6,11 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from raiutils.exceptions import UserConfigValidationException
 from sklearn.preprocessing import LabelEncoder
 
 from dice_ml.data_interfaces.base_data_interface import _BaseData
-from dice_ml.utils.exception import (SystemException,
-                                     UserConfigValidationException)
+from dice_ml.utils.exception import SystemException
 
 
 class PublicData(_BaseData):
@@ -138,9 +138,11 @@ class PublicData(_BaseData):
 
     def get_data_type(self, col):
         """Infers data type of a continuous feature from the training data."""
-        if (self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32):
+        if (self.data_df[col].dtype == np.int64) or (self.data_df[col].dtype == np.int32) or \
+                (self.data_df[col].dtype == np.int16) or (self.data_df[col].dtype == np.int8):
             return 'int'
-        elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32):
+        elif (self.data_df[col].dtype == np.float64) or (self.data_df[col].dtype == np.float32) or \
+                (self.data_df[col].dtype == np.float16):
             return 'float'
         else:
             raise ValueError("Unknown data type of feature %s: must be int or float" % col)

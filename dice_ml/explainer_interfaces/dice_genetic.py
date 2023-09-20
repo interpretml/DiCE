@@ -8,11 +8,11 @@ import timeit
 
 import numpy as np
 import pandas as pd
+from raiutils.exceptions import UserConfigValidationException
 
 from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class DiceGenetic(ExplainerBase):
@@ -507,7 +507,7 @@ class DiceGenetic(ExplainerBase):
 
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
-        query_instance_df[self.data_interface.outcome_name] = self.test_pred
+        query_instance_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.test_pred)
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 

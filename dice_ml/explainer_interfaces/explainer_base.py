@@ -5,15 +5,16 @@
 import pickle
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
+from raiutils.exceptions import UserConfigValidationException
 from sklearn.neighbors import KDTree
 from tqdm import tqdm
 
 from dice_ml.constants import ModelTypes, _PostHocSparsityTypes
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
-from dice_ml.utils.exception import UserConfigValidationException
 
 
 class ExplainerBase(ABC):
@@ -47,12 +48,36 @@ class ExplainerBase(ABC):
         # self.cont_precisions = \
         #   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]
 
+    def _find_features_having_missing_values(
+            self, data: Any) -> List[str]:
+        """Return list of features which have missing values.
+
+        :param data: The dataset to check.
+        :type data: Any
+        :return: List of feature names which have missing values.
+        :rtype: List[str]
+        """
+        if not isinstance(data, pd.DataFrame):
+            return []
+
+        list_of_feature_having_missing_values = []
+        for feature in data.columns.tolist():
+            if np.any(data[feature].isnull()):
+                list_of_feature_having_missing_values.append(feature)
+        return list_of_feature_having_missing_values
+
     def _validate_counterfactual_configuration(
             self, query_instances, total_CFs,
             desired_class="opposite", desired_range=None,
             permitted_range=None, features_to_vary="all",
             stopping_threshold=0.5, posthoc_sparsity_param=0.1,
             posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
+
+        if len(self._find_features_having_missing_values(query_instances)) > 0:
+            raise UserConfigValidationException(
+                "The query instance(s) should not have any missing values. "
+                "Please impute the missing values and try again."
+            )
 
         if total_CFs <= 0:
             raise UserConfigValidationException(
@@ -533,7 +558,7 @@ class ExplainerBase(ABC):
                 # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iat[0] - final_cfs_sparse.at[cf_ix, feature]
-                if(abs(diff) <= quantiles[feature]):
+                if (abs(diff) <= quantiles[feature]):
                     if posthoc_sparsity_algorithm == "linear":
                         final_cfs_sparse = self.do_linear_search(diff, decimal_prec, query_instance, cf_ix,
                                                                  feature, final_cfs_sparse, current_pred, limit_steps_ls)
@@ -558,8 +583,8 @@ class ExplainerBase(ABC):
         current_pred = current_pred_orig
         count_steps = 0
         if self.model.model_type == ModelTypes.Classifier:
-            while((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and
-                  self.is_cf_valid(current_pred)) and (count_steps < limit_steps_ls):
+            while ((abs(diff) > 10e-4) and (np.sign(diff*old_diff) > 0) and
+                    self.is_cf_valid(current_pred)) and (count_steps < limit_steps_ls):
 
                 old_val = final_cfs_sparse.at[cf_ix, feature]
                 final_cfs_sparse.at[cf_ix, feature] += np.sign(diff)*change
@@ -801,7 +826,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.model.get_output(dataset_instance, model_score=False).flatten()
+        predictions = self.get_model_output_from_scores(self.model.get_output(dataset_instance, model_score=False)).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 

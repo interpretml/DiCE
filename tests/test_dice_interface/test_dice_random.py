@@ -1,83 +1,12 @@
-from itertools import product
-
 import pytest
-import torch
+from raiutils.exceptions import UserConfigValidationException
 
-import dice_ml
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
-from dice_ml.utils import helpers
-from dice_ml.utils.exception import UserConfigValidationException
-from dice_ml.utils.neuralnetworks import FFNetwork
 
 BACKENDS = ['sklearn', 'PYT']
 
 DATA_INTERFACES = ['private', 'public']
-
-
-@pytest.fixture(scope="module", params=product(BACKENDS, DATA_INTERFACES))
-def random_binary_classification_exp_object(request):
-    backend, dinterface = request.param
-    if dinterface == "public":
-        dataset = helpers.load_custom_testing_dataset_binary()
-        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    else:
-        d = dice_ml.Data(features={
-                                   'Numerical': [0, 5],
-                                   'Categorical': ['a', 'b', 'c']},
-                         outcome_name="Outcome")
-    if backend == "PYT":
-        torch.manual_seed(1)
-        net = FFNetwork(4)
-        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
-    else:
-        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_binary()
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='random')
-    return exp
-
-
-# TODO multiclass is not currently supported for neural networks
-@pytest.fixture(scope="module", params=product(['sklearn'], DATA_INTERFACES))
-def random_multi_classification_exp_object(request):
-    backend, dinterface = request.param
-    if dinterface == "public":
-        dataset = helpers.load_custom_testing_dataset_multiclass()
-        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    else:
-        d = dice_ml.Data(features={
-                                   'Numerical': [7, 23],
-                                   'Categorical': ['a', 'b', 'c']},
-                         outcome_name="Outcome")
-    if backend == "PYT":
-        net = FFNetwork(4)
-        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
-    else:
-        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_multiclass()
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend)
-    exp = dice_ml.Dice(d, m, method='random')
-    return exp
-
-
-@pytest.fixture(scope="module", params=product(BACKENDS, DATA_INTERFACES))
-def random_regression_exp_object(request):
-    backend, dinterface = request.param
-    if dinterface == 'public':
-        dataset = helpers.load_custom_testing_dataset_regression()
-        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    else:
-        d = dice_ml.Data(features={
-                                   'Numerical': [7, 23],
-                                   'Categorical': ['a', 'b', 'c']},
-                         outcome_name="Outcome")
-    if backend == "PYT":
-        net = FFNetwork(4, is_classifier=False)
-        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max", model_type='regressor')
-    else:
-        ML_modelpath = helpers.get_custom_dataset_modelpath_pipeline_regression()
-        m = dice_ml.Model(model_path=ML_modelpath, backend=backend, model_type='regressor')
-    exp = dice_ml.Dice(d, m, method='random')
-    return exp
 
 
 class TestDiceRandomBinaryClassificationMethods:
