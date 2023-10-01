@@ -1,10 +1,9 @@
-|BuildStatusTests|_ |BuildStatusNotebooks|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |CondaVersion|_
+|PyPiVersion|_ |CondaVersion|_ |MITlicense| |PythonSupport|_ |Downloads|_ 
 
-.. |BuildStatusTests| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
-.. _BuildStatusTests: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+|BuildStatusTests|_ |BuildStatusNotebooks|_ 
 
-.. |BuildStatusNotebooks| image:: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml/badge.svg?branch=main
-.. _BuildStatusNotebooks: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml?query=workflow%3A%22Notebook+tests%22
+.. |MITlicense| image:: https://img.shields.io/badge/License-MIT-blue.svg
+.. _MITlicense: https://img.shields.io/badge/License-MIT-blue.svg
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/dice-ml
 .. _PyPiVersion: https://pypi.org/project/dice-ml/
@@ -17,6 +16,12 @@
 
 .. |CondaVersion| image:: https://anaconda.org/conda-forge/dice-ml/badges/version.svg
 .. _CondaVersion: https://anaconda.org/conda-forge/dice-ml
+
+.. |BuildStatusTests| image:: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml/badge.svg?branch=main
+.. _BuildStatusTests: https://github.com/interpretml/DiCE/actions/workflows/python-package.yml?query=workflow%3A%22Python+package%22
+
+.. |BuildStatusNotebooks| image:: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml/badge.svg?branch=main
+.. _BuildStatusNotebooks: https://github.com/interpretml/DiCE/actions/workflows/notebook-tests.yml?query=workflow%3A%22Notebook+tests%22
 
 Diverse Counterfactual Explanations (DiCE) for ML
 ======================================================================
