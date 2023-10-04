@@ -128,15 +128,17 @@ class DiceKD(ExplainerBase):
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
             self.final_cfs_df[self.data_interface.outcome_name] = \
                 self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
-            self.final_cfs_df_sparse[self.data_interface.outcome_name] = \
-                self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
+            if self.final_cfs_df_sparse is not None:
+                self.final_cfs_df_sparse[self.data_interface.outcome_name] = \
+                    self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
+        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class[0]))[0] if hasattr(self, 'target_cf_class')  else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=self.final_cfs_df,
                                           test_instance_df=query_instance,
                                           final_cfs_df_sparse=self.final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
-                                          desired_class=self.decode_model_output(pd.Series(self.target_cf_class[0]))[0],
+                                          desired_class=desired_class_param,
                                           model_type=self.model.model_type)
 
     def predict_fn_scores(self, input_instance):

@@ -81,8 +81,9 @@ class TestDiceKDBinaryClassificationMethods:
 
         expected_output = self.exp.data_interface.data_df.iloc[np.r_[2, 0]][self.exp.data_interface.feature_names]
         expected_output = expected_output.reset_index(drop=True)
-
-        assert all(self.exp.final_cfs_df == expected_output)
+        print(expected_output)
+        print(self.exp.final_cfs_df)
+        assert all(self.exp.final_cfs_df.drop(columns="Outcome") == expected_output)
 
     # Testing for index returned
     @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 1)])

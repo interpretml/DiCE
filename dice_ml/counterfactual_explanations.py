@@ -158,6 +158,7 @@ class CounterfactualExplanations:
             desired_class = None
             desired_range = None
             for cf_examples in self.cf_examples_list:
+                print(cf_examples)
                 cf_examples_str = cf_examples.to_json(
                     serialization_version=serialization_version)
                 # We need to load the json again since we need to decompose the

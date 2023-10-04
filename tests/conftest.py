@@ -349,7 +349,7 @@ def _load_custom_testing_regression_model():
 
 
 def load_custom_vars_testing_dataset():
-    data = [['a', 0, 10, 0], ['b', 1, 10000, 0], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
+    data = [['a', 0, 10, 0], ['b', 1, 10000, 1], ['c', 0, 14, 0], ['a', 2, 88, 0], ['c', 1, 14, 0]]
     return pd.DataFrame(data, columns=['Categorical', 'CategoricalNum', 'Numerical', 'Outcome'])
 
 

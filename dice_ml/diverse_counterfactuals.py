@@ -1,6 +1,6 @@
 import copy
 import json
-
+import numpy as np
 import pandas as pd
 
 from dice_ml.constants import ModelTypes, _SchemaVersions
@@ -33,8 +33,9 @@ def json_converter(obj):
     try:
         return obj.to_json()
     except AttributeError:
+        if isinstance(obj, np.generic):
+            return obj.item()
         return obj.__dict__
-
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""
@@ -207,7 +208,7 @@ class CounterfactualExamples:
                 _DiverseCFV2SchemaConstants.DESIRED_CLASS: self.desired_class,
                 _DiverseCFV2SchemaConstants.DESIRED_RANGE: self.desired_range
             }
-            return json.dumps(alternate_obj)
+            return json.dumps(alternate_obj, default=json_converter)
 
     @staticmethod
     def from_json(cf_example_json_str):

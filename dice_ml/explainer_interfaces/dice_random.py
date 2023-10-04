@@ -183,7 +183,7 @@ class DiceRandom(ExplainerBase):
         # decoding to original label
         test_instance_df[self.data_interface.outcome_name] = \
             self.decode_model_output(test_instance_df[self.data_interface.outcome_name])
-        if self.valid_cfs_found:
+        if final_cfs_df is not None:
             final_cfs_df[self.data_interface.outcome_name] = \
                 self.decode_model_output(final_cfs_df[self.data_interface.outcome_name])
             final_cfs_df_sparse[self.data_interface.outcome_name] = \
@@ -199,13 +199,14 @@ class DiceRandom(ExplainerBase):
                 print('Only %d (required %d) ' % (self.total_cfs_found, self.total_CFs),
                       'Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...',
                       '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
-
+        
+        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class))[0] if hasattr(self, 'target_cf_class') else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
                                           test_instance_df=test_instance_df,
                                           final_cfs_df_sparse=final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
-                                          desired_class=self.decode_model_output(pd.Series(self.target_cf_class))[0],
+                                          desired_class=desired_class_param,
                                           desired_range=desired_range,
                                           model_type=self.model.model_type)
 
