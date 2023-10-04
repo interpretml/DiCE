@@ -1,5 +1,7 @@
 import numpy as np
 import pytest
+from rai_test_utils.datasets.tabular import (create_housing_data,
+                                             create_iris_data)
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 import dice_ml
@@ -14,9 +16,9 @@ class TestModelClassification:
         model = rfc.fit(X, y)
         return model
 
-    def test_base_model_classification(self, create_iris_data):
+    def test_base_model_classification(self):
         x_train, x_test, y_train, y_test, feature_names, classes = \
-            create_iris_data
+            create_iris_data()
         trained_model = self.create_sklearn_random_forest_classifier(x_train, y_train)
 
         diceml_model = dice_ml.Model(model=trained_model, backend='sklearn')
@@ -47,9 +49,9 @@ class TestModelRegression:
         model = rfc.fit(X, y)
         return model
 
-    def test_base_model_regression(self, create_housing_data):
+    def test_base_model_regression(self):
         x_train, x_test, y_train, y_test, feature_names = \
-            create_housing_data
+            create_housing_data()
         trained_model = self.create_sklearn_random_forest_regressor(x_train, y_train)
 
         diceml_model = dice_ml.Model(model=trained_model, model_type='regressor', backend='sklearn')

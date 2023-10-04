@@ -33,8 +33,7 @@ class Model:
         """
         if backend not in BackEndTypes.ALL:
             warnings.warn('{0} backend not in supported backends {1}'.format(
-                backend, ','.join(BackEndTypes.ALL))
-            )
+                backend, ','.join(BackEndTypes.ALL)), stacklevel=2)
 
         if model_type not in ModelTypes.ALL:
             raise UserConfigValidationException('{0} model type not in supported model types {1}'.format(

@@ -4,4 +4,4 @@ pytest
 pytest-cov
 twine
 pytest-mock
-torch
+rai_test_utils
