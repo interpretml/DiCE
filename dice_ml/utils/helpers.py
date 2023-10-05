@@ -141,6 +141,15 @@ def load_custom_testing_dataset_binary():
     data = [['a', 1, 0], ['b', 5, 1], ['c', 2, 0], ['a', 3, 0], ['c', 4, 1]]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
+def load_custom_testing_dataset_binary_str():
+    data = [
+        ["a", 1, "zero"],
+        ["b", 5, "one"],
+        ["c", 2, "zero"],
+        ["a", 3, "one"],
+        ["c", 4, "one"],
+    ]
+    return pd.DataFrame(data, columns=["Categorical", "Numerical", "Outcome"])
 
 def load_custom_testing_dataset_multiclass():
     data = [['a', 10, 1], ['b', 20, 2], ['c', 14, 1], ['a', 23, 2], ['c', 7, 0]]
