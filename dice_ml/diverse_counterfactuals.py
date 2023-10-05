@@ -1,7 +1,8 @@
 import copy
 import json
-import numpy as np
 import math
+
+import numpy as np
 import pandas as pd
 
 from dice_ml.constants import ModelTypes, _SchemaVersions
@@ -37,6 +38,7 @@ def json_converter(obj):
         if isinstance(obj, np.generic):
             return obj.item()
         return obj.__dict__
+
 
 class CounterfactualExamples:
     """A class to store and visualize the resulting counterfactual explanations."""

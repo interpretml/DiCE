@@ -77,6 +77,7 @@ class TestDiceRandomBinaryClassificationMethods:
                 permitted_range[feature][0] <= ans.final_cfs_df[feature].values[i] <= permitted_range[feature][1] for i
                 in range(total_CFs))
 
+
 class TestDiceRandomStrBinaryClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, random_str_binary_classification_exp_object):

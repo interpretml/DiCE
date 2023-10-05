@@ -199,8 +199,9 @@ class DiceRandom(ExplainerBase):
                 print('Only %d (required %d) ' % (self.total_cfs_found, self.total_CFs),
                       'Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...',
                       '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
-        
-        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class))[0] if hasattr(self, 'target_cf_class') else desired_class
+
+        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class))[0] \
+            if hasattr(self, 'target_cf_class') else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
                                           test_instance_df=test_instance_df,

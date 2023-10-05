@@ -37,6 +37,7 @@ def random_binary_classification_exp_object(request):
     exp = dice_ml.Dice(d, m, method='random')
     return exp
 
+
 @pytest.fixture(scope="session", params=product(["sklearn"], DATA_INTERFACES))
 def random_str_binary_classification_exp_object(request):
     backend, dinterface = request.param
@@ -60,6 +61,7 @@ def random_str_binary_classification_exp_object(request):
     exp = dice_ml.Dice(d, m, method="random")
     print(m.model.classes_)
     return exp
+
 
 # TODO multiclass is not currently supported for neural networks
 @pytest.fixture(scope="module", params=product(['sklearn'], DATA_INTERFACES))
@@ -118,6 +120,7 @@ def genetic_binary_classification_exp_object(request):
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
 
+
 @pytest.fixture(scope="module", params=["sklearn"])
 def genetic_binary_str_classification_exp_object(request):
     backend = request.param
@@ -133,6 +136,7 @@ def genetic_binary_str_classification_exp_object(request):
         m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method="genetic")
     return exp
+
 
 @pytest.fixture(scope="module", params=['sklearn'])
 def genetic_multi_classification_exp_object(request):
@@ -326,6 +330,7 @@ def _load_custom_testing_binary_model():
         X_train, y_train, num_feature_names, cat_feature_names)
     return model
 
+
 def _load_custom_testing_binary_str_model():
     dataset = helpers.load_custom_testing_dataset_binary_str()
     X_train = dataset[["Categorical", "Numerical"]]
@@ -335,6 +340,7 @@ def _load_custom_testing_binary_str_model():
     model = create_complex_classification_pipeline(
         X_train, y_train, num_feature_names, cat_feature_names)
     return model
+
 
 def _load_custom_testing_multiclass_model():
     dataset = helpers.load_custom_testing_dataset_multiclass()
