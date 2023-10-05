@@ -59,7 +59,6 @@ def random_str_binary_classification_exp_object(request):
         model = _load_custom_testing_binary_str_model()
         m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method="random")
-    print(m.model.classes_)
     return exp
 
 

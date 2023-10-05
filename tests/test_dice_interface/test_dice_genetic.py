@@ -136,7 +136,11 @@ class TestDiceGeneticBinaryStrClassificationMethods:
             total_CFs=total_CFs,
             desired_class=desired_class,
         )
-        print(ans.cf_examples_list[0].final_cfs_df)
+        assert all(
+            ans.cf_examples_list[0]
+            .final_cfs_df["Outcome"]
+            .isin(["one", "zero"])
+        )
 
 
 class TestDiceGeneticMultiClassificationMethods:
