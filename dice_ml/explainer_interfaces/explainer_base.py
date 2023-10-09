@@ -781,6 +781,13 @@ class ExplainerBase(ABC):
         else:
             return self.target_cf_range[0] <= model_score and model_score <= self.target_cf_range[1]
 
+    def decode_model_output(self, encoded_labels):
+        if self.model.model_type == ModelTypes.Classifier:
+            if hasattr(self.model.model, "classes_"):  # sklearn model
+                label_dict = {idx: label for idx, label in enumerate(self.model.model.classes_)}
+                return encoded_labels.apply(lambda x: label_dict[x])
+        return encoded_labels  # no op
+
     def get_model_output_from_scores(self, model_scores):
         if self.model.model_type == ModelTypes.Classifier:
             output_type = np.int32
@@ -826,7 +833,7 @@ class ExplainerBase(ABC):
         dataset_instance = self.data_interface.prepare_query_instance(
             query_instance=data_df_copy[self.data_interface.feature_names])
 
-        predictions = self.get_model_output_from_scores(self.model.get_output(dataset_instance, model_score=False)).flatten()
+        predictions = self.get_model_output_from_scores(self.model.get_output(dataset_instance, model_score=True)).flatten()
         # TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient
         data_df_copy[predicted_outcome_name] = predictions
 
@@ -866,6 +873,17 @@ class ExplainerBase(ABC):
         if no_cf_generated:
             raise UserConfigValidationException(
                 "No counterfactuals found for any of the query points! Kindly check your configuration.")
+
+    def decode_to_original_labels(self, test_instance_df, final_cfs_df, final_cfs_df_sparse):
+        test_instance_df[self.data_interface.outcome_name] = \
+            self.decode_model_output(test_instance_df[self.data_interface.outcome_name])
+        if final_cfs_df is not None:
+            final_cfs_df[self.data_interface.outcome_name] = \
+                self.decode_model_output(final_cfs_df[self.data_interface.outcome_name])
+            if final_cfs_df_sparse is not None:
+                final_cfs_df_sparse[self.data_interface.outcome_name] = \
+                    self.decode_model_output(final_cfs_df_sparse[self.data_interface.outcome_name])
+        return test_instance_df, final_cfs_df, final_cfs_df_sparse
 
     def serialize_explainer(self, path):
         """Serialize the explainer to the file specified by path."""
