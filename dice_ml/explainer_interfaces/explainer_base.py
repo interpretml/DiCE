@@ -873,6 +873,17 @@ class ExplainerBase(ABC):
         if no_cf_generated:
             raise UserConfigValidationException(
                 "No counterfactuals found for any of the query points! Kindly check your configuration.")
+    
+    def decode_to_original_labels(self, test_instance_df, final_cfs_df, final_cfs_df_sparse):
+        test_instance_df[self.data_interface.outcome_name] = \
+            self.decode_model_output(test_instance_df[self.data_interface.outcome_name])
+        if final_cfs_df is not None:
+            final_cfs_df[self.data_interface.outcome_name] = \
+                self.decode_model_output(final_cfs_df[self.data_interface.outcome_name])
+            if final_cfs_df_sparse is not None:
+                final_cfs_df_sparse[self.data_interface.outcome_name] = \
+                    self.decode_model_output(final_cfs_df_sparse[self.data_interface.outcome_name])
+        return test_instance_df, final_cfs_df, final_cfs_df_sparse
 
     def serialize_explainer(self, path):
         """Serialize the explainer to the file specified by path."""

@@ -509,19 +509,17 @@ class DiceGenetic(ExplainerBase):
         # converting to dataframe
         query_instance_df = self.label_decode(query_instance)
         query_instance_df[self.data_interface.outcome_name] = self.get_model_output_from_scores(self.test_pred)
-        query_instance_df[self.data_interface.outcome_name] = \
-            self.decode_model_output(query_instance_df[self.data_interface.outcome_name])
         self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-            self.final_cfs_df[self.data_interface.outcome_name] = \
-                self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
             self.final_cfs_df_sparse[self.data_interface.outcome_name] = self.cfs_preds
-            self.final_cfs_df_sparse[self.data_interface.outcome_name] = \
-                self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
             self.round_to_precision()
+
+        # decoding to original label
+        query_instance_df, self.final_cfs_df, self.final_cfs_df_sparse = \
+            self.decode_to_original_labels(query_instance_df, self.final_cfs_df, self.final_cfs_df_sparse)
 
         self.elapsed = timeit.default_timer() - self.start_time
         m, s = divmod(self.elapsed, 60)

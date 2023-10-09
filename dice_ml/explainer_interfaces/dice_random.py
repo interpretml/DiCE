@@ -180,14 +180,11 @@ class DiceRandom(ExplainerBase):
 
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
+
         # decoding to original label
-        test_instance_df[self.data_interface.outcome_name] = \
-            self.decode_model_output(test_instance_df[self.data_interface.outcome_name])
+        test_instance_df, final_cfs_df, final_cfs_df_sparse = \
+            self.decode_to_original_labels(test_instance_df, final_cfs_df, final_cfs_df_sparse)
         if final_cfs_df is not None:
-            final_cfs_df[self.data_interface.outcome_name] = \
-                self.decode_model_output(final_cfs_df[self.data_interface.outcome_name])
-            final_cfs_df_sparse[self.data_interface.outcome_name] = \
-                self.decode_model_output(final_cfs_df_sparse[self.data_interface.outcome_name])
             if verbose:
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')

@@ -121,16 +121,12 @@ class DiceKD(ExplainerBase):
                                                               verbose,
                                                               limit_steps_ls)
         self.cfs_preds = cfs_preds
-        # Decoding the output label back to original data type (e.g., str labels)
-        query_instance[self.data_interface.outcome_name] = \
-            self.decode_model_output(query_instance[self.data_interface.outcome_name])
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-            self.final_cfs_df[self.data_interface.outcome_name] = \
-                self.decode_model_output(self.final_cfs_df[self.data_interface.outcome_name])
-            if self.final_cfs_df_sparse is not None:
-                self.final_cfs_df_sparse[self.data_interface.outcome_name] = \
-                    self.decode_model_output(self.final_cfs_df_sparse[self.data_interface.outcome_name])
+        
+        # decoding to original label
+        query_instance, self.final_cfs_df, self.final_cfs_df_sparse = \
+            self.decode_to_original_labels(query_instance, self.final_cfs_df, self.final_cfs_df_sparse)
         desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class[0]))[0] \
             if hasattr(self, 'target_cf_class') else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,

@@ -120,7 +120,9 @@ class TestDiceGeneticBinaryStrClassificationMethods:
     # When invalid desired_class is given
     @pytest.mark.parametrize(("desired_class", "total_CFs"), [(7, 3)])
     def test_no_cfs(self, desired_class, sample_custom_query_1, total_CFs):
-        with pytest.raises(UserConfigValidationException):
+        with pytest.raises(
+                UserConfigValidationException,
+                match="Desired class not present in training data"):
             self.exp.generate_counterfactuals(
                 query_instances=sample_custom_query_1,
                 total_CFs=total_CFs,
