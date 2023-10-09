@@ -84,6 +84,27 @@ def random_multi_classification_exp_object(request):
     return exp
 
 
+@pytest.fixture(scope="module", params=product(['sklearn'], DATA_INTERFACES))
+def random_str_multi_classification_exp_object(request):
+    backend, dinterface = request.param
+    if dinterface == "public":
+        dataset = helpers.load_custom_testing_dataset_multiclass_str()
+        d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    else:
+        d = dice_ml.Data(features={
+                                   'Numerical': [7, 23],
+                                   'Categorical': ['a', 'b', 'c']},
+                         outcome_name="Outcome")
+    if backend == "PYT":
+        net = FFNetwork(4)
+        m = dice_ml.Model(model=net, backend=backend,  func="ohe-min-max")
+    else:
+        model = _load_custom_testing_multiclass_str_model()
+        m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='random')
+    return exp
+
+
 @pytest.fixture(scope="module", params=product(BACKENDS, DATA_INTERFACES))
 def random_regression_exp_object(request):
     backend, dinterface = request.param
@@ -147,6 +168,15 @@ def genetic_multi_classification_exp_object(request):
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
 
+@pytest.fixture(scope="module", params=['sklearn'])
+def genetic_str_multi_classification_exp_object(request):
+    backend = request.param
+    dataset = helpers.load_custom_testing_dataset_multiclass_str()
+    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
+    model = _load_custom_testing_multiclass_str_model()
+    m = dice_ml.Model(model=model, backend=backend)
+    exp = dice_ml.Dice(d, m, method='genetic')
+    return exp
 
 @pytest.fixture(scope="module", params=BACKENDS)
 def genetic_regression_exp_object(request):
@@ -343,6 +373,17 @@ def _load_custom_testing_binary_str_model():
 
 def _load_custom_testing_multiclass_model():
     dataset = helpers.load_custom_testing_dataset_multiclass()
+    X_train = dataset[["Categorical", "Numerical"]]
+    y_train = dataset["Outcome"].values
+    num_feature_names = ["Numerical"]
+    cat_feature_names = ["Categorical"]
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
+
+
+def _load_custom_testing_multiclass_str_model():
+    dataset = helpers.load_custom_testing_dataset_multiclass_str()
     X_train = dataset[["Categorical", "Numerical"]]
     y_train = dataset["Outcome"].values
     num_feature_names = ["Numerical"]

@@ -108,6 +108,36 @@ class TestDiceRandomStrBinaryClassificationMethods:
             .isin(["one", "zero"])
         )
 
+class TestDiceRandomStrMultiClassificationMethods:
+    @pytest.fixture(autouse=True)
+    def _initiate_exp_object(self, random_str_multi_classification_exp_object):
+        self.exp = random_str_multi_classification_exp_object  # explainer object
+
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 1)])
+    def test_random_counterfactual_explanations_output(
+        self, desired_class, sample_custom_query_1, total_CFs
+    ):
+        counterfactual_explanations = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1,
+            desired_class=desired_class,
+            total_CFs=total_CFs,
+        )
+
+        assert counterfactual_explanations is not None
+        assert (
+            len(counterfactual_explanations.cf_examples_list)
+            == sample_custom_query_1.shape[0]
+        )
+        assert (
+            counterfactual_explanations.cf_examples_list[0].final_cfs_df.shape[0]
+            == total_CFs
+        )
+        assert all(
+            counterfactual_explanations.cf_examples_list[0]
+            .final_cfs_df["Outcome"]
+            .isin(["one", "zero", "two"])
+        )
+
 
 class TestDiceRandomRegressionMethods:
     @pytest.fixture(autouse=True)

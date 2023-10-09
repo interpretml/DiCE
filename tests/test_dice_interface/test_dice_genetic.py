@@ -198,6 +198,38 @@ class TestDiceGeneticMultiClassificationMethods:
         assert hasattr(preds, "shape"), "The object that contains the predictions doesn't have a 'shape' attribute."
         assert preds.shape[0] == df.shape[0], "The number of predictions differs from the number of elements in the dataset."
 
+class TestDiceGeneticStrMultiClassificationMethods:
+    @pytest.fixture(autouse=True)
+    def _initiate_exp_object(self, genetic_str_multi_classification_exp_object):
+        self.exp = genetic_str_multi_classification_exp_object  # explainer object
+
+    # When invalid desired_class is given
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(7, 3)])
+    def test_no_cfs(self, desired_class, sample_custom_query_1, total_CFs):
+        with pytest.raises(
+                UserConfigValidationException,
+                match="Desired class not present in training data"):
+            self.exp.generate_counterfactuals(
+                query_instances=sample_custom_query_1,
+                total_CFs=total_CFs,
+                desired_class=desired_class,
+            )
+
+    @pytest.mark.parametrize(("desired_class", "total_CFs"), [(0, 3)])
+    def test_outcome_in_original_labels(
+        self, desired_class, sample_custom_query_1, total_CFs
+    ):
+        ans = self.exp.generate_counterfactuals(
+            query_instances=sample_custom_query_1,
+            total_CFs=total_CFs,
+            desired_class=desired_class,
+        )
+        assert all(
+            ans.cf_examples_list[0]
+            .final_cfs_df["Outcome"]
+            .isin(["one", "zero", "two"])
+        )
+
 
 class TestDiceGeneticRegressionMethods:
     @pytest.fixture(autouse=True)
