@@ -168,6 +168,7 @@ def genetic_multi_classification_exp_object(request):
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
 
+
 @pytest.fixture(scope="module", params=['sklearn'])
 def genetic_str_multi_classification_exp_object(request):
     backend = request.param
@@ -177,6 +178,7 @@ def genetic_str_multi_classification_exp_object(request):
     m = dice_ml.Model(model=model, backend=backend)
     exp = dice_ml.Dice(d, m, method='genetic')
     return exp
+
 
 @pytest.fixture(scope="module", params=BACKENDS)
 def genetic_regression_exp_object(request):

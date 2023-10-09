@@ -123,7 +123,7 @@ class DiceKD(ExplainerBase):
         self.cfs_preds = cfs_preds
         if self.final_cfs_df is not None:
             self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
-        
+
         # decoding to original label
         query_instance, self.final_cfs_df, self.final_cfs_df_sparse = \
             self.decode_to_original_labels(query_instance, self.final_cfs_df, self.final_cfs_df_sparse)

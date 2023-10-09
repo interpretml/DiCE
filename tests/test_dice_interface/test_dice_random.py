@@ -108,6 +108,7 @@ class TestDiceRandomStrBinaryClassificationMethods:
             .isin(["one", "zero"])
         )
 
+
 class TestDiceRandomStrMultiClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, random_str_multi_classification_exp_object):

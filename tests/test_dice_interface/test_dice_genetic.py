@@ -198,6 +198,7 @@ class TestDiceGeneticMultiClassificationMethods:
         assert hasattr(preds, "shape"), "The object that contains the predictions doesn't have a 'shape' attribute."
         assert preds.shape[0] == df.shape[0], "The number of predictions differs from the number of elements in the dataset."
 
+
 class TestDiceGeneticStrMultiClassificationMethods:
     @pytest.fixture(autouse=True)
     def _initiate_exp_object(self, genetic_str_multi_classification_exp_object):

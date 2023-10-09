@@ -873,7 +873,7 @@ class ExplainerBase(ABC):
         if no_cf_generated:
             raise UserConfigValidationException(
                 "No counterfactuals found for any of the query points! Kindly check your configuration.")
-    
+
     def decode_to_original_labels(self, test_instance_df, final_cfs_df, final_cfs_df_sparse):
         test_instance_df[self.data_interface.outcome_name] = \
             self.decode_model_output(test_instance_df[self.data_interface.outcome_name])
