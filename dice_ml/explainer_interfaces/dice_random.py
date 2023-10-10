@@ -180,7 +180,11 @@ class DiceRandom(ExplainerBase):
 
         self.elapsed = timeit.default_timer() - start_time
         m, s = divmod(self.elapsed, 60)
-        if self.valid_cfs_found:
+
+        # decoding to original label
+        test_instance_df, final_cfs_df, final_cfs_df_sparse = \
+            self.decode_to_original_labels(test_instance_df, final_cfs_df, final_cfs_df_sparse)
+        if final_cfs_df is not None:
             if verbose:
                 print('Diverse Counterfactuals found! total time taken: %02d' %
                       m, 'min %02d' % s, 'sec')
@@ -193,12 +197,14 @@ class DiceRandom(ExplainerBase):
                       'Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...',
                       '; total time taken: %02d' % m, 'min %02d' % s, 'sec')
 
+        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class))[0] \
+            if hasattr(self, 'target_cf_class') else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=final_cfs_df,
                                           test_instance_df=test_instance_df,
                                           final_cfs_df_sparse=final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
-                                          desired_class=desired_class,
+                                          desired_class=desired_class_param,
                                           desired_range=desired_range,
                                           model_type=self.model.model_type)
 

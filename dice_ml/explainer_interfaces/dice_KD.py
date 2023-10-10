@@ -91,10 +91,9 @@ class DiceKD(ExplainerBase):
                 query_instance=query_instance)
 
         # find the predicted value of query_instance
-        test_pred = self.predict_fn(query_instance)[0]
-
-        query_instance[self.data_interface.outcome_name] = test_pred
-        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred)
+        test_pred = self.predict_fn_scores(query_instance)
+        query_instance[self.data_interface.outcome_name] = self.get_model_output_from_scores(test_pred)
+        desired_class = self.misc_init(stopping_threshold, desired_class, desired_range, test_pred[0])
 
         if desired_class == "opposite" and self.model.model_type == ModelTypes.Classifier:
             if self.num_output_nodes == 2:
@@ -122,15 +121,30 @@ class DiceKD(ExplainerBase):
                                                               verbose,
                                                               limit_steps_ls)
         self.cfs_preds = cfs_preds
+        if self.final_cfs_df is not None:
+            self.final_cfs_df[self.data_interface.outcome_name] = self.cfs_preds
 
+        # decoding to original label
+        query_instance, self.final_cfs_df, self.final_cfs_df_sparse = \
+            self.decode_to_original_labels(query_instance, self.final_cfs_df, self.final_cfs_df_sparse)
+        desired_class_param = self.decode_model_output(pd.Series(self.target_cf_class[0]))[0] \
+            if hasattr(self, 'target_cf_class') else desired_class
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           final_cfs_df=self.final_cfs_df,
                                           test_instance_df=query_instance,
                                           final_cfs_df_sparse=self.final_cfs_df_sparse,
                                           posthoc_sparsity_param=posthoc_sparsity_param,
                                           desired_range=desired_range,
-                                          desired_class=desired_class,
+                                          desired_class=desired_class_param,
                                           model_type=self.model.model_type)
+
+    def predict_fn_scores(self, input_instance):
+        """Returns prediction scores."""
+        out = self.model.get_output(input_instance)
+        if self.model.model_type == ModelTypes.Classifier and out.shape[1] == 1:
+            # DL models return only 1 for binary classification
+            out = np.hstack((1-out, out))
+        return out
 
     def predict_fn(self, input_instance):
         """returns predictions"""
