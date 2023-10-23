@@ -317,6 +317,26 @@ class TestExplainerBaseBinaryClassification:
                                       total_CFs=total_CFs, desired_class=desired_class,
                                       desired_range=desired_range, permitted_range=permitted_range)
 
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_cfs_type_consistency(
+            self, desired_class, method,
+            sample_custom_query_1, sample_counterfactual_example_dummy,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        sample_custom_query = pd.concat([sample_custom_query_1, sample_custom_query_1])
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query,
+                    total_CFs=2,
+                    desired_class=desired_class)
+        for col in sample_custom_query.columns:
+            assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query[col].dtype
+            assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query[col].dtype
+            assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query[col].dtype
+
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
 class TestExplainerBaseMultiClassClassification:
@@ -428,6 +448,24 @@ class TestExplainerBaseMultiClassClassification:
                                       total_CFs=total_CFs, desired_class=desired_class,
                                       desired_range=desired_range, permitted_range=permitted_range)
 
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_cfs_type_consistency(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=[sample_custom_query_1],
+                    total_CFs=2,
+                    desired_class=desired_class)
+
+        for col in sample_custom_query_1.columns:
+            assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query_1[col].dtype
+            assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query_1[col].dtype
+            assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query_1[col].dtype
 
 class TestExplainerBaseRegression:
 
