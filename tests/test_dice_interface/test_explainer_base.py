@@ -300,7 +300,6 @@ class TestExplainerBaseBinaryClassification:
                     permitted_range[feature][0] <= ans.cf_examples_list[0].final_cfs_df_sparse[feature].values[i] <=
                     permitted_range[feature][1] for i in range(total_CFs))
 
-
     # Testing for 0 CFs needed
     @pytest.mark.parametrize(("features_to_vary", "desired_class", "desired_range", "total_CFs", "permitted_range"),
                              [("all", 0, None, 0, None)])
@@ -467,6 +466,7 @@ class TestExplainerBaseMultiClassClassification:
             assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query_1[col].dtype
             assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query_1[col].dtype
             assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query_1[col].dtype
+
 
 class TestExplainerBaseRegression:
 
