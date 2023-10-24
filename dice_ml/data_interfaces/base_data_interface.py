@@ -6,6 +6,8 @@ from raiutils.exceptions import UserConfigValidationException
 
 from dice_ml.utils.exception import SystemException
 
+import pandas as pd
+
 
 class _BaseData(ABC):
 
