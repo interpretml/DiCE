@@ -71,6 +71,31 @@ class _BaseData(ABC):
                     )
         self.permitted_range, _ = self.get_features_range(input_permitted_range, features_dict)
 
+    def ensure_consistent_type(self, output_df, query_instance):
+        qdf = self.query_instance_to_df(query_instance)
+        output_df = output_df.astype(qdf.dtypes.to_dict())
+        return output_df
+
+    def query_instance_to_df(self, query_instance):
+        if isinstance(query_instance, list):
+            if isinstance(query_instance[0], dict):  # prepare a list of query instances
+                test = pd.DataFrame(query_instance, columns=self.feature_names)
+
+            else:  # prepare a single query instance in list
+                query_instance = {'row1': query_instance}
+                test = pd.DataFrame.from_dict(
+                    query_instance, orient='index', columns=self.feature_names)
+
+        elif isinstance(query_instance, dict):
+            test = pd.DataFrame({k: [v] for k, v in query_instance.items()}, columns=self.feature_names)
+
+        elif isinstance(query_instance, pd.DataFrame):
+            test = query_instance.copy()
+
+        else:
+            raise ValueError("Query instance should be a dict, a pandas dataframe, a list, or a list of dicts")
+        return test
+
     @abstractmethod
     def __init__(self, params):
         """The init method needs to be implemented by the inherting classes."""

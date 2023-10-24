@@ -351,11 +351,6 @@ class PrivateData(_BaseData):
 
         return df
 
-    def ensure_consistent_type(self, output_df, query_instance):
-        qdf = self.query_instance_to_df(query_instance)
-        output_df = output_df.astype(qdf.dtypes.to_dict())
-        return output_df
-
     def query_instance_to_df(self, query_instance):
         if isinstance(query_instance, list):
             if isinstance(query_instance[0], dict):  # prepare a list of query instances
