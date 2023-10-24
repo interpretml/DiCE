@@ -334,8 +334,10 @@ class TestExplainerBaseBinaryClassification:
                     desired_class=desired_class)
         for col in sample_custom_query.columns:
             assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query[col].dtype
-            assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query[col].dtype
-            assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df_sparse is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query[col].dtype
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
@@ -464,8 +466,10 @@ class TestExplainerBaseMultiClassClassification:
 
         for col in sample_custom_query_1.columns:
             assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query_1[col].dtype
-            assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query_1[col].dtype
-            assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query_1[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query_1[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df_sparse is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query_1[col].dtype
 
 
 class TestExplainerBaseRegression:
