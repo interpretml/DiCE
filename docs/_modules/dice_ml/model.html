@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.model &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.model &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -116,8 +116,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BackEndTypes</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> backend not in supported backends </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BackEndTypes</span><span class="o">.</span><span class="n">ALL</span><span class="p">))</span>
-            <span class="p">)</span>
+                <span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BackEndTypes</span><span class="o">.</span><span class="n">ALL</span><span class="p">)),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> model type not in supported model types </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.model_interfaces.pytorch_model &mdash; DiCE 0.9 documentation</title>
+  <title>dice_ml.model_interfaces.pytorch_model &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -50,8 +50,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -95,7 +93,7 @@
 <div class="viewcode-block" id="PyTorchModel"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel">[docs]</a><span class="k">class</span> <span class="nc">PyTorchModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;PYT&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Init method</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param model: trained PyTorch Model.</span>
 <span class="sd">        :param model_path: path to trained model.</span>
@@ -113,7 +111,7 @@
 
 <div class="viewcode-block" id="PyTorchModel.get_output"><a class="viewcode-back" href="../../../dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">,</span> <span class="n">model_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                    <span class="n">transform_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_tensor</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;returns prediction probabilities</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns prediction probabilities</span>
 
 <span class="sd">        :param input_tensor: test input.</span>
 <span class="sd">        :param transform_data: boolean to indicate if data transformation is required.</span>

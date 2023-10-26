@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.10 documentation</title>
+  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -370,7 +370,7 @@ div.rendered_html tbody tr:hover {
 <section id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
 <h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this heading"></a></h1>
 <p>This notebook will demonstrate how the DiCE library can be used for multiclass classification and regression for scikit-learn models. You can use any method (“random”, “kdtree”, “genetic”), just specific it in the method argument in the initialization step. The rest of the code is completely identical. For demonstration, we will be using the genetic algorithm for CFs.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -387,15 +387,6 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import pandas as pd
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/exception.py:12: UserWarning: UserConfigValidationException will be deprecated from dice_ml.utils. Please import UserConfigValidationException from raiutils.exceptions.
-  warnings.warn(&#34;UserConfigValidationException will be deprecated from dice_ml.utils. &#34;
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -603,7 +594,7 @@ genetic_iris.visualize_as_dataframe()
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.32s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.16s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -721,42 +712,34 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
-      <td>4.3</td>
-      <td>4.0</td>
-      <td>4.9</td>
-      <td>1.8</td>
+      <td>6.3</td>
+      <td>3.8</td>
+      <td>4.4</td>
+      <td>2.1</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
       <td>6.4</td>
-      <td>4.0</td>
-      <td>6.4</td>
+      <td>3.3</td>
+      <td>6.1</td>
+      <td>0.9</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>7.2</td>
+      <td>3.6</td>
+      <td>5.2</td>
       <td>1.3</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>6.4</td>
-      <td>3.7</td>
-      <td>5.6</td>
-      <td>1.8</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.4</td>
-      <td>4.0</td>
-      <td>4.9</td>
-      <td>1.8</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>5.2</td>
-      <td>4.0</td>
-      <td>5.8</td>
-      <td>2.5</td>
+      <td>4.3</td>
+      <td>3.3</td>
+      <td>4.5</td>
+      <td>1.7</td>
       <td>2</td>
     </tr>
   </tbody>
@@ -779,7 +762,7 @@ genetic_iris.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.28s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:03&lt;00:00,  1.56s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -881,8 +864,8 @@ Diverse Counterfactual set (new outcome: 2)
   <tbody>
     <tr>
       <th>0</th>
-      <td>6.7</td>
-      <td>3.1</td>
+      <td>-</td>
+      <td>-</td>
       <td>5.6</td>
       <td>2.4</td>
       <td>2.0</td>
@@ -890,23 +873,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.4</td>
-      <td>3.1</td>
-      <td>5.5</td>
-      <td>1.5</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.7</td>
-      <td>3.0</td>
-      <td>5.2</td>
-      <td>1.8</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.4</td>
-      <td>3.1</td>
+      <td>-</td>
       <td>5.5</td>
       <td>1.8</td>
       <td>2.0</td>
@@ -914,7 +881,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.9</td>
-      <td>3.1</td>
+      <td>-</td>
       <td>5.4</td>
       <td>2.1</td>
       <td>2.0</td>
@@ -922,17 +889,33 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.9</td>
-      <td>3.1</td>
+      <td>-</td>
       <td>5.1</td>
       <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>6.7</td>
+      <td>-</td>
       <td>3.0</td>
       <td>5.2</td>
       <td>2.3</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>5.7</td>
+      <td>-</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>3.3</td>
+      <td>5.7</td>
+      <td>2.1</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1031,7 +1014,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>7.2</td>
-      <td>3.2</td>
+      <td>-</td>
       <td>6.0</td>
       <td>1.8</td>
       <td>2.0</td>
@@ -1039,7 +1022,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.5</td>
-      <td>3.2</td>
+      <td>-</td>
       <td>5.1</td>
       <td>2.0</td>
       <td>2.0</td>
@@ -1047,7 +1030,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.9</td>
-      <td>3.2</td>
+      <td>-</td>
       <td>5.7</td>
       <td>2.3</td>
       <td>2.0</td>
@@ -1055,7 +1038,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.8</td>
-      <td>3.2</td>
+      <td>-</td>
       <td>5.9</td>
       <td>2.3</td>
       <td>2.0</td>
@@ -1063,7 +1046,7 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>6.4</td>
-      <td>3.2</td>
+      <td>-</td>
       <td>5.3</td>
       <td>2.3</td>
       <td>2.0</td>
@@ -1071,16 +1054,16 @@ Diverse Counterfactual set (new outcome: 2)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>2.7</td>
-      <td>5.6</td>
-      <td>2.2</td>
+      <td>2.8</td>
+      <td>1.5</td>
+      <td>2.0</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>-</td>
-      <td>2.4</td>
-      <td>2.2</td>
+      <td>6.9</td>
+      <td>3.1</td>
+      <td>5.4</td>
       <td>2.1</td>
       <td>2.0</td>
     </tr>
@@ -1313,7 +1296,7 @@ genetic_housing.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.64it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.09s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1321,7 +1304,7 @@ genetic_housing.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 1)
+Query instance (original outcome : 1.5158300399780273)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1376,7 +1359,7 @@ Query instance (original outcome : 1)
       <td>2.910112</td>
       <td>38.650002</td>
       <td>-121.839996</td>
-      <td>1.39714</td>
+      <td>1.51583</td>
     </tr>
   </tbody>
 </table>
@@ -1427,6 +1410,18 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
   <tbody>
     <tr>
       <th>0</th>
+      <td>3.6976</td>
+      <td>-</td>
+      <td>5.9</td>
+      <td>1.0</td>
+      <td>-</td>
+      <td>2.0</td>
+      <td>34.24</td>
+      <td>-124.35</td>
+      <td>3.6281412000000004</td>
+    </tr>
+    <tr>
+      <th>0</th>
       <td>6.5173</td>
       <td>24.0</td>
       <td>6.5</td>
@@ -1435,19 +1430,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.7</td>
       <td>34.45</td>
       <td>-119.81</td>
-      <td>3.4560403999999965</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>5.6184</td>
-      <td>-</td>
-      <td>5.9</td>
-      <td>1.0</td>
-      <td>1543.0</td>
-      <td>2.7</td>
-      <td>34.24</td>
-      <td>-118.28</td>
-      <td>3.2037501000000015</td>
+      <td>3.517150499999996</td>
     </tr>
   </tbody>
 </table>
@@ -1458,7 +1441,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 1)
+Query instance (original outcome : 0.8763800263404846)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1505,7 +1488,7 @@ Query instance (original outcome : 1)
       <td>2.746479</td>
       <td>33.200001</td>
       <td>-115.599998</td>
-      <td>0.8702</td>
+      <td>0.87638</td>
     </tr>
   </tbody>
 </table>
@@ -1560,11 +1543,11 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>-</td>
       <td>8.1</td>
       <td>1.1</td>
-      <td>394.0</td>
+      <td>-</td>
       <td>2.6</td>
       <td>33.61</td>
       <td>-117.92</td>
-      <td>4.962199599999989</td>
+      <td>4.94750939999999</td>
     </tr>
     <tr>
       <th>0</th>
@@ -1572,11 +1555,11 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>43.0</td>
       <td>4.6</td>
       <td>1.2</td>
-      <td>393.0</td>
+      <td>-</td>
       <td>1.6</td>
       <td>34.01</td>
       <td>-118.47</td>
-      <td>4.193990299999995</td>
+      <td>4.3242802999999945</td>
     </tr>
   </tbody>
 </table>

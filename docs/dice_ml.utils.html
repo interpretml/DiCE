@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils package &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.utils package &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -189,18 +189,6 @@
 </dl>
 </dd></dl>
 
-<dl class="py exception">
-<dt class="sig sig-object py" id="dice_ml.utils.exception.UserConfigValidationException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.exception.</span></span><span class="sig-name descname"><span class="pre">UserConfigValidationException</span></span><a class="reference internal" href="_modules/dice_ml/utils/exception.html#UserConfigValidationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.exception.UserConfigValidationException" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>An exception indicating that some user configuration is not valid.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>exception_message</strong> (<em>str</em>) – A message describing the error.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="module-dice_ml.utils.helpers">
 <span id="dice-ml-utils-helpers-module"></span><h2>dice_ml.utils.helpers module<a class="headerlink" href="#module-dice_ml.utils.helpers" title="Permalink to this heading"></a></h2>
@@ -304,8 +292,18 @@ This class calls FunctionTransformer of scikit-learn internally
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dice_ml.utils.helpers.load_custom_testing_dataset_binary_str">
+<span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">load_custom_testing_dataset_binary_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_binary_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">
 <span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">load_custom_testing_dataset_multiclass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_multiclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str">
+<span class="sig-prename descclassname"><span class="pre">dice_ml.utils.helpers.</span></span><span class="sig-name descname"><span class="pre">load_custom_testing_dataset_multiclass_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/helpers.html#load_custom_testing_dataset_multiclass_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -344,6 +342,17 @@ This class calls FunctionTransformer of scikit-learn internally
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.utils.neuralnetworks.FFNetwork.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/neuralnetworks.html#FFNetwork.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.neuralnetworks.FFNetwork.forward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dice_ml.utils.neuralnetworks.MulticlassNetwork">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.utils.neuralnetworks.</span></span><span class="sig-name descname"><span class="pre">MulticlassNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/neuralnetworks.html#MulticlassNetwork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.neuralnetworks.MulticlassNetwork" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dice_ml.utils.neuralnetworks.MulticlassNetwork.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/utils/neuralnetworks.html#MulticlassNetwork.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.utils.neuralnetworks.MulticlassNetwork.forward" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

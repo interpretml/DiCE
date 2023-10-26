@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; DiCE 0.10 documentation</title>
+  <title>Index &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -98,6 +98,7 @@
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -262,6 +263,10 @@
         <li><a href="dice_ml.html#dice_ml.model.Model.decide_implementation_type">(dice_ml.model.Model method)</a>
 </li>
       </ul></li>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output">decode_model_output() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
+</li>
+      <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels">decode_to_original_labels() (dice_ml.explainer_interfaces.explainer_base.ExplainerBase method)</a>
+</li>
       <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.decoder">decoder() (dice_ml.utils.sample_architecture.vae_model.AutoEncoder method)</a>
 
       <ul>
@@ -621,17 +626,19 @@
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.find_counterfactuals">(dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders">fit_label_encoders() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
         <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.public_data_interface.PublicData.fit_label_encoders">(dice_ml.data_interfaces.public_data_interface.PublicData method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.FFNetwork.forward">forward() (dice_ml.utils.neuralnetworks.FFNetwork method)</a>
 
       <ul>
+        <li><a href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.MulticlassNetwork.forward">(dice_ml.utils.neuralnetworks.MulticlassNetwork method)</a>
+</li>
         <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.AutoEncoder.forward">(dice_ml.utils.sample_architecture.vae_model.AutoEncoder method)</a>
 </li>
         <li><a href="dice_ml.utils.sample_architecture.html#dice_ml.utils.sample_architecture.vae_model.CF_VAE.forward">(dice_ml.utils.sample_architecture.vae_model.CF_VAE method)</a>
@@ -879,10 +886,14 @@
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary">load_custom_testing_dataset_binary() (in module dice_ml.utils.helpers)</a>
 </li>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str">load_custom_testing_dataset_binary_str() (in module dice_ml.utils.helpers)</a>
+</li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">load_custom_testing_dataset_multiclass() (in module dice_ml.utils.helpers)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str">load_custom_testing_dataset_multiclass_str() (in module dice_ml.utils.helpers)</a>
+</li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_regression">load_custom_testing_dataset_regression() (in module dice_ml.utils.helpers)</a>
 </li>
       <li><a href="dice_ml.utils.html#dice_ml.utils.helpers.load_min_max_equal_dataset">load_min_max_equal_dataset() (in module dice_ml.utils.helpers)</a>
@@ -993,6 +1004,10 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.MulticlassNetwork">MulticlassNetwork (class in dice_ml.utils.neuralnetworks)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
@@ -1061,7 +1076,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn_scores">predict_fn_scores() (dice_ml.explainer_interfaces.dice_genetic.DiceGenetic method)</a>
+
+      <ul>
+        <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn_scores">(dice_ml.explainer_interfaces.dice_KD.DiceKD method)</a>
 </li>
+      </ul></li>
       <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding">prepare_df_for_ohe_encoding() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 
       <ul>
@@ -1083,6 +1102,14 @@
       <li><a href="dice_ml.html#dice_ml.constants.BackEndTypes.Pytorch">Pytorch (dice_ml.constants.BackEndTypes attribute)</a>
 </li>
       <li><a href="dice_ml.model_interfaces.html#dice_ml.model_interfaces.pytorch_model.PyTorchModel">PyTorchModel (class in dice_ml.model_interfaces.pytorch_model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df">query_instance_to_df() (dice_ml.data_interfaces.private_data_interface.PrivateData method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1200,10 +1227,6 @@
         <li><a href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2.update_hyperparameters">(dice_ml.explainer_interfaces.dice_tensorflow2.DiceTensorFlow2 method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dice_ml.utils.html#dice_ml.utils.exception.UserConfigValidationException">UserConfigValidationException</a>
-</li>
   </ul></td>
 </tr></table>
 
