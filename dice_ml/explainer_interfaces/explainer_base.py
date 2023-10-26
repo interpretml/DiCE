@@ -194,6 +194,14 @@ class ExplainerBase(ABC):
                 posthoc_sparsity_algorithm=posthoc_sparsity_algorithm,
                 verbose=verbose,
                 **kwargs)
+            res.test_instance_df = self.data_interface.ensure_consistent_type(
+                    res.test_instance_df, query_instance)
+            if res.final_cfs_df is not None and len(res.final_cfs_df) > 0:
+                res.final_cfs_df = self.data_interface.ensure_consistent_type(
+                    res.final_cfs_df, query_instance)
+            if res.final_cfs_df_sparse is not None and len(res.final_cfs_df_sparse) > 0:
+                res.final_cfs_df_sparse = self.data_interface.ensure_consistent_type(
+                    res.final_cfs_df_sparse, query_instance)
             cf_examples_arr.append(res)
         self._check_any_counterfactuals_computed(cf_examples_arr=cf_examples_arr)
 
