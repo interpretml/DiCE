@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -88,6 +88,7 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -130,12 +131,36 @@
         <span class="c1"># self.cont_precisions = \</span>
         <span class="c1">#   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]</span>
 
+    <span class="k">def</span> <span class="nf">_find_features_having_missing_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return list of features which have missing values.</span>
+
+<span class="sd">        :param data: The dataset to check.</span>
+<span class="sd">        :type data: Any</span>
+<span class="sd">        :return: List of feature names which have missing values.</span>
+<span class="sd">        :rtype: List[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">list_of_feature_having_missing_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()):</span>
+                <span class="n">list_of_feature_having_missing_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">list_of_feature_having_missing_values</span>
+
     <span class="k">def</span> <span class="nf">_validate_counterfactual_configuration</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
             <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
             <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
             <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_features_having_missing_values</span><span class="p">(</span><span class="n">query_instances</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
+                <span class="s2">&quot;The query instance(s) should not have any missing values. &quot;</span>
+                <span class="s2">&quot;Please impute the missing values and try again.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">total_CFs</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
@@ -252,6 +277,14 @@
                 <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">test_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">ensure_consistent_type</span><span class="p">(</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">test_instance_df</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">ensure_consistent_type</span><span class="p">(</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">ensure_consistent_type</span><span class="p">(</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">)</span>
             <span class="n">cf_examples_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_any_counterfactuals_computed</span><span class="p">(</span><span class="n">cf_examples_arr</span><span class="o">=</span><span class="n">cf_examples_arr</span><span class="p">)</span>
 
@@ -616,7 +649,7 @@
                 <span class="c1"># current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])</span>
                 <span class="c1"># feat_ix = self.data_interface.continuous_feature_names.index(feature)</span>
                 <span class="n">diff</span> <span class="o">=</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span>
-                <span class="k">if</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">quantiles</span><span class="p">[</span><span class="n">feature</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">posthoc_sparsity_algorithm</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
                         <span class="n">final_cfs_sparse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_linear_search</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span>
                                                                  <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">)</span>
@@ -641,8 +674,8 @@
         <span class="n">current_pred</span> <span class="o">=</span> <span class="n">current_pred_orig</span>
         <span class="n">count_steps</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
-            <span class="k">while</span><span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10e-4</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="o">*</span><span class="n">old_diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span>
-                  <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count_steps</span> <span class="o">&lt;</span> <span class="n">limit_steps_ls</span><span class="p">):</span>
+            <span class="k">while</span> <span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">10e-4</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="o">*</span><span class="n">old_diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">is_cf_valid</span><span class="p">(</span><span class="n">current_pred</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count_steps</span> <span class="o">&lt;</span> <span class="n">limit_steps_ls</span><span class="p">):</span>
 
                 <span class="n">old_val</span> <span class="o">=</span> <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span>
                 <span class="n">final_cfs_sparse</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="o">*</span><span class="n">change</span>
@@ -839,6 +872,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">model_score</span> <span class="ow">and</span> <span class="n">model_score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
 
+<div class="viewcode-block" id="ExplainerBase.decode_model_output"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output">[docs]</a>    <span class="k">def</span> <span class="nf">decode_model_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded_labels</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;classes_&quot;</span><span class="p">):</span>  <span class="c1"># sklearn model</span>
+                <span class="n">label_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span><span class="p">:</span> <span class="n">label</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="p">)}</span>
+                <span class="k">return</span> <span class="n">encoded_labels</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">label_dict</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">encoded_labels</span>  <span class="c1"># no op</span></div>
+
 <div class="viewcode-block" id="ExplainerBase.get_model_output_from_scores"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_scores</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
             <span class="n">output_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
@@ -884,7 +924,7 @@
         <span class="n">dataset_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span>
             <span class="n">query_instance</span><span class="o">=</span><span class="n">data_df_copy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
 
-        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">dataset_instance</span><span class="p">,</span> <span class="n">model_score</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">dataset_instance</span><span class="p">,</span> <span class="n">model_score</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="c1"># TODO: Is it okay to insert a column in the original dataframe with the predicted outcome? This is memory-efficient</span>
         <span class="n">data_df_copy</span><span class="p">[</span><span class="n">predicted_outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">predictions</span>
 
@@ -924,6 +964,17 @@
         <span class="k">if</span> <span class="n">no_cf_generated</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
                 <span class="s2">&quot;No counterfactuals found for any of the query points! Kindly check your configuration.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExplainerBase.decode_to_original_labels"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels">[docs]</a>    <span class="k">def</span> <span class="nf">decode_to_original_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span><span class="p">):</span>
+        <span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span></div>
 
 <div class="viewcode-block" id="ExplainerBase.serialize_explainer"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.serialize_explainer">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_explainer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the explainer to the file specified by path.&quot;&quot;&quot;</span>

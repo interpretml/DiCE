@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.10 documentation</title>
+  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -364,7 +364,7 @@ div.rendered_html tbody tr:hover {
 <section id="Benchmarking-different-CF-explanation-methods">
 <h1>Benchmarking different CF explanation methods<a class="headerlink" href="#Benchmarking-different-CF-explanation-methods" title="Permalink to this heading"></a></h1>
 <p>In this notebook, we show runtimes of different model-agnostic explanation methods. Currently, we support three model-agnostic explanation methods: 1. Random-Sampling 2. Genetic Algorithm 3. Querying a KD tree</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -383,15 +383,6 @@ from dice_ml.utils import helpers  # helper functions
 from dice_ml import Dice
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/exception.py:12: UserWarning: UserConfigValidationException will be deprecated from dice_ml.utils. Please import UserConfigValidationException from raiutils.exceptions.
-  warnings.warn(&#34;UserConfigValidationException will be deprecated from dice_ml.utils. &#34;
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -757,36 +748,36 @@ print(&#39;For genetic algorithm: Total time taken to generate %d&#39; % num_loo
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/tmp/ipykernel_2173/3514951616.py:11: SettingWithCopyWarning:
+/tmp/ipykernel_169/3514951616.py:11: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   query_instances.loc[:, q] = \
-/tmp/ipykernel_2173/3514951616.py:8: SettingWithCopyWarning:
+/tmp/ipykernel_169/3514951616.py:8: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   query_instances.loc[:, q] = \
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  1.92it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.17it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.34it/s]
-/tmp/ipykernel_2173/3514951616.py:11: SettingWithCopyWarning:
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.58it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.13s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.05s/it]
+/tmp/ipykernel_169/3514951616.py:11: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   query_instances.loc[:, q] = \
-/tmp/ipykernel_2173/3514951616.py:8: SettingWithCopyWarning:
+/tmp/ipykernel_169/3514951616.py:8: SettingWithCopyWarning:
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   query_instances.loc[:, q] = \
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.91it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.12it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.04it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.55it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.06s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.11it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -796,7 +787,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <div class="highlight"><pre>
 For Independent random sampling of features: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 02 sec
 For querying from a KD tree: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 05 sec
-For genetic algorithm: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 05 sec
+For genetic algorithm: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 06 sec
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

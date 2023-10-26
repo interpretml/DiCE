@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.10 documentation</title>
+  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -408,7 +408,7 @@ the counterfactuals and consequently, the local importance score. Given a set of
 </ul>
 <p><img alt="DiCE API" src="../_images/dice_getting_started_api.png" /></p>
 <p>DiCE requires two inputs: a training dataset and a pre-trained ML model. When the training dataset is unknown (e.g., for privacy reasons), it can also work without access to the full dataset (see this <a class="reference internal" href="DiCE_with_private_data.html"><span class="doc">notebook</span></a> for an example). Below we show a simple example.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -424,15 +424,6 @@ import dice_ml
 from dice_ml.utils import helpers  # helper functions
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/exception.py:12: UserWarning: UserConfigValidationException will be deprecated from dice_ml.utils. Please import UserConfigValidationException from raiutils.exceptions.
-  warnings.warn(&#34;UserConfigValidationException will be deprecated from dice_ml.utils. &#34;
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -678,7 +669,7 @@ e1.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.17it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.99it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -753,7 +744,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -794,9 +785,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
+      <td>Prof-school</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -805,10 +796,10 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>1</th>
       <td>-</td>
+      <td>Government</td>
       <td>-</td>
-      <td>Assoc</td>
+      <td>Single</td>
       <td>-</td>
-      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -891,7 +882,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -932,9 +923,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>0</th>
       <td>29</td>
       <td>Private</td>
-      <td>Bachelors</td>
+      <td>Prof-school</td>
       <td>Married</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>White</td>
       <td>Female</td>
       <td>38</td>
@@ -943,10 +934,10 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>1</th>
       <td>29</td>
-      <td>Private</td>
-      <td>Assoc</td>
-      <td>Married</td>
-      <td>White-Collar</td>
+      <td>Government</td>
+      <td>HS-grad</td>
+      <td>Single</td>
+      <td>Blue-Collar</td>
       <td>White</td>
       <td>Female</td>
       <td>38</td>
@@ -976,7 +967,7 @@ e2.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.89it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.88it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1051,7 +1042,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1092,9 +1083,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
+      <td>Prof-school</td>
       <td>-</td>
-      <td>Other/Unknown</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1104,9 +1095,9 @@ Diverse Counterfactual set (new outcome: 1.0)
       <th>1</th>
       <td>-</td>
       <td>-</td>
-      <td>Assoc</td>
+      <td>Some-college</td>
       <td>-</td>
-      <td>White-Collar</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1134,7 +1125,7 @@ e3.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.66it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.68it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1209,7 +1200,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1261,13 +1252,13 @@ Diverse Counterfactual set (new outcome: 1.0)
     <tr>
       <th>1</th>
       <td>-</td>
-      <td>Government</td>
       <td>-</td>
-      <td>Single</td>
-      <td>-</td>
+      <td>Prof-school</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>28</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -1297,7 +1288,7 @@ print(imp.local_importance)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  1.37it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.31it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1305,7 +1296,7 @@ print(imp.local_importance)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[{&#39;education&#39;: 0.7, &#39;occupation&#39;: 0.7, &#39;workclass&#39;: 0.4, &#39;marital_status&#39;: 0.1, &#39;gender&#39;: 0.1, &#39;race&#39;: 0.0, &#39;age&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
+[{&#39;education&#39;: 0.9, &#39;occupation&#39;: 0.4, &#39;workclass&#39;: 0.2, &#39;gender&#39;: 0.2, &#39;age&#39;: 0.2, &#39;marital_status&#39;: 0.0, &#39;race&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1336,7 +1327,7 @@ print(imp.summary_importance)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████████████████████| 20/20 [00:12&lt;00:00,  1.66it/s]
+100%|███████████████████████████████████████████████████████████████████████████████████| 20/20 [00:08&lt;00:00,  2.25it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1344,7 +1335,7 @@ print(imp.summary_importance)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;education&#39;: 0.56, &#39;marital_status&#39;: 0.32, &#39;occupation&#39;: 0.275, &#39;hours_per_week&#39;: 0.25, &#39;age&#39;: 0.23, &#39;workclass&#39;: 0.19, &#39;race&#39;: 0.12, &#39;gender&#39;: 0.095}
+{&#39;education&#39;: 0.62, &#39;occupation&#39;: 0.295, &#39;marital_status&#39;: 0.29, &#39;workclass&#39;: 0.22, &#39;age&#39;: 0.205, &#39;hours_per_week&#39;: 0.205, &#39;race&#39;: 0.115, &#39;gender&#39;: 0.09}
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1380,9 +1371,9 @@ m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-m
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2023-06-26 19:18:40.752470: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2023-06-26 19:18:40.756608: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2023-06-26 19:18:40.756625: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2023-10-26 15:43:24.138021: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-10-26 15:43:24.207078: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2023-10-26 15:43:24.207103: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 </pre></div></div>
 </div>
 <p>We want to note that the time required to find counterfactuals with Tensorflow 2.x’s eager style of execution is significantly greater than that with TensorFlow 1.x’s graph execution.</p>
@@ -1401,10 +1392,10 @@ exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2023-06-26 19:18:43.948236: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-2023-06-26 19:18:43.948388: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-2023-06-26 19:18:43.948454: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
-2023-06-26 19:18:43.948952: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+2023-10-26 15:43:28.626560: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+2023-10-26 15:43:28.626614: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+2023-10-26 15:43:28.626637: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
+2023-10-26 15:43:28.627732: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
 </pre></div></div>
 </div>
@@ -1425,8 +1416,8 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 01 min 11 sec
-Query instance (original outcome : 1)
+Diverse Counterfactuals found! total time taken: 00 min 53 sec
+Query instance (original outcome : 0.6710000038146973)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1615,7 +1606,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 50%|██████████████████████████████████████████▌                                          | 1/2 [00:08&lt;00:08,  8.31s/it]
+ 50%|██████████████████████████████████████████▌                                          | 1/2 [00:04&lt;00:04,  4.54s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1623,7 +1614,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 07 sec
+Diverse Counterfactuals found! total time taken: 00 min 04 sec
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1631,7 +1622,7 @@ Diverse Counterfactuals found! total time taken: 00 min 07 sec
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:17&lt;00:00,  8.87s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:09&lt;00:00,  4.88s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1639,8 +1630,8 @@ Diverse Counterfactuals found! total time taken: 00 min 07 sec
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 09 sec
-Query instance (original outcome : 1)
+Diverse Counterfactuals found! total time taken: 00 min 04 sec
+Query instance (original outcome : 0.6179999709129333)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1687,14 +1678,14 @@ Query instance (original outcome : 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>50.0</td>
+      <td>50</td>
       <td>Other/Unknown</td>
       <td>Some-college</td>
       <td>Married</td>
       <td>Other/Unknown</td>
       <td>White</td>
       <td>Male</td>
-      <td>40.0</td>
+      <td>40</td>
       <td>0.618</td>
     </tr>
   </tbody>
@@ -1746,14 +1737,14 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>38.0</td>
+      <td>38</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>26.0</td>
+      <td>26</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1782,7 +1773,7 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>3</th>
-      <td>70.0</td>
+      <td>70</td>
       <td>-</td>
       <td>-</td>
       <td>Divorced</td>
@@ -1801,7 +1792,7 @@ Diverse Counterfactual set (new outcome: 0.0)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 1)
+Query instance (original outcome : 0.9679999947547913)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1840,14 +1831,14 @@ Query instance (original outcome : 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>50.0</td>
+      <td>50</td>
       <td>Private</td>
       <td>Bachelors</td>
       <td>Married</td>
       <td>Professional</td>
       <td>White</td>
       <td>Male</td>
-      <td>40.0</td>
+      <td>40</td>
       <td>0.968</td>
     </tr>
   </tbody>
@@ -1899,14 +1890,14 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>18.0</td>
+      <td>18</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>35.0</td>
+      <td>35</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1923,7 +1914,7 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>2</th>
-      <td>69.0</td>
+      <td>69</td>
       <td>-</td>
       <td>-</td>
       <td>Single</td>
@@ -1975,7 +1966,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.44it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.32it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2050,7 +2041,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2092,46 +2083,46 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>Widowed</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Female</td>
-      <td>-</td>
+      <td>22</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>68.0</td>
+      <td>28</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>18.0</td>
+      <td>-</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>29</td>
+      <td>Private</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Single</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>7.0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>83.0</td>
+      <td>-</td>
+      <td>-</td>
+      <td>School</td>
+      <td>Widowed</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
@@ -2203,7 +2194,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -2246,10 +2237,10 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>Separated</td>
-      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>32</td>
       <td>0</td>
     </tr>
     <tr>
@@ -2257,22 +2248,22 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Divorced</td>
-      <td>Blue-Collar</td>
+      <td>Separated</td>
       <td>-</td>
       <td>-</td>
+      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>23.0</td>
-      <td>-</td>
-      <td>Some-college</td>
       <td>-</td>
       <td>-</td>
+      <td>School</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils.exception &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.utils.exception &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -82,18 +82,6 @@
              
   <h1>Source code for dice_ml.utils.exception</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Exceptions for the package.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-
-
-<div class="viewcode-block" id="UserConfigValidationException"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.exception.UserConfigValidationException">[docs]</a><span class="k">class</span> <span class="nc">UserConfigValidationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An exception indicating that some user configuration is not valid.</span>
-
-<span class="sd">    :param exception_message: A message describing the error.</span>
-<span class="sd">    :type exception_message: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_error_code</span> <span class="o">=</span> <span class="s2">&quot;Invalid Configuration&quot;</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;UserConfigValidationException will be deprecated from dice_ml.utils. &quot;</span>
-                  <span class="s2">&quot;Please import UserConfigValidationException from raiutils.exceptions.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SystemException"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.exception.SystemException">[docs]</a><span class="k">class</span> <span class="nc">SystemException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>

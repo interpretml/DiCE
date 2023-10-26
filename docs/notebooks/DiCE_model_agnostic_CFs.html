@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generating counterfactual explanations with any ML model &mdash; DiCE 0.10 documentation</title>
+  <title>Generating counterfactual explanations with any ML model &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -396,7 +396,7 @@ div.rendered_html tbody tr:hover {
 <p>We use scikit-learn models for demonstration.</p>
 <section id="1.-Independent-random-sampling-of-features">
 <h2>1. Independent random sampling of features<a class="headerlink" href="#1.-Independent-random-sampling-of-features" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -411,15 +411,6 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/mnt/c/Users/amshar/code/dice/dice_ml/utils/exception.py:12: UserWarning: UserConfigValidationException will be deprecated from dice_ml.utils. Please import UserConfigValidationException from raiutils.exceptions.
-  warnings.warn(&#34;UserConfigValidationException will be deprecated from dice_ml.utils. &#34;
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -640,7 +631,7 @@ dice_exp_random = exp_random.generate_counterfactuals(query_instances, total_CFs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.79it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.98it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -715,7 +706,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -754,9 +745,9 @@ Diverse Counterfactual set (new outcome: 1.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>68.0</td>
+      <td>42</td>
       <td>-</td>
-      <td>Assoc</td>
+      <td>Prof-school</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -766,14 +757,14 @@ Diverse Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>1</th>
-      <td>71.0</td>
+      <td>43</td>
       <td>-</td>
       <td>Prof-school</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>71.0</td>
+      <td>-</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -844,7 +835,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -883,26 +874,26 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>58.0</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Prof-school</td>
+      <td>Separated</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>67.0</td>
+      <td>51</td>
+      <td>-</td>
+      <td>Masters</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>24.0</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -929,7 +920,7 @@ dice_exp_random = exp_random.generate_counterfactuals(query_instances,
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  3.07it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.49it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1004,7 +995,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1043,7 +1034,7 @@ Diverse Counterfactual set (new outcome: 1.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>87.0</td>
+      <td>87</td>
       <td>-</td>
       <td>Assoc</td>
       <td>-</td>
@@ -1055,7 +1046,7 @@ Diverse Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>1</th>
-      <td>67.0</td>
+      <td>67</td>
       <td>-</td>
       <td>Assoc</td>
       <td>-</td>
@@ -1067,7 +1058,7 @@ Diverse Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>2</th>
-      <td>61.0</td>
+      <td>61</td>
       <td>-</td>
       <td>Assoc</td>
       <td>-</td>
@@ -1079,7 +1070,7 @@ Diverse Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>3</th>
-      <td>72.0</td>
+      <td>72</td>
       <td>-</td>
       <td>Assoc</td>
       <td>-</td>
@@ -1157,7 +1148,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1199,11 +1190,11 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>Single</td>
+      <td>Professional</td>
       <td>-</td>
-      <td>Other/Unknown</td>
       <td>-</td>
       <td>-</td>
-      <td>16.0</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1213,14 +1204,14 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>White</td>
       <td>-</td>
-      <td>77.0</td>
+      <td>Female</td>
+      <td>16</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>44.0</td>
+      <td>44</td>
       <td>-</td>
       <td>-</td>
       <td>Separated</td>
@@ -1232,6 +1223,7 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>3</th>
+      <td>19</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1239,7 +1231,6 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>24.0</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1260,28 +1251,12 @@ dice_exp_random = exp_random.generate_counterfactuals(
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
- 50%|██████████████████████████████████████████▌                                          | 1/2 [00:00&lt;00:00,  2.04it/s]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Only 3 (required 4)  Diverse Counterfactuals found for the given configuration, perhaps try with different parameters... ; total time taken: 00 min 00 sec
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.45it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.64it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1356,7 +1331,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1402,7 +1377,7 @@ Diverse Counterfactual set (new outcome: 1.0)
       <td>Sales</td>
       <td>-</td>
       <td>-</td>
-      <td>82.0</td>
+      <td>82</td>
       <td>1</td>
     </tr>
     <tr>
@@ -1414,7 +1389,7 @@ Diverse Counterfactual set (new outcome: 1.0)
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>85.0</td>
+      <td>85</td>
       <td>1</td>
     </tr>
     <tr>
@@ -1426,7 +1401,7 @@ Diverse Counterfactual set (new outcome: 1.0)
       <td>Sales</td>
       <td>-</td>
       <td>-</td>
-      <td>70.0</td>
+      <td>70</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -1497,7 +1472,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1537,49 +1512,49 @@ Diverse Counterfactual set (new outcome: 0.0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>Other/Unknown</td>
+      <td>-</td>
+      <td>HS-grad</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>46.0</td>
+      <td>34</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
       <td>-</td>
+      <td>Other/Unknown</td>
+      <td>Doctorate</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>25.0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
       <td>-</td>
-      <td>Private</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>34.0</td>
+      <td>-</td>
+      <td>10</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3</th>
       <td>-</td>
-      <td>Other/Unknown</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>3.0</td>
+      <td>16</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1606,7 +1581,7 @@ dice_exp_random = exp_random.generate_counterfactuals(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.73it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.17it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1681,7 +1656,7 @@ Query instance (original outcome : 0)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 1.0)
+Diverse Counterfactual set (new outcome: 1)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1720,22 +1695,22 @@ Diverse Counterfactual set (new outcome: 1.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>43.0</td>
+      <td>37</td>
+      <td>-</td>
+      <td>Prof-school</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Professional</td>
       <td>-</td>
       <td>-</td>
-      <td>59.0</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43.0</td>
-      <td>Government</td>
+      <td>42</td>
       <td>-</td>
-      <td>Widowed</td>
+      <td>Prof-school</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1744,23 +1719,23 @@ Diverse Counterfactual set (new outcome: 1.0)
     </tr>
     <tr>
       <th>2</th>
-      <td>41.0</td>
-      <td>Self-Employed</td>
-      <td>-</td>
-      <td>Married</td>
+      <td>38</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>60</td>
       <td>1</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>33.0</td>
+      <td>38</td>
       <td>-</td>
-      <td>Doctorate</td>
+      <td>Prof-school</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1834,7 +1809,7 @@ Query instance (original outcome : 1)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
-Diverse Counterfactual set (new outcome: 0.0)
+Diverse Counterfactual set (new outcome: 0)
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1874,21 +1849,9 @@ Diverse Counterfactual set (new outcome: 0.0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>Private</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>-</td>
-      <td>-</td>
-      <td>HS-grad</td>
-      <td>-</td>
+      <td>Divorced</td>
       <td>Other/Unknown</td>
       <td>-</td>
       <td>-</td>
@@ -1896,24 +1859,36 @@ Diverse Counterfactual set (new outcome: 0.0)
       <td>0</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>-</td>
-      <td>Government</td>
-      <td>HS-grad</td>
+      <th>1</th>
+      <td>24</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
     </tr>
     <tr>
+      <th>2</th>
+      <td>-</td>
+      <td>-</td>
+      <td>School</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>52</td>
+      <td>0</td>
+    </tr>
+    <tr>
       <th>3</th>
-      <td>24.0</td>
+      <td>-</td>
+      <td>Private</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1975,7 +1950,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 50%|██████████████████████████████████████████▌                                          | 1/2 [00:01&lt;00:01,  1.99s/it]
+ 50%|██████████████████████████████████████████▌                                          | 1/2 [00:03&lt;00:03,  3.78s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1983,7 +1958,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 01 sec
+Diverse Counterfactuals found! total time taken: 00 min 03 sec
 Initializing initial parameters to the genetic algorithm...
 Initialization complete! Generating counterfactuals...
 </pre></div></div>
@@ -1993,7 +1968,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.43s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:04&lt;00:00,  2.46s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2001,7 +1976,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 00 sec
+Diverse Counterfactuals found! total time taken: 00 min 01 sec
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -2127,8 +2102,20 @@ Diverse Counterfactual set (new outcome: 1)
       <td>-</td>
       <td>Some-college</td>
       <td>Married</td>
+      <td>Professional</td>
       <td>-</td>
-      <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>Sales</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>1</td>
@@ -2149,22 +2136,10 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
-      <td>Married</td>
-      <td>Sales</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>26.0</td>
-      <td>-</td>
-      <td>Bachelors</td>
+      <td>Some-college</td>
       <td>Married</td>
       <td>-</td>
-      <td>-</td>
+      <td>Other</td>
       <td>-</td>
       <td>-</td>
       <td>1</td>
@@ -2276,23 +2251,11 @@ Diverse Counterfactual set (new outcome: 0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>32.0</td>
       <td>-</td>
       <td>-</td>
+      <td>School</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Assoc</td>
-      <td>-</td>
-      <td>-</td>
+      <td>Professional</td>
       <td>White</td>
       <td>-</td>
       <td>-</td>
@@ -2313,10 +2276,22 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>-</td>
+      <td>Private</td>
       <td>School</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>Blue-Collar</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
+      <td>HS-grad</td>
+      <td>-</td>
+      <td>White-Collar</td>
       <td>White</td>
       <td>-</td>
       <td>-</td>
@@ -2344,7 +2319,7 @@ dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:12&lt;00:00,  6.19s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:14&lt;00:00,  7.28s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2465,19 +2440,19 @@ Diverse Counterfactual set (new outcome: 1)
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>70.0</td>
+      <td>71</td>
       <td>1</td>
     </tr>
     <tr>
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
+      <td>Assoc</td>
       <td>-</td>
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>71.0</td>
+      <td>82</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -2588,8 +2563,8 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>Government</td>
       <td>-</td>
+      <td>Assoc</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2600,10 +2575,10 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
+      <td>Government</td>
       <td>-</td>
-      <td>Assoc</td>
       <td>-</td>
-      <td>-</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2631,7 +2606,7 @@ dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.04s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.25s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2747,9 +2722,9 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
+      <td>Some-college</td>
       <td>Married</td>
-      <td>Sales</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2759,9 +2734,9 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Assoc</td>
+      <td>Bachelors</td>
       <td>Married</td>
-      <td>White-Collar</td>
+      <td>Sales</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2875,11 +2850,11 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
+      <td>Private</td>
+      <td>Bachelors</td>
       <td>-</td>
-      <td>School</td>
+      <td>White-Collar</td>
       <td>-</td>
-      <td>Professional</td>
-      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
@@ -2887,11 +2862,11 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>-</td>
+      <td>Private</td>
       <td>Assoc</td>
-      <td>Divorced</td>
-      <td>Blue-Collar</td>
       <td>-</td>
+      <td>-</td>
+      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
@@ -2934,7 +2909,7 @@ dice_exp_KD = exp_KD.generate_counterfactuals(query_instances, total_CFs=4, desi
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.02s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.01it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -3047,20 +3022,8 @@ Diverse Counterfactual set (new outcome: 1)
   </thead>
   <tbody>
     <tr>
-      <th>6646</th>
-      <td>28.0</td>
-      <td>-</td>
-      <td>Assoc</td>
-      <td>Married</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>1</td>
-    </tr>
-    <tr>
       <th>11233</th>
-      <td>26.0</td>
+      <td>26</td>
       <td>-</td>
       <td>Bachelors</td>
       <td>Married</td>
@@ -3071,12 +3034,12 @@ Diverse Counterfactual set (new outcome: 1)
       <td>1</td>
     </tr>
     <tr>
-      <th>23580</th>
-      <td>-</td>
+      <th>3155</th>
+      <td>28</td>
       <td>-</td>
       <td>Assoc</td>
       <td>Married</td>
-      <td>White-Collar</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3090,6 +3053,18 @@ Diverse Counterfactual set (new outcome: 1)
       <td>Married</td>
       <td>-</td>
       <td>Other</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8361</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Some-college</td>
+      <td>Married</td>
+      <td>Professional</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>1</td>
@@ -3201,7 +3176,7 @@ Diverse Counterfactual set (new outcome: 0)
   <tbody>
     <tr>
       <th>15736</th>
-      <td>32.0</td>
+      <td>32</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3213,7 +3188,7 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>20071</th>
-      <td>-</td>
+      <td>29</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3270,7 +3245,7 @@ dice_exp_KD = exp_KD.generate_counterfactuals(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.20it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.45s/it]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -3384,7 +3359,7 @@ Diverse Counterfactual set (new outcome: 1)
   <tbody>
     <tr>
       <th>1267</th>
-      <td>25.0</td>
+      <td>25</td>
       <td>-</td>
       <td>Assoc</td>
       <td>-</td>
@@ -3501,7 +3476,7 @@ Diverse Counterfactual set (new outcome: 0)
   <tbody>
     <tr>
       <th>15736</th>
-      <td>32.0</td>
+      <td>32</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3513,7 +3488,7 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>20071</th>
-      <td>-</td>
+      <td>29</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3572,7 +3547,7 @@ dice_exp_KD.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.32it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.38s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -3746,7 +3721,7 @@ Diverse Counterfactual set (new outcome: 0)
   <tbody>
     <tr>
       <th>15736</th>
-      <td>32.0</td>
+      <td>32</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3793,12 +3768,12 @@ Diverse Counterfactual set (new outcome: 0)
       <td>0</td>
     </tr>
     <tr>
-      <th>5064</th>
+      <th>22686</th>
+      <td>-</td>
+      <td>Private</td>
+      <td>Bachelors</td>
       <td>-</td>
       <td>-</td>
-      <td>HS-grad</td>
-      <td>-</td>
-      <td>Blue-Collar</td>
       <td>White</td>
       <td>-</td>
       <td>-</td>

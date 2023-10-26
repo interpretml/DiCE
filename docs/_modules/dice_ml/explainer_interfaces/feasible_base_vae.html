@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.feasible_base_vae &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.explainer_interfaces.feasible_base_vae &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -272,7 +272,7 @@
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_CFs</span><span class="p">):</span>
                 <span class="n">recon_err</span><span class="p">,</span> <span class="n">kl_err</span><span class="p">,</span> <span class="n">x_true</span><span class="p">,</span> <span class="n">x_pred</span><span class="p">,</span> <span class="n">cf_label</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">compute_elbo</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">train_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_model</span><span class="p">)</span>
-                <span class="k">while</span><span class="p">(</span><span class="n">cf_label</span> <span class="o">==</span> <span class="n">train_y</span><span class="p">):</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">cf_label</span> <span class="o">==</span> <span class="n">train_y</span><span class="p">):</span>
                     <span class="nb">print</span><span class="p">(</span><span class="n">cf_label</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
                     <span class="n">recon_err</span><span class="p">,</span> <span class="n">kl_err</span><span class="p">,</span> <span class="n">x_true</span><span class="p">,</span> <span class="n">x_pred</span><span class="p">,</span> <span class="n">cf_label</span> <span class="o">=</span> \
                         <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">compute_elbo</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">train_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pred_model</span><span class="p">)</span>

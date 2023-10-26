@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml package &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml package &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -241,6 +241,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data"><code class="docutils literal notranslate"><span class="pre">PrivateData.one_hot_encode_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding"><code class="docutils literal notranslate"><span class="pre">PrivateData.prepare_df_for_ohe_encoding()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance"><code class="docutils literal notranslate"><span class="pre">PrivateData.prepare_query_instance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df"><code class="docutils literal notranslate"><span class="pre">PrivateData.query_instance_to_df()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -286,6 +287,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.duplicates"><code class="docutils literal notranslate"><span class="pre">DiceKD.duplicates()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.find_counterfactuals"><code class="docutils literal notranslate"><span class="pre">DiceKD.find_counterfactuals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn"><code class="docutils literal notranslate"><span class="pre">DiceKD.predict_fn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn_scores"><code class="docutils literal notranslate"><span class="pre">DiceKD.predict_fn_scores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_KD.DiceKD.vary_valid"><code class="docutils literal notranslate"><span class="pre">DiceKD.vary_valid()</span></code></a></li>
 </ul>
 </li>
@@ -402,6 +404,8 @@
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.check_permitted_range()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.check_query_instance_validity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.decide_cf_validity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.decode_model_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.decode_to_original_labels()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.deserialize_explainer"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.deserialize_explainer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.do_binary_search()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search"><code class="docutils literal notranslate"><span class="pre">ExplainerBase.do_linear_search()</span></code></a></li>
@@ -498,7 +502,6 @@
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.exception">dice_ml.utils.exception module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.exception.SystemException"><code class="docutils literal notranslate"><span class="pre">SystemException</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.exception.UserConfigValidationException"><code class="docutils literal notranslate"><span class="pre">UserConfigValidationException</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.helpers">dice_ml.utils.helpers module</a><ul>
@@ -521,7 +524,9 @@
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset"><code class="docutils literal notranslate"><span class="pre">load_adult_income_dataset()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset_binary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset_binary_str()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset_multiclass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset_multiclass_str()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_regression"><code class="docutils literal notranslate"><span class="pre">load_custom_testing_dataset_regression()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_min_max_equal_dataset"><code class="docutils literal notranslate"><span class="pre">load_min_max_equal_dataset()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.helpers.load_outcome_not_last_column_dataset"><code class="docutils literal notranslate"><span class="pre">load_outcome_not_last_column_dataset()</span></code></a></li>
@@ -532,6 +537,10 @@
 <li class="toctree-l2"><a class="reference internal" href="dice_ml.utils.html#module-dice_ml.utils.neuralnetworks">dice_ml.utils.neuralnetworks module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.FFNetwork"><code class="docutils literal notranslate"><span class="pre">FFNetwork</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.FFNetwork.forward"><code class="docutils literal notranslate"><span class="pre">FFNetwork.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.MulticlassNetwork"><code class="docutils literal notranslate"><span class="pre">MulticlassNetwork</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dice_ml.utils.html#dice_ml.utils.neuralnetworks.MulticlassNetwork.forward"><code class="docutils literal notranslate"><span class="pre">MulticlassNetwork.forward()</span></code></a></li>
 </ul>
 </li>
 </ul>
