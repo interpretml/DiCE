@@ -138,7 +138,17 @@ def load_outcome_not_last_column_dataset():
 
 
 def load_custom_testing_dataset_binary():
-    data = [['a', 1, 0], ['b', 5, 1], ['c', 2, 0], ['a', 3, 0], ['c', 4, 1]]
+    data = [
+        ['a', 1, 0],
+        ['b', 5, 1],
+        ['c', 2, 0],
+        ['a', 3, 0],
+        ['c', 4, 1],
+        ['d', 10, 0],
+        ['a', 7, 0],
+        ['c', 8, 1],
+        ['b', 10, 1],
+    ]
     return pd.DataFrame(data, columns=['Categorical', 'Numerical', 'Outcome'])
 
 
