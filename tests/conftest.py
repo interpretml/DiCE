@@ -24,8 +24,8 @@ def random_binary_classification_exp_object(request):
         d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     else:
         d = dice_ml.Data(features={
-                                   'Numerical': [0, 5],
-                                   'Categorical': ['a', 'b', 'c']},
+                                   'Numerical': [0, 10],
+                                   'Categorical': ['a', 'b', 'c',]},
                          outcome_name="Outcome")
     if backend == "PYT":
         torch.manual_seed(1)
