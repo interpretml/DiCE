@@ -1,8 +1,7 @@
 import pytest
-from raiutils.exceptions import UserConfigValidationException
-
 from dice_ml.counterfactual_explanations import CounterfactualExplanations
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from raiutils.exceptions import UserConfigValidationException
 
 BACKENDS = ['sklearn', 'PYT']
 

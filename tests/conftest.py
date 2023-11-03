@@ -251,17 +251,6 @@ def binary_classification_exp_object(method="random"):
 
 
 @pytest.fixture(scope="session")
-def binary_classification_exp_object_out_of_order(method="random"):
-    backend = 'sklearn'
-    dataset = helpers.load_outcome_not_last_column_dataset()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    model = _load_custom_testing_binary_model()
-    m = dice_ml.Model(model=model, backend=backend)
-    exp = dice_ml.Dice(d, m, method=method)
-    return exp
-
-
-@pytest.fixture(scope="session")
 def multi_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_multiclass()
