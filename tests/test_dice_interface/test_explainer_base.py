@@ -1,15 +1,16 @@
 import re
 
-import dice_ml
 import numpy as np
 import pandas as pd
 import pytest
-from dice_ml.diverse_counterfactuals import CounterfactualExamples
-from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
-from dice_ml.utils import helpers
 from rai_test_utils.datasets.tabular import create_housing_data
 from raiutils.exceptions import UserConfigValidationException
 from sklearn.ensemble import RandomForestRegressor
+
+import dice_ml
+from dice_ml.diverse_counterfactuals import CounterfactualExamples
+from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.utils import helpers
 
 from ..conftest import _load_custom_testing_binary_model
 
