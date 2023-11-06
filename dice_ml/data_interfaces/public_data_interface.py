@@ -451,24 +451,7 @@ class PublicData(_BaseData):
 
     def prepare_query_instance(self, query_instance):
         """Prepares user defined test input(s) for DiCE."""
-        if isinstance(query_instance, list):
-            if isinstance(query_instance[0], dict):  # prepare a list of query instances
-                test = pd.DataFrame(query_instance, columns=self.feature_names)
-
-            else:  # prepare a single query instance in list
-                query_instance = {'row1': query_instance}
-                test = pd.DataFrame.from_dict(
-                    query_instance, orient='index', columns=self.feature_names)
-
-        elif isinstance(query_instance, dict):
-            test = pd.DataFrame({k: [v] for k, v in query_instance.items()}, columns=self.feature_names)
-
-        elif isinstance(query_instance, pd.DataFrame):
-            test = query_instance.copy()
-
-        else:
-            raise ValueError("Query instance should be a dict, a pandas dataframe, a list, or a list of dicts")
-
+        test = self.query_instance_to_df(query_instance)
         test = test.reset_index(drop=True)
         # encode categorical and numerical columns
         test = self._set_feature_dtypes(test,

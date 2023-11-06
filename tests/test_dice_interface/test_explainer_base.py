@@ -10,6 +10,9 @@ from sklearn.ensemble import RandomForestRegressor
 import dice_ml
 from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
+from dice_ml.utils import helpers
+
+from ..conftest import _load_custom_testing_binary_model
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
@@ -116,18 +119,26 @@ class TestExplainerBaseBinaryClassification:
 
         self._verify_feature_importance(global_importance.summary_importance)
 
-    # @pytest.mark.parametrize("desired_class, binary_classification_exp_object_out_of_order",
-    #                          [(1, 'random'), (1, 'genetic'), (1, 'kdtree')],
-    #                          indirect=['binary_classification_exp_object_out_of_order'])
-    # def test_columns_out_of_order(self, desired_class, binary_classification_exp_object_out_of_order, sample_custom_query_1):
-    #     exp = binary_classification_exp_object_out_of_order  # explainer object
-    #     exp._generate_counterfactuals(
-    #         query_instance=sample_custom_query_1,
-    #         total_CFs=0,
-    #         desired_class=desired_class,
-    #         desired_range=None,
-    #         permitted_range=None,
-    #         features_to_vary='all')
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_columns_out_of_order(self, desired_class, method, sample_custom_query_1):
+        if method == 'genetic':
+            pytest.skip('DiceGenetic explainer fails this test case')
+
+        dataset = helpers.load_outcome_not_last_column_dataset()
+        d = dice_ml.Data(
+            dataframe=dataset, continuous_features=['Numerical'],
+            outcome_name='Outcome')
+        model = _load_custom_testing_binary_model()
+        m = dice_ml.Model(model=model, backend='sklearn')
+        exp = dice_ml.Dice(d, m, method=method)
+
+        exp._generate_counterfactuals(
+            query_instance=sample_custom_query_1,
+            total_CFs=0,
+            desired_class=desired_class,
+            desired_range=None,
+            permitted_range=None,
+            features_to_vary='all')
 
     @pytest.mark.parametrize("desired_class", [1])
     def test_incorrect_features_to_vary_list(
@@ -317,6 +328,28 @@ class TestExplainerBaseBinaryClassification:
                                       total_CFs=total_CFs, desired_class=desired_class,
                                       desired_range=desired_range, permitted_range=permitted_range)
 
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_cfs_type_consistency(
+            self, desired_class, method,
+            sample_custom_query_1, sample_counterfactual_example_dummy,
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_binary_classification_model_interface,
+            method=method)
+        sample_custom_query = pd.concat([sample_custom_query_1, sample_custom_query_1])
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=sample_custom_query,
+                    total_CFs=2,
+                    desired_class=desired_class)
+        for col in sample_custom_query.columns:
+            assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df_sparse is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query[col].dtype
+
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
 class TestExplainerBaseMultiClassClassification:
@@ -427,6 +460,27 @@ class TestExplainerBaseMultiClassClassification:
         exp._generate_counterfactuals(features_to_vary=features_to_vary, query_instance=sample_custom_query_2,
                                       total_CFs=total_CFs, desired_class=desired_class,
                                       desired_range=desired_range, permitted_range=permitted_range)
+
+    @pytest.mark.parametrize("desired_class", [1])
+    def test_cfs_type_consistency(
+            self, desired_class, method, sample_custom_query_1,
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface):
+        exp = dice_ml.Dice(
+            custom_public_data_interface,
+            sklearn_multiclass_classification_model_interface,
+            method=method)
+        cf_explanations = exp.generate_counterfactuals(
+                    query_instances=[sample_custom_query_1],
+                    total_CFs=2,
+                    desired_class=desired_class)
+
+        for col in sample_custom_query_1.columns:
+            assert cf_explanations.cf_examples_list[0].test_instance_df[col].dtype == sample_custom_query_1[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query_1[col].dtype
+            if cf_explanations.cf_examples_list[0].final_cfs_df_sparse is not None:
+                assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query_1[col].dtype
 
 
 class TestExplainerBaseRegression:

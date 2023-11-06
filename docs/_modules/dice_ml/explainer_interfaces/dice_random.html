@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.dice_random &mdash; DiCE 0.9 documentation</title>
+  <title>dice_ml.explainer_interfaces.dice_random &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -50,8 +50,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_model_agnostic_CFs.html">Generating counterfactual explanations with any ML model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_private_data.html">Generating counterfactual explanations without access to training data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_with_advanced_options.html">Advanced options to customize Counterfactual Explanations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html">Generate feasible counterfactual explanations using a VAE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notebooks/DiCE_getting_started_feasible.html#Adding-feasibility-constraints">Adding feasibility constraints</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package:</span></p>
 <ul>
@@ -102,7 +100,7 @@
 <div class="viewcode-block" id="DiceRandom"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_random.DiceRandom">[docs]</a><span class="k">class</span> <span class="nc">DiceRandom</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Init method</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param data_interface: an interface class to access data related params.</span>
 <span class="sd">        :param model_interface: an interface class to access trained ML model.</span>
@@ -125,7 +123,7 @@
                                   <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                                   <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                   <span class="n">limit_steps_ls</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Generate counterfactuals by randomly sampling features.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate counterfactuals by randomly sampling features.</span>
 
 <span class="sd">        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.</span>
 <span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
@@ -265,7 +263,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_cfs_found</span><span class="p">:</span>
+
+        <span class="c1"># decoding to original label</span>
+        <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">decode_to_original_labels</span><span class="p">(</span><span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Diverse Counterfactuals found! total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span>
                       <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
@@ -278,12 +280,14 @@
                       <span class="s1">&#39;Diverse Counterfactuals found for the given configuration, perhaps try with different parameters...&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;; total time taken: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
 
+        <span class="n">desired_class_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> \
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;target_cf_class&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">desired_class</span>
         <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span><span class="n">data_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span>
                                           <span class="n">final_cfs_df</span><span class="o">=</span><span class="n">final_cfs_df</span><span class="p">,</span>
                                           <span class="n">test_instance_df</span><span class="o">=</span><span class="n">test_instance_df</span><span class="p">,</span>
                                           <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span>
                                           <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
-                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class_param</span><span class="p">,</span>
                                           <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
                                           <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span>
 

@@ -24,8 +24,8 @@ def random_binary_classification_exp_object(request):
         d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     else:
         d = dice_ml.Data(features={
-                                   'Numerical': [0, 5],
-                                   'Categorical': ['a', 'b', 'c']},
+                                   'Numerical': [0, 10],
+                                   'Categorical': ['a', 'b', 'c',]},
                          outcome_name="Outcome")
     if backend == "PYT":
         torch.manual_seed(1)
@@ -243,17 +243,6 @@ def KD_regression_exp_object():
 def binary_classification_exp_object(method="random"):
     backend = 'sklearn'
     dataset = helpers.load_custom_testing_dataset_binary()
-    d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
-    model = _load_custom_testing_binary_model()
-    m = dice_ml.Model(model=model, backend=backend)
-    exp = dice_ml.Dice(d, m, method=method)
-    return exp
-
-
-@pytest.fixture(scope="session")
-def binary_classification_exp_object_out_of_order(method="random"):
-    backend = 'sklearn'
-    dataset = helpers.load_outcome_not_last_column_dataset()
     d = dice_ml.Data(dataframe=dataset, continuous_features=['Numerical'], outcome_name='Outcome')
     model = _load_custom_testing_binary_model()
     m = dice_ml.Model(model=model, backend=backend)

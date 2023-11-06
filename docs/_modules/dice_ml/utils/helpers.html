@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils.helpers &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -225,9 +225,31 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
+<div class="viewcode-block" id="load_custom_testing_dataset_binary_str"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_binary_str</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">,</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">])</span></div>
+
+
 <div class="viewcode-block" id="load_custom_testing_dataset_multiclass"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_multiclass</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="load_custom_testing_dataset_multiclass_str"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_multiclass_str</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">,</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="load_custom_testing_dataset_regression"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_regression">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_regression</span><span class="p">():</span>

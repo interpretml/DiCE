@@ -90,7 +90,7 @@ class TestDiceKDBinaryClassificationMethods:
         self.exp._generate_counterfactuals(query_instance=sample_custom_query_index, total_CFs=total_CFs,
                                            desired_class=desired_class,
                                            posthoc_sparsity_algorithm=posthoc_sparsity_algorithm)
-        assert self.exp.final_cfs_df.index[0] == 3
+        assert self.exp.final_cfs_df.index[0] == 6
 
 
 class TestDiceKDMultiClassificationMethods:

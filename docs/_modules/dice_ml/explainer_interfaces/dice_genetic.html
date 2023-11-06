@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.dice_genetic &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.explainer_interfaces.dice_genetic &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -357,11 +357,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">x1</span> <span class="o">=</span> <span class="n">query_instance</span>
 
         <span class="c1"># find the predicted value of query_instance</span>
-        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
+        <span class="n">test_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn_scores</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span> <span class="o">=</span> <span class="n">test_pred</span>
-
-        <span class="n">desired_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">misc_init</span><span class="p">(</span><span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">)</span>
+        <span class="n">desired_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">misc_init</span><span class="p">(</span><span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="n">query_instance_df_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">query_instance_orig</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_all_dummy_colnames</span><span class="p">():</span>
@@ -376,13 +375,15 @@
         <span class="n">query_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_counterfactuals</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span>
                                                       <span class="n">maxiterations</span><span class="p">,</span> <span class="n">thresh</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
+        <span class="n">desired_class_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span> \
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;target_cf_class&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">desired_class</span>
         <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span><span class="n">data_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span>
                                           <span class="n">test_instance_df</span><span class="o">=</span><span class="n">query_instance_df</span><span class="p">,</span>
                                           <span class="n">final_cfs_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span>
                                           <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">,</span>
                                           <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
                                           <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
-                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class_param</span><span class="p">,</span>
                                           <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DiceGenetic.predict_fn_scores"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_genetic.DiceGenetic.predict_fn_scores">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
@@ -590,7 +591,7 @@
 
         <span class="c1"># converting to dataframe</span>
         <span class="n">query_instance_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
-        <span class="n">query_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span>
+        <span class="n">query_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_decode_cfs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span>
 
@@ -598,6 +599,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_preds</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">round_to_precision</span><span class="p">()</span>
+
+        <span class="c1"># decoding to original label</span>
+        <span class="n">query_instance_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">decode_to_original_labels</span><span class="p">(</span><span class="n">query_instance_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
         <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>

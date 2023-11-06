@@ -22,7 +22,7 @@ copyright = '2020, Ramaravind, Amit, Chenhao'  # noqa: A001
 author = 'Ramaravind, Amit, Chenhao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.10'
+release = '0.11'
 
 
 # -- General configuration ---------------------------------------------------

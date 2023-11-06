@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.10 documentation</title>
+  <title>dice_ml.explainer_interfaces package &mdash; DiCE 0.11 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -172,6 +172,12 @@ This code is similar to ‘Interpretable Counterfactual Explanations Guided by P
 <dt class="sig sig-object py" id="dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn">
 <span class="sig-name descname"><span class="pre">predict_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.predict_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn" title="Permalink to this definition"></a></dt>
 <dd><p>returns predictions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn_scores">
+<span class="sig-name descname"><span class="pre">predict_fn_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/dice_KD.html#DiceKD.predict_fn_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.dice_KD.DiceKD.predict_fn_scores" title="Permalink to this definition"></a></dt>
+<dd><p>Returns prediction scores.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -806,6 +812,16 @@ TODO: add comments as to where this is used if this function is necessary, else 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity">
 <span class="sig-name descname"><span class="pre">decide_cf_validity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.decide_cf_validity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output">
+<span class="sig-name descname"><span class="pre">decode_model_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded_labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.decode_model_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels">
+<span class="sig-name descname"><span class="pre">decode_to_original_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_instance_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_cfs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_cfs_df_sparse</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/explainer_interfaces/explainer_base.html#ExplainerBase.decode_to_original_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
