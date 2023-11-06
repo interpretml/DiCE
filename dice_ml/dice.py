@@ -60,6 +60,9 @@ def decide(model_interface, method):
     elif method == SamplingStrategy.Genetic_Conformance:
         from dice_ml.explainer_interfaces.dice_genetic_conformance import DiceGeneticConformance
         return DiceGeneticConformance
+    elif method == SamplingStrategy.MultiObjectiveGenetic:
+        from dice_ml.explainer_interfaces.dice_multi_objective_genetic import DiceMultiObjectiveGenetic
+        return DiceMultiObjectiveGenetic
     elif method == SamplingStrategy.KdTree:
         from dice_ml.explainer_interfaces.dice_KD import DiceKD
         return DiceKD

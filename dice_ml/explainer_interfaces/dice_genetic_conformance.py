@@ -15,6 +15,7 @@ from dice_ml.utils.exception import UserConfigValidationException
 import pm4py
 from declare4py.declare4py import Declare4Py
 from declare4py.enums import TraceState
+import re
 '''
 from pm4py.objects.log.exporter.xes.factory import export_log as export_log_xes
 from pm4py.objects.conversion.log.factory import apply as df_to_eventLog
@@ -24,7 +25,7 @@ import pm4py.objects.log.importer.csv.factory
 import itertools
 from datetime import datetime
 heuristic = 1
-#import declare4py.src.declare4py.declare4py
+#import declare4py.nirdizati_light.declare4py.declare4py
 class DiceGeneticConformance(ExplainerBase):
 
     def __init__(self, data_interface, model_interface,encoder=None,dataset=None):
@@ -88,7 +89,8 @@ class DiceGeneticConformance(ExplainerBase):
                         # the weight is inversely proportional to max value
                         feature_weights_list.append(round(1 / self.feature_range[feature].max(), 2))
             self.feature_weights_list = [feature_weights_list]
-
+    # make do_random_init function more efficient
+    '''
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
         remaining_cfs = np.zeros((num_inits, self.data_interface.number_of_features))
         # kx is the number of valid inits found so far
@@ -109,6 +111,35 @@ class DiceGeneticConformance(ExplainerBase):
                 remaining_cfs[kx] = one_init
                 kx += 1
         return remaining_cfs
+    '''
+
+    def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
+        valid_inits = []
+        precisions = self.data_interface.get_decimal_precisions()
+
+        while len(valid_inits) < num_inits:
+            num_remaining = num_inits - len(valid_inits)
+            num_features = self.data_interface.number_of_features
+
+            # Generate random initializations for all features at once
+            random_inits = np.zeros((num_remaining, num_features))
+            for jx, feature in enumerate(self.data_interface.feature_names):
+                if feature in features_to_vary:
+                    if feature in self.data_interface.continuous_feature_names:
+                        random_inits[:, jx] = np.random.uniform(self.feature_range[feature][0],
+                                                                self.feature_range[feature][1], num_remaining)
+                        random_inits[:, jx] = np.round(random_inits[:, jx], precisions[jx])
+                    else:
+                        random_inits[:, jx] = np.random.choice(self.feature_range[feature], num_remaining)
+                else:
+                    random_inits[:, jx] = query_instance[jx]
+
+            # Filter out the valid initializations
+            valid_mask = np.apply_along_axis(self.is_cf_valid, 1, self.predict_fn_scores(random_inits))
+            valid_inits.extend(random_inits[valid_mask])
+
+        return np.array(valid_inits[:num_inits])
+
 
     def do_KD_init(self, features_to_vary, query_instance, cfs, desired_class, desired_range):
         #cfs = self.label_encode(cfs)
@@ -151,6 +182,8 @@ class DiceGeneticConformance(ExplainerBase):
             remaining_cfs = self.do_random_init(
                 self.population_size - len(uniques), features_to_vary, query_instance, desired_class, desired_range)
             self.cfs = np.concatenate([uniques, remaining_cfs])
+            
+
     def do_cf_initializations(self, total_CFs, initialization, algorithm, features_to_vary, desired_range,
                               desired_class,
                               query_instance, query_instance_df_dummies, verbose):
@@ -214,9 +247,9 @@ class DiceGeneticConformance(ExplainerBase):
                                   sparsity_weight=0.5, diversity_weight=0.5, categorical_penalty=0.1,
                                   algorithm="DiverseCF", features_to_vary="all", permitted_range=None,
                                   yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
-                                  feature_weights="inverse_mad", stopping_threshold=0.2, posthoc_sparsity_param=0,
+                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0,
                                   posthoc_sparsity_algorithm="linear", maxiterations=15, thresh=1e-2, verbose=True,conformance_weight=3,
-                                  model_path=None,optimization=None,heuristic=None):
+                                  model_path=None,optimization=None,heuristic=None, random_seed=None):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -257,7 +290,8 @@ class DiceGeneticConformance(ExplainerBase):
         :return: A CounterfactualExamples object to store and visualize the resulting counterfactual explanations
                  (see diverse_counterfactuals.py).
         """
-
+        random.seed(random_seed)
+        np.random.seed(random_seed)
         if not hasattr(self.data_interface, 'data_df') and initialization == "kdtree":
             raise UserConfigValidationException(
                     "kd-tree initialization is not supported for private data"
@@ -302,19 +336,11 @@ class DiceGeneticConformance(ExplainerBase):
                                       yloss_type, diversity_loss_type, feature_weights, proximity_weight,
                                       sparsity_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose)
         d4py = Declare4Py()
-        d4py.parse_decl_model(os.path.join(model_path,(dataset+'_'+str(encoder.prefix_length)+'.decl')))
-        #d4py.parse_decl_model(os.path.join(model_path,(dataset+'.decl')))
-        activities, activations, targets = self.get_constraint_activities(d4py)
-        '''
-        start_time = timeit.default_timer()
+        d4py.parse_decl_model(os.path.join(model_path,(dataset+'.decl')))
+        self.filter_declare_model(query_instance,encoder,d4py)
 
-        self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-            query_instance, self.cfs, encoder, dataset, d4py
-        )
-        elapsed = timeit.default_timer() - start_time
-        print('Conformance score computation time: ', elapsed)
-        self.cfs = self.cfs[np.where(self.conformance_score > 0.95)]
-        '''
+        activities, activations, targets = self.get_constraint_activities(d4py)
+
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary,
                                                       maxiterations, thresh, verbose,encoder,dataset,model_path,d4py,optimization,
                                                       heuristic,activities,activations,targets)
@@ -460,22 +486,13 @@ class DiceGeneticConformance(ExplainerBase):
         encoder.decode(original_query_df)
         one_init = np.zeros(self.data_interface.number_of_features)
         prob = random.random()
-        '''
-        This decides randomly which parent's activities that are in the declare model to take
-        parent1df = k1df[k1df.isin(activities)]
-        parent2df = k2df[k2df.isin(activities)]
-        if prob < 0.5:
-            child = parent1df[parent1df.notnull()]
-        else:
-            child = parent2df[parent2df.notnull()]
-        '''
         filter_query = original_query_df[original_query_df.isin(activities)]
         child = filter_query[filter_query.notnull()]
         child = child.to_numpy().reshape(-1)
 
         for j in range(self.data_interface.number_of_features):
             feat_name = self.data_interface.feature_names[j]
-            if 'prefix' in feat_name:
+            if ('prefix' in feat_name) & (pd.isnull(child[j])):
                 if k1df[feat_name][0] in targets:
                     child[j] = k1df[feat_name][0]
                 elif k2df[feat_name][0] in targets:
@@ -598,24 +615,17 @@ class DiceGeneticConformance(ExplainerBase):
             population = np.unique(tuple(map(tuple, population)), axis=0)
             ##TODO: Add conformance checking here before computing fitness
             if optimization == 'filtering':
-                '''
-                if iterations == 1:
-                    self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-                        query_instance, population, encoder, dataset, d4py
-                    )
-                    population = population[np.where(self.conformance_score > 0.85)]
-                '''
-                if iterations % 2 == 0:
-                    self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-                        query_instance, population, encoder, dataset, d4py
-                    )
-                    population = population[np.where(self.conformance_score > 0.85)]
+                if iterations % 2 == 0 & iterations != 0:
+                    #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
+                    #    query_instance, population, encoder, d4py)
+                    self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder, d4py)
+                    population = population[np.where(self.conformance_score > 0.8)]
 
                 population_fitness = self.compute_filtered_loss(query_instance,population, desired_range, desired_class)
             elif (optimization == 'loss_function') | (iterations > 0):
-                self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-                    query_instance, population, encoder, dataset, d4py
-                )
+                #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
+                #    query_instance, population, encoder, d4py)
+                self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder,d4py)
                 population_fitness = self.compute_loss(query_instance,population, desired_range, desired_class)
             population_fitness = population_fitness[population_fitness[:, 1].argsort()]
             current_best_loss = population_fitness[0][1]
@@ -656,14 +666,12 @@ class DiceGeneticConformance(ExplainerBase):
                 raise SystemError("The number of total_Cfs is greater than the population size!")
             iterations += 1
         if optimization == 'filtering':
-            start_time = timeit.default_timer()
-            self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-                query_instance, population, encoder, dataset, d4py
-            )
-            elapsed = timeit.default_timer() - start_time
-            print('Time elapsed for conformance checking: ', elapsed)
+            #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
+            #    query_instance, population, encoder, d4py)
+            self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder,d4py)
+            self.conformance_score.argsort()[::-1]
+            population = population[self.conformance_score.argsort()[::-1]]
 
-            population = population[np.where(self.conformance_score > 0.999)]
 
         self.cfs_preds = []
         self.final_cfs = []
@@ -756,7 +764,7 @@ class DiceGeneticConformance(ExplainerBase):
             ret[feat_name] = np.array(ret[feat_name],dtype=float)
         return ret
 
-    def compute_conformance(self,query_instance,population,encoder,dataset,d4py):
+    def compute_conformance(self,query_instance,population,encoder,d4py):
         population_df = pd.DataFrame(population, columns=self.data_interface.feature_names)
         query_instance_to_decode = pd.DataFrame(np.array(query_instance,dtype=float), columns=self.data_interface.feature_names)
         encoder.decode(query_instance_to_decode)
@@ -822,3 +830,78 @@ class DiceGeneticConformance(ExplainerBase):
         activities = activations.copy()
         activities.update(targets)
         return activities, activations, targets
+
+    def filter_declare_model(self,query_instance,encoder,d4py):
+        query_instance_to_decode = pd.DataFrame(np.array(query_instance, dtype=float),
+                                                columns=self.data_interface.feature_names)
+        encoder.decode(query_instance_to_decode)
+
+        query_instance_to_decode.insert(loc=0, column='Case ID',
+                                        value=np.divmod(np.arange(len(query_instance_to_decode)), 1)[0] + 1)
+        query_instance_to_decode.insert(loc=1, column='label', value=1)
+        long_query_instance = pd.wide_to_long(query_instance_to_decode, stubnames=['prefix'], i='Case ID',
+                                              j='order', sep='_', suffix=r'\w+')
+        long_query_instance_sorted = long_query_instance.sort_values(['Case ID', 'order'], ).reset_index(drop=False)
+        columns_to_rename = {'Case ID': 'case:concept:name', 'prefix': 'concept:name'}
+        long_query_instance_sorted.rename(columns=columns_to_rename, inplace=True)
+        long_query_instance_sorted['label'].replace({'regular': 'false', 'deviant': 'true'}, inplace=True)
+        long_query_instance_sorted.replace('0', 'other', inplace=True)
+        query_log = pm4py.convert_to_event_log(long_query_instance_sorted)
+        d4py.load_xes_log(query_log)
+        model_check_query = d4py.conformance_checking(consider_vacuity=False)
+        query_patterns = {
+            constraint
+            for trace, patts in model_check_query.items()
+            for constraint, checker in patts.items()
+            if checker.state == TraceState.SATISFIED
+        }
+
+        def remove(list):
+            pattern = r'(Exactly|Existence|Absence)(1|2|3)'
+            # Replace "Exactly1" or "Existence1" with "Exactly" or "Existence"
+            list = [re.sub(pattern, r'\1', s) for s in list]
+            return list
+
+        query_pattern = list(query_patterns)
+        query_pattern_filter = remove(query_pattern)
+
+        model_constraints = d4py.model.constraints
+        updated_constraints = []
+        indexes = []
+        for i in model_constraints:
+            if i in query_pattern_filter:
+                indexes.append(d4py.model.constraints.index(i))
+                updated_constraints.append(i)
+        d4py.model.checkers = [d4py.model.checkers[i] for i in indexes]
+        d4py.model.constraints = updated_constraints
+
+    def compute_conformance_new(self, population, encoder, d4py):
+        population_df = pd.DataFrame(population, columns=self.data_interface.feature_names)
+        encoder.decode(population_df)
+        population_df.insert(loc=0, column='Case ID', value=np.divmod(np.arange(len(population_df)), 1)[0] + 1)
+        population_df.insert(loc=1, column='label', value=1)
+        long_data = pd.wide_to_long(population_df, stubnames=['prefix'], i='Case ID',
+                                    j='order', sep='_', suffix=r'\w+')
+        timestamps = pd.date_range('1/1/2011', periods=len(long_data), freq='H')
+        long_data_sorted = long_data.sort_values(['Case ID', 'order'], ).reset_index(drop=False)
+        long_data_sorted['time:timestamp'] = timestamps
+        long_data_sorted['label'].replace({1: 'regular'}, inplace=True)
+        long_data_sorted.drop(columns=['order'], inplace=True)
+        columns_to_rename = {'Case ID': 'case:concept:name', 'prefix': 'concept:name'}
+        long_data_sorted.rename(columns=columns_to_rename, inplace=True)
+        long_data_sorted['label'].replace({'regular': 'false', 'deviant': 'true'}, inplace=True)
+        long_data_sorted.replace('0', 'other', inplace=True)
+        event_log = pm4py.convert_to_event_log(long_data_sorted)
+        d4py.load_xes_log(event_log)
+        model_check_res = d4py.conformance_checking(consider_vacuity=False)
+
+        model_check_res_filter = {
+            k: {
+                constraint: checker
+                for constraint, checker in v.items()
+                if checker.state != TraceState.VIOLATED
+            }
+            for k, v in model_check_res.items()
+        }
+        conformance_score = np.array([len(v) / len(model_check_res.get(k).values()) for k,v in model_check_res_filter.items()])
+        return conformance_score, model_check_res

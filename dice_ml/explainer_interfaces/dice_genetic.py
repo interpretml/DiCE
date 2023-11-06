@@ -14,10 +14,8 @@ from dice_ml import diverse_counterfactuals as exp
 from dice_ml.constants import ModelTypes
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
-
 class DiceGenetic(ExplainerBase):
-
-    def __init__(self, data_interface, model_interface):
+    def __init__(self, data_interface, model_interface,encoder=None,dataset=None):
         """Init method
 
         :param data_interface: an interface class to access data related params.
@@ -34,7 +32,7 @@ class DiceGenetic(ExplainerBase):
         self.feature_weights_input = ''
 
         # Initializing a label encoder to obtain label-encoded values for categorical variables
-        self.labelencoder = self.data_interface.fit_label_encoders()
+        self.labelencoder = set()
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
     def update_hyperparameters(self, proximity_weight, sparsity_weight,
@@ -78,7 +76,8 @@ class DiceGenetic(ExplainerBase):
                         # the weight is inversely proportional to max value
                         feature_weights_list.append(round(1 / self.feature_range[feature].max(), 2))
             self.feature_weights_list = [feature_weights_list]
-
+    # make do_random_init function more efficient
+    '''
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
         remaining_cfs = np.zeros((num_inits, self.data_interface.number_of_features))
         # kx is the number of valid inits found so far
@@ -99,11 +98,41 @@ class DiceGenetic(ExplainerBase):
                 remaining_cfs[kx] = one_init
                 kx += 1
         return remaining_cfs
+    '''
+
+    def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
+        valid_inits = []
+        precisions = self.data_interface.get_decimal_precisions()
+
+        while len(valid_inits) < num_inits:
+            num_remaining = num_inits - len(valid_inits)
+            num_features = self.data_interface.number_of_features
+
+            # Generate random initializations for all features at once
+            random_inits = np.zeros((num_remaining, num_features))
+            for jx, feature in enumerate(self.data_interface.feature_names):
+                if feature in features_to_vary:
+                    if feature in self.data_interface.continuous_feature_names:
+                        random_inits[:, jx] = np.random.uniform(self.feature_range[feature][0],
+                                                                self.feature_range[feature][1], num_remaining)
+                        random_inits[:, jx] = np.round(random_inits[:, jx], precisions[jx])
+                    else:
+                        random_inits[:, jx] = np.random.choice(self.feature_range[feature], num_remaining)
+                else:
+                    random_inits[:, jx] = query_instance[jx]
+
+            # Filter out the valid initializations
+            valid_mask = np.apply_along_axis(self.is_cf_valid, 1, self.predict_fn_scores(random_inits))
+            valid_inits.extend(random_inits[valid_mask])
+
+        return np.array(valid_inits[:num_inits])
+
 
     def do_KD_init(self, features_to_vary, query_instance, cfs, desired_class, desired_range):
-        cfs = self.label_encode(cfs)
+        #cfs = self.label_encode(cfs)
+        #cfs = pd.DataFrame(cfs,columns=self.data_interface.feature_names)
         cfs = cfs.reset_index(drop=True)
-
+        query_instance = query_instance.reshape(-1,1)
         self.cfs = np.zeros((self.population_size, self.data_interface.number_of_features))
         for kx in range(self.population_size):
             if kx >= len(cfs):
@@ -123,10 +152,10 @@ class DiceGenetic(ExplainerBase):
                                 one_init[jx] = np.random.uniform(
                                     self.feature_range[feature][0], self.feature_range[feature][1])
                     else:
-                        if cfs.iat[kx, jx] in self.feature_range[feature]:
+                        if float(cfs.iat[kx, jx]) in self.feature_range[feature]:
                             one_init[jx] = cfs.iat[kx, jx]
                         else:
-                            if query_instance[jx] in self.feature_range[feature]:
+                            if float(query_instance[jx]) in self.feature_range[feature]:
                                 one_init[jx] = query_instance[jx]
                             else:
                                 one_init[jx] = np.random.choice(self.feature_range[feature])
@@ -185,7 +214,7 @@ class DiceGenetic(ExplainerBase):
     def do_param_initializations(self, total_CFs, initialization, desired_range, desired_class,
                                  query_instance, query_instance_df_dummies, algorithm, features_to_vary,
                                  permitted_range, yloss_type, diversity_loss_type, feature_weights,
-                                 proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, verbose):
+                                 proximity_weight, sparsity_weight, diversity_weight, categorical_penalty,encoder, verbose):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
@@ -199,13 +228,13 @@ class DiceGenetic(ExplainerBase):
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
         self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty)
 
-    def _generate_counterfactuals(self, query_instance, total_CFs,encoder=None,dataset=None, initialization="kdtree",
+    def _generate_counterfactuals(self,query_instance,total_CFs,encoder,dataset, initialization="kdtree",
                                   desired_range=None, desired_class="opposite", proximity_weight=0.2,
-                                  sparsity_weight=0.2, diversity_weight=5.0, categorical_penalty=0.1,
+                                  sparsity_weight=0.3, diversity_weight=0.5, categorical_penalty=0.1,
                                   algorithm="DiverseCF", features_to_vary="all", permitted_range=None,
                                   yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
-                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                  posthoc_sparsity_algorithm="binary", maxiterations=1, thresh=1e-2, verbose=False):
+                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0,
+                                  posthoc_sparsity_algorithm="linear", maxiterations=100, thresh=1e-2, verbose=False):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -269,10 +298,11 @@ class DiceGenetic(ExplainerBase):
         if self.model.model_type == ModelTypes.Classifier:
             self.num_output_nodes = self.model.get_num_output_nodes2(query_instance)
 
-        query_instance = self.label_encode(query_instance)
+        #query_instance = self.label_encode(query_instance)
+        #query_instance = pd.DataFrame(query_instance,columns=self.data_interface.feature_names)
         query_instance = np.array(query_instance.values[0])
         self.x1 = query_instance
-
+        query_instance = query_instance.reshape(1,-1)
         # find the predicted value of query_instance
         test_pred = self.predict_fn(query_instance)
 
@@ -288,10 +318,10 @@ class DiceGenetic(ExplainerBase):
         self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance,
                                       query_instance_df_dummies, algorithm, features_to_vary, permitted_range,
                                       yloss_type, diversity_loss_type, feature_weights, proximity_weight,
-                                      sparsity_weight, diversity_weight, categorical_penalty, verbose)
+                                      sparsity_weight, diversity_weight, categorical_penalty,encoder, verbose)
 
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary,
-                                                      maxiterations, thresh, verbose)
+                                                      maxiterations, thresh, verbose,encoder)
 
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
@@ -304,7 +334,8 @@ class DiceGenetic(ExplainerBase):
 
     def predict_fn_scores(self, input_instance):
         """Returns prediction scores."""
-        input_instance = self.label_decode(input_instance)
+        #input_instance = self.label_decode(input_instance)
+        input_instance = pd.DataFrame(input_instance,columns=self.data_interface.feature_names)
         out = self.model.get_output(input_instance)
         if self.model.model_type == ModelTypes.Classifier and out.shape[1] == 1:
             # DL models return only 1 for binary classification
@@ -313,7 +344,8 @@ class DiceGenetic(ExplainerBase):
 
     def predict_fn(self, input_instance):
         """Returns actual prediction."""
-        input_instance = self.label_decode(input_instance)
+        #input_instance = self.label_decode(input_instance)
+        input_instance = pd.DataFrame(input_instance,columns=self.data_interface.feature_names)
         preds = self.model.get_output(input_instance, model_score=False)
         return preds
 
@@ -325,7 +357,8 @@ class DiceGenetic(ExplainerBase):
         of 2. This is why we need a custom predict function that returns the desired class if the maximum predict
         probability is the same as the probability of the desired class."""
 
-        input_instance = self.label_decode(input_instance)
+        #input_instance = self.label_decode(input_instance)
+        input_instance = pd.DataFrame(input_instance,columns=self.data_interface.feature_names)
         output = self.model.get_output(input_instance, model_score=True)
         if self.model.model_type == ModelTypes.Classifier and np.array(output).shape[1] == 1:
             # DL models return only 1 for binary classification
@@ -380,18 +413,18 @@ class DiceGenetic(ExplainerBase):
 
     def compute_sparsity_loss(self, cfs):
         """Compute weighted distance between two vectors."""
-        sparsity_loss = np.count_nonzero(cfs - self.x1, axis=1)
+        sparsity_loss = np.count_nonzero(np.asarray(cfs,dtype='int') - np.asarray(self.x1,dtype='int'), axis=1)
         return sparsity_loss / len(
             self.data_interface.feature_names)  # Dividing by the number of features to normalize sparsity loss
 
     def compute_loss(self, cfs, desired_range, desired_class):
         """Computes the overall loss"""
         self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
-        #self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
-        #    if self.proximity_weight > 0 else 0.0
+        self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
+            if self.proximity_weight > 0 and len(self.data_interface.continuous_feature_indexes) > 1 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
         self.loss = np.reshape(np.array(self.yloss
-                                        #+ (self.proximity_weight * self.proximity_loss) +
+                                        + (self.proximity_weight * self.proximity_loss) +
                                         + (self.sparsity_weight * self.sparsity_loss))
                             , (-1, 1))
         index = np.reshape(np.arange(len(cfs)), (-1, 1))
@@ -429,7 +462,7 @@ class DiceGenetic(ExplainerBase):
         return one_init
 
     def find_counterfactuals(self, query_instance, desired_range, desired_class,
-                             features_to_vary, maxiterations, thresh, verbose):
+                             features_to_vary, maxiterations, thresh, verbose,encoder):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
         population = self.cfs.copy()
         iterations = 0
@@ -495,7 +528,7 @@ class DiceGenetic(ExplainerBase):
         self.final_cfs = []
         i = 0
         while i < self.total_CFs:
-            predictions = self.predict_fn_scores(population[i])[0]
+            predictions = self.predict_fn_scores(population[i].reshape(1,-1))[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
                 # checking if predictions is a float before taking the length as len() works only for array-like
@@ -508,9 +541,10 @@ class DiceGenetic(ExplainerBase):
             i += 1
 
         # converting to dataframe
-        query_instance_df = self.label_decode(query_instance)
+       #query_instance_df = self.label_decode(query_instance)
+        query_instance_df = pd.DataFrame(query_instance,columns=self.data_interface.feature_names)
         query_instance_df[self.data_interface.outcome_name] = self.test_pred
-        self.final_cfs_df = self.label_decode_cfs(self.final_cfs)
+        self.final_cfs_df = pd.DataFrame(self.final_cfs, columns=self.data_interface.feature_names)
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
 
         if self.final_cfs_df is not None:
@@ -577,5 +611,6 @@ class DiceGenetic(ExplainerBase):
     def get_valid_feature_range(self, normalized=False):
         ret = self.data_interface.get_valid_feature_range(self.feature_range, normalized=normalized)
         for feat_name in self.data_interface.categorical_feature_names:
-            ret[feat_name] = self.labelencoder[feat_name].transform(ret[feat_name])
+            #ret[feat_name] = self.labelencoder[feat_name].transform(ret[feat_name])
+            ret[feat_name] = np.array(ret[feat_name],dtype=float)
         return ret
