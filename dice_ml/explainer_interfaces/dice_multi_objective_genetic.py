@@ -25,7 +25,8 @@ from pymoo.problems import get_problem
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
-from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling,\
+
+from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling, \
     MixedVariableDuplicateElimination
 from pymoo.algorithms.moo.age import AGEMOEA
 from scipy.spatial.distance import _validate_vector
