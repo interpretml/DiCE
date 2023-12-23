@@ -182,11 +182,7 @@ class PrivateData(_BaseData):
 
         ranges = {}
         # Getting default ranges based on the dataset
-        for feature in features_dict:
-            if type(features_dict[feature][0]) is int:  # continuous feature
-                ranges[feature] = features_dict[feature]
-            else:
-                ranges[feature] = features_dict[feature]
+        ranges[feature] = features_dict[feature]
         feature_ranges_orig = ranges.copy()
         # Overwriting the ranges for a feature if input provided
         if permitted_range_input is not None:
