@@ -16,16 +16,13 @@ import pm4py
 from declare4py.declare4py import Declare4Py
 from declare4py.enums import TraceState
 import re
-'''
-from pm4py.objects.log.exporter.xes.factory import export_log as export_log_xes
-from pm4py.objects.conversion.log.factory import apply as df_to_eventLog
-from pm4py.objects.log.util.general import CASE_ATTRIBUTE_PREFIX
-import pm4py.objects.log.importer.csv.factory
-'''
+from scipy.spatial.distance import _validate_vector
+from scipy.spatial.distance import cdist, pdist
+from scipy.stats import median_abs_deviation
+
 import itertools
 from datetime import datetime
-heuristic = 1
-#import declare4py.nirdizati_light.declare4py.declare4py
+
 class DiceGeneticConformance(ExplainerBase):
 
     def __init__(self, data_interface, model_interface,encoder=None,dataset=None):
@@ -48,13 +45,14 @@ class DiceGeneticConformance(ExplainerBase):
         self.labelencoder = set()
         self.predicted_outcome_name = self.data_interface.outcome_name + '_pred'
 
-    def update_hyperparameters(self, proximity_weight, sparsity_weight,
+    def update_hyperparameters(self, proximity_weight, sparsity_weight,plausibility_weight,
                                diversity_weight, categorical_penalty,conformance_weight):
         """Update hyperparameters of the loss function"""
 
         self.proximity_weight = proximity_weight
         self.sparsity_weight = sparsity_weight
         self.diversity_weight = diversity_weight
+        self.plausibility_weight = plausibility_weight
         self.categorical_penalty = categorical_penalty
         self.conformance_weight = conformance_weight
     def do_loss_initializations(self, yloss_type, diversity_loss_type, feature_weights,
@@ -228,7 +226,7 @@ class DiceGeneticConformance(ExplainerBase):
     def do_param_initializations(self, total_CFs, initialization, desired_range, desired_class,
                                  query_instance, query_instance_df_dummies, algorithm, features_to_vary,
                                  permitted_range, yloss_type, diversity_loss_type, feature_weights,
-                                 proximity_weight, sparsity_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose):
+                                 proximity_weight, sparsity_weight,plausibility_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose):
         if verbose:
             print("Initializing initial parameters to the genetic algorithm...")
 
@@ -240,16 +238,16 @@ class DiceGeneticConformance(ExplainerBase):
         else:
             self.total_CFs = total_CFs
         self.do_loss_initializations(yloss_type, diversity_loss_type, feature_weights, encoding='label')
-        self.update_hyperparameters(proximity_weight, sparsity_weight, diversity_weight, categorical_penalty, conformance_weight)
+        self.update_hyperparameters(proximity_weight, sparsity_weight,plausibility_weight, diversity_weight, categorical_penalty, conformance_weight)
 
     def _generate_counterfactuals(self,query_instance,total_CFs,encoder,dataset, initialization="kdtree",
                                   desired_range=None, desired_class="opposite", proximity_weight=0.5,
-                                  sparsity_weight=0.5, diversity_weight=0.5, categorical_penalty=0.1,
+                                  sparsity_weight=0.5, diversity_weight=0.5, plausibility_weight=0.5, categorical_penalty=0.1,
                                   algorithm="DiverseCF", features_to_vary="all", permitted_range=None,
                                   yloss_type="hinge_loss", diversity_loss_type="dpp_style:inverse_dist",
-                                  feature_weights="inverse_mad", stopping_threshold=0.5, posthoc_sparsity_param=0,
-                                  posthoc_sparsity_algorithm="linear", maxiterations=15, thresh=1e-2, verbose=True,conformance_weight=3,
-                                  model_path=None,optimization=None,heuristic=None, random_seed=None):
+                                  feature_weights="inverse_mad", stopping_threshold=0.25, posthoc_sparsity_param=0,
+                                  posthoc_sparsity_algorithm="linear", maxiterations=50, thresh=1e-2, verbose=True,conformance_weight=3,
+                                  model_path=None,optimization=None,heuristic=None, random_seed=None,adapted=None):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -297,7 +295,7 @@ class DiceGeneticConformance(ExplainerBase):
                     "kd-tree initialization is not supported for private data"
                     " interface because training data to build kd-tree is not available.")
 
-        self.population_size = 30 * total_CFs
+        self.population_size = 15 * total_CFs
 
         self.start_time = timeit.default_timer()
 
@@ -334,7 +332,7 @@ class DiceGeneticConformance(ExplainerBase):
         self.do_param_initializations(total_CFs, initialization, desired_range, desired_class, query_instance,
                                       query_instance_df_dummies, algorithm, features_to_vary, permitted_range,
                                       yloss_type, diversity_loss_type, feature_weights, proximity_weight,
-                                      sparsity_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose)
+                                      sparsity_weight,plausibility_weight, diversity_weight, categorical_penalty,conformance_weight,encoder, verbose)
         d4py = Declare4Py()
         d4py.parse_decl_model(os.path.join(model_path,(dataset+'.decl')))
         self.filter_declare_model(query_instance,encoder,d4py)
@@ -343,7 +341,7 @@ class DiceGeneticConformance(ExplainerBase):
 
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary,
                                                       maxiterations, thresh, verbose,encoder,dataset,model_path,d4py,optimization,
-                                                      heuristic,activities,activations,targets)
+                                                      heuristic,activities,activations,targets,adapted)
         ## change model given to this function
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
@@ -396,6 +394,72 @@ class DiceGeneticConformance(ExplainerBase):
 
         return predicted_values
 
+    def compute_plausibility(self,cfs=None, ratio_cont=None):
+        query_instance = self.x1
+        continuous_features = self.data_interface.continuous_feature_names
+        categorical_features = self.data_interface.categorical_feature_names
+        dists = []
+        ratio_cont = len(continuous_features)/len(categorical_features)
+        X_y = self.data_interface.data_df
+        if cfs is None:
+            cfs = self.cfs
+        for cf in cfs:
+            neigh_dist = self.distance_mh(query_instance=query_instance.reshape(1, -1), cf_list=cfs, X=X_y)
+            idx_neigh = np.argsort(neigh_dist)[0]
+            closest = X_y.to_numpy()[idx_neigh]
+            d = self.distance_mh(query_instance=cf.reshape(1, -1), cf_list=closest.reshape(1, -1), X=X_y)
+            dists.append(d)
+        return np.array(dists)
+    #update here to not get confused
+    def distance_mh(self,query_instance, cf_list,X, ratio_cont=None, agg=None):
+        nbr_features = self.data_interface.number_of_features
+        cont_feature_index = self.data_interface.continuous_feature_indexes
+        cat_feature_index = self.data_interface.categorical_feature_indexes
+        dist_cont = self.continuous_distance(query_instance=query_instance, cf_list=cf_list, metric='mad', X=X, agg=agg)
+        dist_cate = self.categorical_distance(query_instance=query_instance, cf_list=cf_list, metric='hamming', agg=agg)
+        if ratio_cont is None:
+            ratio_continuous = len(cont_feature_index) / nbr_features
+            ratio_categorical = len(cat_feature_index) / nbr_features
+        else:
+            ratio_continuous = ratio_cont
+            ratio_categorical = 1.0 - ratio_cont
+        dist = ratio_continuous * dist_cont + ratio_categorical * dist_cate
+        return dist
+
+    def continuous_distance(self,query_instance,cf_list, metric='euclidean', X=None, agg=None):
+        cont_feature_index = self.data_interface.continuous_feature_indexes
+        if metric == 'mad':
+            mad = median_abs_deviation(X.iloc[:, cont_feature_index], axis=0)
+            mad = np.array([v if v != 0 else 1.0 for v in mad])
+
+            def _mad_cityblock(u, v):
+                return mad_cityblock(u, v, mad)
+            dist = cdist(query_instance.reshape(1,-1)[:, cont_feature_index], cf_list[:, cont_feature_index], metric=_mad_cityblock)
+        else:
+            dist = cdist(query_instance.reshape(1,-1)[:, cont_feature_index], cf_list[:, cont_feature_index], metric=metric)
+
+        if agg is None or agg == 'mean':
+            return np.mean(dist)
+
+        if agg == 'max':
+            return np.max(dist)
+
+        if agg == 'min':
+            return np.min(dist)
+
+    def categorical_distance(self, query_instance, cf_list, metric='jaccard', agg=None):
+        cat_feature_index = self.data_interface.categorical_feature_indexes
+        dist = cdist(query_instance.reshape(1, -1)[:, cat_feature_index], cf_list[:, cat_feature_index], metric=metric)
+
+        if agg is None or agg == 'mean':
+            return np.mean(dist)
+
+        if agg == 'max':
+            return np.max(dist)
+
+        if agg == 'min':
+            return np.min(dist)
+
     def compute_yloss(self, cfs, desired_range, desired_class):
         """Computes the first part (y-loss) of the loss function."""
         yloss = 0.0
@@ -443,13 +507,25 @@ class DiceGeneticConformance(ExplainerBase):
         self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
             if self.proximity_weight > 0 and len(self.data_interface.continuous_feature_indexes) > 1 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
+        self.plausibility_loss = self.compute_plausibility(cfs = cfs)
         # TODO DO ONLY ONE ROUND OF COMPUTE PERFORMANCE AND SAVE THE SCORE
         self.loss = np.reshape(np.array(self.yloss
-                                        + (self.proximity_weight * self.proximity_loss) +
-                                        + (self.sparsity_weight * self.sparsity_loss)
-                                        # + (self.conformance_weight * 1 - self.conformance_score)
-                                        )
-                               , (-1, 1))
+                                            + (self.proximity_weight * self.proximity_loss) + (self.sparsity_weight * self.sparsity_loss)
+                                           # + (self.conformance_weight * (1 - self.conformance_score))
+                            + (self.plausibility_weight * self.plausibility_loss)), (-1, 1))
+        index = np.reshape(np.arange(len(cfs)), (-1, 1))
+        self.loss = np.concatenate([index, self.loss], axis=1)
+        return self.loss
+    def compute_baseline_loss(self,query_instance,cfs, desired_range, desired_class):
+        self.yloss = self.compute_yloss(cfs, desired_range, desired_class)
+        self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
+            if self.proximity_weight > 0 and len(self.data_interface.continuous_feature_indexes) > 1 else 0.0
+        self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
+        self.plausibility_loss = self.compute_plausibility(cfs = cfs)
+        # TODO DO ONLY ONE ROUND OF COMPUTE PERFORMANCE AND SAVE THE SCORE
+        self.loss = np.reshape(np.array(self.yloss
+                                            + (self.proximity_weight * self.proximity_loss) + (self.sparsity_weight * self.sparsity_loss)
+                            + (self.plausibility_weight * self.plausibility_loss)), (-1, 1))
         index = np.reshape(np.arange(len(cfs)), (-1, 1))
         self.loss = np.concatenate([index, self.loss], axis=1)
         return self.loss
@@ -460,13 +536,13 @@ class DiceGeneticConformance(ExplainerBase):
         self.proximity_loss = self.compute_proximity_loss(cfs, self.query_instance_normalized) \
             if self.proximity_weight > 0 and len(self.data_interface.continuous_feature_indexes) > 1 else 0.0
         self.sparsity_loss = self.compute_sparsity_loss(cfs) if self.sparsity_weight > 0 else 0.0
+        self.plausibility_loss = self.compute_plausibility(cfs = cfs)
         #TODO DO ONLY ONE ROUND OF COMPUTE PERFORMANCE AND SAVE THE SCORE
         self.loss = np.reshape(np.array(self.yloss
-                                            + (self.proximity_weight * self.proximity_loss) +
-                                            + (self.sparsity_weight * self.sparsity_loss)
+                                        + (self.proximity_weight * self.proximity_loss) + (
+                                                    self.sparsity_weight * self.sparsity_loss)+
                                             + (self.conformance_weight * (1 - self.conformance_score))
-                                             )
-                                , (-1, 1))
+                            + (self.plausibility_weight * self.plausibility_loss)), (-1, 1))
 
         index = np.reshape(np.arange(len(cfs)), (-1, 1))
         self.loss = np.concatenate([index, self.loss], axis=1)
@@ -493,9 +569,9 @@ class DiceGeneticConformance(ExplainerBase):
         for j in range(self.data_interface.number_of_features):
             feat_name = self.data_interface.feature_names[j]
             if ('prefix' in feat_name) & (pd.isnull(child[j])):
-                if k1df[feat_name][0] in targets:
+                if k1df[feat_name][0] not in activations:
                     child[j] = k1df[feat_name][0]
-                elif k2df[feat_name][0] in targets:
+                elif k2df[feat_name][0] not in activations:
                     child[j] = k2df[feat_name][0]
                 else:
                     child[j] = np.random.choice([x for x in encoder._label_dict[feat_name].keys() if x not in activations])
@@ -585,10 +661,38 @@ class DiceGeneticConformance(ExplainerBase):
         child = pd.DataFrame([child], columns=self.data_interface.feature_names)
         encoder.encode(child)
         return child
-    
+    def mate(self, k1, k2, features_to_vary, query_instance):
+        """Performs mating and produces new offsprings"""
+        # chromosome for offspring
+        one_init = np.zeros(self.data_interface.number_of_features)
+        for j in range(self.data_interface.number_of_features):
+            gp1 = k1[j]
+            gp2 = k2[j]
+            feat_name = self.data_interface.feature_names[j]
+
+            # random probability
+            prob = random.random()
+
+            if prob < 0.40:
+                # if prob is less than 0.40, insert gene from parent 1
+                one_init[j] = gp1
+            elif prob < 0.80:
+                # if prob is between 0.40 and 0.80, insert gene from parent 2
+                one_init[j] = gp2
+            else:
+                # otherwise insert random gene(mutate) for maintaining diversity
+                if feat_name in features_to_vary:
+                    if feat_name in self.data_interface.continuous_feature_names:
+                        one_init[j] = np.random.uniform(self.feature_range[feat_name][0],
+                                                        self.feature_range[feat_name][0])
+                    else:
+                        one_init[j] = np.random.choice(self.feature_range[feat_name])
+                else:
+                    one_init[j] = query_instance[j]
+        return one_init
     def find_counterfactuals(self, query_instance, desired_range, desired_class,
                              features_to_vary, maxiterations, thresh, verbose,encoder,dataset,model_path,d4py,optimization,
-                             heuristic,activities,activations,targets):
+                             heuristic,activities,activations,targets,adapted):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
         population = self.cfs.copy()
         iterations = 0
@@ -614,19 +718,16 @@ class DiceGeneticConformance(ExplainerBase):
             previous_best_loss = current_best_loss
             population = np.unique(tuple(map(tuple, population)), axis=0)
             ##TODO: Add conformance checking here before computing fitness
-            if optimization == 'filtering':
-                if iterations % 2 == 0 & iterations != 0:
-                    #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
-                    #    query_instance, population, encoder, d4py)
-                    self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder, d4py)
-                    population = population[np.where(self.conformance_score > 0.8)]
-
-                population_fitness = self.compute_filtered_loss(query_instance,population, desired_range, desired_class)
-            elif (optimization == 'loss_function') | (iterations > 0):
+            if optimization == 'baseline':
+                population_fitness = self.compute_baseline_loss(query_instance,population, desired_range, desired_class)
+            elif optimization == 'loss_function':
                 #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
                 #    query_instance, population, encoder, d4py)
                 self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder,d4py)
                 population_fitness = self.compute_loss(query_instance,population, desired_range, desired_class)
+            #elif (optimization == 'loss_function') & (iterations > 0) & (not adapted):
+
+
             population_fitness = population_fitness[population_fitness[:, 1].argsort()]
             current_best_loss = population_fitness[0][1]
             to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
@@ -651,10 +752,13 @@ class DiceGeneticConformance(ExplainerBase):
                     parent1 = population[idx1]
                     idx2 = random.randint(0,int(len(population) / 2))
                     parent2 = population[idx2]
-                    if heuristic == 'heuristic_1':
-                        child = self.mate_1(parent1, parent2, features_to_vary, query_instance,encoder,d4py,activities,activations,targets)
-                    elif heuristic == 'heuristic_2':
+                   # if heuristic == 'heuristic_1':
+                   #     child = self.mate_1(parent1, parent2, features_to_vary, query_instance,encoder,d4py,activities,activations,targets)
+                    if adapted:
                         child = self.mate_2(parent1, parent2, features_to_vary, query_instance,encoder,d4py,activities,activations,targets)
+                    else:
+                        child = self.mate(parent1, parent2, features_to_vary, query_instance)
+
                     new_generation_2[new_gen_idx] = child
 
             if new_generation_2 is not None:
@@ -669,15 +773,13 @@ class DiceGeneticConformance(ExplainerBase):
             #self.conformance_score, population_conformance, query_conformance = self.compute_conformance(
             #    query_instance, population, encoder, d4py)
             self.conformance_score, population_conformance = self.compute_conformance_new(population, encoder,d4py)
-            self.conformance_score.argsort()[::-1]
-            population = population[self.conformance_score.argsort()[::-1]]
-
+            population = population[self.conformance_score > 0.99]
 
         self.cfs_preds = []
         self.final_cfs = []
         i = 0
-        while i < self.total_CFs:
-            predictions = self.predict_fn_scores(population[i].reshape(1,-1))[0]
+        while i < self.population_size and i < len(population):
+            predictions = self.predict_fn_scores(population[i].reshape(1, -1))[0]
             if self.is_cf_valid(predictions):
                 self.final_cfs.append(population[i])
                 # checking if predictions is a float before taking the length as len() works only for array-like
@@ -687,6 +789,8 @@ class DiceGeneticConformance(ExplainerBase):
                     self.cfs_preds.append(np.argmax(predictions))
                 else:
                     self.cfs_preds.append(predictions)
+            if len(self.final_cfs) >= self.total_CFs:
+                break
             i += 1
 
         # converting to dataframe
@@ -905,3 +1009,11 @@ class DiceGeneticConformance(ExplainerBase):
         }
         conformance_score = np.array([len(v) / len(model_check_res.get(k).values()) for k,v in model_check_res_filter.items()])
         return conformance_score, model_check_res
+
+def mad_cityblock(u, v, mad):
+    u = _validate_vector(u)
+    v = _validate_vector(v)
+    l1_diff = abs(u - v)
+    l1_diff_mad = l1_diff / mad
+    return l1_diff_mad.sum()
+

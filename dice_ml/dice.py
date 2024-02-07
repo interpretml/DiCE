@@ -11,7 +11,7 @@ from dice_ml.utils.exception import UserConfigValidationException
 class Dice(ExplainerBase):
     """An interface class to different DiCE implementations."""
 
-    def __init__(self, data_interface, model_interface,method,encoder,  **kwargs):
+    def __init__(self, data_interface, model_interface,method,  **kwargs):
         """Init method
 
         :param data_interface: an interface to access data related params.
@@ -69,7 +69,6 @@ def decide(model_interface, method):
     elif method == SamplingStrategy.BallTree:
         from dice_ml.explainer_interfaces.dice_Ball import DiceBall
         return DiceBall
-
     elif method == SamplingStrategy.Gradient:
         if model_interface.backend == BackEndTypes.Tensorflow1:
             # pretrained Keras Sequential model with Tensorflow 1.x backend

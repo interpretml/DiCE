@@ -27,7 +27,7 @@ from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
 from pymoo.core.mixed import MixedVariableMating, MixedVariableGA, MixedVariableSampling,\
     MixedVariableDuplicateElimination
-from pymoo.algorithms.moo.age import AGEMOEA
+from pymoo.algorithms.moo.age import AGEMOEA,AGEMOEASurvival
 from scipy.spatial.distance import _validate_vector
 from scipy.spatial.distance import cdist, pdist
 from scipy.stats import median_abs_deviation
@@ -262,7 +262,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
                                   feature_weights="inverse_mad", stopping_threshold=0.2, posthoc_sparsity_param=0,
                                   posthoc_sparsity_algorithm="linear", maxiterations=15, thresh=1e-2, verbose=True,
                                   conformance_weight=3,
-                                  model_path=None, optimization=None, heuristic=None,random_seed=None):
+                                  model_path=None, optimization=None, heuristic=None,random_seed=None,adapted=None,filtering=None):
         """Generates diverse counterfactual explanations
 
         :param query_instance: A dictionary of feature names and values. Test point of interest.
@@ -311,7 +311,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
         self.random_seed = random_seed
         random.seed(self.random_seed)
         np.random.seed(self.random_seed)
-        self.population_size = 30 * total_CFs
+        self.population_size = 15 * total_CFs
 
         self.start_time = timeit.default_timer()
 
@@ -359,7 +359,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
         query_instance_df = self.find_counterfactuals(query_instance, desired_range, desired_class, features_to_vary,
                                                       maxiterations, thresh, verbose, encoder, dataset, model_path,
                                                       d4py, optimization,
-                                                      heuristic, activities, activations, targets)
+                                                      heuristic, activities, activations, targets,adapted,filtering)
         ## change model given to this function
         return exp.CounterfactualExamples(data_interface=self.data_interface,
                                           test_instance_df=query_instance_df,
@@ -678,7 +678,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
     def find_counterfactuals(self, query_instance, desired_range, desired_class,
                              features_to_vary, maxiterations, thresh, verbose, encoder, dataset, model_path, d4py,
                              optimization,
-                             heuristic, activities, activations, targets):
+                             heuristic, activities, activations, targets,adapted,filtering):
         """Finds counterfactuals by generating cfs through the genetic algorithm"""
         population = self.cfs.copy()
         iterations = 0
@@ -703,10 +703,10 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
                 vars[x] = Real(bounds=(self.data_interface.permitted_range[i][0],
                                        self.data_interface.permitted_range[i][1]))
             x += 1
-        class DiceGeneticProblem(Problem):
+        class DiceAdaptedGeneticProblem(Problem):
             def __init__(self,DiCEMultiObjectiveGeneticSelf, vars, desired_range, desired_class,
                          query_instance, features_to_vary, query_instance_normalized,encoder,d4py):
-                super(DiceGeneticProblem, self).__init__(vars=vars,n_var=len(vars), n_obj=4, n_constr=0)
+                super(DiceAdaptedGeneticProblem, self).__init__(vars=vars,n_var=len(vars), n_obj=5, n_constr=0)
                 self.desired_range = desired_range
                 self.desired_class = desired_class
                 self.query_instance = query_instance
@@ -723,40 +723,62 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
                 self.proximity_loss = self.DiCEMultiObjectiveGeneticSelf.compute_proximity_loss(x, self.query_instance_normalized) if len(self.DiCEMultiObjectiveGeneticSelf.data_interface.continuous_feature_indexes) > 1 else \
                     np.zeros(shape=len(x))
                 self.sparsity_loss = self.DiCEMultiObjectiveGeneticSelf.compute_sparsity_loss(x)
-                self.distance = 0.5 * self.proximity_loss + 0.5 * self.sparsity_loss
                 self.conformance_score = 1 - self.DiCEMultiObjectiveGeneticSelf.compute_conformance_new(x, self.encoder, self.d4py)
                 self.plausibility = self.DiCEMultiObjectiveGeneticSelf.compute_plausibility(cfs = x)
-                out['F'] = [self.yloss, self.distance, self.conformance_score,self.plausibility
+                out['F'] = [self.yloss, self.proximity_loss,self.sparsity_loss, self.conformance_score,self.plausibility
+                             ]
+        class DiceBaselineGeneticProblem(Problem):
+            def __init__(self,DiCEMultiObjectiveGeneticSelf, vars, desired_range, desired_class,
+                         query_instance, features_to_vary, query_instance_normalized,encoder):
+                super(DiceBaselineGeneticProblem, self).__init__(vars=vars,n_var=len(vars), n_obj=4, n_constr=0)
+                self.desired_range = desired_range
+                self.desired_class = desired_class
+                self.query_instance = query_instance
+                self.features_to_vary = features_to_vary
+                self.query_instance_normalized = query_instance_normalized
+                self.encoder = encoder
+                self.d4py = d4py
+                self.vars = vars
+                self.n_var = n_var
+                self.DiCEMultiObjectiveGeneticSelf = DiCEMultiObjectiveGeneticSelf
+            def _evaluate(self, x, out,  *args, **kwargs):
+                x = np.array(pd.DataFrame(list(x),dtype='float64'))
+                self.yloss = self.DiCEMultiObjectiveGeneticSelf.compute_yloss(x, self.desired_range, self.desired_class)
+                self.proximity_loss = self.DiCEMultiObjectiveGeneticSelf.compute_proximity_loss(x, self.query_instance_normalized) if len(self.DiCEMultiObjectiveGeneticSelf.data_interface.continuous_feature_indexes) > 1 else \
+                    np.zeros(shape=len(x))
+                self.sparsity_loss = self.DiCEMultiObjectiveGeneticSelf.compute_sparsity_loss(x)
+                self.plausibility = self.DiCEMultiObjectiveGeneticSelf.compute_plausibility(cfs = x)
+                out['F'] = [self.yloss, self.proximity_loss,self.sparsity_loss,self.plausibility
                              ]
 
 
         n_var = len(self.data_interface.feature_names)
 
-        problem = DiceGeneticProblem(self,vars,desired_range, desired_class, query_instance, features_to_vary, query_instance_normalized,encoder,d4py)
-        pop = Population.new("X", population)
-        Evaluator().eval(problem, pop)
-        adapted_operator = False
-        if not adapted_operator:
-            algorithm = AGEMOEA(pop_size=int(self.population_size),sampling=pop,
-                                mating=MixedVariableMating(mating=MixedVariableMating(),
-                      eliminate_duplicates=False),
-                      eliminate_duplicates=True,seed=1234,verbose=True)
-        else:
-            algorithm = AGEMOEA(pop_size=int(self.population_size), sampling=pop,
+        if adapted:
+            problem = DiceAdaptedGeneticProblem(self, vars, desired_range, desired_class, query_instance, features_to_vary,
+                                         query_instance_normalized, encoder, d4py)
+            pop = Population.new("X", population)
+            Evaluator().eval(problem, pop)
+            algorithm = MixedVariableGA(pop_size=int(self.population_size ), sampling=pop,
                                  crossover=MyCrossover(self, vars , desired_range, desired_class,
                                         query_instance, features_to_vary, query_instance_normalized,encoder,d4py,activities,targets,activations),
                                         mutation=MyMutation(self, vars, desired_range, desired_class,
                                         query_instance, features_to_vary, query_instance_normalized,encoder,d4py,activities),
-                                eliminate_duplicates=True, seed=1234, verbose=True)
-        from pymoo.termination.default import DefaultMultiObjectiveTermination
+                                eliminate_duplicates=True, seed=1234, verbose=True,survival=AGEMOEASurvival())
+            res = minimize(problem, algorithm, termination=('n_gen', 50), seed=self.random_seed, verbose=True,
+                           save_history=True)
 
-        res = minimize(problem, algorithm,termination=('n_gen',50), seed=self.random_seed, verbose=True,save_history=True)
+        else:
+            self.population_size = self.population_size
+            problem = DiceBaselineGeneticProblem(self, vars, desired_range, desired_class, query_instance, features_to_vary,
+                                         query_instance_normalized, encoder)
+            pop = Population.new("X", population)
+            Evaluator().eval(problem, pop)
+            algorithm = MixedVariableGA(pop_size=int(self.population_size),sampling=pop,
+                                survival=AGEMOEASurvival(),
+                      eliminate_duplicates=True,seed=1234,verbose=True)
 
-        from pymoo.visualization.scatter import Scatter
-        plot = Scatter(tight_layout=False,labels=['yloss', 'proximity_loss', 'sparsity_loss', 'conformance_score','plausibility'])
-        plot.add(res.F, s=10)
-        #plot.add(res['F'][10], s=30, color="red")
-        #plot.save('../experiments/updated_cf_results/objective_pairwise_space.png')
+            res = minimize(problem, algorithm,termination=('n_gen',50), seed=self.random_seed, verbose=True,save_history=True)
 
         all_pop = Population()
 
@@ -768,7 +790,7 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
         population = []
         results = []
         for inv in all_pop:
-            if adapted_operator:
+            if adapted:
                 if isinstance(inv.get('x'), dict):
                     population.append(list(inv.get('X').values()))
                 else:
@@ -778,18 +800,21 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
             results.append(inv.get('F'))
         population = np.array(population)
         results = np.array(results)
-        population_filtered = population[results[:, 2] == 0.0]
-        population_filtered = np.array(pd.DataFrame(population_filtered, columns=self.data_interface.feature_names).drop_duplicates())
+        #population_filtered = population[results[:, 2] == 0.0]
+        #population_filtered = np.array(pd.DataFrame(population_filtered, columns=self.data_interface.feature_names).drop_duplicates())
 
-        if len(population_filtered) < self.total_CFs:
-            population_filtered = population[results[:, 2] < 0.2]
+
+        if adapted:
+            population = population[results[:, 3] == 0.0]
+        #if filtering & adapted:
+        #    population = population[results[:, 3] == 0.0]
         self.cfs_preds = []
         self.final_cfs = []
         i = 0
-        while i < self.total_CFs:
-            predictions = self.predict_fn_scores(population_filtered[i].reshape(1, -1))[0]
+        while i < self.population_size and i < len(population):
+            predictions = self.predict_fn_scores(population[i].reshape(1, -1))[0]
             if self.is_cf_valid(predictions):
-                self.final_cfs.append(population_filtered[i])
+                self.final_cfs.append(population[i])
                 # checking if predictions is a float before taking the length as len() works only for array-like
                 # elements. isinstance(predictions, (np.floating, float)) checks if it's any float (numpy or otherwise)
                 # We do this as we take the argmax if the prediction is a vector -- like the output of a classifier
@@ -797,19 +822,9 @@ class DiceMultiObjectiveGenetic(ExplainerBase):
                     self.cfs_preds.append(np.argmax(predictions))
                 else:
                     self.cfs_preds.append(predictions)
+            if len(self.final_cfs) >= self.total_CFs:
+                break
             i += 1
-
-        from pymoo.util.running_metric import RunningMetric, RunningMetricAnimation
-
-        running = RunningMetricAnimation(delta_gen=50,
-                                         n_plots=1,
-                                         key_press=False,
-                                         do_show=True)
-
-        for algorithm in res.history:
-            running.update(algorithm)
-        from matplotlib.pyplot import savefig
-        #savefig('../experiments/updated_cf_results/running_metric_convergence_analysis_%s_%s' % (dataset,optimization))
         self.final_cfs_df = pd.DataFrame(self.final_cfs, columns=self.data_interface.feature_names)
 
         self.final_cfs_df_sparse = copy.deepcopy(self.final_cfs_df)
@@ -1119,10 +1134,10 @@ class MyCrossover(Crossover):
             for j in range(self.DiCEMultiObjectiveGeneticSelf.data_interface.number_of_features):
                 feat_name = self.DiCEMultiObjectiveGeneticSelf.data_interface.feature_names[j]
                 if ('prefix' in feat_name) & ((pd.isnull(child[j])) | (child[j] == 'nan')):
-                    if k1df[feat_name][0] in self.targets:
-                        child[j] = k2df[feat_name][0]
-                    elif k2df[feat_name][0] in self.targets:
+                    if (prob < 0.5) & (k1df[feat_name][0] not in self.activations):
                         child[j] = k1df[feat_name][0]
+                    elif k2df[feat_name][0] not in self.activations:
+                        child[j] = k2df[feat_name][0]
                     else:
                         choices = [x for x in self.encoder._label_dict[feat_name].keys() if x not in self.activations]
                         child[j] = np.random.choice(choices)

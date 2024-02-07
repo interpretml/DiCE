@@ -51,11 +51,29 @@ class BaseModel:
         input_instance = self.transformer.transform(input_instance)
         if model_score:
             if self.model_type == ModelTypes.Classifier:
-                return self.model.predict_proba(input_instance)
+                try:
+                    res = self.model.predict_proba(input_instance)
+                except:
+                    for i in input_instance.columns:
+                        if input_instance[i].dtype == 'category':
+                            input_instance[i] = input_instance[i].astype('int')
+                        else:
+                            input_instance[i] = input_instance[i].astype('float')
+                    res = self.model.predict_proba(input_instance)
+                return res
             else:
                 return self.model.predict(input_instance)
         else:
-            return self.model.predict(input_instance)
+            try:
+                res = self.model.predict(input_instance)
+                return res
+            except:
+                for i in input_instance.columns:
+                    if input_instance[i].dtype == 'category':
+                        input_instance[i] = input_instance[i].astype('int')
+                    else:
+                        input_instance[i] = input_instance[i].astype('float')
+                return self.model.predict(input_instance)
 
     def get_gradient(self):
         raise NotImplementedError
