@@ -49,19 +49,19 @@ jobs:
       if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
       with:
         files: junit/test-results.xml
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        directory: .
-        env_vars: OS,PYTHON
-        fail_ci_if_error: true
-        files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        path_to_write_report: ./coverage/codecov_report.txt
-        verbose: true
+    # - name: Upload coverage to Codecov
+    #   uses: codecov/codecov-action@v3
+    #   if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     directory: .
+    #     env_vars: OS,PYTHON
+    #     fail_ci_if_error: true
+    #     files: ./coverage.xml
+    #     flags: unittests
+    #     name: codecov-umbrella
+    #     path_to_write_report: ./coverage/codecov_report.txt
+    #     verbose: true
     - name: Check package consistency with twine
       run: |
         python setup.py check sdist bdist_wheel
