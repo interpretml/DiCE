@@ -411,6 +411,34 @@ def _load_custom_vars_dataset_model():
     return model
 
 
+def _load_adult_income_binary_model():
+    dataset = helpers.load_adult_income_dataset()
+    X_train = dataset.drop('income', axis=1)
+    y_train = dataset["income"]
+    num_feature_names = ["age", "hours_per_week"]
+    cat_feature_names = X_train.columns.difference(num_feature_names)
+    model = create_complex_classification_pipeline(
+        X_train, y_train, num_feature_names, cat_feature_names)
+    return model
+
+
+def sample_adult_income_custom_query_11():
+    """
+    Returns multiple query instance for adult income dataset
+    """
+    data_point = 2
+    query_instances = pd.DataFrame({'age': [22]*data_point,
+                                  'workclass': ['Private']*data_point,
+                                  'education': ['HS-grad']*data_point,
+                                  'marital_status': ['Single']*data_point,
+                                  'occupation': ['Service']*data_point,
+                                  'race': ['White']*data_point,
+                                  'gender': ['Female']*data_point,
+                                  'hours_per_week': [45]*data_point}, 
+                                  index=list(range(data_point)))
+    return query_instances
+
+
 @pytest.fixture(scope='session')
 def sample_adultincome_query():
     """
