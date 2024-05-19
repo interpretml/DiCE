@@ -1,5 +1,9 @@
 import json
+import unittest
+from unittest.mock import Mock, patch
 
+import numpy as np
+import pandas as pd
 import pytest
 from raiutils.exceptions import UserConfigValidationException
 
@@ -319,3 +323,78 @@ class TestSerializationCounterfactualExplanations:
             counterfactual_explanations.to_json()
 
         assert "Unsupported serialization version {}".format(unsupported_version) in str(ucve)
+
+
+class TestCounterfactualExplanationsPlot(unittest.TestCase):
+
+    @patch('dice_ml.counterfactual_explanations.CreatePlot', return_value="dummy_plot")
+    def test_plot_counterplots_sklearn(self, mock_create_plot):
+        # Dummy DiCE's model object with a Sklearn backend
+        dummy_model = Mock()
+        dummy_model.backend = "sklearn"
+        dummy_model.model.predict_proba = Mock(return_value=np.array([[0.4, 0.6], [0.2, 0.8]]))
+
+        # Sample cf_examples to test with
+        cf_examples_mock = Mock()
+        cf_examples_mock.test_instance_df = pd.DataFrame({
+            'feature1': [1],
+            'feature2': [2],
+            'target': [0]
+        })
+        cf_examples_mock.final_cfs_df = pd.DataFrame({
+            'feature1': [1.1, 1.2],
+            'feature2': [2.1, 2.2],
+            'target': [1, 1]
+        })
+
+        counterfact = CounterfactualExplanations(
+            cf_examples_list=[cf_examples_mock],
+            local_importance=None,
+            summary_importance=None,
+            version=None)
+
+        # Call function
+        result = counterfact.plot_counterplots(dummy_model)
+
+        # Assert the CreatePlot was called twice (as there are 2 counterfactual instances)
+        assert mock_create_plot.call_count == 2
+
+        # Assert that the result is as expected
+        assert result == ["dummy_plot", "dummy_plot"]
+
+    @patch('dice_ml.counterfactual_explanations.CreatePlot', return_value="dummy_plot")
+    def test_plot_counterplots_non_sklearn(self, mock_create_plot):
+        # Sample Non-Sklearn backend
+        dummy_model = Mock()
+        dummy_model.backend = "NonSklearn"
+        dummy_model.model.predict = Mock(return_value=np.array([0, 1]))
+        dummy_model.transformer = Mock()
+        dummy_model.transformer.transform = Mock(return_value=np.array([[1, 2], [1.1, 2.1]]))
+
+        # Sample cf_examples to test with
+        cf_examples_mock = Mock()
+        cf_examples_mock.test_instance_df = pd.DataFrame({
+            'feature1': [1],
+            'feature2': [2],
+            'target': [0]
+        })
+        cf_examples_mock.final_cfs_df = pd.DataFrame({
+            'feature1': [1.1, 1.2],
+            'feature2': [2.1, 2.2],
+            'target': [1, 1]
+        })
+
+        counterfact = CounterfactualExplanations(
+            cf_examples_list=[cf_examples_mock],
+            local_importance=None,
+            summary_importance=None,
+            version=None)
+
+        # Call function
+        result = counterfact.plot_counterplots(dummy_model)
+
+        # Assert the CreatePlot was called twice (as there are 2 counterfactual instances)
+        assert mock_create_plot.call_count == 2
+
+        # Assert that the result is as expected
+        assert result == ["dummy_plot", "dummy_plot"]
