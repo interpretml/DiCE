@@ -19,9 +19,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
         os: [ubuntu-latest, macos-latest, windows-latest]
-        exclude:
-          - os: macos-latest
-            python-version: "3.7"
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.os }}
@@ -46,12 +44,12 @@ jobs:
         pytest tests/ -m "not notebook_tests" --durations=10 --doctest-modules --junitxml=junit/test-results.xml --cov=dice_ml --cov-report=xml --cov-report=html
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
-      if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
+      if: ${{ (matrix.python-version == '3.9') && (matrix.os == 'ubuntu-latest') }}
       with:
         files: junit/test-results.xml
     # - name: Upload coverage to Codecov
     #   uses: codecov/codecov-action@v3
-    #   if: ${{ (matrix.python-version == '3.8') && (matrix.os == 'ubuntu-latest') }}
+    #   if: ${{ (matrix.python-version == '3.9') && (matrix.os == 'ubuntu-latest') }}
     #   with:
     #     token: ${{ secrets.CODECOV_TOKEN }}
     #     directory: .
