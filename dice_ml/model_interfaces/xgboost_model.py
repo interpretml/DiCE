@@ -1,5 +1,6 @@
 import xgboost as xgb
 from dice_ml.model_interfaces.base_model import BaseModel
+from dice_ml.constants import ModelTypes
 
 class XGBoostModel(BaseModel):
     
@@ -17,7 +18,13 @@ class XGBoostModel(BaseModel):
         input_instance = self.transformer.transform(input_instance)
         for col in input_instance.columns:
             input_instance[col] = input_instance[col].astype('int64')
-        return self.model.predict_proba(input_instance)
+        if model_score:
+            if self.model_type == ModelTypes.Classifier:
+                return self.model.predict_proba(input_instance)
+            else:
+                return self.model.predict(input_instance)
+        else:
+            return self.model.predict(input_instance)
 
     def get_gradient(self):
         raise NotImplementedError("XGBoost does not support gradient calculation in this context")
