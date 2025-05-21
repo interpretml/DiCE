@@ -481,8 +481,6 @@ class DiceGenetic(ExplainerBase):
                     parent2_idx = random.choice(population_indices)
                     parent1 = population[parent1_idx]
                     parent2 = population[parent2_idx]
-                    # parent1 = random.choice(population[:int(len(population) / 2)])
-                    # parent2 = random.choice(population[:int(len(population) / 2)])
                     child = self.mate(parent1, parent2, features_to_vary, query_instance)
                     new_generation_2[new_gen_idx] = child
 
