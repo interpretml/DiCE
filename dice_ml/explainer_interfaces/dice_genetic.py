@@ -476,8 +476,13 @@ class DiceGenetic(ExplainerBase):
             if rest_members > 0:
                 new_generation_2 = np.zeros((rest_members, self.data_interface.number_of_features))
                 for new_gen_idx in range(rest_members):
-                    parent1 = random.choice(population[:int(len(population) / 2)])
-                    parent2 = random.choice(population[:int(len(population) / 2)])
+                    population_indices = list(range(int(len(population) / 2)))
+                    parent1_idx = random.choice(population_indices)
+                    parent2_idx = random.choice(population_indices)
+                    parent1 = population[parent1_idx]
+                    parent2 = population[parent2_idx]
+                    # parent1 = random.choice(population[:int(len(population) / 2)])
+                    # parent2 = random.choice(population[:int(len(population) / 2)])
                     child = self.mate(parent1, parent2, features_to_vary, query_instance)
                     new_generation_2[new_gen_idx] = child
 
