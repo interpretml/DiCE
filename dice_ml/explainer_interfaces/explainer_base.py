@@ -123,8 +123,6 @@ class ExplainerBase(ABC):
                                  desired_class="opposite", desired_range=None,
                                  permitted_range=None, features_to_vary="all",
                                  stopping_threshold=0.5, posthoc_sparsity_param=0.1,
-                                 proximity_weight=0.2, sparsity_weight=0.2, diversity_weight=5.0,
-                                 categorical_penalty=0.1,
                                  posthoc_sparsity_algorithm="linear", verbose=False, **kwargs):
         """General method for generating counterfactuals.
 
