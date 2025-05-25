@@ -12,7 +12,10 @@ from dice_ml.diverse_counterfactuals import CounterfactualExamples
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 from dice_ml.utils import helpers
 
-from ..conftest import _load_custom_testing_binary_model
+from ..conftest import (private_data_object,
+                        sample_adult_income_custom_query_11,
+                        _load_adult_income_binary_model,
+                        _load_custom_testing_binary_model)
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
@@ -349,6 +352,20 @@ class TestExplainerBaseBinaryClassification:
                 assert cf_explanations.cf_examples_list[0].final_cfs_df[col].dtype == sample_custom_query[col].dtype
             if cf_explanations.cf_examples_list[0].final_cfs_df_sparse is not None:
                 assert cf_explanations.cf_examples_list[0].final_cfs_df_sparse[col].dtype == sample_custom_query[col].dtype
+    
+    @pytest.mark.parametrize("method", ["genetic"])
+    def test_genetic_private_data(method):
+        d = private_data_object()
+        query = sample_adult_income_custom_query_11()
+        model = _load_adult_income_binary_model()
+        m = dice_ml.Model(model=model, backend='sklearn')
+        exp = dice_ml.Dice(d, m, method=method)
+    
+        return exp.generate_counterfactuals(
+            query_instances=query,
+            total_CFs=1,
+            desired_class="opposite",
+            initialization="random")
 
 
 @pytest.mark.parametrize("method", ['random', 'genetic', 'kdtree'])
