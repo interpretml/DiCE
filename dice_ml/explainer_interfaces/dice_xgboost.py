@@ -1,5 +1,6 @@
 from dice_ml.explainer_interfaces.explainer_base import ExplainerBase
 
+
 class DiceXGBoost(ExplainerBase):
     def __init__(self, data_interface, model_interface):
         """Initialize with data and model interfaces"""

@@ -150,7 +150,7 @@ class DicePyTorch(ExplainerBase):
 
     def predict_fn_for_sparsity(self, input_instance):
         """prediction function for sparsity correction"""
-        input_instance = self.model.transformer.transform(input_instance).to_numpy()[0]
+        input_instance = self.model.transformer.transform(input_instance).to_numpy(dtype=np.float64)[0]
         return self.predict_fn(torch.tensor(input_instance).float())
 
     def do_cf_initializations(self, total_CFs, algorithm, features_to_vary):
@@ -418,7 +418,7 @@ class DicePyTorch(ExplainerBase):
                              init_near_query_instance, tie_random, stopping_threshold, posthoc_sparsity_param,
                              posthoc_sparsity_algorithm, limit_steps_ls):
         """Finds counterfactuals by gradient-descent."""
-        query_instance = self.model.transformer.transform(query_instance).to_numpy()[0]
+        query_instance = self.model.transformer.transform(query_instance).to_numpy(dtype=np.float64)[0]
         self.x1 = torch.tensor(query_instance)
 
         # find the predicted value of query_instance

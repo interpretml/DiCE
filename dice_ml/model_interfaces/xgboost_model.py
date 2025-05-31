@@ -1,9 +1,11 @@
 import xgboost as xgb
-from dice_ml.model_interfaces.base_model import BaseModel
+
 from dice_ml.constants import ModelTypes
+from dice_ml.model_interfaces.base_model import BaseModel
+
 
 class XGBoostModel(BaseModel):
-    
+
     def __init__(self, model=None, model_path='', backend='', func=None, kw_args=None):
         super().__init__(model=model, model_path=model_path, backend='xgboost', func=func, kw_args=kw_args)
         if model is None and model_path:
