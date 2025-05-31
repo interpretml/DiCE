@@ -30,7 +30,8 @@ class TestDiceTorchMethods:
         # query_instance = self.exp.data_interface.prepare_query_instance(
         #     query_instance=sample_adultincome_query, encoding='one-hot')
         # self.query_instance = query_instance.iloc[0].values
-        self.query_instance = self.exp.data_interface.get_ohe_min_max_normalized_data(sample_adultincome_query).iloc[0].to_numpy(dtype=np.float64)
+        self.query_instance = self.exp.data_interface.get_ohe_min_max_normalized_data(
+                sample_adultincome_query).iloc[0].to_numpy(dtype=np.float64)
 
         self.exp.initialize_CFs(self.query_instance, init_near_query_instance=True)  # initialize CFs
         self.exp.target_cf_class = torch.tensor(1).float()  # set desired class to 1
