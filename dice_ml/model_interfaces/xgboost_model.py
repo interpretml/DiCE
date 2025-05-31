@@ -1,6 +1,8 @@
 import xgboost as xgb
-from dice_ml.model_interfaces.base_model import BaseModel
+
 from dice_ml.constants import ModelTypes
+from dice_ml.model_interfaces.base_model import BaseModel
+
 
 class XGBoostModel(BaseModel):
     
