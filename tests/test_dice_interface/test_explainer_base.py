@@ -261,9 +261,6 @@ class TestExplainerBaseBinaryClassification:
         ans = exp.generate_counterfactuals(query_instances=sample_custom_query_2,
                                            features_to_vary='all',
                                            total_CFs=2, desired_class=desired_class,
-                                           proximity_weight=0.2, sparsity_weight=0.2,
-                                           diversity_weight=5.0,
-                                           categorical_penalty=0.1,
                                            permitted_range=None)
         if method != 'kdtree':
             assert all(ans.cf_examples_list[0].final_cfs_df[exp.data_interface.outcome_name].values == [desired_class] * 2)
@@ -277,9 +274,6 @@ class TestExplainerBaseBinaryClassification:
         ans = new_exp.generate_counterfactuals(query_instances=sample_custom_query_2,
                                                features_to_vary='all',
                                                total_CFs=2, desired_class=desired_class,
-                                               proximity_weight=0.2, sparsity_weight=0.2,
-                                               diversity_weight=5.0,
-                                               categorical_penalty=0.1,
                                                permitted_range=None)
         if method != 'kdtree':
             assert all(ans.cf_examples_list[0].final_cfs_df[new_exp.data_interface.outcome_name].values == [desired_class] * 2)
