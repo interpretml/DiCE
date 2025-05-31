@@ -22,9 +22,9 @@ class PyTorchModel(BaseModel):
 
         super().__init__(model, model_path, backend, func, kw_args)
 
-    def load_model(self):
+    def load_model(self, weights_only=False):
         if self.model_path != '':
-            self.model = torch.load(self.model_path)
+            self.model = torch.load(self.model_path, weights_only=weights_only)
 
     def get_output(self, input_instance, model_score=True,
                    transform_data=False, out_tensor=False):
@@ -35,9 +35,9 @@ class PyTorchModel(BaseModel):
         """
         input_tensor = input_instance
         if transform_data:
-            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy(dtype=np.float64)).float()
         if not torch.is_tensor(input_instance):
-            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy()).float()
+            input_tensor = torch.tensor(self.transformer.transform(input_instance).to_numpy(dtype=np.float64)).float()
         out = self.model(input_tensor).float()
         if not out_tensor:
             out = out.data.numpy()

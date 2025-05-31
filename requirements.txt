@@ -4,3 +4,5 @@ pandas>=2.0.0
 scikit-learn
 tqdm
 raiutils>=0.4.0
+xgboost # if you are using xgboost
+lightgbm # if you are using lightgbm
