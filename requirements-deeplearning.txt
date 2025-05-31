@@ -1,2 +1,2 @@
-tensorflow>=1.13.1,<2.16.1
+tensorflow>=1.13.1
 torch
