@@ -24,7 +24,7 @@ jobs:
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        uv pip install build twine
+        uv pip install --system build twine
     - name: Build
       run: |
         python -m build

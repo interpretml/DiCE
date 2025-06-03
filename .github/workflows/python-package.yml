@@ -32,7 +32,7 @@ jobs:
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
     - name: Install all dependencies
       run: |
-        uv pip install -e .[deeplearning,test]
+        uv pip install --system -e .[deeplearning,test]
     - name: Test with pytest
       run: |
         # pytest

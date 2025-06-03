@@ -27,7 +27,7 @@ jobs:
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        uv pip install -e .[linting]
+        uv pip install --system -e .[linting]
     - name: Check sorted python imports using isort
       run: |
         isort . -c
