@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dice_ml"
-version = "0.11"
+dynamic = ["version"]
 authors = [
     {name = "Ramaravind Mothilal", email = "raam.arvind93@gmail.com"},
     {name = "Amit Sharma"},
