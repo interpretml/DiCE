@@ -32,8 +32,6 @@ jobs:
     - name: Install all dependencies
       run: |
         uv pip install --system -e .[deeplearning,test]
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
     - name: Test with pytest
       run: |
         # pytest
