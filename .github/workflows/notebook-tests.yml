@@ -29,15 +29,9 @@ jobs:
     - name: Upgrade pip
       run: |
         python -m pip install --upgrade pip
-    - name: Install core dependencies
+    - name: Install all dependencies
       run: |
-        pip install -r requirements.txt
-    - name: Install deep learning dependencies
-      run: |
-        pip install -r requirements-deeplearning.txt
-    - name: Install test dependencies
-      run: |
-        pip install -r requirements-test.txt
+        python -m pip install -e .[deeplearning,test]
     - name: Test with pytest
       run: |
         # pytest
