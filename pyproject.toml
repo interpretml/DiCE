@@ -1,0 +1,95 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dice_ml"
+version = "0.11"
+authors = [
+    {name = "Ramaravind Mothilal", email = "raam.arvind93@gmail.com"},
+    {name = "Amit Sharma"},
+    {name = "Chenhao Tan"}
+]
+description = "Generate Diverse Counterfactual Explanations for any machine learning model."
+readme = "README.rst"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["machine-learning", "explanation", "interpretability", "counterfactual"]
+dependencies = [
+    "jsonschema",
+    "numpy>=1.20.0",
+    "pandas>=2.0.0",
+    "scikit-learn",
+    "tqdm",
+    "raiutils>=0.4.0",
+    "xgboost",
+    "lightgbm",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/interpretml/DiCE"
+"Download" = "https://github.com/interpretml/DiCE/archive/v0.11.tar.gz"
+
+[project.optional-dependencies]
+deeplearning = [
+    "numpy<2.0.0",
+    "tensorflow>=1.13.1",
+    "torch",
+]
+test = [
+    "ipython",
+    "jupyter",
+    "pytest==8.3.5",
+    "pytest-cov",
+    "twine",
+    "pytest-mock",
+    "rai_test_utils",
+]
+linting = [
+    "flake8",
+    "flake8-bugbear",
+    "flake8-blind-except",
+    "flake8-breakpoint",
+    "flake8-builtins",
+    "flake8-logging-format",
+    "flake8-pytest-style",
+    "flake8-all-not-strings",
+    "isort",
+    "packaging",
+]
+dev = [
+    "ipython",
+    "jupyter",
+    "pytest==8.3.5",
+    "pytest-cov",
+    "twine",
+    "pytest-mock",
+    "rai_test_utils",
+    "flake8",
+    "flake8-bugbear",
+    "flake8-blind-except",
+    "flake8-breakpoint",
+    "flake8-builtins",
+    "flake8-logging-format",
+    "flake8-pytest-style",
+    "flake8-all-not-strings",
+    "isort",
+    "packaging",
+]
+
+[tool.setuptools]
+packages = {find = {exclude = ["tests*"]}}
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = ["*.h5", "counterfactual_explanations_v1.0.json", "counterfactual_explanations_v2.0.json"]

@@ -1,7 +1,0 @@
-ipython
-jupyter
-pytest
-pytest-cov
-twine
-pytest-mock
-rai_test_utils
