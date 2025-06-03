@@ -28,8 +28,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install uv
       run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        pip install uv
     - name: Install all dependencies
       run: |
         uv pip install --system -e .[deeplearning,test]
