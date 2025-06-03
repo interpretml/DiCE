@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dice_ml"
-dynamic = ["version"]
+version = "0.11"
 authors = [
     {name = "Ramaravind Mothilal", email = "raam.arvind93@gmail.com"},
     {name = "Amit Sharma"},
@@ -27,7 +27,7 @@ classifiers = [
 keywords = ["machine-learning", "explanation", "interpretability", "counterfactual"]
 dependencies = [
     "jsonschema",
-    "numpy",
+    "numpy>=1.20.0",
     "pandas>=2.0.0",
     "scikit-learn",
     "tqdm",
@@ -42,6 +42,7 @@ dependencies = [
 
 [project.optional-dependencies]
 deeplearning = [
+    "numpy<2.0.0",
     "tensorflow>=1.13.1",
     "torch",
 ]

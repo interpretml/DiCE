@@ -71,6 +71,7 @@ class TestCommonDataMethods:
         output_query = [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]
         d = self.d[0]
+        import ipdb; ipdb.set_trace(context=20)
         prepared_query = d.get_ohe_min_max_normalized_data(query_instance=sample_adultincome_query).iloc[0].tolist()
         assert output_query == pytest.approx(prepared_query, abs=1e-3)
 
