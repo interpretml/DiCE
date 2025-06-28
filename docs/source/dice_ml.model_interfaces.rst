@@ -28,6 +28,14 @@ dice\_ml.model\_interfaces.pytorch\_model module
    :undoc-members:
    :show-inheritance:
 
+dice\_ml.model\_interfaces.xgboost\_model module
+------------------------------------------------
+
+.. automodule:: dice_ml.model_interfaces.xgboost_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
