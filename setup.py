@@ -1,6 +1,6 @@
 import setuptools
 
-VERSION_STR = "0.11"
+VERSION_STR = "0.12"
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
@@ -37,6 +37,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
