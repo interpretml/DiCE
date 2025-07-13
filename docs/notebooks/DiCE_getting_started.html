@@ -1,25 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Quick introduction to generating counterfactual explanations using DiCE &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -65,7 +69,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#Explaining-a-Pytorch-model">Explaining a Pytorch model</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#More-resources:-What’s-next?">More resources: What’s next?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#More-resources:-What's-next?">More resources: What’s next?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="DiCE_feature_importances.html">Estimating local and global feature importance scores using DiCE</a></li>
@@ -93,9 +97,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
-      <li>Quick introduction to generating counterfactual explanations using DiCE</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="nb_index.html">&lt;no title&gt;</a></li>
+      <li class="breadcrumb-item active">Quick introduction to generating counterfactual explanations using DiCE</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notebooks/DiCE_getting_started.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -105,286 +109,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="Quick-introduction-to-generating-counterfactual-explanations-using-DiCE">
-<h1>Quick introduction to generating counterfactual explanations using DiCE<a class="headerlink" href="#Quick-introduction-to-generating-counterfactual-explanations-using-DiCE" title="Permalink to this heading"></a></h1>
+  <section id="Quick-introduction-to-generating-counterfactual-explanations-using-DiCE">
+<h1>Quick introduction to generating counterfactual explanations using DiCE<a class="headerlink" href="#Quick-introduction-to-generating-counterfactual-explanations-using-DiCE" title="Link to this heading"></a></h1>
 <p>Exploring “what-if” scenarios is an important way to inspect a machine learning (ML) model. The DiCE library helps you to understand an ML model by generating “what-if” data points that lead to the desired model output. Formally, such “what-if” data points are known as <em>counterfactuals</em>, described by the following question: &gt; Given that the model’s output for input <span class="math notranslate nohighlight">\(x\)</span> is <span class="math notranslate nohighlight">\(y\)</span>, what would be the output if input <span class="math notranslate nohighlight">\(x\)</span> is changed to <span class="math notranslate nohighlight">\(x'\)</span>?</p>
 <p>The answer to the above question can be obtained by simply inputting <span class="math notranslate nohighlight">\(x'\)</span> to the ML model. However, in many cases, we are interested in the reverse question: what changes to <span class="math notranslate nohighlight">\(x\)</span> would lead to a desired change in model’s output? When inspecting a classifier, for instance, we are often interested in knowing the changes to <span class="math notranslate nohighlight">\(x\)</span> that will lead to a desired predicted class. For a regressor, we may be interested in the changes to <span class="math notranslate nohighlight">\(x\)</span> that lead to a desired output range. Ideally,
 these changes should be <em>proximal</em> to bring out the local decision logic of the classifier, <em>sparse</em> to highlight a limited set of features, and <em>diverse</em> to show the different ways in which the same outcome can be achieved. The DiCE library provides an easy interface to generate such counterfactual examples for any ML model.</p>
@@ -412,16 +138,16 @@ the counterfactuals and consequently, the local importance score. Given a set of
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Sklearn imports
-from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.ensemble import RandomForestClassifier
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sklearn imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 
-# DiCE imports
-import dice_ml
-from dice_ml.utils import helpers  # helper functions
+<span class="c1"># DiCE imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dice_ml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
 </pre></div>
 </div>
 </div>
@@ -429,30 +155,39 @@ from dice_ml.utils import helpers  # helper functions
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
-%autoreload 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <section id="Preliminaries:-Loading-a-dataset-and-a-ML-model-trained-over-it">
-<h2>Preliminaries: Loading a dataset and a ML model trained over it<a class="headerlink" href="#Preliminaries:-Loading-a-dataset-and-a-ML-model-trained-over-it" title="Permalink to this heading"></a></h2>
+<h2>Preliminaries: Loading a dataset and a ML model trained over it<a class="headerlink" href="#Preliminaries:-Loading-a-dataset-and-a-ML-model-trained-over-it" title="Link to this heading"></a></h2>
 <section id="Loading-the-Adult-dataset">
-<h3>Loading the <code class="docutils literal notranslate"><span class="pre">Adult</span></code> dataset<a class="headerlink" href="#Loading-the-Adult-dataset" title="Permalink to this heading"></a></h3>
+<h3>Loading the <code class="docutils literal notranslate"><span class="pre">Adult</span></code> dataset<a class="headerlink" href="#Loading-the-Adult-dataset" title="Link to this heading"></a></h3>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as described in <strong>dice_ml.utils.helpers</strong> module.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset = helpers.load_adult_income_dataset()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/helpers.py:79: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  adult_data = adult_data.replace({&#39;income&#39;: {&#39;&lt;=50K&#39;: 0, &#39;&gt;50K&#39;: 1}})
+</pre></div></div>
 </div>
 <p>This dataset has 8 features. The outcome is income which is binarized to 0 (low-income, &lt;=50K) or 1 (high-income, &gt;50K).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset.head()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -559,9 +294,9 @@ from dice_ml.utils import helpers  # helper functions
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># description of transformed features
-adult_info = helpers.get_adult_data_info()
-adult_info
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># description of transformed features</span>
+<span class="n">adult_info</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_data_info</span><span class="p">()</span>
+<span class="n">adult_info</span>
 </pre></div>
 </div>
 </div>
@@ -587,14 +322,14 @@ adult_info
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>target = dataset[&quot;income&quot;]
-train_dataset, test_dataset, y_train, y_test = train_test_split(dataset,
-                                                                target,
-                                                                test_size=0.2,
-                                                                random_state=0,
-                                                                stratify=target)
-x_train = train_dataset.drop(&#39;income&#39;, axis=1)
-x_test = test_dataset.drop(&#39;income&#39;, axis=1)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                                                                <span class="n">target</span><span class="p">,</span>
+                                                                <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                                <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                                <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+<span class="n">x_train</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;income&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_test</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;income&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -603,52 +338,52 @@ x_test = test_dataset.drop(&#39;income&#39;, axis=1)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Step 1: dice_ml.Data
-d = dice_ml.Data(dataframe=train_dataset, continuous_features=[&#39;age&#39;, &#39;hours_per_week&#39;], outcome_name=&#39;income&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 1: dice_ml.Data</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Loading-the-ML-model">
-<h3>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Permalink to this heading"></a></h3>
+<h3>Loading the ML model<a class="headerlink" href="#Loading-the-ML-model" title="Link to this heading"></a></h3>
 <p>DiCE supports sklearn, tensorflow and pytorch models.</p>
-<p>The variable <em>backend</em> below indicates the implementation type of DiCE we want to use. Four backends are supported: sklearn, TensorFlow 1.x with backend=‘TF1’, Tensorflow 2.x with backend=‘TF2’, and PyTorch with backend=‘PYT’.</p>
+<p>The variable <em>backend</em> below indicates the implementation type of DiCE we want to use. Four backends are supported: sklearn, TensorFlow 1.x with backend=’TF1’, Tensorflow 2.x with backend=’TF2’, and PyTorch with backend=’PYT’.</p>
 <p>Below we show use a trained classification model using sklearn.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>numerical = [&quot;age&quot;, &quot;hours_per_week&quot;]
-categorical = x_train.columns.difference(numerical)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">numerical</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours_per_week&quot;</span><span class="p">]</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical</span><span class="p">)</span>
 
-categorical_transformer = Pipeline(steps=[
-    (&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
 
-transformations = ColumnTransformer(
-    transformers=[
-        (&#39;cat&#39;, categorical_transformer, categorical)])
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical</span><span class="p">)])</span>
 
-# Append classifier to preprocessing pipeline.
-# Now we have a full prediction pipeline.
-clf = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
-                      (&#39;classifier&#39;, RandomForestClassifier())])
-model = clf.fit(x_train, y_train)
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 </section>
 <section id="Generating-counterfactual-examples-using-DiCE">
-<h2>Generating counterfactual examples using DiCE<a class="headerlink" href="#Generating-counterfactual-examples-using-DiCE" title="Permalink to this heading"></a></h2>
+<h2>Generating counterfactual examples using DiCE<a class="headerlink" href="#Generating-counterfactual-examples-using-DiCE" title="Link to this heading"></a></h2>
 <p>We now initialize the DiCE explainer, which needs a dataset and a model. DiCE provides local explanation for the model <em>m</em> and requires an query input whose outcome needs to be explained.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Using sklearn backend
-m = dice_ml.Model(model=model, backend=&quot;sklearn&quot;)
-# Using method=random for generating CFs
-exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using sklearn backend</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">)</span>
+<span class="c1"># Using method=random for generating CFs</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -659,8 +394,8 @@ exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>e1 = exp.generate_counterfactuals(x_test[0:1], total_CFs=2, desired_class=&quot;opposite&quot;)
-e1.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
+<span class="n">e1</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -669,7 +404,7 @@ e1.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.99it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.18it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -784,10 +519,10 @@ Diverse Counterfactual set (new outcome: 1)
     <tr>
       <th>0</th>
       <td>-</td>
+      <td>Government</td>
       <td>-</td>
-      <td>Prof-school</td>
+      <td>Single</td>
       <td>-</td>
-      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -797,8 +532,8 @@ Diverse Counterfactual set (new outcome: 1)
       <th>1</th>
       <td>-</td>
       <td>Government</td>
+      <td>Assoc</td>
       <td>-</td>
-      <td>Single</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -814,7 +549,7 @@ Diverse Counterfactual set (new outcome: 1)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>e1.visualize_as_dataframe(show_only_changes=False)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e1</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -922,10 +657,10 @@ Diverse Counterfactual set (new outcome: 1)
     <tr>
       <th>0</th>
       <td>29</td>
-      <td>Private</td>
-      <td>Prof-school</td>
-      <td>Married</td>
-      <td>White-Collar</td>
+      <td>Government</td>
+      <td>HS-grad</td>
+      <td>Single</td>
+      <td>Blue-Collar</td>
       <td>White</td>
       <td>Female</td>
       <td>38</td>
@@ -935,8 +670,8 @@ Diverse Counterfactual set (new outcome: 1)
       <th>1</th>
       <td>29</td>
       <td>Government</td>
-      <td>HS-grad</td>
-      <td>Single</td>
+      <td>Assoc</td>
+      <td>Married</td>
       <td>Blue-Collar</td>
       <td>White</td>
       <td>Female</td>
@@ -952,13 +687,13 @@ Diverse Counterfactual set (new outcome: 1)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Changing only age and education
-e2 = exp.generate_counterfactuals(x_test[0:1],
-                                  total_CFs=2,
-                                  desired_class=&quot;opposite&quot;,
-                                  features_to_vary=[&quot;education&quot;, &quot;occupation&quot;]
-                                  )
-e2.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Changing only age and education</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                                  <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;education&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">]</span>
+                                  <span class="p">)</span>
+<span class="n">e2</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -967,7 +702,7 @@ e2.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.88it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.02it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1095,9 +830,9 @@ Diverse Counterfactual set (new outcome: 1)
       <th>1</th>
       <td>-</td>
       <td>-</td>
-      <td>Some-college</td>
+      <td>Masters</td>
       <td>-</td>
-      <td>Professional</td>
+      <td>Sales</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1111,12 +846,12 @@ Diverse Counterfactual set (new outcome: 1)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Restricting age to be between [20,30] and Education to be either {&#39;Doctorate&#39;, &#39;Prof-school&#39;}.
-e3 = exp.generate_counterfactuals(x_test[0:1],
-                                  total_CFs=2,
-                                  desired_class=&quot;opposite&quot;,
-                                  permitted_range={&#39;age&#39;: [20, 30], &#39;education&#39;: [&#39;Doctorate&#39;, &#39;Prof-school&#39;]})
-e3.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Restricting age to be between [20,30] and Education to be either {&#39;Doctorate&#39;, &#39;Prof-school&#39;}.</span>
+<span class="n">e3</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                                  <span class="n">permitted_range</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="s1">&#39;education&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Doctorate&#39;</span><span class="p">,</span> <span class="s1">&#39;Prof-school&#39;</span><span class="p">]})</span>
+<span class="n">e3</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1125,7 +860,7 @@ e3.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.68it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  3.72it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1240,10 +975,10 @@ Diverse Counterfactual set (new outcome: 1)
     <tr>
       <th>0</th>
       <td>-</td>
+      <td>Other/Unknown</td>
       <td>-</td>
-      <td>Prof-school</td>
       <td>-</td>
-      <td>White-Collar</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1252,13 +987,13 @@ Diverse Counterfactual set (new outcome: 1)
     <tr>
       <th>1</th>
       <td>-</td>
+      <td>Government</td>
       <td>-</td>
-      <td>Prof-school</td>
+      <td>Single</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>28</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -1267,19 +1002,19 @@ Diverse Counterfactual set (new outcome: 1)
 </div>
 </section>
 <section id="Generating-feature-attributions-(local-and-global)-using-DiCE">
-<h2>Generating feature attributions (local and global) using DiCE<a class="headerlink" href="#Generating-feature-attributions-(local-and-global)-using-DiCE" title="Permalink to this heading"></a></h2>
+<h2>Generating feature attributions (local and global) using DiCE<a class="headerlink" href="#Generating-feature-attributions-(local-and-global)-using-DiCE" title="Link to this heading"></a></h2>
 <p>DiCE can generate feature importance scores using a summary of the counterfactuals generated. Intuitively, a feature that is changed more often when generating proximal counterfactuals for an input is locally important for causing the model’s prediction at the input. Formally, counterfactuals operationalize the <strong>necessity</strong> criterion for a model explanation: <em>is the feature value necessary for the given model output?</em></p>
 <p>For more details, refer to the paper, <a class="reference external" href="https://arxiv.org/abs/2011.04917">Towards Unifying Feature Attribution and Counterfactual Explanations: Different Means to the Same End</a>.</p>
 <section id="Local-feature-importance-scores">
-<h3>Local feature importance scores<a class="headerlink" href="#Local-feature-importance-scores" title="Permalink to this heading"></a></h3>
+<h3>Local feature importance scores<a class="headerlink" href="#Local-feature-importance-scores" title="Link to this heading"></a></h3>
 <p>These scores are computed for a given query instance (input point) by summarizing a set of counterfactual examples around the point.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instance = x_test[0:1]
-imp = exp.local_feature_importance(query_instance, total_CFs=10)
-print(imp.local_importance)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instance</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">local_feature_importance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">local_importance</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1288,7 +1023,7 @@ print(imp.local_importance)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  2.31it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00&lt;00:00,  1.65it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1296,7 +1031,7 @@ print(imp.local_importance)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[{&#39;education&#39;: 0.9, &#39;occupation&#39;: 0.4, &#39;workclass&#39;: 0.2, &#39;gender&#39;: 0.2, &#39;age&#39;: 0.2, &#39;marital_status&#39;: 0.0, &#39;race&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
+[{&#39;workclass&#39;: 0.6, &#39;education&#39;: 0.6, &#39;occupation&#39;: 0.5, &#39;gender&#39;: 0.2, &#39;marital_status&#39;: 0.1, &#39;race&#39;: 0.0, &#39;age&#39;: 0.0, &#39;hours_per_week&#39;: 0.0}]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1310,15 +1045,15 @@ print(imp.local_importance)
 <p>The <code class="docutils literal notranslate"><span class="pre">total_CFs</span></code> parameter denotes the number of counterfactuals that are used to create the local importance. More the better.</p>
 </section>
 <section id="Global-feature-importance-scores">
-<h3>Global feature importance scores<a class="headerlink" href="#Global-feature-importance-scores" title="Permalink to this heading"></a></h3>
+<h3>Global feature importance scores<a class="headerlink" href="#Global-feature-importance-scores" title="Link to this heading"></a></h3>
 <p>A global importance score per feature can be estimated by aggregating the scores over individual inputs. The more the inputs, the better the estimate for global importance of a feature.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instances = x_test[0:20]
-imp = exp.global_feature_importance(query_instances)
-print(imp.summary_importance)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">global_feature_importance</span><span class="p">(</span><span class="n">query_instances</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">summary_importance</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1327,7 +1062,7 @@ print(imp.summary_importance)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|███████████████████████████████████████████████████████████████████████████████████| 20/20 [00:08&lt;00:00,  2.25it/s]
+100%|███████████████████████████████████████████████████████████████████████████████████| 20/20 [00:16&lt;00:00,  1.19it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1335,7 +1070,7 @@ print(imp.summary_importance)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;education&#39;: 0.62, &#39;occupation&#39;: 0.295, &#39;marital_status&#39;: 0.29, &#39;workclass&#39;: 0.22, &#39;age&#39;: 0.205, &#39;hours_per_week&#39;: 0.205, &#39;race&#39;: 0.115, &#39;gender&#39;: 0.09}
+{&#39;education&#39;: 0.705, &#39;occupation&#39;: 0.285, &#39;marital_status&#39;: 0.28, &#39;workclass&#39;: 0.23, &#39;age&#39;: 0.2, &#39;hours_per_week&#39;: 0.19, &#39;race&#39;: 0.075, &#39;gender&#39;: 0.075}
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1349,20 +1084,20 @@ print(imp.summary_importance)
 </section>
 </section>
 <section id="Working-with-deep-learning-models-(TensorFlow-and-PyTorch)">
-<h2>Working with deep learning models (TensorFlow and PyTorch)<a class="headerlink" href="#Working-with-deep-learning-models-(TensorFlow-and-PyTorch)" title="Permalink to this heading"></a></h2>
+<h2>Working with deep learning models (TensorFlow and PyTorch)<a class="headerlink" href="#Working-with-deep-learning-models-(TensorFlow-and-PyTorch)" title="Link to this heading"></a></h2>
 <p>We now show examples of gradient-based methods with Tensorflow and Pytorch models. Since the gradient-based methods <em>optimize</em> the loss rather than simply sampling some points, they can be slower to generate counterfactuals. The loss is defined by three component: <strong>validity</strong> (does the CF have the desired model output), <strong>proximity</strong> (distance of CF from original point should be low), and <strong>diversity</strong> (multiple CFs should change different features). The DiCE loss formulation is described in
 the paper, <a class="reference external" href="https://arxiv.org/abs/1905.07697">Explaining Machine Learning Classifiers through Diverse Counterfactual Explanations</a>.</p>
 <p>Below, we use a pre-trained ML model which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package.</p>
 <section id="Explaining-a-Tensorflow-model">
-<h3>Explaining a Tensorflow model<a class="headerlink" href="#Explaining-a-Tensorflow-model" title="Permalink to this heading"></a></h3>
+<h3>Explaining a Tensorflow model<a class="headerlink" href="#Explaining-a-Tensorflow-model" title="Link to this heading"></a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>backend = &#39;TF2&#39;  # needs tensorflow installed
-ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
-# Step 2: dice_ml.Model
-m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-max&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;TF2&#39;</span>  <span class="c1"># needs tensorflow installed</span>
+<span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+<span class="c1"># Step 2: dice_ml.Model</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1371,9 +1106,17 @@ m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-m
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2023-10-26 15:43:24.138021: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2023-10-26 15:43:24.207078: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2023-10-26 15:43:24.207103: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2025-07-13 22:26:04.607485: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-07-13 22:26:05.168864: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1752425765.377977    1958 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1752425765.438120    1958 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1752425765.869114    1958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1752425765.869394    1958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1752425765.869400    1958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1752425765.869404    1958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-07-13 22:26:05.927837: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
 </pre></div></div>
 </div>
 <p>We want to note that the time required to find counterfactuals with Tensorflow 2.x’s eager style of execution is significantly greater than that with TensorFlow 1.x’s graph execution.</p>
@@ -1382,8 +1125,8 @@ m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-m
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Step 3: initiate DiCE
-exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 3: initiate DiCE</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;gradient&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1392,11 +1135,13 @@ exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2023-10-26 15:43:28.626560: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcuda.so.1&#39;; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-2023-10-26 15:43:28.626614: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-2023-10-26 15:43:28.626637: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (AMSHAR-X1): /proc/driver/nvidia/version does not exist
-2023-10-26 15:43:28.627732: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+/home/amshar/python-envs/vpy39/lib/python3.9/site-packages/keras/src/layers/core/dense.py:93: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(activity_regularizer=activity_regularizer, **kwargs)
+2025-07-13 22:26:13.425985: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+/home/amshar/python-envs/vpy39/lib/python3.9/site-packages/keras/src/optimizers/base_optimizer.py:86: UserWarning: Argument `decay` is no longer supported and will be ignored.
+  warnings.warn(
+WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+WARNING:absl:Error in loading the saved optimizer state. As a result, your model is starting with a freshly initialized optimizer.
 </pre></div></div>
 </div>
 <p>Below we provide query instances from <code class="docutils literal notranslate"><span class="pre">x_test</span></code>.</p>
@@ -1404,20 +1149,36 @@ To enable them in other operations, rebuild TensorFlow with the appropriate comp
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp = exp.generate_counterfactuals(x_test[1:2], total_CFs=4, desired_class=&quot;opposite&quot;)
-# visualize the result, highlight only the changes
-dice_exp.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
+<span class="c1"># visualize the result, highlight only the changes</span>
+<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [01:33&lt;00:00, 93.76s/it]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 53 sec
+Diverse Counterfactuals found! total time taken: 01 min 33 sec
 Query instance (original outcome : 0.6710000038146973)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1456,14 +1217,14 @@ Query instance (original outcome : 0.6710000038146973)
   <tbody>
     <tr>
       <th>0</th>
-      <td>50.0</td>
+      <td>50</td>
       <td>Other/Unknown</td>
       <td>Some-college</td>
       <td>Married</td>
       <td>Other/Unknown</td>
       <td>White</td>
       <td>Male</td>
-      <td>40.0</td>
+      <td>40</td>
       <td>0.671</td>
     </tr>
   </tbody>
@@ -1515,19 +1276,19 @@ Diverse Counterfactual set (new outcome: 0.0)
   <tbody>
     <tr>
       <th>0</th>
-      <td>23.0</td>
+      <td>23</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>13.0</td>
+      <td>13</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>17.0</td>
+      <td>17</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1551,7 +1312,7 @@ Diverse Counterfactual set (new outcome: 0.0)
     </tr>
     <tr>
       <th>3</th>
-      <td>62.0</td>
+      <td>62</td>
       <td>-</td>
       <td>-</td>
       <td>Divorced</td>
@@ -1569,15 +1330,15 @@ Diverse Counterfactual set (new outcome: 0.0)
 <a class="reference external" href="https://github.com/interpretml/DiCE/blob/master/dice_ml/dice_interfaces/dice_tensorflow1.py">dice_ml.dice_interfaces.dice_tensorflow.py</a>.</p>
 </section>
 <section id="Explaining-a-Pytorch-model">
-<h3>Explaining a Pytorch model<a class="headerlink" href="#Explaining-a-Pytorch-model" title="Permalink to this heading"></a></h3>
+<h3>Explaining a Pytorch model<a class="headerlink" href="#Explaining-a-Pytorch-model" title="Link to this heading"></a></h3>
 <p>Just change the backend variable to ‘PYT’ to use DiCE with PyTorch. Below, we use a pre-trained ML model in PyTorch which produces high accuracy comparable to other baselines. For convenience, we include the sample trained model with the DiCE package. Additionally, we need to provide a data transformer function that converts input dataframe into one-hot encoded/numeric format.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>backend = &#39;PYT&#39;  # needs pytorch installed
-ML_modelpath = helpers.get_adult_income_modelpath(backend=backend)
-m = dice_ml.Model(model_path=ML_modelpath, backend=backend,  func=&quot;ohe-min-max&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;PYT&#39;</span>  <span class="c1"># needs pytorch installed</span>
+<span class="n">ML_modelpath</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>  <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1586,7 +1347,7 @@ m = dice_ml.Model(model_path=ML_modelpath, backend=backend,  func=&quot;ohe-min-
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp = dice_ml.Dice(d, m, method=&quot;gradient&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;gradient&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1594,10 +1355,10 @@ m = dice_ml.Model(model_path=ML_modelpath, backend=backend,  func=&quot;ohe-min-
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp = exp.generate_counterfactuals(x_test[1:3], total_CFs=4, desired_class=&quot;opposite&quot;)
-# highlight only the changes
-dice_exp.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
+<span class="c1"># highlight only the changes</span>
+<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1606,7 +1367,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 50%|██████████████████████████████████████████▌                                          | 1/2 [00:04&lt;00:04,  4.54s/it]
+ 50%|██████████████████████████████████████████▌                                          | 1/2 [00:09&lt;00:09,  9.69s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1614,7 +1375,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 04 sec
+Diverse Counterfactuals found! total time taken: 00 min 09 sec
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1622,7 +1383,7 @@ Diverse Counterfactuals found! total time taken: 00 min 04 sec
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:09&lt;00:00,  4.88s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:17&lt;00:00,  8.58s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1630,7 +1391,7 @@ Diverse Counterfactuals found! total time taken: 00 min 04 sec
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 04 sec
+Diverse Counterfactuals found! total time taken: 00 min 07 sec
 Query instance (original outcome : 0.6179999709129333)
 </pre></div></div>
 </div>
@@ -1945,8 +1706,8 @@ Diverse Counterfactual set (new outcome: 0.0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m = dice_ml.Model(model_path=ML_modelpath, backend=backend, func=&quot;ohe-min-max&quot;)
-exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_path</span><span class="o">=</span><span class="n">ML_modelpath</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s2">&quot;ohe-min-max&quot;</span><span class="p">)</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1954,10 +1715,10 @@ exp = dice_ml.Dice(d, m, method=&quot;random&quot;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp = exp.generate_counterfactuals(x_test[1:3], total_CFs=4, desired_class=&quot;opposite&quot;)
-# highlight only the changes
-dice_exp.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">x_test</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
+<span class="c1"># highlight only the changes</span>
+<span class="n">dice_exp</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1966,7 +1727,7 @@ dice_exp.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.32it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  3.52it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2087,12 +1848,12 @@ Diverse Counterfactual set (new outcome: 0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>22</td>
+      <td>78</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>28</td>
+      <td>35</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2104,22 +1865,22 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>2</th>
-      <td>29</td>
-      <td>Private</td>
+      <td>-</td>
+      <td>-</td>
+      <td>HS-grad</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
+      <td>45</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3</th>
+      <td>33</td>
       <td>-</td>
       <td>-</td>
-      <td>School</td>
-      <td>Widowed</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2237,21 +1998,21 @@ Diverse Counterfactual set (new outcome: 0)
       <td>-</td>
       <td>-</td>
       <td>Separated</td>
+      <td>Sales</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>32</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
       <td>-</td>
+      <td>Government</td>
+      <td>-</td>
+      <td>Widowed</td>
       <td>-</td>
       <td>-</td>
-      <td>Separated</td>
       <td>-</td>
-      <td>-</td>
-      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
@@ -2259,11 +2020,11 @@ Diverse Counterfactual set (new outcome: 0)
       <th>2</th>
       <td>-</td>
       <td>-</td>
-      <td>School</td>
+      <td>-</td>
+      <td>Separated</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Female</td>
       <td>-</td>
       <td>0</td>
     </tr>
@@ -2271,10 +2032,10 @@ Diverse Counterfactual set (new outcome: 0)
       <th>3</th>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
+      <td>School</td>
       <td>Single</td>
       <td>-</td>
-      <td>Other</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
@@ -2285,8 +2046,8 @@ Diverse Counterfactual set (new outcome: 0)
 </div>
 </section>
 </section>
-<section id="More-resources:-What’s-next?">
-<h2>More resources: What’s next?<a class="headerlink" href="#More-resources:-What’s-next?" title="Permalink to this heading"></a></h2>
+<section id="More-resources:-What's-next?">
+<h2>More resources: What’s next?<a class="headerlink" href="#More-resources:-What's-next?" title="Link to this heading"></a></h2>
 <p>DiCE has multiple configurable options and support for different kinds of models. Follow these notebooks to learn more.</p>
 <ol class="arabic simple">
 <li><p>You can constrain the features to vary, weigh the relative importance of different features for computing distance, or specify permitted ranges for each feature. Check out the <a class="reference internal" href="DiCE_with_advanced_options.html"><span class="doc">Customizing Counterfactuals Notebook</span></a>.</p></li>

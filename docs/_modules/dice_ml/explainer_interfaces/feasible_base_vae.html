@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.feasible_base_vae &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.explainer_interfaces.feasible_base_vae &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.explainer_interfaces.feasible_base_vae</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.explainer_interfaces.feasible_base_vae</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -82,21 +85,23 @@
              
   <h1>Source code for dice_ml.explainer_interfaces.feasible_base_vae</h1><div class="highlight"><pre>
 <span></span><span class="c1"># General Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="c1"># Pytorch</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.utils.data</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.utils.data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
 <span class="c1"># Dice Imports</span>
-<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
-<span class="kn">from</span> <span class="nn">dice_ml.utils.helpers</span> <span class="kn">import</span> <span class="n">get_base_gen_cf_initialization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.explainer_interfaces.explainer_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplainerBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_base_gen_cf_initialization</span>
 
 
-<div class="viewcode-block" id="FeasibleBaseVAE"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE">[docs]</a><span class="k">class</span> <span class="nc">FeasibleBaseVAE</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
+<div class="viewcode-block" id="FeasibleBaseVAE">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FeasibleBaseVAE</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param data_interface: an interface class to data related params</span>
 <span class="sd">        :param model_interface: an interface class to access trained ML model</span>
@@ -135,7 +140,9 @@
             <span class="s1">&#39;-margin-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-validity_reg-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validity_reg</span><span class="p">)</span> <span class="o">+</span> \
             <span class="s1">&#39;-epoch-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;base-gen&#39;</span> <span class="o">+</span> <span class="s1">&#39;.pth&#39;</span>
 
-<div class="viewcode-block" id="FeasibleBaseVAE.compute_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.compute_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_out</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">target_label</span><span class="p">):</span>
+<div class="viewcode-block" id="FeasibleBaseVAE.compute_loss">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.compute_loss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_out</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">target_label</span><span class="p">):</span>
 
         <span class="n">em</span> <span class="o">=</span> <span class="n">model_out</span><span class="p">[</span><span class="s1">&#39;em&#39;</span><span class="p">]</span>
         <span class="n">ev</span> <span class="o">=</span> <span class="n">model_out</span><span class="p">[</span><span class="s1">&#39;ev&#39;</span><span class="p">]</span>
@@ -196,7 +203,10 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;recon: &#39;</span><span class="p">,</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">recon_err</span><span class="p">),</span> <span class="s1">&#39; KL: &#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">kl_divergence</span><span class="p">),</span> <span class="s1">&#39; Validity: &#39;</span><span class="p">,</span> <span class="o">-</span><span class="n">validity_loss</span><span class="p">)</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">recon_err</span> <span class="o">-</span> <span class="n">kl_divergence</span><span class="p">)</span> <span class="o">-</span> <span class="n">validity_loss</span></div>
 
-<div class="viewcode-block" id="FeasibleBaseVAE.train"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_trained</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FeasibleBaseVAE.train">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.train">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_trained</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        pre_trained: Bool Variable to check whether pre trained model exists to avoid training again</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -243,8 +253,11 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">epoch</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span></div>
 
+
     <span class="c1"># The input arguments for this function same as the one defined for Diverse CF</span>
-<div class="viewcode-block" id="FeasibleBaseVAE.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="FeasibleBaseVAE.generate_counterfactuals">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.feasible_base_vae.FeasibleBaseVAE.generate_counterfactuals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">):</span>
 
         <span class="c1"># Loading the latest trained CFVAE model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cf_vae</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">))</span>
@@ -324,7 +337,9 @@
                                           <span class="n">test_instance_df</span><span class="o">=</span><span class="n">test_instance_df</span><span class="p">,</span>
                                           <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                           <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">)</span></div></div>
+                                          <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

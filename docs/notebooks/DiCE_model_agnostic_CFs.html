@@ -1,25 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generating counterfactual explanations with any ML model &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Generating counterfactual explanations with any ML model &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -100,9 +104,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
-      <li>Generating counterfactual explanations with any ML model</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="nb_index.html">&lt;no title&gt;</a></li>
+      <li class="breadcrumb-item active">Generating counterfactual explanations with any ML model</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notebooks/DiCE_model_agnostic_CFs.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -112,303 +116,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="Generating-counterfactual-explanations-with-any-ML-model">
-<h1>Generating counterfactual explanations with any ML model<a class="headerlink" href="#Generating-counterfactual-explanations-with-any-ML-model" title="Permalink to this heading"></a></h1>
-<p>The goal of this notebook is to show how to generate CFs for ML models using frameworks other than TensorFlow or PyTorch. We show how to generate diverse CFs by three methods: 1. Independent random sampling of features (<code class="docutils literal notranslate"><span class="pre">method_name='random')</span></code> 2. Genetic algorithm (<code class="docutils literal notranslate"><span class="pre">method_name='genetic')</span></code> 3. Querying a KD tree (<code class="docutils literal notranslate"><span class="pre">method_name='kdtree')</span></code></p>
+  <section id="Generating-counterfactual-explanations-with-any-ML-model">
+<h1>Generating counterfactual explanations with any ML model<a class="headerlink" href="#Generating-counterfactual-explanations-with-any-ML-model" title="Link to this heading"></a></h1>
+<p>The goal of this notebook is to show how to generate CFs for ML models using frameworks other than TensorFlow or PyTorch. We show how to generate diverse CFs by three methods:</p>
+<ol class="arabic simple">
+<li><p>Independent random sampling of features (<code class="docutils literal notranslate"><span class="pre">method_name='random')</span></code></p></li>
+<li><p>Genetic algorithm (<code class="docutils literal notranslate"><span class="pre">method_name='genetic')</span></code></p></li>
+<li><p>Querying a KD tree (<code class="docutils literal notranslate"><span class="pre">method_name='kdtree')</span></code></p></li>
+</ol>
 <p>We use scikit-learn models for demonstration.</p>
 <section id="1.-Independent-random-sampling-of-features">
-<h2>1. Independent random sampling of features<a class="headerlink" href="#1.-Independent-random-sampling-of-features" title="Permalink to this heading"></a></h2>
+<h2>1. Independent random sampling of features<a class="headerlink" href="#1.-Independent-random-sampling-of-features" title="Link to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># import DiCE
-import dice_ml
-from dice_ml.utils import helpers  # helper functions
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import DiCE</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dice_ml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
 
-from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.ensemble import RandomForestClassifier
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 </pre></div>
 </div>
 </div>
@@ -416,27 +147,36 @@ from sklearn.ensemble import RandomForestClassifier
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
-%autoreload 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <section id="Loading-dataset">
-<h3>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this heading"></a></h3>
+<h3>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Link to this heading"></a></h3>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). We transform the data as described in dice_ml.utils.helpers module.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset = helpers.load_adult_income_dataset()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/helpers.py:79: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  adult_data = adult_data.replace({&#39;income&#39;: {&#39;&lt;=50K&#39;: 0, &#39;&gt;50K&#39;: 1}})
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset.head()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -543,47 +283,47 @@ from sklearn.ensemble import RandomForestClassifier
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d = dice_ml.Data(dataframe=dataset, continuous_features=[&#39;age&#39;, &#39;hours_per_week&#39;], outcome_name=&#39;income&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Training-a-custom-ML-model">
-<h3>Training a custom ML model<a class="headerlink" href="#Training-a-custom-ML-model" title="Permalink to this heading"></a></h3>
+<h3>Training a custom ML model<a class="headerlink" href="#Training-a-custom-ML-model" title="Link to this heading"></a></h3>
 <p>Below, we build an ML model using scikit-learn to demonstrate how our methods can work with any sklearn model.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>target = dataset[&quot;income&quot;]
-# Split data into train and test
-datasetX = dataset.drop(&quot;income&quot;, axis=1)
-x_train, x_test, y_train, y_test = train_test_split(datasetX,
-                                                    target,
-                                                    test_size=0.2,
-                                                    random_state=0,
-                                                    stratify=target)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
+<span class="c1"># Split data into train and test</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
+                                                    <span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 
-numerical = [&quot;age&quot;, &quot;hours_per_week&quot;]
-categorical = x_train.columns.difference(numerical)
+<span class="n">numerical</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours_per_week&quot;</span><span class="p">]</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical</span><span class="p">)</span>
 
-# We create the preprocessing pipelines for both numeric and categorical data.
-numeric_transformer = Pipeline(steps=[
-    (&#39;scaler&#39;, StandardScaler())])
+<span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
 
-categorical_transformer = Pipeline(steps=[
-    (&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
 
-transformations = ColumnTransformer(
-    transformers=[
-        (&#39;num&#39;, numeric_transformer, numerical),
-        (&#39;cat&#39;, categorical_transformer, categorical)])
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">numerical</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical</span><span class="p">)])</span>
 
-# Append classifier to preprocessing pipeline.
-# Now we have a full prediction pipeline.
-clf = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
-                      (&#39;classifier&#39;, RandomForestClassifier())])
-model = clf.fit(x_train, y_train)
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -591,21 +331,21 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># provide the trained ML model to DiCE&#39;s model object
-backend = &#39;sklearn&#39;
-m = dice_ml.Model(model=model, backend=backend)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># provide the trained ML model to DiCE&#39;s model object</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;sklearn&#39;</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Generate-diverse-counterfactuals">
-<h3>Generate diverse counterfactuals<a class="headerlink" href="#Generate-diverse-counterfactuals" title="Permalink to this heading"></a></h3>
+<h3>Generate diverse counterfactuals<a class="headerlink" href="#Generate-diverse-counterfactuals" title="Link to this heading"></a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># initiate DiCE
-exp_random = dice_ml.Dice(d, m, method=&quot;random&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiCE</span>
+<span class="n">exp_random</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -613,7 +353,7 @@ exp_random = dice_ml.Dice(d, m, method=&quot;random&quot;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instances = x_train[4:6]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -621,8 +361,8 @@ exp_random = dice_ml.Dice(d, m, method=&quot;random&quot;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_random = exp_random.generate_counterfactuals(query_instances, total_CFs=2, desired_class=&quot;opposite&quot;, verbose=False)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_random</span> <span class="o">=</span> <span class="n">exp_random</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -631,14 +371,14 @@ dice_exp_random = exp_random.generate_counterfactuals(query_instances, total_CFs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.98it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  6.13it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_random.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_random</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -745,7 +485,7 @@ Diverse Counterfactual set (new outcome: 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>42</td>
+      <td>39</td>
       <td>-</td>
       <td>Prof-school</td>
       <td>-</td>
@@ -757,9 +497,9 @@ Diverse Counterfactual set (new outcome: 1)
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
+      <td>85</td>
       <td>-</td>
-      <td>Prof-school</td>
+      <td>Assoc</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -876,20 +616,20 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Prof-school</td>
-      <td>Separated</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>6</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>51</td>
       <td>-</td>
-      <td>Masters</td>
       <td>-</td>
+      <td>-</td>
+      <td>Divorced</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -906,12 +646,12 @@ Diverse Counterfactual set (new outcome: 0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-# default random seed is 17
-dice_exp_random = exp_random.generate_counterfactuals(query_instances,
-                                                      total_CFs=4,
-                                                      desired_class=&quot;opposite&quot;,
-                                                      random_seed=9)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="c1"># default random seed is 17</span>
+<span class="n">dice_exp_random</span> <span class="o">=</span> <span class="n">exp_random</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span>
+                                                      <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                                      <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+                                                      <span class="n">random_seed</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -920,14 +660,14 @@ dice_exp_random = exp_random.generate_counterfactuals(query_instances,
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  2.49it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  4.73it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_random.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_random</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1190,11 +930,11 @@ Diverse Counterfactual set (new outcome: 0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Single</td>
-      <td>Professional</td>
       <td>-</td>
       <td>-</td>
+      <td>White</td>
       <td>-</td>
+      <td>31</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1205,28 +945,28 @@ Diverse Counterfactual set (new outcome: 0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Female</td>
-      <td>16</td>
+      <td>-</td>
+      <td>11</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>44</td>
       <td>-</td>
       <td>-</td>
-      <td>Separated</td>
       <td>-</td>
       <td>-</td>
+      <td>-</td>
+      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>19</td>
+      <td>79</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
+      <td>Single</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1238,16 +978,16 @@ Diverse Counterfactual set (new outcome: 0)
 </div></div>
 </div>
 <section id="Selecting-the-features-to-vary">
-<h4>Selecting the features to vary<a class="headerlink" href="#Selecting-the-features-to-vary" title="Permalink to this heading"></a></h4>
+<h4>Selecting the features to vary<a class="headerlink" href="#Selecting-the-features-to-vary" title="Link to this heading"></a></h4>
 <p>Here, you can ensure that DiCE varies only features that it makes sense to vary.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_random = exp_random.generate_counterfactuals(
-        query_instances, total_CFs=4, desired_class=&quot;opposite&quot;,
-        features_to_vary=[&#39;workclass&#39;, &#39;education&#39;, &#39;occupation&#39;, &#39;hours_per_week&#39;])
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_random</span> <span class="o">=</span> <span class="n">exp_random</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+        <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+        <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;workclass&#39;</span><span class="p">,</span> <span class="s1">&#39;education&#39;</span><span class="p">,</span> <span class="s1">&#39;occupation&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1256,14 +996,14 @@ dice_exp_random = exp_random.generate_counterfactuals(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.64it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  4.46it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_random.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_random</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1372,12 +1112,12 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
+      <td>Assoc</td>
       <td>-</td>
-      <td>Sales</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>82</td>
+      <td>71</td>
       <td>1</td>
     </tr>
     <tr>
@@ -1389,19 +1129,7 @@ Diverse Counterfactual set (new outcome: 1)
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>85</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Bachelors</td>
-      <td>-</td>
-      <td>Sales</td>
-      <td>-</td>
-      <td>-</td>
-      <td>70</td>
+      <td>73</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -1513,36 +1241,36 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>HS-grad</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>34</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>-</td>
-      <td>Other/Unknown</td>
       <td>Doctorate</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>98</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
       <td>-</td>
+      <td>-</td>
+      <td>School</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>16</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
       <td>-</td>
+      <td>Government</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>10</td>
+      <td>3</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1551,10 +1279,10 @@ Diverse Counterfactual set (new outcome: 0)
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Blue-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>16</td>
+      <td>-</td>
+      <td>6</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1563,16 +1291,16 @@ Diverse Counterfactual set (new outcome: 0)
 </div>
 </section>
 <section id="Choosing-feature-ranges">
-<h4>Choosing feature ranges<a class="headerlink" href="#Choosing-feature-ranges" title="Permalink to this heading"></a></h4>
+<h4>Choosing feature ranges<a class="headerlink" href="#Choosing-feature-ranges" title="Link to this heading"></a></h4>
 <p>Since the features are sampled randomly, they can freely vary across their range. In the below example, we show how range of continuous features can be controlled using <em>permitted_range</em> parameter that can now be passed during CF generation.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_random = exp_random.generate_counterfactuals(
-    query_instances, total_CFs=4, desired_class=&quot;opposite&quot;,
-    permitted_range={&#39;age&#39;: [22, 50], &#39;hours_per_week&#39;: [40, 60]})
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_random</span> <span class="o">=</span> <span class="n">exp_random</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+    <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+    <span class="n">permitted_range</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">]})</span>
 </pre></div>
 </div>
 </div>
@@ -1581,14 +1309,14 @@ dice_exp_random = exp_random.generate_counterfactuals(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.17it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00&lt;00:00,  3.56it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_random.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_random</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1695,23 +1423,23 @@ Diverse Counterfactual set (new outcome: 1)
   <tbody>
     <tr>
       <th>0</th>
-      <td>37</td>
-      <td>-</td>
-      <td>Prof-school</td>
+      <td>38</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
+      <td>Professional</td>
       <td>-</td>
       <td>-</td>
-      <td>1</td>
+      <td>55</td>
+      <td>-</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>42</td>
+      <td>47</td>
+      <td>Self-Employed</td>
       <td>-</td>
-      <td>Prof-school</td>
       <td>-</td>
-      <td>-</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1719,19 +1447,19 @@ Diverse Counterfactual set (new outcome: 1)
     </tr>
     <tr>
       <th>2</th>
-      <td>38</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Masters</td>
+      <td>Married</td>
+      <td>Sales</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>60</td>
       <td>1</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>38</td>
+      <td>37</td>
       <td>-</td>
       <td>Prof-school</td>
       <td>-</td>
@@ -1848,11 +1576,11 @@ Diverse Counterfactual set (new outcome: 0)
   <tbody>
     <tr>
       <th>0</th>
+      <td>32</td>
+      <td>Government</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>Divorced</td>
-      <td>Other/Unknown</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -1860,12 +1588,12 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>1</th>
-      <td>24</td>
       <td>-</td>
       <td>-</td>
+      <td>HS-grad</td>
       <td>-</td>
+      <td>Other/Unknown</td>
       <td>-</td>
-      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
@@ -1874,12 +1602,12 @@ Diverse Counterfactual set (new outcome: 0)
       <th>2</th>
       <td>-</td>
       <td>-</td>
-      <td>School</td>
+      <td>Bachelors</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
-      <td>52</td>
+      <td>45</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1902,20 +1630,20 @@ Diverse Counterfactual set (new outcome: 0)
 </section>
 </section>
 <section id="2.-Genetic-Algorithm">
-<h2>2. Genetic Algorithm<a class="headerlink" href="#2.-Genetic-Algorithm" title="Permalink to this heading"></a></h2>
+<h2>2. Genetic Algorithm<a class="headerlink" href="#2.-Genetic-Algorithm" title="Link to this heading"></a></h2>
 <p>Here, we show how to use DiCE can be used to generate CFs for any ML model by using the genetic algorithm to find the best counterfactuals close to the query point. The genetic algorithm converges quickly, and promotes diverse counterfactuals.</p>
 <section id="id1">
-<h3>Training a custom ML model<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>Training a custom ML model<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Currently, the genetic algorithm method works with scikit-learn models. We will use the same model as shown previously in the notebook. Support for Tensorflow 1&amp;2 and Pytorch will be implemented soon.</p>
 </section>
 <section id="id2">
-<h3>Generate diverse counterfactuals<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<h3>Generate diverse counterfactuals<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># initiate DiceGenetic
-exp_genetic = dice_ml.Dice(d, m, method=&#39;genetic&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiceGenetic</span>
+<span class="n">exp_genetic</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;genetic&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1923,8 +1651,8 @@ exp_genetic = dice_ml.Dice(d, m, method=&#39;genetic&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_genetic = exp_genetic.generate_counterfactuals(query_instances, total_CFs=4, desired_class=&quot;opposite&quot;, verbose=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_genetic</span> <span class="o">=</span> <span class="n">exp_genetic</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1950,7 +1678,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 50%|██████████████████████████████████████████▌                                          | 1/2 [00:03&lt;00:03,  3.78s/it]
+ 50%|██████████████████████████████████████████▌                                          | 1/2 [00:02&lt;00:02,  2.52s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1958,7 +1686,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Diverse Counterfactuals found! total time taken: 00 min 03 sec
+Diverse Counterfactuals found! total time taken: 00 min 02 sec
 Initializing initial parameters to the genetic algorithm...
 Initialization complete! Generating counterfactuals...
 </pre></div></div>
@@ -1968,7 +1696,7 @@ Initialization complete! Generating counterfactuals...
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:04&lt;00:00,  2.46s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:03&lt;00:00,  1.82s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1991,7 +1719,7 @@ Diverse Counterfactuals found! total time taken: 00 min 01 sec
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_genetic</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2112,18 +1840,6 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Bachelors</td>
-      <td>Married</td>
-      <td>Sales</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>-</td>
-      <td>-</td>
       <td>Assoc</td>
       <td>Married</td>
       <td>White-Collar</td>
@@ -2136,10 +1852,22 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Some-college</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>26</td>
+      <td>-</td>
+      <td>Bachelors</td>
       <td>Married</td>
       <td>-</td>
-      <td>Other</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>1</td>
@@ -2252,22 +1980,10 @@ Diverse Counterfactual set (new outcome: 0)
     <tr>
       <th>0</th>
       <td>-</td>
-      <td>-</td>
-      <td>School</td>
-      <td>-</td>
-      <td>Professional</td>
-      <td>White</td>
+      <td>Private</td>
+      <td>Bachelors</td>
       <td>-</td>
       <td>-</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>-</td>
-      <td>-</td>
-      <td>HS-grad</td>
-      <td>-</td>
-      <td>Blue-Collar</td>
       <td>White</td>
       <td>-</td>
       <td>-</td>
@@ -2277,9 +1993,9 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>Private</td>
-      <td>School</td>
+      <td>Bachelors</td>
       <td>-</td>
-      <td>Blue-Collar</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2289,9 +2005,21 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>-</td>
+      <td>Assoc</td>
+      <td>-</td>
+      <td>-</td>
+      <td>White</td>
+      <td>Female</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>-</td>
+      <td>-</td>
       <td>HS-grad</td>
       <td>-</td>
-      <td>White-Collar</td>
+      <td>Other/Unknown</td>
       <td>White</td>
       <td>-</td>
       <td>-</td>
@@ -2306,11 +2034,11 @@ Diverse Counterfactual set (new outcome: 0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_genetic = exp_genetic.generate_counterfactuals(
-    query_instances, total_CFs=2, desired_class=&quot;opposite&quot;,
-    features_to_vary=[&#39;workclass&#39;, &#39;education&#39;, &#39;occupation&#39;, &#39;hours_per_week&#39;])
-dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_genetic</span> <span class="o">=</span> <span class="n">exp_genetic</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+    <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+    <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;workclass&#39;</span><span class="p">,</span> <span class="s1">&#39;education&#39;</span><span class="p">,</span> <span class="s1">&#39;occupation&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">])</span>
+<span class="n">dice_exp_genetic</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2319,7 +2047,7 @@ dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:14&lt;00:00,  7.28s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:08&lt;00:00,  4.07s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2440,19 +2168,19 @@ Diverse Counterfactual set (new outcome: 1)
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>71</td>
+      <td>70</td>
       <td>1</td>
     </tr>
     <tr>
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Assoc</td>
+      <td>Bachelors</td>
       <td>-</td>
       <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
-      <td>82</td>
+      <td>71</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -2576,9 +2304,9 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>Government</td>
+      <td>School</td>
       <td>-</td>
       <td>-</td>
-      <td>Professional</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2593,11 +2321,11 @@ Diverse Counterfactual set (new outcome: 0)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_genetic = exp_genetic.generate_counterfactuals(
-    query_instances, total_CFs=2, desired_class=&quot;opposite&quot;,
-    permitted_range={&#39;age&#39;: [22, 50], &#39;hours_per_week&#39;: [40, 60]})
-dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_genetic</span> <span class="o">=</span> <span class="n">exp_genetic</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+    <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+    <span class="n">permitted_range</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">]})</span>
+<span class="n">dice_exp_genetic</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2606,7 +2334,7 @@ dice_exp_genetic.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.25s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.01s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2722,9 +2450,9 @@ Diverse Counterfactual set (new outcome: 1)
       <th>0</th>
       <td>-</td>
       <td>-</td>
-      <td>Some-college</td>
+      <td>Assoc</td>
       <td>Married</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -2851,10 +2579,10 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>Private</td>
-      <td>Bachelors</td>
+      <td>Assoc</td>
       <td>-</td>
-      <td>White-Collar</td>
       <td>-</td>
+      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>
@@ -2863,7 +2591,7 @@ Diverse Counterfactual set (new outcome: 0)
       <th>0</th>
       <td>-</td>
       <td>Private</td>
-      <td>Assoc</td>
+      <td>Bachelors</td>
       <td>-</td>
       <td>-</td>
       <td>White</td>
@@ -2878,20 +2606,20 @@ Diverse Counterfactual set (new outcome: 0)
 </section>
 </section>
 <section id="3.-Querying-a-KD-Tree">
-<h2>3. Querying a KD Tree<a class="headerlink" href="#3.-Querying-a-KD-Tree" title="Permalink to this heading"></a></h2>
+<h2>3. Querying a KD Tree<a class="headerlink" href="#3.-Querying-a-KD-Tree" title="Link to this heading"></a></h2>
 <p>Here, we show how to use DiCE can be used to generate CFs for any ML model by finding the closest points in the dataset that give the output as the desired class. We do this efficiently by building KD trees for each class, and querying the KD tree of the desired class to find the k closest counterfactuals from the dataset. The idea behind finding the closest points from the training data itself is to ensure that the counterfactuals displayed are feasible.</p>
 <section id="id3">
-<h3>Training a custom ML model<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<h3>Training a custom ML model<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <p>Currently, the KD tree algorithm method works with scikit-learn models. Again, we will use the same model as shown previously in the notebook. Support for Tensorflow 1&amp;2 and Pytorch will be implemented soon.</p>
 </section>
 <section id="id4">
-<h3>Generate diverse counterfactuals<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<h3>Generate diverse counterfactuals<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># initiate DiceKD
-exp_KD = dice_ml.Dice(d, m, method=&#39;kdtree&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initiate DiceKD</span>
+<span class="n">exp_KD</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;kdtree&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2899,8 +2627,8 @@ exp_KD = dice_ml.Dice(d, m, method=&#39;kdtree&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_KD = exp_KD.generate_counterfactuals(query_instances, total_CFs=4, desired_class=&quot;opposite&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_KD</span> <span class="o">=</span> <span class="n">exp_KD</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2909,14 +2637,14 @@ dice_exp_KD = exp_KD.generate_counterfactuals(query_instances, total_CFs=4, desi
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.01it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.42it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_KD.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_KD</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3022,6 +2750,18 @@ Diverse Counterfactual set (new outcome: 1)
   </thead>
   <tbody>
     <tr>
+      <th>6646</th>
+      <td>28</td>
+      <td>-</td>
+      <td>Assoc</td>
+      <td>Married</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
       <th>11233</th>
       <td>26</td>
       <td>-</td>
@@ -3034,36 +2774,24 @@ Diverse Counterfactual set (new outcome: 1)
       <td>1</td>
     </tr>
     <tr>
-      <th>3155</th>
-      <td>28</td>
+      <th>17378</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Bachelors</td>
+      <td>Married</td>
+      <td>Sales</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1690</th>
+      <td>-</td>
       <td>-</td>
       <td>Assoc</td>
       <td>Married</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2571</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>-</td>
-      <td>Other</td>
-      <td>-</td>
-      <td>-</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>8361</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Some-college</td>
-      <td>Married</td>
-      <td>Professional</td>
+      <td>White-Collar</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3188,7 +2916,7 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>20071</th>
-      <td>29</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3227,16 +2955,16 @@ Diverse Counterfactual set (new outcome: 0)
 </div></div>
 </div>
 <section id="id5">
-<h4>Selecting the features to vary<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h4>
+<h4>Selecting the features to vary<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <p>Here, again, you can vary only features that you wish to vary. Please note that the output counterfactuals are only from the training data. If you want other counterfactuals, please use the random or genetic method.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_KD = exp_KD.generate_counterfactuals(
-    query_instances, total_CFs=4, desired_class=&quot;opposite&quot;,
-    features_to_vary=[&#39;age&#39;, &#39;workclass&#39;, &#39;education&#39;, &#39;occupation&#39;, &#39;hours_per_week&#39;])
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_KD</span> <span class="o">=</span> <span class="n">exp_KD</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+    <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+    <span class="n">features_to_vary</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;workclass&#39;</span><span class="p">,</span> <span class="s1">&#39;education&#39;</span><span class="p">,</span> <span class="s1">&#39;occupation&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -3245,14 +2973,14 @@ dice_exp_KD = exp_KD.generate_counterfactuals(
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.45s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.47it/s]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dice_exp_KD.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dice_exp_KD</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3488,7 +3216,7 @@ Diverse Counterfactual set (new outcome: 0)
     </tr>
     <tr>
       <th>20071</th>
-      <td>29</td>
+      <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
@@ -3528,17 +3256,17 @@ Diverse Counterfactual set (new outcome: 0)
 </div>
 </section>
 <section id="Selecting-the-feature-ranges">
-<h4>Selecting the feature ranges<a class="headerlink" href="#Selecting-the-feature-ranges" title="Permalink to this heading"></a></h4>
+<h4>Selecting the feature ranges<a class="headerlink" href="#Selecting-the-feature-ranges" title="Link to this heading"></a></h4>
 <p>Here, you can control the ranges of continuous features.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># generate counterfactuals
-dice_exp_KD = exp_KD.generate_counterfactuals(
-    query_instances, total_CFs=5, desired_class=&quot;opposite&quot;,
-    permitted_range={&#39;age&#39;: [30, 50], &#39;hours_per_week&#39;: [40, 60]})
-dice_exp_KD.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate counterfactuals</span>
+<span class="n">dice_exp_KD</span> <span class="o">=</span> <span class="n">exp_KD</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span>
+    <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
+    <span class="n">permitted_range</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">]})</span>
+<span class="n">dice_exp_KD</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3547,7 +3275,7 @@ dice_exp_KD.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.38s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.47it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -3744,18 +3472,6 @@ Diverse Counterfactual set (new outcome: 0)
       <td>0</td>
     </tr>
     <tr>
-      <th>12896</th>
-      <td>-</td>
-      <td>-</td>
-      <td>Assoc</td>
-      <td>-</td>
-      <td>-</td>
-      <td>White</td>
-      <td>-</td>
-      <td>-</td>
-      <td>0</td>
-    </tr>
-    <tr>
       <th>15712</th>
       <td>-</td>
       <td>-</td>
@@ -3768,13 +3484,25 @@ Diverse Counterfactual set (new outcome: 0)
       <td>0</td>
     </tr>
     <tr>
-      <th>22686</th>
+      <th>12896</th>
+      <td>-</td>
+      <td>-</td>
+      <td>Assoc</td>
+      <td>-</td>
+      <td>-</td>
+      <td>White</td>
+      <td>-</td>
+      <td>-</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>554</th>
       <td>-</td>
       <td>Private</td>
       <td>Bachelors</td>
       <td>-</td>
+      <td>White-Collar</td>
       <td>-</td>
-      <td>White</td>
       <td>-</td>
       <td>-</td>
       <td>0</td>

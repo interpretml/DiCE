@@ -1,23 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.data_interfaces package &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.data_interfaces package &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -97,9 +100,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="dice_ml.html">dice_ml package</a> &raquo;</li>
-      <li>dice_ml.data_interfaces package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="dice_ml.html">dice_ml package</a></li>
+      <li class="breadcrumb-item active">dice_ml.data_interfaces package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/dice_ml.data_interfaces.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -109,144 +112,120 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="dice-ml-data-interfaces-package">
-<h1>dice_ml.data_interfaces package<a class="headerlink" href="#dice-ml-data-interfaces-package" title="Permalink to this heading"></a></h1>
+  <section id="dice-ml-data-interfaces-package">
+<h1>dice_ml.data_interfaces package<a class="headerlink" href="#dice-ml-data-interfaces-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-dice_ml.data_interfaces.base_data_interface">
-<span id="dice-ml-data-interfaces-base-data-interface-module"></span><h2>dice_ml.data_interfaces.base_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.base_data_interface" title="Permalink to this heading"></a></h2>
+<span id="dice-ml-data-interfaces-base-data-interface-module"></span><h2>dice_ml.data_interfaces.base_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.base_data_interface" title="Link to this heading"></a></h2>
 <p>Module containing base class for data interfaces for dice-ml.</p>
 </section>
 <section id="module-dice_ml.data_interfaces.private_data_interface">
-<span id="dice-ml-data-interfaces-private-data-interface-module"></span><h2>dice_ml.data_interfaces.private_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.private_data_interface" title="Permalink to this heading"></a></h2>
+<span id="dice-ml-data-interfaces-private-data-interface-module"></span><h2>dice_ml.data_interfaces.private_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.private_data_interface" title="Link to this heading"></a></h2>
 <p>Module containing meta data information about private data.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.data_interfaces.private_data_interface.</span></span><span class="sig-name descname"><span class="pre">PrivateData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.data_interfaces.private_data_interface.</span></span><span class="sig-name descname"><span class="pre">PrivateData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseData</span></code></p>
 <p>A data interface for private data with meta information.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params">
-<span class="sig-name descname"><span class="pre">create_ohe_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">one_hot_encoded_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.create_ohe_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_ohe_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">one_hot_encoded_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.create_ohe_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data">
-<span class="sig-name descname"><span class="pre">de_normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.de_normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">de_normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.de_normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data" title="Link to this definition"></a></dt>
 <dd><p>De-normalizes continuous features from [0,1] range to original range.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders">
-<span class="sig-name descname"><span class="pre">fit_label_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.fit_label_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fit_label_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.fit_label_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">
-<span class="sig-name descname"><span class="pre">from_dummies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.from_dummies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_dummies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.from_dummies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies" title="Link to this definition"></a></dt>
 <dd><p>Gets the original data from dummy encoded data with k levels.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.from_label">
-<span class="sig-name descname"><span class="pre">from_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.from_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.from_label" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.from_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.from_label" title="Link to this definition"></a></dt>
 <dd><p>Transforms label encoded data back to categorical values</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames">
-<span class="sig-name descname"><span class="pre">get_all_dummy_colnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_all_dummy_colnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_all_dummy_colnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_all_dummy_colnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params_for_gradient_dice">
-<span class="sig-name descname"><span class="pre">get_data_params_for_gradient_dice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_data_params_for_gradient_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params_for_gradient_dice" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_data_params_for_gradient_dice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_data_params_for_gradient_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params_for_gradient_dice" title="Link to this definition"></a></dt>
 <dd><p>Gets all data related params for DiCE.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions">
-<span class="sig-name descname"><span class="pre">get_decimal_precisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'list'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decimal_precisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_decimal_precisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'list'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decimal_precisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions" title="Link to this definition"></a></dt>
 <dd><p>“Gets the precision of continuous features in the data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data">
-<span class="sig-name descname"><span class="pre">get_decoded_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one-hot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decoded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_decoded_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one-hot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_decoded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data" title="Link to this definition"></a></dt>
 <dd><p>Gets the original data from encoded data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes">
-<span class="sig-name descname"><span class="pre">get_encoded_categorical_feature_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_encoded_categorical_feature_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_encoded_categorical_feature_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_encoded_categorical_feature_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes" title="Link to this definition"></a></dt>
 <dd><p>Gets the column indexes categorical features after one-hot-encoding.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range">
-<span class="sig-name descname"><span class="pre">get_features_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permitted_range_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_features_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_features_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permitted_range_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_features_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary">
-<span class="sig-name descname"><span class="pre">get_indexes_of_features_to_vary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_to_vary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_indexes_of_features_to_vary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_indexes_of_features_to_vary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_to_vary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_indexes_of_features_to_vary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary" title="Link to this definition"></a></dt>
 <dd><p>Gets indexes from feature names of one-hot-encoded data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data">
-<span class="sig-name descname"><span class="pre">get_inverse_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformed_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_inverse_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformed_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data" title="Link to this definition"></a></dt>
 <dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
 should be a dataframe or an array</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">
-<span class="sig-name descname"><span class="pre">get_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads" title="Link to this definition"></a></dt>
 <dd><p>Computes Median Absolute Deviation of features.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx">
-<span class="sig-name descname"><span class="pre">get_minx_maxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_minx_maxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_minx_maxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_minx_maxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx" title="Link to this definition"></a></dt>
 <dd><p>Gets the min/max value of features in normalized or de-normalized form.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data">
-<span class="sig-name descname"><span class="pre">get_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data" title="Link to this definition"></a></dt>
 <dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
 a dataframe, a list, or a list of dicts</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range">
-<span class="sig-name descname"><span class="pre">get_valid_feature_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_range_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_valid_feature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_valid_feature_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_range_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_valid_feature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range" title="Link to this definition"></a></dt>
 <dd><p>Gets the min/max value of features in normalized or de-normalized
 form. Assumes that all features are already encoded to numerical form
 such that the number of features remains the same.</p>
@@ -256,162 +235,162 @@ both continuous and discrete when provided in _generate_counterfactuals.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads">
-<span class="sig-name descname"><span class="pre">get_valid_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_valid_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_valid_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.get_valid_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads" title="Link to this definition"></a></dt>
 <dd><p>Computes Median Absolute Deviation of features. If they are &lt;=0, returns a practical value instead</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data">
-<span class="sig-name descname"><span class="pre">normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data" title="Link to this definition"></a></dt>
 <dd><p>Normalizes continuous features to make them fall in the range [0,1].</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data">
-<span class="sig-name descname"><span class="pre">one_hot_encode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.one_hot_encode_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">one_hot_encode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.one_hot_encode_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data" title="Link to this definition"></a></dt>
 <dd><p>One-hot-encodes the data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding">
-<span class="sig-name descname"><span class="pre">prepare_df_for_ohe_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_df_for_ohe_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">prepare_df_for_ohe_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_df_for_ohe_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding" title="Link to this definition"></a></dt>
 <dd><p>Create base dataframe to do OHE for a single instance or a set of instances</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">
-<span class="sig-name descname"><span class="pre">prepare_query_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_query_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">prepare_query_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.prepare_query_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance" title="Link to this definition"></a></dt>
 <dd><p>Prepares user defined test input(s) for DiCE.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df">
-<span class="sig-name descname"><span class="pre">query_instance_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.query_instance_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">query_instance_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/private_data_interface.html#PrivateData.query_instance_to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-dice_ml.data_interfaces.public_data_interface">
-<span id="dice-ml-data-interfaces-public-data-interface-module"></span><h2>dice_ml.data_interfaces.public_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.public_data_interface" title="Permalink to this heading"></a></h2>
+<span id="dice-ml-data-interfaces-public-data-interface-module"></span><h2>dice_ml.data_interfaces.public_data_interface module<a class="headerlink" href="#module-dice_ml.data_interfaces.public_data_interface" title="Link to this heading"></a></h2>
 <p>Module containing all required information about the interface between raw (or transformed)
 public data and DiCE explainers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.data_interfaces.public_data_interface.</span></span><span class="sig-name descname"><span class="pre">PublicData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dice_ml.data_interfaces.public_data_interface.</span></span><span class="sig-name descname"><span class="pre">PublicData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseData</span></code></p>
 <p>A data interface for public data. This class is an interface to DiCE explainers
 and contains methods to transform user-fed raw data into the format a DiCE explainer
 requires, and vice versa.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.create_ohe_params">
-<span class="sig-name descname"><span class="pre">create_ohe_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">one_hot_encoded_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.create_ohe_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.create_ohe_params" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_ohe_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">one_hot_encoded_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.create_ohe_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.create_ohe_params" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.de_normalize_data">
-<span class="sig-name descname"><span class="pre">de_normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.de_normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.de_normalize_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">de_normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.de_normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.de_normalize_data" title="Link to this definition"></a></dt>
 <dd><p>De-normalizes continuous features from [0,1] range to original range.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.fit_label_encoders">
-<span class="sig-name descname"><span class="pre">fit_label_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.fit_label_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.fit_label_encoders" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fit_label_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.fit_label_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.fit_label_encoders" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies">
-<span class="sig-name descname"><span class="pre">from_dummies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.from_dummies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_dummies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.from_dummies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.from_dummies" title="Link to this definition"></a></dt>
 <dd><p>Gets the original data from dummy encoded data with k levels.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.from_label">
-<span class="sig-name descname"><span class="pre">from_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.from_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.from_label" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.from_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.from_label" title="Link to this definition"></a></dt>
 <dd><p>Transforms label encoded data back to categorical values</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_all_dummy_colnames">
-<span class="sig-name descname"><span class="pre">get_all_dummy_colnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_all_dummy_colnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_all_dummy_colnames" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_all_dummy_colnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_all_dummy_colnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_all_dummy_colnames" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params_for_gradient_dice">
-<span class="sig-name descname"><span class="pre">get_data_params_for_gradient_dice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_params_for_gradient_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params_for_gradient_dice" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_data_params_for_gradient_dice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_params_for_gradient_dice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_params_for_gradient_dice" title="Link to this definition"></a></dt>
 <dd><p>Gets all data related params for DiCE.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_data_type">
-<span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_type" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_data_type" title="Link to this definition"></a></dt>
 <dd><p>Infers data type of a continuous feature from the training data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_decimal_precisions">
-<span class="sig-name descname"><span class="pre">get_decimal_precisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'list'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decimal_precisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decimal_precisions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_decimal_precisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'list'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decimal_precisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decimal_precisions" title="Link to this definition"></a></dt>
 <dd><p>“Gets the precision of continuous features in the data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_decoded_data">
-<span class="sig-name descname"><span class="pre">get_decoded_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one-hot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decoded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decoded_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_decoded_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one-hot'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_decoded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_decoded_data" title="Link to this definition"></a></dt>
 <dd><p>Gets the original data from encoded data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes">
-<span class="sig-name descname"><span class="pre">get_encoded_categorical_feature_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_encoded_categorical_feature_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_encoded_categorical_feature_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_encoded_categorical_feature_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_encoded_categorical_feature_indexes" title="Link to this definition"></a></dt>
 <dd><p>Gets the column indexes categorical features after one-hot-encoding.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range">
-<span class="sig-name descname"><span class="pre">get_features_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permitted_range_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_features_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_features_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permitted_range_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_features_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_features_range" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_indexes_of_features_to_vary">
-<span class="sig-name descname"><span class="pre">get_indexes_of_features_to_vary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_to_vary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_indexes_of_features_to_vary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_indexes_of_features_to_vary" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_indexes_of_features_to_vary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_to_vary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_indexes_of_features_to_vary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_indexes_of_features_to_vary" title="Link to this definition"></a></dt>
 <dd><p>Gets indexes from feature names of one-hot-encoded data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_inverse_ohe_min_max_normalized_data">
-<span class="sig-name descname"><span class="pre">get_inverse_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformed_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_inverse_ohe_min_max_normalized_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_inverse_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformed_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_inverse_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_inverse_ohe_min_max_normalized_data" title="Link to this definition"></a></dt>
 <dd><p>Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data
 should be a dataframe or an array</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_mads">
-<span class="sig-name descname"><span class="pre">get_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_mads" title="Link to this definition"></a></dt>
 <dd><p>Computes Median Absolute Deviation of features.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx">
-<span class="sig-name descname"><span class="pre">get_minx_maxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_minx_maxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_minx_maxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_minx_maxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_minx_maxx" title="Link to this definition"></a></dt>
 <dd><p>Gets the min/max value of features in normalized or de-normalized form.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_ohe_min_max_normalized_data">
-<span class="sig-name descname"><span class="pre">get_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_ohe_min_max_normalized_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_ohe_min_max_normalized_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_ohe_min_max_normalized_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_ohe_min_max_normalized_data" title="Link to this definition"></a></dt>
 <dd><p>Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,
 a dataframe, a list, or a list of dicts</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data">
-<span class="sig-name descname"><span class="pre">get_quantiles_from_training_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_quantiles_from_training_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_quantiles_from_training_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_quantiles_from_training_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_quantiles_from_training_data" title="Link to this definition"></a></dt>
 <dd><p>Computes required quantile of Absolute Deviations of features.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_feature_range">
-<span class="sig-name descname"><span class="pre">get_valid_feature_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_range_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_valid_feature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_feature_range" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_valid_feature_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_range_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_valid_feature_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_feature_range" title="Link to this definition"></a></dt>
 <dd><p>Gets the min/max value of features in normalized or de-normalized
 form. Assumes that all features are already encoded to numerical form
 such that the number of features remains the same.</p>
@@ -421,31 +400,31 @@ both continuous and discrete when provided in _generate_counterfactuals.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_mads">
-<span class="sig-name descname"><span class="pre">get_valid_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_valid_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_mads" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_valid_mads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.get_valid_mads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.get_valid_mads" title="Link to this definition"></a></dt>
 <dd><p>Computes Median Absolute Deviation of features. If they are &lt;=0, returns a practical value instead</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.normalize_data">
-<span class="sig-name descname"><span class="pre">normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.normalize_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">normalize_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.normalize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.normalize_data" title="Link to this definition"></a></dt>
 <dd><p>Normalizes continuous features to make them fall in the range [0,1].</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.one_hot_encode_data">
-<span class="sig-name descname"><span class="pre">one_hot_encode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.one_hot_encode_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.one_hot_encode_data" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">one_hot_encode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.one_hot_encode_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.one_hot_encode_data" title="Link to this definition"></a></dt>
 <dd><p>One-hot-encodes the data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_ohe_encoding">
-<span class="sig-name descname"><span class="pre">prepare_df_for_ohe_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_df_for_ohe_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_ohe_encoding" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">prepare_df_for_ohe_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_df_for_ohe_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_df_for_ohe_encoding" title="Link to this definition"></a></dt>
 <dd><p>Create base dataframe to do OHE for a single instance or a set of instances</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance">
-<span class="sig-name descname"><span class="pre">prepare_query_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_query_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">prepare_query_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dice_ml/data_interfaces/public_data_interface.html#PublicData.prepare_query_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dice_ml.data_interfaces.public_data_interface.PublicData.prepare_query_instance" title="Link to this definition"></a></dt>
 <dd><p>Prepares user defined test input(s) for DiCE.</p>
 </dd></dl>
 
@@ -453,7 +432,7 @@ both continuous and discrete when provided in _generate_counterfactuals.</p>
 
 </section>
 <section id="module-dice_ml.data_interfaces">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.data_interfaces" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dice_ml.data_interfaces" title="Link to this heading"></a></h2>
 </section>
 </section>
 
