@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 import dice_ml
@@ -71,7 +72,8 @@ class TestCommonDataMethods:
         output_query = [0.068, 0.449, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]
         d = self.d[0]
-        prepared_query = d.get_ohe_min_max_normalized_data(query_instance=sample_adultincome_query).iloc[0].tolist()
+        prepared_query = \
+            d.get_ohe_min_max_normalized_data(query_instance=sample_adultincome_query).iloc[0].to_numpy(dtype=np.float64)
         assert output_query == pytest.approx(prepared_query, abs=1e-3)
 
     def test_encoded_categorical_features(self):

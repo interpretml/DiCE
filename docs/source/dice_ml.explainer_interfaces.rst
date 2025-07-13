@@ -52,6 +52,14 @@ dice\_ml.explainer\_interfaces.dice\_tensorflow2 module
    :undoc-members:
    :show-inheritance:
 
+dice\_ml.explainer\_interfaces.dice\_xgboost module
+---------------------------------------------------
+
+.. automodule:: dice_ml.explainer_interfaces.dice_xgboost
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dice\_ml.explainer\_interfaces.explainer\_base module
 -----------------------------------------------------
 
