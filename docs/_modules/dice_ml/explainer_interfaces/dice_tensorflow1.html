@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.explainer_interfaces.dice_tensorflow1 &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.explainer_interfaces.dice_tensorflow1</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.explainer_interfaces.dice_tensorflow1</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,22 +87,23 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module to generate diverse counterfactual explanations based on tensorflow 1.x</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">timeit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">timeit</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml</span> <span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
-<span class="kn">from</span> <span class="nn">dice_ml.counterfactual_explanations</span> <span class="kn">import</span> <span class="n">CounterfactualExplanations</span>
-<span class="kn">from</span> <span class="nn">dice_ml.explainer_interfaces.explainer_base</span> <span class="kn">import</span> <span class="n">ExplainerBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">diverse_counterfactuals</span> <span class="k">as</span> <span class="n">exp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.explainer_interfaces.explainer_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplainerBase</span>
 
 
-<div class="viewcode-block" id="DiceTensorFlow1"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1">[docs]</a><span class="k">class</span> <span class="nc">DiceTensorFlow1</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
+<div class="viewcode-block" id="DiceTensorFlow1">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiceTensorFlow1</span><span class="p">(</span><span class="n">ExplainerBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param data_interface: an interface class to access data related params.</span>
@@ -144,20 +148,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">loss_weights</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># yloss_type, diversity_loss_type, feature_weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_weights</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># optimizer</span>
 
-<div class="viewcode-block" id="DiceTensorFlow1.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                                 <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;DiverseCF&quot;</span><span class="p">,</span>
-                                 <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span>
-                                 <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span> <span class="n">feature_weights</span><span class="o">=</span><span class="s2">&quot;inverse_mad&quot;</span><span class="p">,</span>
-                                 <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;tensorflow:adam&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
-                                 <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                                 <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                  <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;DiverseCF&quot;</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                                  <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span>
+                                  <span class="n">feature_weights</span><span class="o">=</span><span class="s2">&quot;inverse_mad&quot;</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;tensorflow:adam&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                                  <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                  <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates diverse counterfactual explanations</span>
 
 <span class="sd">        :param query_instance: Test point of interest. A dictionary of feature names and values or a single row dataframe.</span>
 <span class="sd">        :param total_CFs: Total number of counterfactuals required.</span>
 <span class="sd">        :param desired_class: Desired counterfactual class - can take 0 or 1. Default value is &quot;opposite&quot; to the</span>
 <span class="sd">                              outcome class of query_instance for binary classification.</span>
+<span class="sd">        :param desired_range: Not supported currently.</span>
 <span class="sd">        :param proximity_weight: A positive float. Larger this weight, more close the counterfactuals are to the</span>
 <span class="sd">                                 query_instance.</span>
 <span class="sd">        :param diversity_weight: A positive float. Larger this weight, more diverse the counterfactuals are.</span>
@@ -242,7 +248,7 @@
             <span class="n">loss_diff_thres</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="p">,</span> <span class="n">tie_random</span><span class="p">,</span>
             <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="p">)</span>
 
-        <span class="n">counterfactual_explanations</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">CounterfactualExamples</span><span class="p">(</span>
             <span class="n">data_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="p">,</span>
             <span class="n">final_cfs_df</span><span class="o">=</span><span class="n">final_cfs_df</span><span class="p">,</span>
             <span class="n">test_instance_df</span><span class="o">=</span><span class="n">test_instance_df</span><span class="p">,</span>
@@ -250,9 +256,9 @@
             <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="n">posthoc_sparsity_param</span><span class="p">,</span>
             <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">CounterfactualExplanations</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="o">=</span><span class="p">[</span><span class="n">counterfactual_explanations</span><span class="p">])</span></div>
-
-<div class="viewcode-block" id="DiceTensorFlow1.do_cf_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_cf_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_cf_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">):</span>
+<div class="viewcode-block" id="DiceTensorFlow1.do_cf_initializations">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_cf_initializations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_cf_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Intializes TF variables required for CF generation.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cf_init_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">]</span>
@@ -301,17 +307,26 @@
             <span class="s2">&quot;scipy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scipy_optimizers</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.predict_fn"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.predict_fn">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;prediction function&quot;&quot;&quot;</span>
         <span class="n">temp_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_tensor</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_tensor</span><span class="p">:</span> <span class="n">input_instance</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">preds</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_output_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">):]</span> <span class="k">for</span> <span class="n">preds</span> <span class="ow">in</span> <span class="n">temp_preds</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.predict_fn_for_sparsity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.predict_fn_for_sparsity">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.predict_fn_for_sparsity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;prediction function for sparsity correction&quot;&quot;&quot;</span>
         <span class="n">input_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_fn</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.compute_yloss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_yloss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_yloss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.compute_yloss">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_yloss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_yloss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the first part (y-loss) of the loss function.&quot;&quot;&quot;</span>
         <span class="n">yloss</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
@@ -341,11 +356,17 @@
 
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">yloss</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.compute_dist"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_dist">[docs]</a>    <span class="k">def</span> <span class="nf">compute_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.compute_dist">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_dist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute weighted distance between two vectors.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">x1</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weights</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.compute_proximity_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_proximity_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_proximity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.compute_proximity_loss">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_proximity_loss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_proximity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the second part (distance from x1) of the loss function.&quot;&quot;&quot;</span>
         <span class="n">proximity_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
@@ -353,7 +374,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">x1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">proximity_loss</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minx</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.dpp_style"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.dpp_style">[docs]</a>    <span class="k">def</span> <span class="nf">dpp_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submethod</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.dpp_style">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.dpp_style">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dpp_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submethod</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the DPP of a matrix.&quot;&quot;&quot;</span>
         <span class="n">det_entries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">submethod</span> <span class="o">==</span> <span class="s2">&quot;inverse_dist&quot;</span><span class="p">:</span>
@@ -376,7 +400,10 @@
         <span class="n">diversity_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matrix_determinant</span><span class="p">(</span><span class="n">det_entries</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">diversity_loss</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.compute_diversity_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_diversity_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_diversity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.compute_diversity_loss">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_diversity_loss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_diversity_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the third part (diversity) of the loss function.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -398,7 +425,10 @@
                                          <span class="bp">self</span><span class="o">.</span><span class="n">compute_dist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">j</span><span class="p">]))))</span>
             <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">diversity_loss</span><span class="p">,</span> <span class="n">count</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.compute_regularization_loss"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_regularization_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_regularization_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.compute_regularization_loss">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.compute_regularization_loss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_regularization_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a linear equality constraints to the loss functions -</span>
 <span class="sd">           to ensure all levels of a categorical variable sums to one&quot;&quot;&quot;</span>
         <span class="n">regularization_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -408,7 +438,10 @@
                     <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs_frozen</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">regularization_loss</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.do_loss_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_loss_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_loss_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.do_loss_initializations">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_loss_initializations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_loss_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span> <span class="n">diversity_loss_type</span><span class="o">=</span><span class="s2">&quot;dpp_style:inverse_dist&quot;</span><span class="p">,</span>
                                 <span class="n">feature_weights</span><span class="o">=</span><span class="s2">&quot;inverse_mad&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines the optimization loss&quot;&quot;&quot;</span>
 
@@ -460,7 +493,10 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">diversity_loss</span><span class="p">)),</span> <span class="n">tf</span><span class="o">.</span><span class="n">scalar_mul</span><span class="p">(</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularization_loss</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.tensorflow_optimizers"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.tensorflow_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">tensorflow_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.tensorflow_optimizers">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.tensorflow_optimizers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tensorflow_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes tensorflow optimizers.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;adam&quot;</span><span class="p">:</span>
             <span class="n">opt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;myadam&#39;</span><span class="p">)</span>
@@ -471,14 +507,20 @@
         <span class="n">optim_step</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">opt</span><span class="p">,</span> <span class="n">optim_step</span></div>
 
+
     <span class="c1"># Future Support: implement scipt wrappers</span>
-<div class="viewcode-block" id="DiceTensorFlow1.scipy_optimizers"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.scipy_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">scipy_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="DiceTensorFlow1.scipy_optimizers">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.scipy_optimizers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scipy_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">):</span>
         <span class="n">opt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">ScipyOptimizerInterface</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Nelder-Mead&#39;</span><span class="p">)</span>
         <span class="n">optim_step</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">optim_step</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.initialize_CFs"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.initialize_CFs">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_CFs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.initialize_CFs">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.initialize_CFs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_CFs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize counterfactuals.&quot;&quot;&quot;</span>
         <span class="n">inits</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_CFs</span><span class="p">):</span>
@@ -494,7 +536,10 @@
             <span class="n">inits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">one_init</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">inits</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.do_optimizer_initializations"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_optimizer_initializations">[docs]</a>    <span class="k">def</span> <span class="nf">do_optimizer_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.do_optimizer_initializations">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.do_optimizer_initializations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_optimizer_initializations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes gradient-based TF optimizers.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">optimizer</span><span class="p">]</span>
@@ -509,7 +554,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_optimizer_op</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">variables_initializer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_vars</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_optimizer_op</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.update_hyperparameters"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.update_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">update_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.update_hyperparameters">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.update_hyperparameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates hyperparameters.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">proximity_weight</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="p">,</span> <span class="n">categorical_penalty</span><span class="p">]</span>
@@ -523,7 +571,10 @@
         <span class="c1"># just sanity check. anyways, the loss part is made to 0.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dice_sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights_assign</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weights_inits</span><span class="p">:</span> <span class="n">categorical_penalty</span><span class="p">})</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.round_off_cfs"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.round_off_cfs">[docs]</a>    <span class="k">def</span> <span class="nf">round_off_cfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assign</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.round_off_cfs">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.round_off_cfs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">round_off_cfs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assign</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;function for intermediate projection of CFs.&quot;&quot;&quot;</span>
         <span class="n">temp_cfs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">tcf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfs</span><span class="p">):</span>
@@ -559,7 +610,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">temp_cfs</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.stop_loop"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.stop_loop">[docs]</a>    <span class="k">def</span> <span class="nf">stop_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">loss_diff</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.stop_loop">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.stop_loop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">loss_diff</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the stopping condition for gradient descent.&quot;&quot;&quot;</span>
 
         <span class="c1"># intermediate projections</span>
@@ -599,7 +653,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">loss_converge_iter</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="DiceTensorFlow1.find_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">find_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+
+<div class="viewcode-block" id="DiceTensorFlow1.find_counterfactuals">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.dice_tensorflow1.DiceTensorFlow1.find_counterfactuals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
                              <span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">project_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loss_diff_thres</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">loss_converge_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                              <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">init_near_query_instance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tie_random</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                              <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">):</span>
@@ -777,7 +834,9 @@
         <span class="k">if</span> <span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">final_cfs_df_sparse</span> <span class="o">=</span> <span class="n">final_cfs_df_sparse</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">valid_ix</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># returning only valid CFs</span>
-        <span class="k">return</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">valid_ix</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span></div></div>
+        <span class="k">return</span> <span class="n">final_cfs_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">valid_ix</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span></div>
+</div>
+
 </pre></div>
 
            </div>

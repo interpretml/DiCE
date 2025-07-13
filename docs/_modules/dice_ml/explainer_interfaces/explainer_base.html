@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.explainer_interfaces.explainer_base &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.explainer_interfaces.explainer_base</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.explainer_interfaces.explainer_base</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -85,24 +88,26 @@
 <span class="sd">   Subclasses implement interfaces for different ML frameworks such as TensorFlow or PyTorch.</span>
 <span class="sd">   All methods are in dice_ml.explainer_interfaces&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">raiutils.exceptions</span> <span class="kn">import</span> <span class="n">UserConfigValidationException</span>
-<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KDTree</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">raiutils.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserConfigValidationException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KDTree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml.constants</span> <span class="kn">import</span> <span class="n">ModelTypes</span><span class="p">,</span> <span class="n">_PostHocSparsityTypes</span>
-<span class="kn">from</span> <span class="nn">dice_ml.counterfactual_explanations</span> <span class="kn">import</span> <span class="n">CounterfactualExplanations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelTypes</span><span class="p">,</span> <span class="n">_PostHocSparsityTypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.counterfactual_explanations</span><span class="w"> </span><span class="kn">import</span> <span class="n">CounterfactualExplanations</span>
 
 
-<div class="viewcode-block" id="ExplainerBase"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase">[docs]</a><span class="k">class</span> <span class="nc">ExplainerBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<div class="viewcode-block" id="ExplainerBase">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExplainerBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">,</span> <span class="n">model_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param data_interface: an interface class to access data related params.</span>
@@ -131,7 +136,7 @@
         <span class="c1"># self.cont_precisions = \</span>
         <span class="c1">#   [self.data_interface.get_decimal_precisions()[ix] for ix in self.encoded_continuous_feature_indexes]</span>
 
-    <span class="k">def</span> <span class="nf">_find_features_having_missing_values</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_features_having_missing_values</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return list of features which have missing values.</span>
 
@@ -149,7 +154,7 @@
                 <span class="n">list_of_feature_having_missing_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">list_of_feature_having_missing_values</span>
 
-    <span class="k">def</span> <span class="nf">_validate_counterfactual_configuration</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_counterfactual_configuration</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
             <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
@@ -202,12 +207,12 @@
                 <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
                     <span class="s2">&quot;The range provided in desired_range should be in ascending order.&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExplainerBase.generate_counterfactuals"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">[docs]</a>    <span class="k">def</span> <span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+<div class="viewcode-block" id="ExplainerBase.generate_counterfactuals">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.generate_counterfactuals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                                  <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                                 <span class="n">proximity_weight</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">sparsity_weight</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">diversity_weight</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
-                                 <span class="n">categorical_penalty</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                                  <span class="n">posthoc_sparsity_algorithm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;General method for generating counterfactuals.</span>
 
@@ -290,8 +295,9 @@
 
         <span class="k">return</span> <span class="n">CounterfactualExplanations</span><span class="p">(</span><span class="n">cf_examples_list</span><span class="o">=</span><span class="n">cf_examples_arr</span><span class="p">)</span></div>
 
+
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_counterfactuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">total_CFs</span><span class="p">,</span>
                                   <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                                   <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -326,7 +332,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="ExplainerBase.setup"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">):</span>
+<div class="viewcode-block" id="ExplainerBase.setup">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_weights</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">check_features_to_vary</span><span class="p">(</span><span class="n">features_to_vary</span><span class="o">=</span><span class="n">features_to_vary</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">check_permitted_range</span><span class="p">(</span><span class="n">permitted_range</span><span class="p">)</span>
 
@@ -343,7 +351,10 @@
 
         <span class="k">return</span> <span class="n">features_to_vary</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.check_query_instance_validity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity">[docs]</a>    <span class="k">def</span> <span class="nf">check_query_instance_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_ranges_orig</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.check_query_instance_validity">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_query_instance_validity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_query_instance_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">feature_ranges_orig</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">query_instance</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">feature</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Target&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">,</span> <span class="s2">&quot;present in query instance&quot;</span><span class="p">)</span>
@@ -363,7 +374,10 @@
                     <span class="k">if</span> <span class="n">query_instance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_range</span><span class="p">[</span><span class="n">feature</span><span class="p">]:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Feature:&quot;</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;is outside the permitted range and isn&#39;t allowed to vary.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.local_feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.local_feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">local_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExplainerBase.local_feature_importance">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.local_feature_importance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                                  <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -421,7 +435,10 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">importances</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.global_feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">global_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExplainerBase.global_feature_importance">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.global_feature_importance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">global_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">local_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                   <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -490,7 +507,10 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">importances</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.feature_importance"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExplainerBase.feature_importance">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.feature_importance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instances</span><span class="p">,</span> <span class="n">cf_examples_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">total_CFs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">local_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">global_importance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                            <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span> <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">permitted_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -594,7 +614,10 @@
             <span class="n">local_importance</span><span class="o">=</span><span class="n">local_importances</span><span class="p">,</span>
             <span class="n">summary_importance</span><span class="o">=</span><span class="n">summary_importance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.predict_fn"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.predict_fn">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;prediction function&quot;&quot;&quot;</span>
 
         <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span>
@@ -603,11 +626,17 @@
             <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">preds</span><span class="p">,</span> <span class="n">preds</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">preds</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.predict_fn_for_sparsity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn_for_sparsity">[docs]</a>    <span class="k">def</span> <span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.predict_fn_for_sparsity">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.predict_fn_for_sparsity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict_fn_for_sparsity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;prediction function for sparsity correction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">input_instance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.do_posthoc_sparsity_enhancement"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement">[docs]</a>    <span class="k">def</span> <span class="nf">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExplainerBase.do_posthoc_sparsity_enhancement">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_posthoc_sparsity_enhancement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_posthoc_sparsity_enhancement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="p">,</span>
                                         <span class="n">posthoc_sparsity_algorithm</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Post-hoc method to encourage sparsity in a generated counterfactuals.</span>
 
@@ -664,7 +693,10 @@
         <span class="c1"># final_cfs_sparse[self.data_interface.outcome_name] = np.round(final_cfs_sparse[self.data_interface.outcome_name], 3)</span>
         <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.do_linear_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search">[docs]</a>    <span class="k">def</span> <span class="nf">do_linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span>
+
+<div class="viewcode-block" id="ExplainerBase.do_linear_search">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_linear_search">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_linear_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span>
                          <span class="n">current_pred_orig</span><span class="p">,</span> <span class="n">limit_steps_ls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs a greedy linear search - moves the continuous features in CFs towards original values in</span>
 <span class="sd">           query_instance greedily until the prediction class changes, or it reaches the maximum number of steps&quot;&quot;&quot;</span>
@@ -692,7 +724,10 @@
 
         <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.do_binary_search"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search">[docs]</a>    <span class="k">def</span> <span class="nf">do_binary_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.do_binary_search">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.do_binary_search">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_binary_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">decimal_prec</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">,</span> <span class="n">cf_ix</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">final_cfs_sparse</span><span class="p">,</span> <span class="n">current_pred</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs a binary search between continuous features of a CF and corresponding values</span>
 <span class="sd">           in query_instance until the prediction class changes.&quot;&quot;&quot;</span>
 
@@ -748,7 +783,10 @@
 
         <span class="k">return</span> <span class="n">final_cfs_sparse</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.misc_init"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.misc_init">[docs]</a>    <span class="k">def</span> <span class="nf">misc_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.misc_init">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.misc_init">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">misc_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stopping_threshold</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">test_pred</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopping_threshold</span> <span class="o">=</span> <span class="n">stopping_threshold</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -764,7 +802,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_target_cfs_range</span><span class="p">(</span><span class="n">desired_range</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">desired_class</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_class"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_class">[docs]</a>    <span class="k">def</span> <span class="nf">infer_target_cfs_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_class_input</span><span class="p">,</span> <span class="n">original_pred</span><span class="p">,</span> <span class="n">num_output_nodes</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_class">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer_target_cfs_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_class_input</span><span class="p">,</span> <span class="n">original_pred</span><span class="p">,</span> <span class="n">num_output_nodes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Infer the target class for generating CFs. Only called when</span>
 <span class="sd">            model_type==&quot;classifier&quot;.</span>
 <span class="sd">            TODO: Add support for opposite desired class in multiclass.</span>
@@ -804,7 +845,10 @@
             <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span><span class="s2">&quot;The target class for </span><span class="si">{0}</span><span class="s2"> could not be identified&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                                 <span class="n">desired_class_input</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_range"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_range">[docs]</a>    <span class="k">def</span> <span class="nf">infer_target_cfs_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_range_input</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.infer_target_cfs_range">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.infer_target_cfs_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer_target_cfs_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_range_input</span><span class="p">):</span>
         <span class="n">target_range</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">desired_range_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Need to provide a desired_range for the target counterfactuals for a regression model.&quot;</span><span class="p">)</span>
@@ -815,7 +859,10 @@
                 <span class="n">target_range</span> <span class="o">=</span> <span class="n">desired_range_input</span>
         <span class="k">return</span> <span class="n">target_range</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.decide_cf_validity"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity">[docs]</a>    <span class="k">def</span> <span class="nf">decide_cf_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_outputs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.decide_cf_validity">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decide_cf_validity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decide_cf_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_outputs</span><span class="p">):</span>
         <span class="n">validity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_outputs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model_outputs</span><span class="p">)):</span>
             <span class="n">pred</span> <span class="o">=</span> <span class="n">model_outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -837,7 +884,10 @@
                     <span class="n">validity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">validity</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.is_cf_valid"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.is_cf_valid">[docs]</a>    <span class="k">def</span> <span class="nf">is_cf_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_score</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.is_cf_valid">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.is_cf_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cf_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_score</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a cf belongs to the target class or target range.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Converting to single prediction if the prediction is provided as a</span>
@@ -872,14 +922,20 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">model_score</span> <span class="ow">and</span> <span class="n">model_score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_cf_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.decode_model_output"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output">[docs]</a>    <span class="k">def</span> <span class="nf">decode_model_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded_labels</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.decode_model_output">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_model_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode_model_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded_labels</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;classes_&quot;</span><span class="p">):</span>  <span class="c1"># sklearn model</span>
                 <span class="n">label_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span><span class="p">:</span> <span class="n">label</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="p">)}</span>
                 <span class="k">return</span> <span class="n">encoded_labels</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">label_dict</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">encoded_labels</span>  <span class="c1"># no op</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.get_model_output_from_scores"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_scores</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.get_model_output_from_scores">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.get_model_output_from_scores">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model_output_from_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_scores</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">:</span>
             <span class="n">output_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
         <span class="k">else</span><span class="p">:</span>
@@ -898,7 +954,10 @@
                 <span class="n">model_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">model_output</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.check_permitted_range"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">[docs]</a>    <span class="k">def</span> <span class="nf">check_permitted_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.check_permitted_range">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.check_permitted_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_permitted_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permitted_range</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;checks permitted range for continuous features</span>
 <span class="sd">           TODO: add comments as to where this is used if this function is necessary, else remove.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -915,11 +974,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cont_minx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cont_maxx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.sigmoid"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid">[docs]</a>    <span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.sigmoid">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.sigmoid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This is used in VAE-based CF explainers.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.build_KD_tree"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.build_KD_tree">[docs]</a>    <span class="k">def</span> <span class="nf">build_KD_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df_copy</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">predicted_outcome_name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.build_KD_tree">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.build_KD_tree">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_KD_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df_copy</span><span class="p">,</span> <span class="n">desired_range</span><span class="p">,</span> <span class="n">desired_class</span><span class="p">,</span> <span class="n">predicted_outcome_name</span><span class="p">):</span>
         <span class="c1"># Stores the predictions on the training data</span>
         <span class="n">dataset_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span>
             <span class="n">query_instance</span><span class="o">=</span><span class="n">data_df_copy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">feature_names</span><span class="p">])</span>
@@ -945,7 +1010,10 @@
 
         <span class="k">return</span> <span class="n">dataset_with_predictions</span><span class="p">,</span> <span class="n">KD_tree</span><span class="p">,</span> <span class="n">predictions</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.round_to_precision"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.round_to_precision">[docs]</a>    <span class="k">def</span> <span class="nf">round_to_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.round_to_precision">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.round_to_precision">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">round_to_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># to display the values with the same precision as the original data</span>
         <span class="n">precisions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">get_decimal_precisions</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">):</span>
@@ -953,7 +1021,8 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">precisions</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span></div>
 
-    <span class="k">def</span> <span class="nf">_check_any_counterfactuals_computed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cf_examples_arr</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_any_counterfactuals_computed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cf_examples_arr</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if any counterfactuals were generated for any query point.&quot;&quot;&quot;</span>
         <span class="n">no_cf_generated</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># Check if any counterfactuals were generated for any query point</span>
@@ -965,7 +1034,9 @@
             <span class="k">raise</span> <span class="n">UserConfigValidationException</span><span class="p">(</span>
                 <span class="s2">&quot;No counterfactuals found for any of the query points! Kindly check your configuration.&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExplainerBase.decode_to_original_labels"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels">[docs]</a>    <span class="k">def</span> <span class="nf">decode_to_original_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span><span class="p">):</span>
+<div class="viewcode-block" id="ExplainerBase.decode_to_original_labels">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.decode_to_original_labels">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode_to_original_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span><span class="p">):</span>
         <span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">test_instance_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -976,19 +1047,27 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">decode_model_output</span><span class="p">(</span><span class="n">final_cfs_df_sparse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_interface</span><span class="o">.</span><span class="n">outcome_name</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">test_instance_df</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="p">,</span> <span class="n">final_cfs_df_sparse</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.serialize_explainer"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.serialize_explainer">[docs]</a>    <span class="k">def</span> <span class="nf">serialize_explainer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.serialize_explainer">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.serialize_explainer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_explainer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the explainer to the file specified by path.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pickle_file</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ExplainerBase.deserialize_explainer"><a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.deserialize_explainer">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">deserialize_explainer</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplainerBase.deserialize_explainer">
+<a class="viewcode-back" href="../../../dice_ml.explainer_interfaces.html#dice_ml.explainer_interfaces.explainer_base.ExplainerBase.deserialize_explainer">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deserialize_explainer</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reload the explainer into the memory by reading the file specified by path.&quot;&quot;&quot;</span>
         <span class="n">deserialized_exp</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pickle_file</span><span class="p">:</span>
             <span class="n">deserialized_exp</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">deserialized_exp</span></div></div>
+        <span class="k">return</span> <span class="n">deserialized_exp</span></div>
+</div>
+
 </pre></div>
 
            </div>

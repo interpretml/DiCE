@@ -1,25 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Benchmarking different CF explanation methods &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -30,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -72,8 +76,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Benchmarking different CF explanation methods</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Benchmarking different CF explanation methods</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notebooks/Benchmarking_different_CF_explanation_methods.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -83,304 +87,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="Benchmarking-different-CF-explanation-methods">
-<h1>Benchmarking different CF explanation methods<a class="headerlink" href="#Benchmarking-different-CF-explanation-methods" title="Permalink to this heading"></a></h1>
-<p>In this notebook, we show runtimes of different model-agnostic explanation methods. Currently, we support three model-agnostic explanation methods: 1. Random-Sampling 2. Genetic Algorithm 3. Querying a KD tree</p>
+  <section id="Benchmarking-different-CF-explanation-methods">
+<h1>Benchmarking different CF explanation methods<a class="headerlink" href="#Benchmarking-different-CF-explanation-methods" title="Link to this heading"></a></h1>
+<p>In this notebook, we show runtimes of different model-agnostic explanation methods. Currently, we support three model-agnostic explanation methods:</p>
+<ol class="arabic simple">
+<li><p>Random-Sampling</p></li>
+<li><p>Genetic Algorithm</p></li>
+<li><p>Querying a KD tree</p></li>
+</ol>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import numpy as np
-import timeit
-import random
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">timeit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.ensemble import RandomForestClassifier
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 
-import dice_ml
-from dice_ml.utils import helpers  # helper functions
-from dice_ml import Dice
+<span class="kn">import</span><span class="w"> </span><span class="nn">dice_ml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpers</span>  <span class="c1"># helper functions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dice</span>
 </pre></div>
 </div>
 </div>
@@ -388,27 +119,36 @@ from dice_ml import Dice
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
-%autoreload 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <section id="Loading-dataset">
-<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Permalink to this heading"></a></h2>
+<h2>Loading dataset<a class="headerlink" href="#Loading-dataset" title="Link to this heading"></a></h2>
 <p>We use the “adult” income dataset from UCI Machine Learning Repository (<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/adult">https://archive.ics.uci.edu/ml/datasets/adult</a>). For demonstration purposes, we transform the data as described in dice_ml.utils.helpers module.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset = helpers.load_adult_income_dataset()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">load_adult_income_dataset</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/mnt/c/Users/amshar/code/dice/dice_ml/utils/helpers.py:79: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  adult_data = adult_data.replace({&#39;income&#39;: {&#39;&lt;=50K&#39;: 0, &#39;&gt;50K&#39;: 1}})
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dataset.head()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -515,49 +255,49 @@ from dice_ml import Dice
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d = dice_ml.Data(dataframe=dataset,
-                 continuous_features=[&#39;age&#39;, &#39;hours_per_week&#39;], outcome_name=&#39;income&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                 <span class="n">continuous_features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;hours_per_week&#39;</span><span class="p">],</span> <span class="n">outcome_name</span><span class="o">=</span><span class="s1">&#39;income&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Training-the-ML-model">
-<h2>Training the ML model<a class="headerlink" href="#Training-the-ML-model" title="Permalink to this heading"></a></h2>
+<h2>Training the ML model<a class="headerlink" href="#Training-the-ML-model" title="Link to this heading"></a></h2>
 <p>Currently, the genetic algorithm &amp; KD tree methods work with scikit-learn models. Support for Tensorflow 1&amp;2 and Pytorch will be implemented soon.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>target = dataset[&quot;income&quot;]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
 
-# Split data into train and test
-datasetX = dataset.drop(&quot;income&quot;, axis=1)
-x_train, x_test, y_train, y_test = train_test_split(datasetX,
-                                                    target,
-                                                    test_size=0.2,
-                                                    random_state=0,
-                                                    stratify=target)
+<span class="c1"># Split data into train and test</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
+                                                    <span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 
-numerical = [&quot;age&quot;, &quot;hours_per_week&quot;]
-categorical = x_train.columns.difference(numerical)
+<span class="n">numerical</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;hours_per_week&quot;</span><span class="p">]</span>
+<span class="n">categorical</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical</span><span class="p">)</span>
 
-# We create the preprocessing pipelines for both numeric and categorical data.
-numeric_transformer = Pipeline(
-    steps=[(&#39;scaler&#39;, StandardScaler())])
+<span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
 
-categorical_transformer = Pipeline(
-    steps=[(&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
 
-transformations = ColumnTransformer(
-    transformers=[
-        (&#39;num&#39;, numeric_transformer, numerical),
-        (&#39;cat&#39;, categorical_transformer, categorical)])
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">numerical</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical</span><span class="p">)])</span>
 
-# Append classifier to preprocessing pipeline.
-# Now we have a full prediction pipeline.
-clf = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
-                      (&#39;classifier&#39;, RandomForestClassifier())])
-model = clf.fit(x_train, y_train)
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -565,19 +305,19 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>m = dice_ml.Model(model=model, backend=&quot;sklearn&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Initialize-counterfactual-generation-methods">
-<h2>Initialize counterfactual generation methods<a class="headerlink" href="#Initialize-counterfactual-generation-methods" title="Permalink to this heading"></a></h2>
+<h2>Initialize counterfactual generation methods<a class="headerlink" href="#Initialize-counterfactual-generation-methods" title="Link to this heading"></a></h2>
 <p>We now initialize all three counterfactuals generation methods</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp_random = Dice(d, m, method=&quot;random&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_random</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -585,7 +325,7 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp_genetic = Dice(d, m, method=&quot;genetic&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_genetic</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -593,7 +333,7 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp_KD = Dice(d, m, method=&quot;kdtree&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_KD</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;kdtree&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -601,7 +341,7 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instances = x_train[4:7]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -609,7 +349,7 @@ model = clf.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>query_instances
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_instances</span>
 </pre></div>
 </div>
 </div>
@@ -686,14 +426,14 @@ model = clf.fit(x_train, y_train)
 </div>
 </section>
 <section id="Generate-Counterfactuals">
-<h2>Generate Counterfactuals<a class="headerlink" href="#Generate-Counterfactuals" title="Permalink to this heading"></a></h2>
+<h2>Generate Counterfactuals<a class="headerlink" href="#Generate-Counterfactuals" title="Link to this heading"></a></h2>
 <p>We now generate counterfactuals of desired_class=0 using all three different methods and check the runtime. You can modify the number of loops (<code class="docutils literal notranslate"><span class="pre">num_loops</span></code>), and the number of diverse counterfactuals to generate (<code class="docutils literal notranslate"><span class="pre">k</span></code>).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>num_loops = 2
-k = 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_loops</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
 </pre></div>
 </div>
 </div>
@@ -701,45 +441,45 @@ k = 2
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>elapsed_random = 0
-elapsed_kd = 0
-elapsed_genetic = 0
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elapsed_random</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">elapsed_kd</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">elapsed_genetic</span> <span class="o">=</span> <span class="mi">0</span>
 
-for _ in range(num_loops):
-    for q in query_instances:
-        if q in d.categorical_feature_names:
-            query_instances.loc[:, q] = \
-                [np.unique(random.choice(dataset[q].values)) for _ in query_instances.index]
-        else:
-            query_instances.loc[:, q] = \
-                [np.random.uniform(dataset[q].min(), dataset[q].max()) for _ in query_instances.index]
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_loops</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">query_instances</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
+            <span class="n">query_instances</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">q</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">query_instances</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query_instances</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">q</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">dataset</span><span class="p">[</span><span class="n">q</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">query_instances</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
 
-    start_time = timeit.default_timer()
-    dice_exp_random = exp_random.generate_counterfactuals(query_instances, total_CFs=k,
-                                                          desired_class=0, verbose=False)
-    elapsed_random += timeit.default_timer() - start_time
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">dice_exp_random</span> <span class="o">=</span> <span class="n">exp_random</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                                                          <span class="n">desired_class</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">elapsed_random</span> <span class="o">+=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
-    start_time = timeit.default_timer()
-    dice_exp = exp_genetic.generate_counterfactuals(query_instances, total_CFs=k, desired_class=0,
-                                                    yloss_type=&quot;hinge_loss&quot;, verbose=False)
-    elapsed_genetic += timeit.default_timer() - start_time
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">dice_exp</span> <span class="o">=</span> <span class="n">exp_genetic</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">yloss_type</span><span class="o">=</span><span class="s2">&quot;hinge_loss&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">elapsed_genetic</span> <span class="o">+=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
-    start_time = timeit.default_timer()
-    dice_kd = exp_KD.generate_counterfactuals(query_instances, total_CFs=k, desired_class=0,
-                                              verbose=False)
-    elapsed_kd += timeit.default_timer() - start_time
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">dice_kd</span> <span class="o">=</span> <span class="n">exp_KD</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                              <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">elapsed_kd</span> <span class="o">+=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
-m_random, s_random = divmod(elapsed_random, 60)
-print(&#39;For Independent random sampling of features: Total time taken to generate %d&#39; % num_loops,
-      &#39;sets of %d&#39; % k, &#39;counterfactuals each: %02d&#39; % m_random, &#39;min %02d&#39; % s_random, &#39;sec&#39;)
+<span class="n">m_random</span><span class="p">,</span> <span class="n">s_random</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">elapsed_random</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For Independent random sampling of features: Total time taken to generate </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_loops</span><span class="p">,</span>
+      <span class="s1">&#39;sets of </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;counterfactuals each: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m_random</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s_random</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
 
-m_kd, s_kd = divmod(elapsed_kd, 60)
-print(&#39;For querying from a KD tree: Total time taken to generate %d&#39; % num_loops,
-      &#39;sets of %d&#39; % k, &#39;counterfactuals each: %02d&#39; % m_kd, &#39;min %02d&#39; % s_kd, &#39;sec&#39;)
+<span class="n">m_kd</span><span class="p">,</span> <span class="n">s_kd</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">elapsed_kd</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For querying from a KD tree: Total time taken to generate </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_loops</span><span class="p">,</span>
+      <span class="s1">&#39;sets of </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;counterfactuals each: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m_kd</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s_kd</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
 
-m_genetic, s_genetic = divmod(elapsed_genetic, 60)
-print(&#39;For genetic algorithm: Total time taken to generate %d&#39; % num_loops,
-      &#39;sets of %d&#39; % k, &#39;counterfactuals each: %02d&#39; % m_genetic, &#39;min %02d&#39; % s_genetic, &#39;sec&#39;)
+<span class="n">m_genetic</span><span class="p">,</span> <span class="n">s_genetic</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">elapsed_genetic</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For genetic algorithm: Total time taken to generate </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_loops</span><span class="p">,</span>
+      <span class="s1">&#39;sets of </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;counterfactuals each: </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">m_genetic</span><span class="p">,</span> <span class="s1">&#39;min </span><span class="si">%02d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s_genetic</span><span class="p">,</span> <span class="s1">&#39;sec&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -748,36 +488,16 @@ print(&#39;For genetic algorithm: Total time taken to generate %d&#39; % num_loo
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/tmp/ipykernel_169/3514951616.py:11: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+/tmp/ipykernel_1707/3514951616.py:11: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value &#39;[52.31385769822646, 58.00782946564132, 28.12332998154627]&#39; has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
   query_instances.loc[:, q] = \
-/tmp/ipykernel_169/3514951616.py:8: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+/tmp/ipykernel_1707/3514951616.py:11: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value &#39;[38.428344657594174, 83.88228253500981, 20.95092307044878]&#39; has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
   query_instances.loc[:, q] = \
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.58it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.13s/it]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.05s/it]
-/tmp/ipykernel_169/3514951616.py:11: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  query_instances.loc[:, q] = \
-/tmp/ipykernel_169/3514951616.py:8: SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  query_instances.loc[:, q] = \
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.55it/s]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.06s/it]
-100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02&lt;00:00,  1.11it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:04&lt;00:00,  1.49s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:12&lt;00:00,  4.23s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:04&lt;00:00,  1.45s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01&lt;00:00,  2.50it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:08&lt;00:00,  2.70s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:04&lt;00:00,  1.50s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -785,9 +505,9 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-For Independent random sampling of features: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 02 sec
-For querying from a KD tree: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 05 sec
-For genetic algorithm: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 06 sec
+For Independent random sampling of features: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 05 sec
+For querying from a KD tree: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 08 sec
+For genetic algorithm: Total time taken to generate 2 sets of 2 counterfactuals each: 00 min 20 sec
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">

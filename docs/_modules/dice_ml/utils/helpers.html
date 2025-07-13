@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.utils.helpers &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.utils.helpers &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.utils.helpers</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.utils.helpers</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,24 +87,26 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module containts helper functions to load data and get meta deta.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">zipfile</span>
-<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlretrieve</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionTransformer</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
 
-<span class="kn">import</span> <span class="nn">dice_ml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dice_ml</span>
 
 
-<div class="viewcode-block" id="load_adult_income_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">only_train</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="load_adult_income_dataset">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_adult_income_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_adult_income_dataset</span><span class="p">(</span><span class="n">only_train</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads adult income dataset from https://archive.ics.uci.edu/ml/datasets/Adult and prepares</span>
 <span class="sd">       the data for data analysis based on https://rpubs.com/H_Zhu/235617</span>
 
@@ -180,7 +185,10 @@
     <span class="k">return</span> <span class="n">adult_data</span></div>
 
 
-<div class="viewcode-block" id="save_adult_income_model"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.save_adult_income_model">[docs]</a><span class="k">def</span> <span class="nf">save_adult_income_model</span><span class="p">(</span><span class="n">modelpath</span><span class="p">,</span> <span class="n">test_fraction</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+<div class="viewcode-block" id="save_adult_income_model">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.save_adult_income_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_adult_income_model</span><span class="p">(</span><span class="n">modelpath</span><span class="p">,</span> <span class="n">test_fraction</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_adult_income_dataset</span><span class="p">()</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
     <span class="n">train_dataset</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
@@ -205,27 +213,52 @@
     <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">modelpath</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_min_max_equal_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_min_max_equal_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_min_max_equal_dataset</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_min_max_equal_dataset">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_min_max_equal_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_min_max_equal_dataset</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_outcome_not_last_column_dataset"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_outcome_not_last_column_dataset">[docs]</a><span class="k">def</span> <span class="nf">load_outcome_not_last_column_dataset</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_outcome_not_last_column_dataset">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_outcome_not_last_column_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_outcome_not_last_column_dataset</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset_binary"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_binary</span><span class="p">():</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset_binary">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset_binary</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset_binary_str"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_binary_str</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset_binary_str">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_binary_str">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset_binary_str</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
         <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
@@ -236,12 +269,18 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">,</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset_multiclass"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_multiclass</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset_multiclass">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset_multiclass</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset_multiclass_str"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_multiclass_str</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset_multiclass_str">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_multiclass_str">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset_multiclass_str</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">],</span>
         <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">],</span>
@@ -252,54 +291,78 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Categorical&quot;</span><span class="p">,</span> <span class="s2">&quot;Numerical&quot;</span><span class="p">,</span> <span class="s2">&quot;Outcome&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="load_custom_testing_dataset_regression"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_regression">[docs]</a><span class="k">def</span> <span class="nf">load_custom_testing_dataset_regression</span><span class="p">():</span>
+
+<div class="viewcode-block" id="load_custom_testing_dataset_regression">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.load_custom_testing_dataset_regression">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_custom_testing_dataset_regression</span><span class="p">():</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Categorical&#39;</span><span class="p">,</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">,</span> <span class="s1">&#39;Outcome&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="get_adult_income_modelpath"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">[docs]</a><span class="k">def</span> <span class="nf">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF1&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_adult_income_modelpath">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_income_modelpath">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_adult_income_modelpath</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">&#39;TF1&#39;</span><span class="p">):</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.h5&#39;</span> <span class="k">if</span> <span class="s1">&#39;TF&#39;</span> <span class="ow">in</span> <span class="n">backend</span> <span class="k">else</span> <span class="p">(</span><span class="s1">&#39;.pth&#39;</span> <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;PYT&#39;</span> <span class="k">else</span> <span class="s1">&#39;.pkl&#39;</span><span class="p">)</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;adult&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_custom_dataset_modelpath_pipeline</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_custom_dataset_modelpath_pipeline</span><span class="p">():</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.sav&#39;</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;custom&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_custom_vars_dataset_modelpath_pipeline"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_vars_dataset_modelpath_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_custom_vars_dataset_modelpath_pipeline</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_custom_vars_dataset_modelpath_pipeline">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_vars_dataset_modelpath_pipeline">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_custom_vars_dataset_modelpath_pipeline</span><span class="p">():</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.sav&#39;</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_vars&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_binary"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_binary">[docs]</a><span class="k">def</span> <span class="nf">get_custom_dataset_modelpath_pipeline_binary</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_binary">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_binary">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_custom_dataset_modelpath_pipeline_binary</span><span class="p">():</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.sav&#39;</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_binary&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_multiclass"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_multiclass">[docs]</a><span class="k">def</span> <span class="nf">get_custom_dataset_modelpath_pipeline_multiclass</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_multiclass">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_multiclass">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_custom_dataset_modelpath_pipeline_multiclass</span><span class="p">():</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.sav&#39;</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_multiclass&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_regression"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_regression">[docs]</a><span class="k">def</span> <span class="nf">get_custom_dataset_modelpath_pipeline_regression</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_custom_dataset_modelpath_pipeline_regression">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_custom_dataset_modelpath_pipeline_regression">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_custom_dataset_modelpath_pipeline_regression</span><span class="p">():</span>
     <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">model_ext</span> <span class="o">=</span> <span class="s1">&#39;.sav&#39;</span>
     <span class="n">modelpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_trained_models&#39;</span><span class="p">,</span> <span class="s1">&#39;custom_regression&#39;</span><span class="o">+</span><span class="n">model_ext</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">modelpath</span></div>
 
 
-<div class="viewcode-block" id="get_adult_data_info"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">[docs]</a><span class="k">def</span> <span class="nf">get_adult_data_info</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_adult_data_info">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_adult_data_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_adult_data_info</span><span class="p">():</span>
     <span class="n">feature_description</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span>
         <span class="s1">&#39;workclass&#39;</span><span class="p">:</span> <span class="s1">&#39;type of industry (Government, Other/Unknown, Private, Self-Employed)&#39;</span><span class="p">,</span>
@@ -313,13 +376,16 @@
     <span class="k">return</span> <span class="n">feature_description</span></div>
 
 
-<div class="viewcode-block" id="get_base_gen_cf_initialization"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_base_gen_cf_initialization">[docs]</a><span class="k">def</span> <span class="nf">get_base_gen_cf_initialization</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">encoded_size</span><span class="p">,</span> <span class="n">cont_minx</span><span class="p">,</span> <span class="n">cont_maxx</span><span class="p">,</span> <span class="n">margin</span><span class="p">,</span> <span class="n">validity_reg</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span>
+
+<div class="viewcode-block" id="get_base_gen_cf_initialization">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.get_base_gen_cf_initialization">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_base_gen_cf_initialization</span><span class="p">(</span><span class="n">data_interface</span><span class="p">,</span> <span class="n">encoded_size</span><span class="p">,</span> <span class="n">cont_minx</span><span class="p">,</span> <span class="n">cont_maxx</span><span class="p">,</span> <span class="n">margin</span><span class="p">,</span> <span class="n">validity_reg</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span>
                                    <span class="n">wm1</span><span class="p">,</span> <span class="n">wm2</span><span class="p">,</span> <span class="n">wm3</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">):</span>
     <span class="c1"># Dice Imports - TODO: keep this method for VAE as a spearate module or move it to feasible_base_vae.py.</span>
     <span class="c1">#                      Check dependencies.</span>
-    <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim</span>
 
-    <span class="kn">from</span> <span class="nn">dice_ml.utils.sample_architecture.vae_model</span> <span class="kn">import</span> <span class="n">CF_VAE</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils.sample_architecture.vae_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">CF_VAE</span>
 
     <span class="c1"># Dataset for training Variational Encoder Decoder model for CF Generation</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data_interface</span><span class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span class="n">data_interface</span><span class="o">.</span><span class="n">one_hot_encoded_data</span><span class="p">)</span>
@@ -360,31 +426,45 @@
     <span class="k">return</span> <span class="n">vae_train_dataset</span><span class="p">,</span> <span class="n">vae_val_dataset</span><span class="p">,</span> <span class="n">vae_test_dataset</span><span class="p">,</span> <span class="n">normalise_weights</span><span class="p">,</span> <span class="n">cf_vae</span><span class="p">,</span> <span class="n">cf_vae_optimizer</span></div>
 
 
-<div class="viewcode-block" id="ohe_min_max_transformation"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.ohe_min_max_transformation">[docs]</a><span class="k">def</span> <span class="nf">ohe_min_max_transformation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ohe_min_max_transformation">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.ohe_min_max_transformation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ohe_min_max_transformation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;the data is one-hot-encoded and min-max normalized and fed to the ML model&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">data_interface</span><span class="o">.</span><span class="n">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="inverse_ohe_min_max_transformation"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.inverse_ohe_min_max_transformation">[docs]</a><span class="k">def</span> <span class="nf">inverse_ohe_min_max_transformation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
+
+<div class="viewcode-block" id="inverse_ohe_min_max_transformation">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.inverse_ohe_min_max_transformation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">inverse_ohe_min_max_transformation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">data_interface</span><span class="o">.</span><span class="n">get_inverse_ohe_min_max_normalized_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DataTransfomer"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer">[docs]</a><span class="k">class</span> <span class="nc">DataTransfomer</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataTransfomer">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataTransfomer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to transform data based on user-defined function to get predicted outcomes.</span>
 <span class="sd">       This class calls FunctionTransformer of scikit-learn internally</span>
 <span class="sd">       (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html).&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kw_args</span> <span class="o">=</span> <span class="n">kw_args</span>
 
-<div class="viewcode-block" id="DataTransfomer.feed_data_params"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.feed_data_params">[docs]</a>    <span class="k">def</span> <span class="nf">feed_data_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
+<div class="viewcode-block" id="DataTransfomer.feed_data_params">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.feed_data_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_data_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kw_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kw_args</span><span class="p">[</span><span class="s1">&#39;data_interface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_interface</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kw_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data_interface&#39;</span><span class="p">:</span> <span class="n">data_interface</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="DataTransfomer.initialize_transform_func"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.initialize_transform_func">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_transform_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataTransfomer.initialize_transform_func">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.initialize_transform_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_transform_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;ohe-min-max&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_transformer</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span>
                     <span class="n">func</span><span class="o">=</span><span class="n">ohe_min_max_transformation</span><span class="p">,</span>
@@ -401,11 +481,19 @@
             <span class="c1"># add more ready-to-use transformers (such as label-encoding) in elif loops.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_transformer</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">kw_args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kw_args</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataTransfomer.transform"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataTransfomer.transform">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.transform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># should return a numpy array</span></div>
 
-<div class="viewcode-block" id="DataTransfomer.inverse_transform"><a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.inverse_transform">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># should return a numpy array</span></div></div>
+
+<div class="viewcode-block" id="DataTransfomer.inverse_transform">
+<a class="viewcode-back" href="../../../dice_ml.utils.html#dice_ml.utils.helpers.DataTransfomer.inverse_transform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># should return a numpy array</span></div>
+</div>
+
 </pre></div>
 
            </div>

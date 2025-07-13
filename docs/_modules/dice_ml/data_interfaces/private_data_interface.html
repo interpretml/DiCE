@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.data_interfaces.private_data_interface &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.data_interfaces.private_data_interface</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.data_interfaces.private_data_interface</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -83,22 +86,24 @@
   <h1>Source code for dice_ml.data_interfaces.private_data_interface</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module containing meta data information about private data.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LabelEncoder</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml.data_interfaces.base_data_interface</span> <span class="kn">import</span> <span class="n">_BaseData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.data_interfaces.base_data_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">_BaseData</span>
 
 
-<div class="viewcode-block" id="PrivateData"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData">[docs]</a><span class="k">class</span> <span class="nc">PrivateData</span><span class="p">(</span><span class="n">_BaseData</span><span class="p">):</span>
+<div class="viewcode-block" id="PrivateData">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrivateData</span><span class="p">(</span><span class="n">_BaseData</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A data interface for private data with meta information.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method</span>
 
 <span class="sd">        :param features: Dictionary or OrderedDict with feature names as keys and range in int/float</span>
@@ -158,25 +163,30 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_and_set_data_name</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_and_set_type_and_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_and_set_type_and_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and set the type and precision.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;type_and_precision&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_and_precision</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;type_and_precision&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_and_precision</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_validate_and_set_mad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_and_set_mad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and set the MAD.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;mad&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;mad&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mad</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="PrivateData.one_hot_encode_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data">[docs]</a>    <span class="k">def</span> <span class="nf">one_hot_encode_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="PrivateData.one_hot_encode_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.one_hot_encode_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_hot_encode_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;One-hot-encodes the data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrivateData.normalize_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.normalize_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.normalize_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalizes continuous features to make them fall in the range [0,1].&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -206,7 +216,10 @@
                         <span class="n">result</span><span class="p">[:,</span> <span class="n">feature_index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[:,</span> <span class="n">feature_index</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_value</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="PrivateData.de_normalize_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data">[docs]</a>    <span class="k">def</span> <span class="nf">de_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.de_normalize_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.de_normalize_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">de_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;De-normalizes continuous features from [0,1] range to original range.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">df</span>
@@ -218,7 +231,10 @@
                 <span class="n">df</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">max_value</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">))</span> <span class="o">+</span> <span class="n">min_value</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_minx_maxx"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx">[docs]</a>    <span class="k">def</span> <span class="nf">get_minx_maxx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_minx_maxx">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_minx_maxx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_minx_maxx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the min/max value of features in normalized or de-normalized form.&quot;&quot;&quot;</span>
         <span class="n">minx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ohe_encoded_feature_names</span><span class="p">)])</span>
         <span class="n">maxx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ohe_encoded_feature_names</span><span class="p">)])</span>
@@ -231,7 +247,10 @@
                 <span class="n">maxx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">minx</span><span class="p">,</span> <span class="n">maxx</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_mads"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">[docs]</a>    <span class="k">def</span> <span class="nf">get_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_mads">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_mads">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes Median Absolute Deviation of features.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">normalized</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mad</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -242,7 +261,10 @@
                     <span class="n">mads</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mad</span><span class="p">[</span><span class="n">feature</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">mads</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_valid_mads"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads">[docs]</a>    <span class="k">def</span> <span class="nf">get_valid_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_warnings</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_mads</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_valid_mads">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_mads">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_valid_mads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_warnings</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_mads</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes Median Absolute Deviation of features. If they are &lt;=0, returns a practical value instead&quot;&quot;&quot;</span>
         <span class="n">mads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mads</span><span class="p">(</span><span class="n">normalized</span><span class="o">=</span><span class="n">normalized</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_feature_names</span><span class="p">:</span>
@@ -259,7 +281,10 @@
         <span class="k">if</span> <span class="n">return_mads</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">mads</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_features_range"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_features_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permitted_range_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_features_range">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_features_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_features_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permitted_range_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">features_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">features_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">features_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span>
 
@@ -277,7 +302,10 @@
                 <span class="n">ranges</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_range</span>
         <span class="k">return</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">feature_ranges_orig</span></div>
 
-<div class="viewcode-block" id="PrivateData.create_ohe_params"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params">[docs]</a>    <span class="k">def</span> <span class="nf">create_ohe_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_hot_encoded_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.create_ohe_params">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.create_ohe_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_ohe_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_hot_encoded_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># simulating sklearn&#39;s one-hot-encoding</span>
             <span class="c1"># continuous features on the left</span>
@@ -296,7 +324,10 @@
         <span class="c1"># when get_data_params_for_gradient_dice() is called from gradient-based DiCE explainers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ohe_base_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_df_for_ohe_encoding</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_data_params_for_gradient_dice"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params_for_gradient_dice">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_params_for_gradient_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_data_params_for_gradient_dice">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_data_params_for_gradient_dice">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_params_for_gradient_dice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all data related params for DiCE.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_ohe_params</span><span class="p">()</span>
@@ -318,7 +349,10 @@
         <span class="k">return</span> <span class="n">minx</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">encoded_categorical_feature_indexes</span><span class="p">,</span> <span class="n">encoded_continuous_feature_indexes</span><span class="p">,</span> \
             <span class="n">cont_minx</span><span class="p">,</span> <span class="n">cont_maxx</span><span class="p">,</span> <span class="n">cont_precisions</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_encoded_categorical_feature_indexes"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoded_categorical_feature_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_encoded_categorical_feature_indexes">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_encoded_categorical_feature_indexes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_encoded_categorical_feature_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the column indexes categorical features after one-hot-encoding.&quot;&quot;&quot;</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">col_parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
@@ -328,7 +362,10 @@
             <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cols</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_indexes_of_features_to_vary"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary">[docs]</a>    <span class="k">def</span> <span class="nf">get_indexes_of_features_to_vary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_indexes_of_features_to_vary">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_indexes_of_features_to_vary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_indexes_of_features_to_vary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_to_vary</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets indexes from feature names of one-hot-encoded data.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">features_to_vary</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ohe_encoded_feature_names</span><span class="p">))]</span>
@@ -343,14 +380,20 @@
                     <span class="n">ixs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colidx</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ixs</span></div>
 
-<div class="viewcode-block" id="PrivateData.fit_label_encoders"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders">[docs]</a>    <span class="k">def</span> <span class="nf">fit_label_encoders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.fit_label_encoders">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.fit_label_encoders">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_label_encoders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">labelencoders</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
             <span class="n">labelencoders</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
             <span class="n">labelencoders</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">labelencoders</span></div>
 
-<div class="viewcode-block" id="PrivateData.from_label"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_label">[docs]</a>    <span class="k">def</span> <span class="nf">from_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.from_label">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_label">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms label encoded data back to categorical values&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -362,7 +405,10 @@
                 <span class="n">out</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelencoder</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">[</span><span class="n">column</span><span class="p">]]</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">([</span><span class="nb">round</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">column</span><span class="p">])])[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="PrivateData.from_dummies"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">[docs]</a>    <span class="k">def</span> <span class="nf">from_dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix_sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.from_dummies">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.from_dummies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dummies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">prefix_sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the original data from dummy encoded data with k levels.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">:</span>
@@ -373,7 +419,10 @@
             <span class="n">out</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_decimal_precisions"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions">[docs]</a>    <span class="k">def</span> <span class="nf">get_decimal_precisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_decimal_precisions">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decimal_precisions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_decimal_precisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;Gets the precision of continuous features in the data.&quot;&quot;&quot;</span>
         <span class="n">precisions_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">precisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
@@ -390,7 +439,10 @@
         <span class="k">elif</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;dict&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">precisions_dict</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_decoded_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_decoded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;one-hot&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_decoded_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_decoded_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_decoded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;one-hot&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the original data from encoded data.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data</span>
@@ -411,7 +463,10 @@
                                 <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="PrivateData.prepare_df_for_ohe_encoding"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_df_for_ohe_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.prepare_df_for_ohe_encoding">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_df_for_ohe_encoding">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_df_for_ohe_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create base dataframe to do OHE for a single instance or a set of instances&quot;&quot;&quot;</span>
         <span class="n">levels</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">feat</span> <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feature_names</span><span class="p">]</span>
@@ -434,7 +489,10 @@
 
         <span class="k">return</span> <span class="n">df</span></div>
 
-<div class="viewcode-block" id="PrivateData.query_instance_to_df"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df">[docs]</a>    <span class="k">def</span> <span class="nf">query_instance_to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.query_instance_to_df">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.query_instance_to_df">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_instance_to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># prepare a list of query instances</span>
                 <span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">query_instance</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
@@ -454,13 +512,19 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Query instance should be a dict, a pandas dataframe, a list, or a list of dicts&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">test</span></div>
 
-<div class="viewcode-block" id="PrivateData.prepare_query_instance"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_query_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.prepare_query_instance">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.prepare_query_instance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_query_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares user defined test input(s) for DiCE.&quot;&quot;&quot;</span>
         <span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_instance_to_df</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
         <span class="n">test</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">test</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_ohe_min_max_normalized_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_ohe_min_max_normalized_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_ohe_min_max_normalized_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ohe_min_max_normalized_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_instance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms query_instance into one-hot-encoded and min-max normalized data. query_instance should be a dict,</span>
 <span class="sd">           a dataframe, a list, or a list of dicts&quot;&quot;&quot;</span>
         <span class="n">query_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_query_instance</span><span class="p">(</span><span class="n">query_instance</span><span class="p">)</span>
@@ -471,7 +535,10 @@
         <span class="c1"># returns a pandas dataframe</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_inverse_ohe_min_max_normalized_data"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_inverse_ohe_min_max_normalized_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformed_data</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_inverse_ohe_min_max_normalized_data">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_inverse_ohe_min_max_normalized_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_inverse_ohe_min_max_normalized_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformed_data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms one-hot-encoded and min-max normalized data into raw user-fed data format. transformed_data</span>
 <span class="sd">           should be a dataframe or an array&quot;&quot;&quot;</span>
         <span class="n">raw_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_dummies</span><span class="p">(</span><span class="n">transformed_data</span><span class="p">)</span>
@@ -483,13 +550,19 @@
         <span class="c1"># returns a pandas dataframe</span>
         <span class="k">return</span> <span class="n">raw_data</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_all_dummy_colnames"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_dummy_colnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_all_dummy_colnames">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_all_dummy_colnames">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_dummy_colnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">max_vals</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="n">sample_data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">max_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permitted_range</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">sample_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sample_data_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">sample_df</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span></div>
 
-<div class="viewcode-block" id="PrivateData.get_valid_feature_range"><a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_valid_feature_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_range_input</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PrivateData.get_valid_feature_range">
+<a class="viewcode-back" href="../../../dice_ml.data_interfaces.html#dice_ml.data_interfaces.private_data_interface.PrivateData.get_valid_feature_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_valid_feature_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_range_input</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the min/max value of features in normalized or de-normalized</span>
 <span class="sd">        form. Assumes that all features are already encoded to numerical form</span>
 <span class="sd">        such that the number of features remains the same.</span>
@@ -499,7 +572,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Normalized feature range not supported for private data interface&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">feature_range_input</span></div></div>
+        <span class="k">return</span> <span class="n">feature_range_input</span></div>
+</div>
+
 </pre></div>
 
            </div>

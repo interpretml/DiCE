@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>dice_ml.diverse_counterfactuals &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -69,9 +72,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>dice_ml.diverse_counterfactuals</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dice_ml.diverse_counterfactuals</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -81,18 +84,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for dice_ml.diverse_counterfactuals</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">dice_ml.constants</span> <span class="kn">import</span> <span class="n">ModelTypes</span><span class="p">,</span> <span class="n">_SchemaVersions</span>
-<span class="kn">from</span> <span class="nn">dice_ml.utils.serialize</span> <span class="kn">import</span> <span class="n">DummyDataInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelTypes</span><span class="p">,</span> <span class="n">_SchemaVersions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml.utils.serialize</span><span class="w"> </span><span class="kn">import</span> <span class="n">DummyDataInterface</span>
 
 
-<span class="k">class</span> <span class="nc">_DiverseCFV1SchemaConstants</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DiverseCFV1SchemaConstants</span><span class="p">:</span>
     <span class="n">DATA_INTERFACE</span> <span class="o">=</span> <span class="s1">&#39;data_interface&#39;</span>
     <span class="n">MODEL_TYPE</span> <span class="o">=</span> <span class="s1">&#39;model_type&#39;</span>
     <span class="n">DESIRED_CLASS</span> <span class="o">=</span> <span class="s1">&#39;desired_class&#39;</span>
@@ -101,7 +104,7 @@
     <span class="n">FINAL_CFS_DF</span> <span class="o">=</span> <span class="s1">&#39;final_cfs_df&#39;</span>
 
 
-<span class="k">class</span> <span class="nc">_DiverseCFV2SchemaConstants</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DiverseCFV2SchemaConstants</span><span class="p">:</span>
     <span class="n">DATA_INTERFACE</span> <span class="o">=</span> <span class="s1">&#39;data_interface&#39;</span>
     <span class="n">MODEL_TYPE</span> <span class="o">=</span> <span class="s1">&#39;model_type&#39;</span>
     <span class="n">DESIRED_CLASS</span> <span class="o">=</span> <span class="s1">&#39;desired_class&#39;</span>
@@ -112,7 +115,9 @@
     <span class="n">FINAL_CFS_LIST</span> <span class="o">=</span> <span class="s1">&#39;final_cfs_list&#39;</span>
 
 
-<div class="viewcode-block" id="json_converter"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.json_converter">[docs]</a><span class="k">def</span> <span class="nf">json_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="json_converter">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.json_converter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">json_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Helper function to convert object to json.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -123,9 +128,12 @@
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span></div>
 
 
-<div class="viewcode-block" id="CounterfactualExamples"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples">[docs]</a><span class="k">class</span> <span class="nc">CounterfactualExamples</span><span class="p">:</span>
+
+<div class="viewcode-block" id="CounterfactualExamples">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CounterfactualExamples</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to store and visualize the resulting counterfactual explanations.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_cfs_df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_instance_df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">final_cfs_df_sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">desired_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="s2">&quot;opposite&quot;</span><span class="p">,</span>
                  <span class="n">model_type</span><span class="o">=</span><span class="n">ModelTypes</span><span class="o">.</span><span class="n">Classifier</span><span class="p">):</span>
@@ -150,7 +158,7 @@
         <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="n">ModelTypes</span><span class="o">.</span><span class="n">Regressor</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">new_outcome</span> <span class="o">=</span> <span class="n">desired_range</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_counterfactual_example</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_counterfactual_example</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other_counterfactual_example</span><span class="p">,</span> <span class="n">CounterfactualExamples</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_class</span> <span class="o">==</span> <span class="n">other_counterfactual_example</span><span class="o">.</span><span class="n">desired_class</span> <span class="ow">and</span> \
                         <span class="bp">self</span><span class="o">.</span><span class="n">desired_range</span> <span class="o">==</span> <span class="n">other_counterfactual_example</span><span class="o">.</span><span class="n">desired_range</span> <span class="ow">and</span> \
@@ -161,7 +169,7 @@
                         <span class="p">(</span><span class="n">other_counterfactual_example</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_dump_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_notebook_console</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dump_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_notebook_console</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_notebook_console</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">display_df</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -169,7 +177,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">print_list</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
                             <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_visualize_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_visualize_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                             <span class="n">is_notebook_console</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posthoc_sparsity_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -202,8 +210,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">No counterfactuals found!&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CounterfactualExamples.visualize_as_dataframe"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<div class="viewcode-block" id="CounterfactualExamples.visualize_as_dataframe">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_dataframe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
 
         <span class="c1"># original instance</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
@@ -212,8 +222,11 @@
                                  <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">,</span>
                                  <span class="n">is_notebook_console</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CounterfactualExamples.display_df"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.display_df">[docs]</a>    <span class="k">def</span> <span class="nf">display_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<div class="viewcode-block" id="CounterfactualExamples.display_df">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.display_df">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
         <span class="k">if</span> <span class="n">show_only_changes</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>  <span class="c1"># works only in Jupyter notebook</span>
         <span class="k">else</span><span class="p">:</span>
@@ -233,7 +246,10 @@
                             <span class="n">newdf</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">newdf</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">])</span>
             <span class="n">display</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">newdf</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>  <span class="c1"># works only in Jupyter notebook</span></div>
 
-<div class="viewcode-block" id="CounterfactualExamples.visualize_as_list"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_list">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CounterfactualExamples.visualize_as_list">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.visualize_as_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_sparse_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># original instance</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Query instance (original outcome : </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_pred</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_instance_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
@@ -241,7 +257,10 @@
                                  <span class="n">show_only_changes</span><span class="o">=</span><span class="n">show_only_changes</span><span class="p">,</span>
                                  <span class="n">is_notebook_console</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CounterfactualExamples.print_list"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list">[docs]</a>    <span class="k">def</span> <span class="nf">print_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">li</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CounterfactualExamples.print_list">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.print_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">li</span><span class="p">,</span> <span class="n">show_only_changes</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">show_only_changes</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">li</span><span class="p">)):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">li</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
@@ -254,7 +273,10 @@
                         <span class="n">newli</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">jx</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">newli</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="CounterfactualExamples.to_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serialization_version</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CounterfactualExamples.to_json">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.to_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serialization_version</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_cfs_df_sparse</span>
         <span class="k">else</span><span class="p">:</span>
@@ -302,8 +324,11 @@
             <span class="p">}</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">alternate_obj</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">json_converter</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CounterfactualExamples.from_json"><a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cf_example_json_str</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CounterfactualExamples.from_json">
+<a class="viewcode-back" href="../../dice_ml.html#dice_ml.diverse_counterfactuals.CounterfactualExamples.from_json">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="n">cf_example_json_str</span><span class="p">):</span>
         <span class="n">cf_example_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cf_example_json_str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cf_example_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_DiverseCFV1SchemaConstants</span><span class="o">.</span><span class="n">TEST_INSTANCE_DF</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">test_instance_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">cf_example_dict</span><span class="p">[</span>
@@ -349,7 +374,9 @@
                                           <span class="n">posthoc_sparsity_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                           <span class="n">desired_class</span><span class="o">=</span><span class="n">desired_class</span><span class="p">,</span>
                                           <span class="n">desired_range</span><span class="o">=</span><span class="n">desired_range</span><span class="p">,</span>
-                                          <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">)</span></div></div>
+                                          <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

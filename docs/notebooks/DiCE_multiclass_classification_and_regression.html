@@ -1,25 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.11 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Generating counterfactuals for multi-class classification and regression models &mdash; DiCE 0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3f949d3d"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> DiCE
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DiCE
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -77,9 +81,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="nb_index.html">&lt;no title&gt;</a> &raquo;</li>
-      <li>Generating counterfactuals for multi-class classification and regression models</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="nb_index.html">&lt;no title&gt;</a></li>
+      <li class="breadcrumb-item active">Generating counterfactuals for multi-class classification and regression models</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/notebooks/DiCE_multiclass_classification_and_regression.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,302 +93,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS for nbsphinx extension */
-
-/* remove conflicting styling from Sphinx themes */
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt *,
-div.nbinput.container div.input_area pre,
-div.nboutput.container div.output_area pre,
-div.nbinput.container div.input_area .highlight,
-div.nboutput.container div.output_area .highlight {
-    border: none;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-}
-
-div.nbinput.container > div[class*=highlight],
-div.nboutput.container > div[class*=highlight] {
-    margin: 0;
-}
-
-div.nbinput.container div.prompt *,
-div.nboutput.container div.prompt * {
-    background: none;
-}
-
-div.nboutput.container div.output_area .highlight,
-div.nboutput.container div.output_area pre {
-    background: unset;
-}
-
-div.nboutput.container div.output_area div.highlight {
-    color: unset;  /* override Pygments text color */
-}
-
-/* avoid gaps between output lines */
-div.nboutput.container div[class*=highlight] pre {
-    line-height: normal;
-}
-
-/* input/output containers */
-div.nbinput.container,
-div.nboutput.container {
-    display: -webkit-flex;
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
-    width: 100%;
-}
-@media (max-width: 540px) {
-    div.nbinput.container,
-    div.nboutput.container {
-        flex-direction: column;
-    }
-}
-
-/* input container */
-div.nbinput.container {
-    padding-top: 5px;
-}
-
-/* last container */
-div.nblast.container {
-    padding-bottom: 5px;
-}
-
-/* input prompt */
-div.nbinput.container div.prompt pre {
-    color: #307FC1;
-}
-
-/* output prompt */
-div.nboutput.container div.prompt pre {
-    color: #BF5B3D;
-}
-
-/* all prompts */
-div.nbinput.container div.prompt,
-div.nboutput.container div.prompt {
-    width: 4.5ex;
-    padding-top: 5px;
-    position: relative;
-    user-select: none;
-}
-
-div.nbinput.container div.prompt > div,
-div.nboutput.container div.prompt > div {
-    position: absolute;
-    right: 0;
-    margin-right: 0.3ex;
-}
-
-@media (max-width: 540px) {
-    div.nbinput.container div.prompt,
-    div.nboutput.container div.prompt {
-        width: unset;
-        text-align: left;
-        padding: 0.4em;
-    }
-    div.nboutput.container div.prompt.empty {
-        padding: 0;
-    }
-
-    div.nbinput.container div.prompt > div,
-    div.nboutput.container div.prompt > div {
-        position: unset;
-    }
-}
-
-/* disable scrollbars on prompts */
-div.nbinput.container div.prompt pre,
-div.nboutput.container div.prompt pre {
-    overflow: hidden;
-}
-
-/* input/output area */
-div.nbinput.container div.input_area,
-div.nboutput.container div.output_area {
-    -webkit-flex: 1;
-    flex: 1;
-    overflow: auto;
-}
-@media (max-width: 540px) {
-    div.nbinput.container div.input_area,
-    div.nboutput.container div.output_area {
-        width: 100%;
-    }
-}
-
-/* input area */
-div.nbinput.container div.input_area {
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    /*background: #f5f5f5;*/
-}
-
-/* override MathJax center alignment in output cells */
-div.nboutput.container div[class*=MathJax] {
-    text-align: left !important;
-}
-
-/* override sphinx.ext.imgmath center alignment in output cells */
-div.nboutput.container div.math p {
-    text-align: left;
-}
-
-/* standard error */
-div.nboutput.container div.output_area.stderr {
-    background: #fdd;
-}
-
-/* ANSI colors */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-default-inverse-fg { color: #FFFFFF; }
-.ansi-default-inverse-bg { background-color: #000000; }
-
-.ansi-bold { font-weight: bold; }
-.ansi-underline { text-decoration: underline; }
-
-
-div.nbinput.container div.input_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight] > pre,
-div.nboutput.container div.output_area div[class*=highlight].math,
-div.nboutput.container div.output_area.rendered_html,
-div.nboutput.container div.output_area > div.output_javascript,
-div.nboutput.container div.output_area:not(.rendered_html) > img{
-    padding: 5px;
-    margin: 0;
-}
-
-/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
-div.nbinput.container div.input_area > div[class^='highlight'],
-div.nboutput.container div.output_area > div[class^='highlight']{
-    overflow-y: hidden;
-}
-
-/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt .copybtn {
-    display: none;
-}
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-.jp-RenderedHTMLCommon table,
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.jp-RenderedHTMLCommon thead,
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-.jp-RenderedHTMLCommon tr,
-.jp-RenderedHTMLCommon th,
-.jp-RenderedHTMLCommon td,
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-.jp-RenderedHTMLCommon th,
-div.rendered_html th {
-  font-weight: bold;
-}
-.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-.jp-RenderedHTMLCommon tbody tr:hover,
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
-
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
-<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Permalink to this heading"></a></h1>
+  <section id="Generating-counterfactuals-for-multi-class-classification-and-regression-models">
+<h1>Generating counterfactuals for multi-class classification and regression models<a class="headerlink" href="#Generating-counterfactuals-for-multi-class-classification-and-regression-models" title="Link to this heading"></a></h1>
 <p>This notebook will demonstrate how the DiCE library can be used for multiclass classification and regression for scikit-learn models. You can use any method (“random”, “kdtree”, “genetic”), just specific it in the method argument in the initialization step. The rest of the code is completely identical. For demonstration, we will be using the genetic algorithm for CFs.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import dice_ml
-from dice_ml import Dice
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dice_ml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dice_ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dice</span>
 
-from sklearn.datasets import load_iris, fetch_california_housing
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_iris</span><span class="p">,</span> <span class="n">fetch_california_housing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span>
 
-import pandas as pd
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 </pre></div>
 </div>
 </div>
@@ -392,21 +118,21 @@ import pandas as pd
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
-%autoreload 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 </pre></div>
 </div>
 </div>
 <p>We will use sklearn’s internal datasets to demonstrate DiCE’s features in this notebook</p>
 <section id="Multiclass-Classification">
-<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Permalink to this heading"></a></h2>
+<h2>Multiclass Classification<a class="headerlink" href="#Multiclass-Classification" title="Link to this heading"></a></h2>
 <p>For multiclass classification, we will use sklearn’s Iris dataset. This data set consists of 3 different types of irises’ (Setosa, Versicolour, and Virginica) petal and sepal length. More information at <a class="reference external" href="https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset">https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_iris = load_iris(as_frame=True).frame
-df_iris.head()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">frame</span>
+<span class="n">df_iris</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -489,7 +215,7 @@ df_iris.head()
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_iris.info()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_iris</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -516,9 +242,9 @@ memory usage: 6.0 KB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>outcome_name = &quot;target&quot;
-continuous_features_iris = df_iris.drop(outcome_name, axis=1).columns.tolist()
-target = df_iris[outcome_name]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outcome_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+<span class="n">continuous_features_iris</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">df_iris</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -526,33 +252,33 @@ target = df_iris[outcome_name]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Split data into train and test
-datasetX = df_iris.drop(outcome_name, axis=1)
-x_train, x_test, y_train, y_test = train_test_split(datasetX,
-                                                    target,
-                                                    test_size=0.2,
-                                                    random_state=0,
-                                                    stratify=target)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split data into train and test</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
+                                                    <span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
 
-categorical_features = x_train.columns.difference(continuous_features_iris)
+<span class="n">categorical_features</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">continuous_features_iris</span><span class="p">)</span>
 
-# We create the preprocessing pipelines for both numeric and categorical data.
-numeric_transformer = Pipeline(steps=[
-    (&#39;scaler&#39;, StandardScaler())])
+<span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
 
-categorical_transformer = Pipeline(steps=[
-    (&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
 
-transformations = ColumnTransformer(
-    transformers=[
-        (&#39;num&#39;, numeric_transformer, continuous_features_iris),
-        (&#39;cat&#39;, categorical_transformer, categorical_features)])
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">continuous_features_iris</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical_features</span><span class="p">)])</span>
 
-# Append classifier to preprocessing pipeline.
-# Now we have a full prediction pipeline.
-clf_iris = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
-                           (&#39;classifier&#39;, RandomForestClassifier())])
-model_iris = clf_iris.fit(x_train, y_train)
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">clf_iris</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s1">&#39;classifier&#39;</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())])</span>
+<span class="n">model_iris</span> <span class="o">=</span> <span class="n">clf_iris</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -560,12 +286,12 @@ model_iris = clf_iris.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d_iris = dice_ml.Data(dataframe=df_iris,
-                      continuous_features=continuous_features_iris,
-                      outcome_name=outcome_name)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_iris</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_iris</span><span class="p">,</span>
+                      <span class="n">continuous_features</span><span class="o">=</span><span class="n">continuous_features_iris</span><span class="p">,</span>
+                      <span class="n">outcome_name</span><span class="o">=</span><span class="n">outcome_name</span><span class="p">)</span>
 
-# We provide the type of model as a parameter (model_type)
-m_iris = dice_ml.Model(model=model_iris, backend=&quot;sklearn&quot;, model_type=&#39;classifier&#39;)
+<span class="c1"># We provide the type of model as a parameter (model_type)</span>
+<span class="n">m_iris</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_iris</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;classifier&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -573,7 +299,7 @@ m_iris = dice_ml.Model(model=model_iris, backend=&quot;sklearn&quot;, model_type
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp_genetic_iris = Dice(d_iris, m_iris, method=&quot;genetic&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_genetic_iris</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_iris</span><span class="p">,</span> <span class="n">m_iris</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -582,10 +308,10 @@ m_iris = dice_ml.Model(model=model_iris, backend=&quot;sklearn&quot;, model_type
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Single input
-query_instances_iris = x_test[2:3]
-genetic_iris = exp_genetic_iris.generate_counterfactuals(query_instances_iris, total_CFs=7, desired_class=2)
-genetic_iris.visualize_as_dataframe()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single input</span>
+<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -594,7 +320,7 @@ genetic_iris.visualize_as_dataframe()
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.16s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01&lt;00:00,  1.01s/it]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -712,34 +438,42 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
-      <td>6.3</td>
-      <td>3.8</td>
-      <td>4.4</td>
-      <td>2.1</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>0</th>
       <td>6.4</td>
       <td>3.3</td>
-      <td>6.1</td>
-      <td>0.9</td>
+      <td>5.5</td>
+      <td>0.5</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>7.2</td>
+      <td>5.3</td>
       <td>3.6</td>
-      <td>5.2</td>
-      <td>1.3</td>
+      <td>4.9</td>
+      <td>2.4</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>4.9</td>
+      <td>3.4</td>
+      <td>4.5</td>
+      <td>2.3</td>
       <td>2</td>
     </tr>
     <tr>
       <th>0</th>
       <td>4.3</td>
-      <td>3.3</td>
-      <td>4.5</td>
-      <td>1.7</td>
+      <td>3.5</td>
+      <td>5.1</td>
+      <td>2.0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>4.8</td>
+      <td>4.1</td>
+      <td>5.4</td>
+      <td>2.3</td>
       <td>2</td>
     </tr>
   </tbody>
@@ -750,10 +484,10 @@ Diverse Counterfactual set (new outcome: 2)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Multiple queries can be given as input at once
-query_instances_iris = x_test[17:19]
-genetic_iris = exp_genetic_iris.generate_counterfactuals(query_instances_iris, total_CFs=7, desired_class=2)
-genetic_iris.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple queries can be given as input at once</span>
+<span class="n">query_instances_iris</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span>
+<span class="n">genetic_iris</span> <span class="o">=</span> <span class="n">exp_genetic_iris</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_iris</span><span class="p">,</span> <span class="n">total_CFs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">desired_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">genetic_iris</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -762,7 +496,7 @@ genetic_iris.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:03&lt;00:00,  1.56s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.19it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -896,18 +630,18 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
+      <td>6.4</td>
       <td>-</td>
-      <td>3.0</td>
-      <td>5.2</td>
-      <td>2.3</td>
+      <td>5.6</td>
+      <td>2.2</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>0</th>
-      <td>5.7</td>
       <td>-</td>
-      <td>5.0</td>
-      <td>2.0</td>
+      <td>3.0</td>
+      <td>5.2</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
     <tr>
@@ -1037,6 +771,14 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
+      <td>6.4</td>
+      <td>-</td>
+      <td>5.6</td>
+      <td>2.1</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>0</th>
       <td>6.8</td>
       <td>-</td>
       <td>5.9</td>
@@ -1053,18 +795,10 @@ Diverse Counterfactual set (new outcome: 2)
     </tr>
     <tr>
       <th>0</th>
+      <td>6.4</td>
       <td>-</td>
-      <td>2.8</td>
-      <td>1.5</td>
-      <td>2.0</td>
-      <td>2.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>6.9</td>
-      <td>3.1</td>
-      <td>5.4</td>
-      <td>2.1</td>
+      <td>6.8</td>
+      <td>2.3</td>
       <td>2.0</td>
     </tr>
   </tbody>
@@ -1074,16 +808,16 @@ Diverse Counterfactual set (new outcome: 2)
 </section>
 </section>
 <section id="Regression">
-<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this heading"></a></h1>
+<h1>Regression<a class="headerlink" href="#Regression" title="Link to this heading"></a></h1>
 <p>For regression, we will use sklearn’s California Housing dataset. This dataset contains California house prices. More information at <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html">https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html</a></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>housing_data = fetch_california_housing()
-df_housing = pd.DataFrame(housing_data.data, columns=housing_data.feature_names)
-df_housing[outcome_name] = pd.Series(housing_data.target)
-df_housing.head()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">housing_data</span> <span class="o">=</span> <span class="n">fetch_california_housing</span><span class="p">()</span>
+<span class="n">df_housing</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">housing_data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">housing_data</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">df_housing</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">housing_data</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+<span class="n">df_housing</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1190,7 +924,7 @@ df_housing.head()
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_housing.info()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_housing</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1221,8 +955,8 @@ memory usage: 1.4 MB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>continuous_features_housing = df_housing.drop(outcome_name, axis=1).columns.tolist()
-target = df_housing[outcome_name]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">continuous_features_housing</span> <span class="o">=</span> <span class="n">df_housing</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">df_housing</span><span class="p">[</span><span class="n">outcome_name</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1230,32 +964,32 @@ target = df_housing[outcome_name]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Split data into train and test
-datasetX = df_housing.drop(outcome_name, axis=1)
-x_train, x_test, y_train, y_test = train_test_split(datasetX,
-                                                    target,
-                                                    test_size=0.2,
-                                                    random_state=0)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split data into train and test</span>
+<span class="n">datasetX</span> <span class="o">=</span> <span class="n">df_housing</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">outcome_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">datasetX</span><span class="p">,</span>
+                                                    <span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-categorical_features = x_train.columns.difference(continuous_features_housing)
+<span class="n">categorical_features</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">continuous_features_housing</span><span class="p">)</span>
 
-# We create the preprocessing pipelines for both numeric and categorical data.
-numeric_transformer = Pipeline(steps=[
-    (&#39;scaler&#39;, StandardScaler())])
+<span class="c1"># We create the preprocessing pipelines for both numeric and categorical data.</span>
+<span class="n">numeric_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">())])</span>
 
-categorical_transformer = Pipeline(steps=[
-    (&#39;onehot&#39;, OneHotEncoder(handle_unknown=&#39;ignore&#39;))])
+<span class="n">categorical_transformer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;onehot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))])</span>
 
-transformations = ColumnTransformer(
-    transformers=[
-        (&#39;num&#39;, numeric_transformer, continuous_features_housing),
-        (&#39;cat&#39;, categorical_transformer, categorical_features)])
+<span class="n">transformations</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="n">numeric_transformer</span><span class="p">,</span> <span class="n">continuous_features_housing</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="n">categorical_transformer</span><span class="p">,</span> <span class="n">categorical_features</span><span class="p">)])</span>
 
-# Append classifier to preprocessing pipeline.
-# Now we have a full prediction pipeline.
-regr_housing = Pipeline(steps=[(&#39;preprocessor&#39;, transformations),
-                               (&#39;regressor&#39;, RandomForestRegressor())])
-model_housing = regr_housing.fit(x_train, y_train)
+<span class="c1"># Append classifier to preprocessing pipeline.</span>
+<span class="c1"># Now we have a full prediction pipeline.</span>
+<span class="n">regr_housing</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;preprocessor&#39;</span><span class="p">,</span> <span class="n">transformations</span><span class="p">),</span>
+                               <span class="p">(</span><span class="s1">&#39;regressor&#39;</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">())])</span>
+<span class="n">model_housing</span> <span class="o">=</span> <span class="n">regr_housing</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1263,9 +997,9 @@ model_housing = regr_housing.fit(x_train, y_train)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>d_housing = dice_ml.Data(dataframe=df_housing, continuous_features=continuous_features_housing, outcome_name=outcome_name)
-# We provide the type of model as a parameter (model_type)
-m_housing = dice_ml.Model(model=model_housing, backend=&quot;sklearn&quot;, model_type=&#39;regressor&#39;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_housing</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df_housing</span><span class="p">,</span> <span class="n">continuous_features</span><span class="o">=</span><span class="n">continuous_features_housing</span><span class="p">,</span> <span class="n">outcome_name</span><span class="o">=</span><span class="n">outcome_name</span><span class="p">)</span>
+<span class="c1"># We provide the type of model as a parameter (model_type)</span>
+<span class="n">m_housing</span> <span class="o">=</span> <span class="n">dice_ml</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_housing</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sklearn&quot;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;regressor&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1273,7 +1007,7 @@ m_housing = dice_ml.Model(model=model_housing, backend=&quot;sklearn&quot;, mode
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>exp_genetic_housing = Dice(d_housing, m_housing, method=&quot;genetic&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_genetic_housing</span> <span class="o">=</span> <span class="n">Dice</span><span class="p">(</span><span class="n">d_housing</span><span class="p">,</span> <span class="n">m_housing</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;genetic&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1282,12 +1016,12 @@ m_housing = dice_ml.Model(model=model_housing, backend=&quot;sklearn&quot;, mode
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Multiple queries can be given as input at once
-query_instances_housing = x_test[2:4]
-genetic_housing = exp_genetic_housing.generate_counterfactuals(query_instances_housing,
-                                                               total_CFs=2,
-                                                               desired_range=[3.0, 5.0])
-genetic_housing.visualize_as_dataframe(show_only_changes=True)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple queries can be given as input at once</span>
+<span class="n">query_instances_housing</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">genetic_housing</span> <span class="o">=</span> <span class="n">exp_genetic_housing</span><span class="o">.</span><span class="n">generate_counterfactuals</span><span class="p">(</span><span class="n">query_instances_housing</span><span class="p">,</span>
+                                                               <span class="n">total_CFs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                                               <span class="n">desired_range</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">])</span>
+<span class="n">genetic_housing</span><span class="o">.</span><span class="n">visualize_as_dataframe</span><span class="p">(</span><span class="n">show_only_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1296,7 +1030,7 @@ genetic_housing.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:02&lt;00:00,  1.09s/it]
+100%|█████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:01&lt;00:00,  1.59it/s]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1304,7 +1038,7 @@ genetic_housing.visualize_as_dataframe(show_only_changes=True)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 1.5158300399780273)
+Query instance (original outcome : 1.4215099811553955)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1359,7 +1093,7 @@ Query instance (original outcome : 1.5158300399780273)
       <td>2.910112</td>
       <td>38.650002</td>
       <td>-121.839996</td>
-      <td>1.51583</td>
+      <td>1.42151</td>
     </tr>
   </tbody>
 </table>
@@ -1410,18 +1144,6 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
   <tbody>
     <tr>
       <th>0</th>
-      <td>3.6976</td>
-      <td>-</td>
-      <td>5.9</td>
-      <td>1.0</td>
-      <td>-</td>
-      <td>2.0</td>
-      <td>34.24</td>
-      <td>-124.35</td>
-      <td>3.6281412000000004</td>
-    </tr>
-    <tr>
-      <th>0</th>
       <td>6.5173</td>
       <td>24.0</td>
       <td>6.5</td>
@@ -1430,7 +1152,19 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.7</td>
       <td>34.45</td>
       <td>-119.81</td>
-      <td>3.517150499999996</td>
+      <td>3.3815001999999965</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>5.6184</td>
+      <td>-</td>
+      <td>5.9</td>
+      <td>1.0</td>
+      <td>-</td>
+      <td>2.7</td>
+      <td>34.24</td>
+      <td>-118.28</td>
+      <td>3.1344</td>
     </tr>
   </tbody>
 </table>
@@ -1441,7 +1175,7 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Query instance (original outcome : 0.8763800263404846)
+Query instance (original outcome : 0.9171000123023987)
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1488,7 +1222,7 @@ Query instance (original outcome : 0.8763800263404846)
       <td>2.746479</td>
       <td>33.200001</td>
       <td>-115.599998</td>
-      <td>0.87638</td>
+      <td>0.9171</td>
     </tr>
   </tbody>
 </table>
@@ -1547,19 +1281,19 @@ Diverse Counterfactual set (new outcome: [3.0, 5.0])
       <td>2.6</td>
       <td>33.61</td>
       <td>-117.92</td>
-      <td>4.94750939999999</td>
+      <td>4.991189899999989</td>
     </tr>
     <tr>
       <th>0</th>
       <td>2.9167</td>
-      <td>43.0</td>
+      <td>35.0</td>
       <td>4.6</td>
       <td>1.2</td>
       <td>-</td>
       <td>1.6</td>
-      <td>34.01</td>
-      <td>-118.47</td>
-      <td>4.3242802999999945</td>
+      <td>33.81</td>
+      <td>-118.39</td>
+      <td>3.9998808999999973</td>
     </tr>
   </tbody>
 </table>
