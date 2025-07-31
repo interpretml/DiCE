@@ -76,7 +76,7 @@ class DiceGenetic(ExplainerBase):
                         feature_weights_list.append(feature_weights[feature])
                     else:
                         # the weight is inversely proportional to max value
-                        feature_weights_list.append(round(1 / self.feature_range[feature].max(), 2))
+                        feature_weights_list.append(round(1 / max(self.feature_range[feature]), 2))
             self.feature_weights_list = [feature_weights_list]
 
     def do_random_init(self, num_inits, features_to_vary, query_instance, desired_class, desired_range):
