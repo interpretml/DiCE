@@ -248,12 +248,7 @@ class ExplainerBase(ABC):
         if features_to_vary == 'all':
             features_to_vary = self.data_interface.feature_names
 
-        if permitted_range is None:  # use the precomputed default
-            self.feature_range = self.data_interface.permitted_range
-            feature_ranges_orig = self.feature_range
-        else:  # compute the new ranges based on user input
-            self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
-
+        self.feature_range, feature_ranges_orig = self.data_interface.get_features_range(permitted_range)
         self.check_query_instance_validity(features_to_vary, permitted_range, query_instance, feature_ranges_orig)
 
         return features_to_vary
