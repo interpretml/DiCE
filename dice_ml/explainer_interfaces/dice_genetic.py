@@ -458,7 +458,8 @@ class DiceGenetic(ExplainerBase):
             population_fitness = population_fitness[population_fitness[:, 1].argsort()]
 
             current_best_loss = population_fitness[0][1]
-            to_pred = np.array([population[int(tup[0])] for tup in population_fitness[:self.total_CFs]])
+            to_pred = np.array([population[int(tup[0].item()) if hasattr(tup[0], 'item') else int(tup[0])] 
+                                for tup in population_fitness[:self.total_CFs]])
 
             if self.total_CFs > 0:
                 if self.model.model_type == ModelTypes.Classifier:
@@ -468,7 +469,8 @@ class DiceGenetic(ExplainerBase):
 
             # self.total_CFS of the next generation obtained from the fittest members of current generation
             top_members = self.total_CFs
-            new_generation_1 = np.array([population[int(tup[0])] for tup in population_fitness[:top_members]])
+            new_generation_1 = np.array([population[int(tup[0].item()) if hasattr(tup[0], 'item') else int(tup[0])] 
+                                         for tup in population_fitness[:top_members]])
 
             # rest of the next generation obtained from top 50% of fittest members of current generation
             rest_members = self.population_size - top_members

@@ -669,7 +669,10 @@ class ExplainerBase(ABC):
             self.target_cf_class = np.array(
                 [[self.infer_target_cfs_class(desired_class, test_pred, self.num_output_nodes)]],
                 dtype=np.float32)
-            desired_class = int(self.target_cf_class[0][0])
+            target_cf_class_scalar = self.target_cf_class[0][0]
+            if hasattr(target_cf_class_scalar, "item"):
+                target_cf_class_scalar = target_cf_class_scalar.item()
+            desired_class = int(target_cf_class_scalar)
             if self.target_cf_class == 0 and self.stopping_threshold > 0.5:
                 self.stopping_threshold = 0.25
             elif self.target_cf_class == 1 and self.stopping_threshold < 0.5:
@@ -692,12 +695,16 @@ class ExplainerBase(ABC):
                 # already contains the class.
                 if hasattr(original_pred, "__len__") and len(original_pred) > 1:
                     original_pred_1 = np.argmax(original_pred)
+                    if hasattr(original_pred_1, "item"):
+                        original_pred_1 = original_pred_1.item()
                 else:
                     original_pred_1 = original_pred
                 target_class = int(1 - original_pred_1)
                 return target_class
             elif num_output_nodes == 1:  # only for pytorch DL model
                 original_pred_1 = np.round(original_pred)
+                if hasattr(original_pred_1, "item"):
+                    original_pred_1 = original_pred_1.item()
                 target_class = int(1-original_pred_1)
                 return target_class
             elif num_output_nodes > 2:
@@ -768,6 +775,8 @@ class ExplainerBase(ABC):
                     target_cf_class = self.target_cf_class[0]
                 elif len(self.target_cf_class.shape) == 2:
                     target_cf_class = self.target_cf_class[0][0]
+            if hasattr(target_cf_class, "item"):
+                target_cf_class = target_cf_class.item()
             target_cf_class = int(target_cf_class)
 
             if len(model_score) == 1:  # for tensorflow/pytorch models
