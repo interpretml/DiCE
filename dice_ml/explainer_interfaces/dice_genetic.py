@@ -419,8 +419,14 @@ class DiceGenetic(ExplainerBase):
                 # otherwise insert random gene(mutate) for maintaining diversity
                 if feat_name in features_to_vary:
                     if feat_name in self.data_interface.continuous_feature_names:
+                        # Mutate uniformly across the feature's [low, high] range.
+                        # The historical line passed feature_range[feat_name][0]
+                        # twice, which collapsed every continuous mutation to the
+                        # lower bound and starved the search of diversity — see
+                        # the do_random_init pattern at the top of this file
+                        # (`np.random.uniform(low, high)`) for the correct shape.
                         one_init[j] = np.random.uniform(self.feature_range[feat_name][0],
-                                                        self.feature_range[feat_name][0])
+                                                        self.feature_range[feat_name][1])
                     else:
                         one_init[j] = np.random.choice(self.feature_range[feat_name])
                 else:

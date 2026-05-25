@@ -261,3 +261,66 @@ class TestDiceGeneticRegressionMethods:
         for cfs_example in ans.cf_examples_list:
             for i in cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values:
                 assert desired_range[0] <= i <= desired_range[1]
+
+
+class TestMateContinuousMutation:
+    """Regression for the typo behind a class of #441 / #260 reports.
+
+    `DiceGenetic.mate` mutates a continuous feature with
+    `np.random.uniform(low, high)`. The historical code passed
+    `feature_range[feat_name][0]` for both arguments, which collapses
+    every continuous mutation to the lower bound. That starves the
+    genetic search of diversity along continuous axes and is consistent
+    with users reporting that the genetic explainer ignores their
+    feature_range / features_to_vary intent on continuous features.
+    """
+
+    def test_mate_mutation_can_reach_upper_half_of_range(self):
+        import random
+        import types
+
+        import numpy as np
+
+        from dice_ml.explainer_interfaces.dice_genetic import DiceGenetic
+
+        # We don't need the full DiceGenetic init — only the `mate` method's
+        # dependencies. Build a minimal stand-in to keep this test fast and
+        # decoupled from data fixtures.
+        exp = DiceGenetic.__new__(DiceGenetic)
+        exp.data_interface = types.SimpleNamespace(
+            number_of_features=1,
+            feature_names=["x"],
+            continuous_feature_names=["x"],
+        )
+        exp.feature_range = {"x": [0.0, 100.0]}
+
+        # Force `mate` into the mutation branch (prob >= 0.80) deterministically
+        # by monkeypatching random.random within this test scope.
+        original_random = random.random
+        random.random = lambda: 0.99
+        try:
+            np.random.seed(0)
+            samples = []
+            for _ in range(200):
+                child = exp.mate(
+                    k1=np.array([0.0]),
+                    k2=np.array([0.0]),
+                    features_to_vary=["x"],
+                    query_instance=[0.0],
+                )
+                samples.append(child[0])
+        finally:
+            random.random = original_random
+
+        samples = np.array(samples)
+        # Every value must lie inside the declared feature range.
+        assert samples.min() >= 0.0
+        assert samples.max() <= 100.0
+        # The fix produces values across the range; the historical typo
+        # pinned every mutation to feature_range[name][0] (~0.0). We assert
+        # at least one mutation lands in the upper half of the range —
+        # essentially impossible on the broken code, near-certain after the fix.
+        assert (samples > 50.0).any(), (
+            "Continuous mutations are still pinned to the lower bound — "
+            "regression of the np.random.uniform(low, low) typo."
+        )
