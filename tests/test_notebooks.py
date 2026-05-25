@@ -2,6 +2,7 @@
 Adapted from the same code for the Microsoft DoWhy library.
 """
 
+import json
 import os
 import subprocess
 import sys
@@ -103,3 +104,25 @@ def test_notebook(notebook_filename):
     _check_notebook_cell_outputs(NOTEBOOKS_PATH + notebook_filename)
     errors = _notebook_run(NOTEBOOKS_PATH + notebook_filename)
     assert len(errors) == 0
+
+
+def _all_notebook_paths():
+    return sorted(
+        os.path.join(NOTEBOOKS_PATH, f.name)
+        for f in os.scandir(NOTEBOOKS_PATH)
+        if f.name.endswith(".ipynb")
+    )
+
+
+@pytest.mark.parametrize("notebook_path", _all_notebook_paths())
+def test_notebook_is_valid_json(notebook_path):
+    """Every shipped notebook must be parseable as JSON.
+
+    Regression test for issue #439: the trailing comma after
+    ``"nbformat_minor": 4`` in DiCE_getting_started_feasible.ipynb
+    made the file unrenderable on GitHub and unopenable in JupyterLab.
+    Skipping execution (covered above) means a malformed notebook can
+    sit in the repo unnoticed; this cheap json.load gate catches it.
+    """
+    with open(notebook_path, "r", encoding="utf-8") as fh:
+        json.load(fh)
