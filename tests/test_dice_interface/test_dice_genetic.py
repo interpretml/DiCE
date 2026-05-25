@@ -261,3 +261,64 @@ class TestDiceGeneticRegressionMethods:
         for cfs_example in ans.cf_examples_list:
             for i in cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values:
                 assert desired_range[0] <= i <= desired_range[1]
+
+
+class TestComputeProximityLossNoContinuousFeatures:
+    """Regression for issue #276.
+
+    `DiceGenetic.compute_proximity_loss` divides by `sum(feature_weights)`,
+    where `feature_weights` is restricted to *continuous* feature indexes.
+    For an all-categorical dataset the array is empty and the original
+    implementation hit RuntimeWarning + NaN losses (or ZeroDivisionError on
+    older numpy). The genetic search then propagated NaN through `compute_loss`
+    and produced unusable counterfactuals.
+    """
+
+    def _make_explainer_categorical_only(self):
+        import numpy as np
+        import pandas as pd
+        from sklearn.compose import ColumnTransformer
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import OneHotEncoder
+        from sklearn.linear_model import LogisticRegression
+
+        rng = np.random.default_rng(0)
+        df = pd.DataFrame({
+            "color": rng.choice(["red", "green", "blue"], size=60),
+            "shape": rng.choice(["circle", "square"], size=60),
+            "label": rng.integers(0, 2, size=60),
+        })
+        cat = ["color", "shape"]
+        X = df[cat]
+        y = df["label"]
+        clf = Pipeline([
+            ("ohe", ColumnTransformer([("o", OneHotEncoder(), cat)])),
+            ("lr", LogisticRegression(max_iter=200)),
+        ]).fit(X, y)
+
+        d = dice_ml.Data(dataframe=df, continuous_features=[],
+                         categorical_features=cat, outcome_name="label")
+        m = dice_ml.Model(model=clf, backend="sklearn")
+        return dice_ml.Dice(d, m, method="genetic")
+
+    def test_compute_proximity_loss_returns_zero_when_no_continuous_features(self):
+        import numpy as np
+        exp = self._make_explainer_categorical_only()
+        # Mirror the setup the explainer would normally do before any
+        # call to compute_proximity_loss: set continuous_feature_indexes
+        # (empty here) and populate feature_weights_list. Driving the full
+        # generate_counterfactuals path would exercise many other
+        # categorical-only code paths that aren't this bug.
+        exp.data_interface.continuous_feature_indexes = []
+        exp.feature_weights_list = [np.ones(len(exp.data_interface.feature_names))]
+        n_features = len(exp.data_interface.feature_names)
+        # normalize_data() consumes a 2-D ndarray for non-DataFrame input.
+        x_hat = np.zeros((4, n_features), dtype=float)
+        query = np.zeros((1, n_features), dtype=float)
+        # Must not raise / warn / produce NaN — origin/main produced
+        # RuntimeWarning: invalid value encountered in scalar divide
+        # plus NaN losses (or ZeroDivisionError on older numpy).
+        loss = exp.compute_proximity_loss(x_hat, query)
+        assert loss.shape == (4,)
+        assert np.all(loss == 0.0)
+        assert not np.any(np.isnan(loss))

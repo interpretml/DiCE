@@ -370,6 +370,14 @@ class DiceGenetic(ExplainerBase):
         x_hat = self.data_interface.normalize_data(x_hat_unnormalized)
         feature_weights = np.array(
             [self.feature_weights_list[0][i] for i in self.data_interface.continuous_feature_indexes])
+        # When the dataset has no continuous features, feature_weights is an
+        # empty array and the original `proximity_loss / sum(feature_weights)`
+        # divided by zero, raising RuntimeWarning + producing NaN losses that
+        # poison the genetic search. Proximity is conceptually undefined in
+        # that case (there are no continuous distances to weigh), so return a
+        # zero loss vector matching the population shape — see issue #276.
+        if len(feature_weights) == 0:
+            return np.zeros(x_hat.shape[0])
         product = np.multiply(
             (abs(x_hat - query_instance_normalized)[:, [self.data_interface.continuous_feature_indexes]]),
             feature_weights)
