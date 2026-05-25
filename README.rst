@@ -162,7 +162,7 @@ See `model-agnostic notebook
 **Gradient-based methods**
 
 * An explicit loss-based method described in `Mothilal et al. (2020) <https://arxiv.org/abs/1905.07697>`_ (Default for deep learning models).
-* A Variational AutoEncoder (VAE)-based method described in `Mahajan et al. (2019) <https://arxiv.org/abs/1912.03277>`_ (see the BaseVAE `notebook <https://github.com/interpretml/DiCE/blob/master/docs/notebooks/DiCE_getting_started_feasible.ipynb>`_).
+* A Variational AutoEncoder (VAE)-based method described in `Mahajan et al. (2019) <https://arxiv.org/abs/1912.03277>`_ (see the BaseVAE `notebook <https://github.com/interpretml/DiCE/blob/master/docs/source/notebooks/DiCE_getting_started_feasible.ipynb>`_).
 
 The last two methods require a differentiable model, such as a neural network. If you are interested in a specific method, do raise an issue `here <https://github.com/interpretml/DiCE/issues>`_.
 
