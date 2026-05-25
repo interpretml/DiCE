@@ -381,6 +381,45 @@ class PublicData(_BaseData):
             out.drop(cols, axis=1, inplace=True)
         return out
 
+    @staticmethod
+    def _decimal_precision_of(value):
+        """Number of decimal digits in the default repr of *value*.
+
+        The historical implementation was ``len(str(value).split('.')[1])``,
+        which mirrors how many digits Python prints after the decimal point
+        in the default repr. That works for ordinary floats (``'0.25'`` → 2)
+        but IndexErrors when ``str(value)`` renders in scientific notation —
+        ``str(np.float32(1e-6))`` is ``'1e-06'`` with no ``'.'`` (issue #442).
+
+        This helper preserves the original semantics for the common case and
+        re-derives an equivalent count from the scientific-notation form,
+        rather than from a re-formatted ``%.20f`` string (which leaks
+        float64 ↔ float32 round-off digits and inflates precision).
+
+        Examples:
+            ``0.25``       → 2
+            ``1e-06``      → 6  (no mantissa fraction, exponent -6)
+            ``2.5e-3``     → 4  (mantissa '2.5' has 1 decimal, exponent -3)
+            ``1e+16``      → 0  (exponent positive ⇒ no decimal digits)
+        """
+        s = str(value).lower()
+        if 'e' not in s:
+            # Plain decimal repr, e.g. '0.25' or '17'.
+            if '.' not in s:
+                return 0
+            return len(s.split('.')[1])
+        # Scientific notation, e.g. '1e-06', '2.5e-3', '1e+16'.
+        mantissa, _, exponent = s.partition('e')
+        mantissa_decimals = len(mantissa.split('.')[1]) if '.' in mantissa else 0
+        try:
+            exp_value = int(exponent)
+        except ValueError:
+            return mantissa_decimals
+        # Decimal places needed = mantissa decimals minus the exponent shift.
+        # A negative exponent moves digits right; a positive one moves them
+        # left (and can cancel mantissa decimals out entirely).
+        return max(mantissa_decimals - exp_value, 0)
+
     def get_decimal_precisions(self, output_type="list"):
         """"Gets the precision of continuous features in the data."""
         # if the precision of a continuous feature is not given, we use the maximum precision of the modes to capture the
@@ -393,9 +432,12 @@ class PublicData(_BaseData):
                 precisions_dict[col] = self.continuous_features_precision[col]
             elif self.data_df[col].dtype == np.float32 or self.data_df[col].dtype == np.float64:
                 modes = self.data_df[col].mode()
-                maxp = len(str(modes[0]).split('.')[1])  # maxp stores the maximum precision of the modes
+                # Use _decimal_precision_of instead of raw str().split('.')[1]
+                # because the latter IndexErrors when the mode renders in
+                # scientific notation (e.g. 1e-06, 1e+16) — see #442.
+                maxp = self._decimal_precision_of(modes[0])
                 for mx in range(len(modes)):
-                    prec = len(str(modes[mx]).split('.')[1])
+                    prec = self._decimal_precision_of(modes[mx])
                     if prec > maxp:
                         maxp = prec
                 precisions[ix] = maxp

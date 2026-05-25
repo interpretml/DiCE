@@ -38,6 +38,41 @@ class TestPublicDataMethods:
         assert self.d.get_decimal_precisions()[1] == 2
 
 
+class TestDecimalPrecisionsScientificNotation:
+    """Regression for issue #442.
+
+    `str(np.float64(1e-6))` is `'1e-06'`; the historical
+    `str(value).split('.')[1]` then IndexErrors on mode values whose default
+    repr is in scientific notation (very small, e.g. <=1e-5, or very large,
+    e.g. >=1e16). This makes DiCE's Data() constructor blow up on legitimate
+    columns of currency / probability / nano-second magnitudes.
+    """
+
+    @pytest.mark.parametrize(
+        "values, expected_precision",
+        [
+            # mode renders as '1e-06' — used to IndexError, now returns 6.
+            ([1e-6, 1e-6, 1e-6], 6),
+            # mode renders as '2.5e-3' — mantissa has 1 decimal, exponent -3 ⇒ 4.
+            ([2.5e-3, 2.5e-3, 2.5e-3], 4),
+            # mode renders as '1e+16' — positive exponent collapses to 0.
+            ([1e16, 1e16, 1e16], 0),
+            # ordinary floats still work — mode 0.5 has 1 decimal.
+            ([0.5, 0.5, 0.25], 1),
+        ],
+    )
+    def test_get_decimal_precisions_handles_scientific_notation(
+        self, values, expected_precision
+    ):
+        df = pd.DataFrame({"feat": values, "outcome": [0, 1, 0]})
+        d = dice_ml.Data(
+            dataframe=df, continuous_features=["feat"], outcome_name="outcome"
+        )
+        # Must not raise; must return a sensible precision.
+        precisions = d.get_decimal_precisions()
+        assert precisions[0] == expected_precision
+
+
 class DataTypeCombinations(Enum):
     Incorrect = 0
     AsNone = 1
