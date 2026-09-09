@@ -810,7 +810,7 @@ class ExplainerBase(ABC):
                 else:  # 1-D input
                     model_output[i] = np.round(model_scores[i])
             elif self.model.model_type == ModelTypes.Regressor:
-                model_output[i] = model_scores[i]
+                model_output[i] = float(np.squeeze(model_scores[i]))
         return model_output
 
     def check_permitted_range(self, permitted_range):
