@@ -1,6 +1,7 @@
 import copy
 import json
 import math
+from io import StringIO
 
 import numpy as np
 import pandas as pd
@@ -223,10 +224,10 @@ class CounterfactualExamples:
     def from_json(cf_example_json_str):
         cf_example_dict = json.loads(cf_example_json_str)
         if cf_example_dict.get(_DiverseCFV1SchemaConstants.TEST_INSTANCE_DF) is not None:
-            test_instance_df = pd.read_json(cf_example_dict[
-                _DiverseCFV1SchemaConstants.TEST_INSTANCE_DF])
+            test_instance_df = pd.read_json(StringIO(cf_example_dict[
+                _DiverseCFV1SchemaConstants.TEST_INSTANCE_DF]))
             if cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF] is not None:
-                cfs_df = pd.read_json(cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF])
+                cfs_df = pd.read_json(StringIO(cf_example_dict[_DiverseCFV1SchemaConstants.FINAL_CFS_DF]))
             else:
                 cfs_df = None
 
