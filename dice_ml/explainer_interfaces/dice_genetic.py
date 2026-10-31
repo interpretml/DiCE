@@ -495,11 +495,16 @@ class DiceGenetic(ExplainerBase):
 
         self.cfs_preds = []
         self.final_cfs = []
+        precisions = self.data_interface.get_decimal_precisions()
         i = 0
         while i < self.total_CFs:
-            predictions = self.predict_fn_scores(population[i])[0]
+            candidate = population[i].copy()
+            for ix, feature in enumerate(self.data_interface.continuous_feature_names):
+                feature_ix = self.data_interface.feature_names.index(feature)
+                candidate[feature_ix] = np.round(candidate[feature_ix], precisions[ix])
+            predictions = self.predict_fn_scores(candidate)[0]
             if self.is_cf_valid(predictions):
-                self.final_cfs.append(population[i])
+                self.final_cfs.append(candidate)
                 # checking if predictions is a float before taking the length as len() works only for array-like
                 # elements. isinstance(predictions, (np.floating, float)) checks if it's any float (numpy or otherwise)
                 # We do this as we take the argmax if the prediction is a vector -- like the output of a classifier

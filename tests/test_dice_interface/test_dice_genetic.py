@@ -1,6 +1,11 @@
+import numpy as np
+import pandas as pd
 import pytest
 import sklearn
 from raiutils.exceptions import UserConfigValidationException
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import make_pipeline
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 import dice_ml
 from dice_ml.utils import helpers
@@ -261,3 +266,34 @@ class TestDiceGeneticRegressionMethods:
         for cfs_example in ans.cf_examples_list:
             for i in cfs_example.final_cfs_df[self.exp.data_interface.outcome_name].values:
                 assert desired_range[0] <= i <= desired_range[1]
+
+
+@pytest.mark.parametrize("model_type", ["classifier", "regressor"])
+def test_genetic_validates_counterfactuals_after_rounding(monkeypatch, model_type):
+    """Returned rounded values must agree with their predicted outcomes."""
+    df = pd.DataFrame({"category": ["a"] * 4, "x": [0.0, 0.49, 0.9, 1.0],
+                       "outcome": [0, 1, 1, 1] if model_type == "classifier" else [0.0, 0.49, 0.9, 1.0]})
+    estimator = DecisionTreeClassifier if model_type == "classifier" else DecisionTreeRegressor
+    features = ["category", "x"]
+    predictor = make_pipeline(ColumnTransformer([("number", "passthrough", ["x"])]), estimator(random_state=0))
+    predictor.fit(df[features], df["outcome"])
+    data = dice_ml.Data(dataframe=df, continuous_features=["x"], outcome_name="outcome",
+                        continuous_features_precision={"x": 0})
+    model = dice_ml.Model(model=predictor, backend="sklearn", model_type=model_type)
+    explainer = dice_ml.Dice(data, model, method="genetic")
+
+    def initialize(*args, **kwargs):
+        # Both candidates are valid before rounding; only the second is valid afterward.
+        explainer.total_CFs = 2
+        explainer.cfs = np.array([[0, 0.49], [0, 0.9]])
+
+    monkeypatch.setattr(explainer, "do_cf_initializations", initialize)
+    target = {"desired_class": 1} if model_type == "classifier" else {"desired_range": [0.4, 1.1]}
+    result = explainer.generate_counterfactuals(
+        pd.DataFrame({"category": ["a"], "x": [0.0]}), total_CFs=2, maxiterations=0, **target,
+        posthoc_sparsity_param=0, feature_weights={"category": 1, "x": 1},
+    )
+    cfs = result.cf_examples_list[0].final_cfs_df
+    assert cfs["x"].tolist() == [1.0]
+    assert cfs["outcome"].tolist() == predictor.predict(cfs[features]).tolist() == [1]
+    pd.testing.assert_frame_equal(cfs, result.cf_examples_list[0].final_cfs_df_sparse)
