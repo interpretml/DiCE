@@ -52,7 +52,9 @@ class PrivateData(_BaseData):
         self.categorical_levels = {}
 
         for feature in features_dict:
-            if isinstance(features_dict[feature][0], (int, float)):  # continuous feature
+            first_val = features_dict[feature][0]
+            if isinstance(first_val, (int, float, np.integer, np.floating)) and not isinstance(
+                    first_val, (bool, np.bool_)):  # continuous feature
                 self.continuous_feature_names.append(feature)
             else:
                 self.categorical_feature_names.append(feature)
