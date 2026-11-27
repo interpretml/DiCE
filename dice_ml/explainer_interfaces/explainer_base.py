@@ -559,9 +559,8 @@ class ExplainerBase(ABC):
         cfs_preds_sparse = []
 
         for cf_ix in list(final_cfs_sparse.index):
-            current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
             for feature in features_sorted:
-                # current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.iat[[cf_ix]][self.data_interface.feature_names])
+                current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
                 # feat_ix = self.data_interface.continuous_feature_names.index(feature)
                 diff = query_instance[feature].iat[0] - final_cfs_sparse.at[cf_ix, feature]
                 if (abs(diff) <= quantiles[feature]):
@@ -623,6 +622,7 @@ class ExplainerBase(ABC):
             final_cfs_sparse.at[cf_ix, feature] = old_val
 
         # move the CF values towards the query_instance
+        last_valid_val = old_val
         if diff > 0:
             left = final_cfs_sparse.at[cf_ix, feature]
             right = query_instance[feature].iat[0]
@@ -634,12 +634,14 @@ class ExplainerBase(ABC):
                 final_cfs_sparse.at[cf_ix, feature] = current_val
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
-                if current_val == right or current_val == left:
-                    break
-
                 if self.is_cf_valid(current_pred):
+                    last_valid_val = current_val
+                    if current_val == right or current_val == left:
+                        break
                     left = current_val + (10 ** -decimal_prec[feature])
                 else:
+                    if current_val == right or current_val == left:
+                        break
                     right = current_val - (10 ** -decimal_prec[feature])
 
         else:
@@ -653,14 +655,17 @@ class ExplainerBase(ABC):
                 final_cfs_sparse.at[cf_ix, feature] = current_val
                 current_pred = self.predict_fn_for_sparsity(final_cfs_sparse.loc[[cf_ix]][self.data_interface.feature_names])
 
-                if current_val == right or current_val == left:
-                    break
-
                 if self.is_cf_valid(current_pred):
+                    last_valid_val = current_val
+                    if current_val == right or current_val == left:
+                        break
                     right = current_val - (10**-decimal_prec[feature])
                 else:
+                    if current_val == right or current_val == left:
+                        break
                     left = current_val + (10**-decimal_prec[feature])
 
+        final_cfs_sparse.at[cf_ix, feature] = last_valid_val
         return final_cfs_sparse
 
     def misc_init(self, stopping_threshold, desired_class, desired_range, test_pred):
@@ -730,6 +735,16 @@ class ExplainerBase(ABC):
                 target_range = desired_range_input
         return target_range
 
+    def _is_binary_score_valid(self, pred_1, target_cf_class):
+        """Checks binary CF validity while avoiding 0.5 ties labeled as class 0 by argmax/round."""
+        if target_cf_class == 0:
+            return bool(pred_1 <= self.stopping_threshold)
+        if target_cf_class == 1:
+            if self.stopping_threshold == 0.5:
+                return bool(pred_1 > self.stopping_threshold)
+            return bool(pred_1 >= self.stopping_threshold)
+        return False
+
     def decide_cf_validity(self, model_outputs):
         validity = np.zeros(len(model_outputs), dtype=np.int32)
         for i in range(len(model_outputs)):
@@ -740,9 +755,8 @@ class ExplainerBase(ABC):
                         pred_1 = pred[self.num_output_nodes-1]
                     else:
                         pred_1 = pred[0]
-                    validity[i] = 1 if \
-                        ((self.target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
-                         (self.target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else 0
+                    target_cf_class = int(np.asarray(self.target_cf_class).item())
+                    validity[i] = 1 if self._is_binary_score_valid(pred_1, target_cf_class) else 0
 
                 else:  # multiclass
                     if np.argmax(pred) == self.target_cf_class:
@@ -762,26 +776,12 @@ class ExplainerBase(ABC):
             model_score = model_score[0]
         # Converting target_cf_class to a scalar (tf/torch have it as (1,1) shape)
         if self.model.model_type == ModelTypes.Classifier:
-            target_cf_class = self.target_cf_class
-            if hasattr(self.target_cf_class, "shape"):
-                if len(self.target_cf_class.shape) == 1:
-                    target_cf_class = self.target_cf_class[0]
-                elif len(self.target_cf_class.shape) == 2:
-                    target_cf_class = self.target_cf_class[0][0]
-            target_cf_class = int(target_cf_class)
+            target_cf_class = int(np.asarray(self.target_cf_class).item())
 
             if len(model_score) == 1:  # for tensorflow/pytorch models
-                pred_1 = model_score[0]
-                validity = True if \
-                    ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
-                     (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
-                return validity
+                return self._is_binary_score_valid(model_score[0], target_cf_class)
             elif len(model_score) == 2:  # binary
-                pred_1 = model_score[1]
-                validity = True if \
-                    ((target_cf_class == 0 and pred_1 <= self.stopping_threshold) or
-                     (target_cf_class == 1 and pred_1 >= self.stopping_threshold)) else False
-                return validity
+                return self._is_binary_score_valid(model_score[1], target_cf_class)
             else:  # multiclass
                 return np.argmax(model_score) == target_cf_class
         else:
